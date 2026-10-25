@@ -37,6 +37,8 @@ Sound is generated on the iPhone (TonePilot's own sample/synth engine using Soun
 
 ## Run it
 
+**On Android:** download and open <https://github.com/TMServicesindia/tonepilot/releases/download/android-latest/TonePilot.apk>. No computer is needed. See **[docs/INSTALL_ON_ANDROID.md](docs/INSTALL_ON_ANDROID.md)**.
+
 **On your iPhone without a Mac:** see **[docs/INSTALL_ON_IPHONE.md](docs/INSTALL_ON_IPHONE.md)**. A free GitHub Actions Mac builds the `.ipa`, and Sideloadly installs it with a free Apple ID. For a tap-to-install link you need TestFlight (Apple Developer Program).
 
 **With a Mac:**
@@ -85,6 +87,8 @@ Packages/TonePilotCore/           Platform-independent and fully tested
   Performance/                    Section scheduler (auto/manual/assisted), accompaniment generator
   MIDI/                           Parser, NoteRouter (layers, splits, stuck-note safety), gain staging
   Models/ Persistence/ Backend/   Data model (schema v3), library store, preset exchange, server client
+  Sources/TonePilotBridge/        JSON + C API over the core for the Android app
+android/                          Android app: Kotlin/Compose UI, USB MIDI, AAudio (JNI shim), MediaCodec import
 server/                           Optional FastAPI server: Demucs stems + Basic Pitch vocal melody
 docs/                             Capabilities, feasibility/architecture, hardware checklist
 ```

@@ -7,7 +7,7 @@ Status key:
 * ⏳ **Planned**
 * ⛔ **Blocked** (licensing, hardware or technical)
 
-Totals: **102 Swift tests** (100 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
+Totals: **107 Swift tests** (104 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
 
 ## 1. Live playing on the Casio CT-X870IN (priority 1)
 
@@ -123,3 +123,15 @@ Totals: **102 Swift tests** (100 run by default; 2 need environment variables �
 | Latency, CPU and layer-count limits on a real iPhone | ⏳ | Needs the device; see the checklist |
 | Interruption / route-change recovery | 🟡 | |
 | UI responsiveness during analysis (background tasks, progress, cancel, resume) | 🟡 | |
+
+## 11. Android app
+
+| Capability | Status | Notes |
+|---|---|---|
+| Shared Swift core on Android (engine, analysis, arrangement, library) through a JSON/C bridge | ✅ bridge · 🟡 device | `BridgeTests` (raw MIDI bytes → sound, tone selection and edits, import → analyse → sections → guide → automatic switching, unreadable-audio error, resampler). Built for arm64 with the Swift SDK for Android in CI |
+| USB MIDI input (android.media.midi), hot-plug, panic on unplug | 🟡 | `MidiInput.kt` |
+| Low-latency audio output (AAudio, exclusive mode when available), reopen on device change | 🟡 | `tonepilot_jni.c` |
+| MP3/M4A/WAV import with the phone's decoders, Open with / Share to TonePilot | 🟡 | `AudioImport.kt` (MediaCodec → mono → resampled to 22.05 kHz in Swift) |
+| Song page, section guide + practice loop (50–100%, pitch kept), Play page with live guide, switching modes, accompaniment, layer volume/octave/mute, tone list with search and My Tones | 🟡 | Compose UI; Kotlin type-checked locally, APK assembled in CI |
+| Listen Mode with a microphone foreground service (works while YouTube/Spotify plays on the same phone) | 🟡 | `ListenService.kt` |
+| Full Tone Studio editor, sample creator, analysis server | ⏳ | iPhone only for now |
