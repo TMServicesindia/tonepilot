@@ -41,7 +41,7 @@ jobs:
           done
           wait
           cd ..
-          swiftc -O -wmo -parse-as-library -module-name TonePilotCore -emit-module -emit-module-path . -emit-library -static \
+          swiftc -O -wmo -parse-as-library -module-name TonePilotCore -emit-module -emit-module-path TonePilotCore.swiftmodule -emit-library -static \
             $(find ../../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') -o libTonePilotCore.a 2>&1 | tee core.log
           swiftc -O -I . -L . -lTonePilotCore -import-objc-header ../CDemucs/tp_demucs.h \
             ../tools/main.swift ../../App/Sources/Audio/StemSeparator.swift obj/*.o -lc++ -o separate 2>&1 | tee cli.log
