@@ -47,3 +47,12 @@ jobs:
             ../tools/main.swift ../../App/Sources/Audio/StemSeparator.swift obj/*.o -lc++ -o separate 2>&1 | tee cli.log
           ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/septest 2>&1 | grep -v "^Loading tensor\|MB$\|^\[" | tee e2e.log | tail -12
           grep -E "^RESULT|^part|::error" e2e.log | while IFS= read -r l; do echo "::notice title=App separator::$l"; done
+      - name: Show e2e logs
+        if: always()
+        working-directory: Native/build
+        run: |
+          for f in core.log cli.log e2e.log; do
+            [ -f "$f" ] || { echo "::notice title=$f::(missing)"; continue; }
+            tail -25 "$f" | while IFS= read -r l; do echo "::notice title=$f::$l"; done
+          done
+          ls -la . obj | head -30 | while IFS= read -r l; do echo "::notice title=ls::$l"; done
