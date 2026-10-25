@@ -76,6 +76,8 @@ jobs:
       - name: Collect native libraries
         run: |
           set -euo pipefail
+          trap 'echo "::error title=Collect native libraries::line $LINENO: $BASH_COMMAND"' ERR
+          find Packages/TonePilotCore/.build -name '*.so' | while read -r f; do echo "::notice title=Built::$f"; done
           LIB=$(find Packages/TonePilotCore/.build -name libTonePilotBridge.so -path '*release*' | head -1)
           test -n "$LIB"
           file "$LIB"
