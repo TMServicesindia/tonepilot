@@ -10,8 +10,14 @@ val buildNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
 android {
     namespace = "com.tonepilot.app"
     compileSdk = 35
-    // The NDK the Swift SDK for Android was set up with (CI sets ANDROID_NDK_HOME).
-    System.getenv("ANDROID_NDK_HOME")?.let { ndkPath = it }
+    // Use the NDK in ANDROID_NDK_HOME (set on CI runners) with its exact version.
+    System.getenv("ANDROID_NDK_HOME")?.let { home ->
+        val props = file("$home/source.properties")
+        if (props.exists()) {
+            val revision = props.readLines().firstOrNull { it.startsWith("Pkg.Revision") }?.substringAfter("=")?.trim()
+            if (revision != null) { ndkVersion = revision; ndkPath = home }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.tonepilot.app"
