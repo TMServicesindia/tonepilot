@@ -55,6 +55,7 @@ extension AppModel {
             let result: Result<[StemInfo], Error>
             do {
                 let stems = try StemSeparator.separate(input: url, outputDir: dir, progress: { p in
+                    // (StemSeparator already reports at most every 0.5%.)
                     Task { @MainActor in if self?.separationProgress[songId] != nil { self?.separationProgress[songId] = p } }
                 }, isCancelled: { cancels.contains(songId) })
                 result = .success(stems)
@@ -74,7 +75,7 @@ extension AppModel {
                 }
             }
         }
-        thread.qualityOfService = .userInitiated
+        thread.qualityOfService = .utility
         thread.stackSize = 8 << 20
         thread.start()
     }

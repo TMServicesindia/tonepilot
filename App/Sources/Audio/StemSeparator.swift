@@ -1,6 +1,9 @@
 import AVFoundation
 import Foundation
 import TonePilotCore
+#if os(iOS)
+import os
+#endif
 
 /// On-device stem separation with Demucs v4 (htdemucs, 4 sources) through demucs.cpp:
 /// splits a song into drums, bass, other (music) and vocals, like Moises does in the cloud.
@@ -38,7 +41,25 @@ enum StemSeparator {
 
     /// Parallel workers: one per performance core plus some efficiency cores, leaving one free
     /// for audio and the UI.
-    static var workers: Int { workersOverride ?? max(1, min(4, ProcessInfo.processInfo.activeProcessorCount - 2)) }
+    /// Parallel workers. Each one briefly needs about 1.1 GB (measured: Demucs' time decoder), and
+    /// iOS closes apps that go over their memory limit (≈3 GB on an iPhone 15) — so this is based
+    /// on the memory actually available, not the number of cores. Usually 1.
+    static var workers: Int {
+        if let w = workersOverride { return w }
+        let perWorker = 1_300 * 1_048_576, reserve = 700 * 1_048_576
+        let available = availableMemory
+        guard available > 0 else { return 1 }
+        return max(1, min(2, (available - reserve) / perWorker))
+    }
+
+    /// Memory this app can still use before iOS closes it (0 when unknown, e.g. on macOS).
+    static var availableMemory: Int {
+        #if os(iOS)
+        return Int(os_proc_available_memory())
+        #else
+        return 0
+        #endif
+    }
     nonisolated(unsafe) static var workersOverride: Int?
     /// Tests: called after each block is written.
     nonisolated(unsafe) static var blockDone: ((Int) -> Void)?
@@ -67,14 +88,18 @@ enum StemSeparator {
         }
 
         let n = left.count
-        let plan = StemChunkPlan(total: n, chunkLength: Int(sampleRate * 20), overlap: Int(sampleRate))
+        let plan = StemChunkPlan(total: n, chunkLength: Int(sampleRate * 15), overlap: Int(sampleRate))
         var merger = StemMerger(plan: plan, trackCount: sources * 2)
         let tracker = ProgressTracker(total: plan.chunks.count, report: progress)
         let k = workers
 
-        for batchStart in stride(from: 0, to: plan.chunks.count, by: k) {
+        var next = 0
+        while next < plan.chunks.count {
             if isCancelled() { throw Failure.cancelled }
-            let batch = Array(plan.chunks[batchStart..<min(plan.chunks.count, batchStart + k)])
+            // Re-check memory before every batch (the user may be playing at the same time).
+            let width = min(k, workersOverride ?? workers)
+            let batch = Array(plan.chunks[next..<min(plan.chunks.count, next + max(1, width))])
+            next += batch.count
             let results = ResultBox(count: batch.count)
             DispatchQueue.concurrentPerform(iterations: batch.count) { j in
                 let c = batch[j]
@@ -95,15 +120,15 @@ enum StemSeparator {
                 Unmanaged<WorkerSlot>.fromOpaque(ctx).release()
                 results.set(j, out, code: code)
             }
-            for (j, c) in batch.enumerated() {
-                let (out, code) = results.get(j)
+            for (j, c) in batch.enumerated() { try autoreleasepool {
+                let (out, code) = results.take(j)
                 guard code == 0 else { throw Failure.separation(code) }
                 let tracks = (0..<(sources * 2)).map { t in Array(out[(t * c.length)..<((t + 1) * c.length)]) }
                 let done = merger.add(c.index, tracks)
                 for s in 0..<sources { try write(files[s].2, left: done[s * 2], right: done[s * 2 + 1]) }
                 tracker.finished(c.index)
                 blockDone?(c.index)
-            }
+            } }
         }
         return files.map { StemInfo(kind: $0.0, fileName: $0.1.lastPathComponent, model: "htdemucs (on this iPhone)") }
     }
@@ -219,5 +244,11 @@ private final class ResultBox: @unchecked Sendable {
         codes = Array(repeating: -1, count: count)
     }
     func set(_ i: Int, _ out: [Float], code: Int32) { lock.lock(); outputs[i] = out; codes[i] = code; lock.unlock() }
-    func get(_ i: Int) -> ([Float], Int32) { lock.lock(); defer { lock.unlock() }; return (outputs[i], codes[i]) }
+    /// Hands over (and forgets) one output so its memory is freed as soon as it's written.
+    func take(_ i: Int) -> ([Float], Int32) {
+        lock.lock(); defer { lock.unlock() }
+        let out = outputs[i]
+        outputs[i] = []
+        return (out, codes[i])
+    }
 }

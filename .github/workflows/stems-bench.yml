@@ -57,7 +57,7 @@ jobs:
           ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/memtrace 120 1 > memtrace.log 2>&1 || true
           grep "^MEM" memtrace.log | while IFS= read -r l; do echo "::notice title=Footprint::$l"; done
           for w in 1; do
-            /usr/bin/time -l ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/sep$w 240 $w > run$w.log 2> time$w.log || true
+            /usr/bin/time -l ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/sep$w 120 $w > run$w.log 2> time$w.log || true
             rss=$(awk '/maximum resident set size/ {print $1}' time$w.log)
             res=$(grep "^RESULT separated" run$w.log || echo "failed")
             echo "::notice title=Memory $w workers::peak $((rss / 1048576)) MB — $res"
