@@ -8,10 +8,13 @@ let package = Package(
     name: "TonePilotCore",
     platforms: [.iOS(.v17), .macOS(.v14)],
     products: [
-        .library(name: "TonePilotCore", targets: ["TonePilotCore"])
+        .library(name: "TonePilotCore", targets: ["TonePilotCore"]),
+        // Shared library for the Android app (JNI shim calls its C entry points).
+        .library(name: "TonePilotBridge", type: .dynamic, targets: ["TonePilotBridge"])
     ],
     targets: [
         .target(name: "TonePilotCore"),
-        .testTarget(name: "TonePilotCoreTests", dependencies: ["TonePilotCore"])
+        .target(name: "TonePilotBridge", dependencies: ["TonePilotCore"]),
+        .testTarget(name: "TonePilotCoreTests", dependencies: ["TonePilotCore", "TonePilotBridge"])
     ]
 )

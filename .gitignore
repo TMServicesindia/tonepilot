@@ -8,3 +8,10 @@ Packages/TonePilotCore/.build/
 App/Resources/SoundFonts/*.sf2
 App/Resources/SoundFonts/*.dls
 docs/demo/*.wav
+android/local.properties
+android/.gradle/
+android/build/
+android/app/build/
+android/.kotlin/
+android/app/src/main/jniLibs/
+android/app/src/main/assets/*.sf2

@@ -1,0 +1,182 @@
+name: Build Android app
+
+# Builds TonePilot for Android on free GitHub runners:
+#   1. the Swift core (same engine/analysis as the iPhone app) with the Swift SDK for Android,
+#   2. the Kotlin app + JNI/AAudio shim with Gradle,
+# and publishes a signed, installable TonePilot.apk at a fixed link:
+#   https://github.com/<owner>/<repo>/releases/download/android-latest/TonePilot.apk
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  SWIFT_SDK_URL: https://download.swift.org/swift-6.4.1-release/android-sdk/swift-6.4.1-RELEASE/swift-6.4.1-RELEASE_android.artifactbundle.tar.gz
+  SWIFT_SDK_CHECKSUM: a356b79f8f1daa6ae3a66f4c556966ca20c0208b3659805cf30a83a0a31d6772
+  NDK_URL: https://dl.google.com/android/repository/android-ndk-r30-linux.zip
+
+jobs:
+  swift-core:
+    name: Swift core for Android (arm64)
+    runs-on: ubuntu-24.04
+    container: swift:6.4.1-noble
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: apt-get update -qq && apt-get install -y -qq curl unzip file > /dev/null
+
+      - name: Android NDK
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/ndk.zip "$NDK_URL"
+          unzip -q /tmp/ndk.zip -d /opt
+          NDK=$(ls -d /opt/android-ndk-* | head -1)
+          echo "ANDROID_NDK_HOME=$NDK" >> "$GITHUB_ENV"
+          echo "NDK: $NDK"
+
+      - name: Swift SDK for Android
+        run: |
+          set -euo pipefail
+          swift sdk install "$SWIFT_SDK_URL" --checksum "$SWIFT_SDK_CHECKSUM"
+          swift sdk list
+          # Older bundles ship a script that links the NDK sysroot into the SDK.
+          SETUP=$(find ~/.swiftpm ~/.config/swiftpm ~/.local/share/swiftpm -name 'setup-android-sdk.sh' 2>/dev/null | head -1 || true)
+          if [ -n "$SETUP" ]; then echo "Running $SETUP"; bash "$SETUP"; fi
+
+      - name: Build libTonePilotBridge.so
+        working-directory: Packages/TonePilotCore
+        run: |
+          set -uo pipefail
+          SDK_NAME=$(swift sdk list | grep -i android | head -1 | tr -d ' ')
+          ok=0
+          for args in "--swift-sdk aarch64-unknown-linux-android28" \
+                      "--swift-sdk $SDK_NAME --triple aarch64-unknown-linux-android28"; do
+            echo "::group::swift build $args"
+            if swift build -c release $args --static-swift-stdlib --product TonePilotBridge 2>&1 | tee build.log; then ok=1; echo "::endgroup::"; break; fi
+            echo "::endgroup::"
+          done
+          if [ $ok != 1 ]; then
+            grep -E "error:" build.log | head -20 | while read -r line; do echo "::error title=Swift Android build::$line"; done
+            exit 1
+          fi
+
+      - name: Collect native libraries
+        run: |
+          set -euo pipefail
+          LIB=$(find Packages/TonePilotCore/.build -name libTonePilotBridge.so -path '*release*' | head -1)
+          test -n "$LIB"
+          file "$LIB"
+          file "$LIB" | grep -q "ARM aarch64"
+          OUT=jniLibs/arm64-v8a
+          mkdir -p "$OUT"
+          cp "$LIB" "$OUT/"
+          READELF=$(find "$ANDROID_NDK_HOME" -name llvm-readelf -type f | head -1)
+          cp "$(find "$ANDROID_NDK_HOME" -path '*aarch64-linux-android/libc++_shared.so' | head -1)" "$OUT/"
+          # Copy any Swift runtime libraries that weren't linked statically.
+          SYSTEM="libc.so libm.so libdl.so liblog.so libandroid.so libz.so libc++_shared.so libaaudio.so libOpenSLES.so"
+          for i in 1 2 3; do
+            for f in "$OUT"/*.so; do
+              for need in $("$READELF" -d "$f" | awk '/NEEDED/ {gsub(/[\[\]]/, "", $5); print $5}'); do
+                case " $SYSTEM " in *" $need "*) continue ;; esac
+                [ -f "$OUT/$need" ] && continue
+                found=$(find ~/.swiftpm ~/.config/swiftpm ~/.local/share/swiftpm -path '*aarch64*' -name "$need" 2>/dev/null | head -1 || true)
+                if [ -z "$found" ]; then echo "::error title=Missing library::$need (needed by $(basename "$f"))"; exit 1; fi
+                cp "$found" "$OUT/"
+              done
+            done
+          done
+          ls -la "$OUT"
+          "$READELF" -d "$OUT/libTonePilotBridge.so" | grep -E "NEEDED|SONAME"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jniLibs
+          path: jniLibs
+
+  apk:
+    name: Android app (APK)
+    needs: swift-core
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: jniLibs
+          path: android/app/src/main/jniLibs
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Bundle the instrument sounds (GeneralUser GS)
+        run: |
+          set -euo pipefail
+          mkdir -p android/app/src/main/assets
+          curl -fsSL -o android/app/src/main/assets/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+          curl -fsSL -o android/app/src/main/assets/GeneralUser-GS-LICENSE.txt https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/documentation/LICENSE.txt
+          ls -la android/app/src/main/assets android/app/src/main/jniLibs/*
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          set -o pipefail
+          echo "NDK: $ANDROID_NDK_HOME"
+          gradle assembleRelease --stacktrace 2>&1 | tee gradle.log
+
+      - name: Report errors as annotations
+        if: failure()
+        working-directory: android
+        run: |
+          grep -E "^e: |error:|FAILURE|What went wrong" -A3 gradle.log | head -60 | while IFS= read -r line; do
+            [ -n "$line" ] && echo "::error title=Gradle::$line"
+          done
+
+      - name: Check the APK
+        run: |
+          set -euo pipefail
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          unzip -l "$APK" | grep -E "lib/arm64-v8a/|assets/|classes" | tee contents.txt
+          grep -q "lib/arm64-v8a/libTonePilotBridge.so" contents.txt
+          grep -q "lib/arm64-v8a/libtonepilot_jni.so" contents.txt
+          grep -q "lib/arm64-v8a/libc++_shared.so" contents.txt
+          grep -q "assets/GeneralUser-GS.sf2" contents.txt
+          "$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs "$APK" | head -3 || true
+          cp "$APK" TonePilot.apk
+          ls -la TonePilot.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TonePilot-apk
+          path: TonePilot.apk
+
+      - name: Publish release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-latest
+          name: TonePilot for Android (latest)
+          body: |
+            Install on your Android phone: download **TonePilot.apk** below, open it, and allow installs from your browser/files app when asked.
+            Each new build replaces this file; installing it updates the app and keeps your songs and tones.
+            Build ${{ github.run_number }} · ${{ github.sha }}
+          files: TonePilot.apk
+          make_latest: false

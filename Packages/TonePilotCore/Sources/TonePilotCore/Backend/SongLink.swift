@@ -1,4 +1,6 @@
 import Foundation
+// The Android app doesn't use the network clients, so it doesn't link FoundationNetworking (curl).
+#if !os(Android)
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
@@ -68,3 +70,5 @@ public struct SongLink: Hashable, Sendable {
         } catch { return nil }
     }
 }
+
+#endif
