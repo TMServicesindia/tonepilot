@@ -5,16 +5,18 @@ import TonePilotCore
 struct AnalyseHomeView: View {
     @EnvironmentObject var model: AppModel
     @State private var showImport = false
+    @State private var showListen = false
 
     var body: some View {
         List {
             Section {
-                Button { showImport = true } label: { Label("Import an MP3 to analyse", systemImage: "square.and.arrow.down") }
+                Button { showListen = true } label: { Label("Listen to a song from your streaming app", systemImage: "ear") }
+                Button { showImport = true } label: { Label("Import an audio file you own", systemImage: "square.and.arrow.down") }
             } footer: {
                 Text("Analysis runs on this iPhone: tempo & beats, key, chords, section boundaries and repeated parts, plus tone suggestions.")
             }
             Section("Songs") {
-                ForEach(model.library.songs.filter { $0.sourceType == .importedFile }) { song in
+                ForEach(model.library.songs.filter { [.importedFile, .listened].contains($0.sourceType) }) { song in
                     NavigationLink(value: song.id) {
                         HStack {
                             Text(song.title)
@@ -33,5 +35,6 @@ struct AnalyseHomeView: View {
         .navigationTitle("Analyse")
         .navigationDestination(for: UUID.self) { SongDetailView(songId: $0) }
         .sheet(isPresented: $showImport) { ImportSongView().environmentObject(model) }
+        .sheet(isPresented: $showListen) { ListenModeView().environmentObject(model) }
     }
 }

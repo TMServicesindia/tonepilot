@@ -7,7 +7,7 @@ Status key:
 * ⏳ **Planned**
 * ⛔ **Blocked** (licensing, hardware or technical)
 
-Totals: **82 Swift tests** (80 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
+Totals: **85 Swift tests** (83 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
 
 ## 1. Live playing on the Casio CT-X870IN (priority 1)
 
@@ -60,6 +60,8 @@ Totals: **82 Swift tests** (80 run by default; 2 need environment variables — 
 | Capability | Status | Notes |
 |---|---|---|
 | MP3/M4A/WAV/AIFF import with a rights confirmation; YouTube = link only | ✅ core · 🟡 UI | No YouTube downloading, by policy |
+| **Listen Mode** — analyse a song playing from a licensed streaming app via the microphone; audio kept in memory only and discarded | ✅ core · 🟡 capture/UI | `ListenSessionTests` (auto-stop at song end, silence trimming, noisy capture → full pipeline at 120 ± 3 BPM). Accuracy depends on volume and room noise; stems/server are not used for captures |
+| Direct streaming-service integration (Spotify/Apple Music audio) | ⛔ | Spotify blocked audio-analysis/audio-features for new apps (Nov 2024); MusicKit doesn't expose audio. Listen Mode is the supported route |
 | Tempo + beat grid (DP beat tracking), ×2/÷2 fix | ✅ | ±2.5 BPM, beats within 40 ms on test material |
 | Key (with harmonic subtraction), per-section key change | ✅ | C major and A minor tests |
 | Chords (maj/min) with alternatives; Viterbi smoothing | ✅ | Extended or modal harmony is simplified, so a drone guide is offered instead |

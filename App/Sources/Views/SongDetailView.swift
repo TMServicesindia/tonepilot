@@ -11,6 +11,7 @@ struct SongDetailView: View {
     @State private var editingTone: ToneEditTarget?
     @State private var showLimitations = false
     @State private var confirmServerUpload = false
+    @State private var showListen = false
 
     private var song: Song? { model.song(songId) }
 
@@ -33,6 +34,7 @@ struct SongDetailView: View {
             }
             .navigationTitle(song.title)
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $showListen) { ListenModeView(songId: songId).environmentObject(model) }
             .sheet(item: $editingSection) { section in
                 SectionEditorSheet(songId: songId, section: section).environmentObject(model)
             }
@@ -60,12 +62,14 @@ struct SongDetailView: View {
                 .font(.subheadline).foregroundStyle(.secondary)
             if song.sourceType == .youtubeLink, let link = song.sourceReference, let url = URL(string: link) {
                 Link(destination: url) { Label("Open in YouTube", systemImage: "play.rectangle") }
-                Text("Reference link only — import an audio file you own to analyse this song.").font(.caption).foregroundStyle(.secondary)
+                Text("Reference link only. Play it in YouTube Music and use Listen Mode to analyse it.").font(.caption).foregroundStyle(.secondary)
+                Button { showListen = true } label: { Label("Listen while it plays", systemImage: "ear") }
             }
         }
     }
 
     private func startAnalysis(_ song: Song) {
+        if song.sourceType == .listened || song.sourceType == .youtubeLink { showListen = true; return }
         if model.serverSettings.enabled { confirmServerUpload = true } else { model.analyze(songId: songId) }
     }
 
@@ -88,7 +92,9 @@ struct SongDetailView: View {
             Card(title: "Analysis") {
                 VStack(alignment: .leading, spacing: 8) {
                     if let e = song.analysisError { Text(e).foregroundStyle(Theme.bad).font(.footnote) }
-                    if song.sourceType == .importedFile {
+                    if song.sourceType == .listened {
+                        Button { showListen = true } label: { Label("Listen again to analyse", systemImage: "ear") }.buttonStyle(.borderedProminent)
+                    } else if song.sourceType == .importedFile {
                         if song.userConfirmedRights {
                             Button { startAnalysis(song) } label: { Label("Analyse & arrange automatically", systemImage: "wand.and.stars") }
                                 .buttonStyle(.borderedProminent)
@@ -142,7 +148,7 @@ struct SongDetailView: View {
                     }
                 }
                 .font(.footnote)
-                Button("Re-analyse") { startAnalysis(song) }.font(.caption)
+                Button(song.sourceType == .listened ? "Listen again to re-analyse" : "Re-analyse") { startAnalysis(song) }.font(.caption)
             }
         }
     }

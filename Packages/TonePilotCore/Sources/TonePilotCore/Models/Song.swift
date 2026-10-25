@@ -90,6 +90,9 @@ public enum SongSourceType: String, Codable, Sendable {
     case youtubeLink
     /// A song entry with no audio (user only wants to store tones/sections).
     case manual
+    /// Analysed by listening (microphone) while it played from a streaming service the user is
+    /// licensed to use. No audio is stored; `sourceReference` may hold the service name or link.
+    case listened
 }
 
 public enum AnalysisStatus: String, Codable, Sendable {

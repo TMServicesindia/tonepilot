@@ -683,6 +683,49 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Listen Mode: analyses audio captured from the microphone while the song played from the
+    /// user's streaming app. On-device only — the captured audio is never stored or uploaded, and
+    /// is released when analysis finishes.
+    func analyzeListened(songId: UUID, audio: AudioBuffer) {
+        guard var song = library.song(id: songId) else { return }
+        analysisTasks[songId]?.cancel()
+        song.analysisStatus = .running
+        song.analysisError = nil
+        // No file to use as a clock later: switching follows a tap-started timer by default.
+        if song.switching == nil { song.switching = SwitchingSettings(mode: .assisted, reference: .timer) }
+        update(song)
+        analysisProgress[songId] = 0
+        analysisStage[songId] = "Analysing what TonePilot heard…"
+        let patches = library.patches
+        let snapshot = song
+        analysisTasks[songId] = Task.detached(priority: .userInitiated) { [weak self] in
+            do {
+                let current = await MainActor.run { self?.library.song(id: songId) } ?? snapshot
+                let output = try SongPipeline.run(song: current, audio: audio, patches: patches) { p in
+                    if Task.isCancelled { return false }
+                    Task { @MainActor in self?.analysisProgress[songId] = p }
+                    return true
+                }
+                await MainActor.run {
+                    guard let self else { return }
+                    self.analysisProgress[songId] = nil
+                    self.analysisStage[songId] = nil
+                    self.analysisNotice[songId] = "Analysed from the microphone — accuracy depends on volume and room noise. Listen again to re-analyse."
+                    self.update(output.song)
+                }
+            } catch {
+                await MainActor.run {
+                    guard let self, var s = self.library.song(id: songId) else { return }
+                    s.analysisStatus = .failed
+                    s.analysisError = Self.describe(error)
+                    self.analysisProgress[songId] = nil
+                    self.analysisStage[songId] = nil
+                    self.update(s)
+                }
+            }
+        }
+    }
+
     func cancelAnalysis(songId: UUID) { analysisTasks[songId]?.cancel() }
 
     nonisolated static func describe(_ error: Error) -> String {

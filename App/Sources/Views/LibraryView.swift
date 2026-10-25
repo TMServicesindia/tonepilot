@@ -6,6 +6,7 @@ struct LibraryView: View {
     @EnvironmentObject var model: AppModel
     @State private var query = ""
     @State private var showImport = false
+    @State private var showListen = false
     @State private var showNewPlaylist = false
     @State private var newPlaylistName = ""
     @State private var filterPlaylist: UUID?
@@ -49,10 +50,13 @@ struct LibraryView: View {
                     ContentUnavailableView {
                         Label(query.isEmpty ? "No songs yet" : "No matches", systemImage: "music.note")
                     } description: {
-                        Text(query.isEmpty ? "Import an MP3 you own to analyse it and build tones for its intro, interludes and chorus."
+                        Text(query.isEmpty ? "Play a song from your streaming app and let TonePilot listen, or import an audio file you own. TonePilot builds tones for every section automatically."
                                            : "Try a title, film, composer, language or tag.")
                     } actions: {
-                        if query.isEmpty { Button("Import a song") { showImport = true }.buttonStyle(.borderedProminent) }
+                        if query.isEmpty {
+                            Button("Listen to a song") { showListen = true }.buttonStyle(.borderedProminent)
+                            Button("Import an audio file") { showImport = true }
+                        }
                     }
                 }
                 ForEach(songs) { song in
@@ -86,12 +90,14 @@ struct LibraryView: View {
             ToolbarItem(placement: .topBarLeading) { ConnectionStatus(midi: model.midi) }
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    Button { showImport = true } label: { Label("Import song", systemImage: "square.and.arrow.down") }
+                    Button { showListen = true } label: { Label("Listen to a song (streaming app)", systemImage: "ear") }
+                    Button { showImport = true } label: { Label("Import an audio file", systemImage: "square.and.arrow.down") }
                     Button { showNewPlaylist = true } label: { Label("New playlist", systemImage: "text.badge.plus") }
                 } label: { Image(systemName: "plus") }
             }
         }
         .sheet(isPresented: $showImport) { ImportSongView().environmentObject(model) }
+        .sheet(isPresented: $showListen) { ListenModeView().environmentObject(model) }
         .alert("New playlist", isPresented: $showNewPlaylist) {
             TextField("Name", text: $newPlaylistName)
             Button("Create") {
@@ -119,7 +125,7 @@ struct SongRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: song.sourceType == .youtubeLink ? "link" : "waveform")
+            Image(systemName: song.sourceType == .youtubeLink ? "link" : song.sourceType == .listened ? "ear" : "waveform")
                 .frame(width: 36, height: 36)
                 .background(Theme.panelRaised, in: RoundedRectangle(cornerRadius: 8))
             VStack(alignment: .leading, spacing: 2) {
