@@ -15,3 +15,7 @@ android/app/build/
 android/.kotlin/
 android/app/src/main/jniLibs/
 android/app/src/main/assets/*.sf2
+Native/demucs/
+Native/eigen/
+App/Resources/Models/
+Native/build/
