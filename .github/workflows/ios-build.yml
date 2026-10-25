@@ -53,7 +53,11 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             build > xcodebuild.log 2>&1 || true
           grep -E "error:|BUILD (SUCCEEDED|FAILED)" xcodebuild.log | sort -u | head -80 || true
-          test -d build/Build/Products/Release-iphoneos/TonePilot.app
+          # The .app folder exists even when compiling fails (resources are copied first):
+          # require a successful build AND the compiled arm64 executable.
+          grep -q "BUILD SUCCEEDED" xcodebuild.log
+          test -f build/Build/Products/Release-iphoneos/TonePilot.app/TonePilot
+          file build/Build/Products/Release-iphoneos/TonePilot.app/TonePilot | grep -q arm64
 
       # Logs need a login to download; annotations are public, so surface errors there.
       - name: Report errors as annotations
@@ -61,7 +65,7 @@ jobs:
         run: |
           for f in swifttest.log xcodebuild.log; do
             [ -f "$f" ] || continue
-            grep -E "error:" "$f" | sed -E 's#^/Users/runner/work/[^/]+/[^/]+/##' | sort -u | head -45 | while IFS= read -r line; do
+            grep -E "error:|Undefined symbol|ld: " "$f" | sed -E 's#^/Users/runner/work/[^/]+/[^/]+/##' | sort -u | head -45 | while IFS= read -r line; do
               echo "::error title=$f::${line}"
             done
           done
