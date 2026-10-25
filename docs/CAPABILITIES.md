@@ -7,7 +7,7 @@ Status key:
 * ⏳ **Planned**
 * ⛔ **Blocked** (licensing, hardware or technical)
 
-Totals: **107 Swift tests** (104 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
+Totals: **114 Swift tests** (111 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
 
 ## 1. Live playing on the Casio CT-X870IN (priority 1)
 
@@ -135,3 +135,22 @@ Totals: **107 Swift tests** (104 run by default; 2 need environment variables �
 | Song page, section guide + practice loop (50–100%, pitch kept), Play page with live guide, switching modes, accompaniment, layer volume/octave/mute, tone list with search and My Tones | 🟡 | Compose UI; Kotlin type-checked locally, APK assembled in CI |
 | Listen Mode with a microphone foreground service (works while YouTube/Spotify plays on the same phone) | 🟡 | `ListenService.kt` |
 | Full Tone Studio editor, sample creator, analysis server | ⏳ | iPhone only for now |
+
+## 12. Song Studio (iPhone)
+
+One screen per song for playing, mixing and changing section tones. It replaces the separate Tone Studio and Play tabs; the tabs are now Library, Analyse, Studio and Settings. The full layer editor is still available from each section's **Edit sound** and from **Sound library (advanced)**.
+
+| Capability | Status | Notes |
+|---|---|---|
+| Header with Play/Pause, current section and position; waveform timeline with section bands; tap/drag to seek; section chips to jump; loop the current section; practice speed 50–100% | ✅ core · 🟡 UI | `SongStudioTests.testWaveformPeaks`. Songs without a recording (Listen Mode) use the tap-started song clock |
+| Mixer showing only the tracks the song really has (original recording or separated stems, rhythm, bass, background chords, AI melody, metronome, your keyboard), each labelled **Audio**, **AI notes** or **Live**; on/off, volume, solo | ✅ core · 🟡 UI | `testOnlyRealTracksAreListed`, `testOnOffVolumeAndSolo`. Your keyboard is never silenced by a solo |
+| Switching a part on or off never stops the song (parts are silenced at their engine slot; the sequence keeps running) | ✅ | `testMutingAPartKeepsTheSongRunningAndKeyboardLevelIsSeparate` |
+| Separate level for your keyboard | ✅ | Same test (live gain 0.25 → 0.25× level) |
+| Background chords generated from the chord guide: soft pad, strings, or piano struck on each beat, voice-led close triads | ✅ | `testBackgroundChordsAreSmoothTriads` |
+| **AI plays difficult parts**: the AI melody plays only in the sections you choose, with a suggested set (instrumental passages with a melody, or sections with difficult phrases) and a choice of sound | ✅ core · 🟡 UI | `testAIPlaysOnlyChosenSections` |
+| Separated stems (from your analysis server) play in sync, with their own level and on/off (e.g. **Original vocals** off) | 🟡 | Started on one shared host time. Without the server, the original recording is a single audio track; stems are never presented as editable notes |
+| Change a section's sound: preview on your keyboard, then **Use for <section>** (stored as that section's My Version; the AI Original and the source tone stay unchanged, and Restore AI Original still works) | 🟡 | `TonePickerSheet`, `AppModel.assignTone` |
+| Edit a section's sound (layers, volume, octave, pan, effects) in a sheet while the song keeps playing | 🟡 | Reuses the existing layer editor |
+| Tones change automatically at section boundaries (driven by the playback position, never by key presses), or assisted with a tap to switch | ✅ core · 🟡 UI | Existing `SectionScheduler` |
+| Per-section track volumes | ⏳ | Track levels apply to the whole song. Tones and the AI melody can differ per section |
+| Editing or regenerating notes of rhythm/bass/chords | ⏳ | They're regenerated from the chord guide (fix chords in the Melody & chord guide). AI melody notes can be corrected there |

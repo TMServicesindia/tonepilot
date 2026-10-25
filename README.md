@@ -32,7 +32,7 @@ Sound is generated on the iPhone (TonePilot's own sample/synth engine using Soun
    * support layers only where they were heard, plus key split and effects
    * a written explanation of why
    Each tone is saved twice, as an unchanged **AI Original** and an editable **My Version**.
-4. **Play on My Casio**. Tones switch by section **automatically** (following the backing track or a tap-started clock), **manually**, or **assisted** (the next tone is highlighted and switches when you tap). The live guide shows the current chord as root → fifth → root and the next melody keys.
+4. **Song Studio** (Studio tab): press Play, play the parts you know on your Casio, and switch on the AI background parts you want (rhythm, bass, background chords, the original recording or its stems). Let the AI play the melody in the sections you choose. **Play on My Casio**: Tones switch by section **automatically** (following the backing track or a tap-started clock), **manually**, or **assisted** (the next tone is highlighted and switches when you tap). The live guide shows the current chord as root → fifth → root and the next melody keys.
 5. Refine anything: tones, layers, envelope/filter/EQ/effects, chords, melody notes, section timing. You can also **Regenerate this section** or **Restore AI Original**.
 
 ## Run it
