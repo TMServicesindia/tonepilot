@@ -6,12 +6,13 @@ import Foundation
 import TonePilotCore
 
 let args = CommandLine.arguments
-guard args.count >= 3 else { print("usage: separate <model.bin> <workdir>"); exit(1) }
+guard args.count >= 3 else { print("usage: separate <model.bin> <workdir> [seconds] [workers]"); exit(1) }
+if args.count > 4 { StemSeparator.workersOverride = Int(args[4]) }
 StemSeparator.modelOverride = URL(fileURLWithPath: args[1])
 let work = URL(fileURLWithPath: args[2], isDirectory: true)
 try? FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
 
-let sr = 44_100.0, seconds = 50.0, n = Int(sr * seconds)
+let sr = 44_100.0, seconds = args.count > 3 ? Double(args[3]) ?? 50 : 50.0, n = Int(sr * seconds)
 var parts = [[Float]](repeating: [Float](repeating: 0, count: n), count: 4)   // drums, bass, other, vocals
 var seed: UInt64 = 7
 func noise() -> Float { seed = seed &* 6364136223846793005 &+ 1442695040888963407; return Float(Int64(bitPattern: seed >> 11) % 2000) / 1000 - 1 }

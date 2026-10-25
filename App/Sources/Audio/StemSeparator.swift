@@ -38,7 +38,8 @@ enum StemSeparator {
 
     /// Parallel workers: one per performance core plus some efficiency cores, leaving one free
     /// for audio and the UI.
-    static var workers: Int { max(1, min(4, ProcessInfo.processInfo.activeProcessorCount - 2)) }
+    static var workers: Int { workersOverride ?? max(1, min(4, ProcessInfo.processInfo.activeProcessorCount - 2)) }
+    nonisolated(unsafe) static var workersOverride: Int?
 
     /// Blocking; run on a background thread. Returns the stems written to `outputDir`.
     static func separate(input: URL, outputDir: URL, progress: @escaping (Double) -> Void,

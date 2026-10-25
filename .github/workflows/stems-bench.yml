@@ -47,6 +47,13 @@ jobs:
             ../tools/main.swift ../../App/Sources/Audio/StemSeparator.swift obj/*.o -lc++ -o separate 2>&1 | tee cli.log
           ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/septest 2>&1 | grep -v "^Loading tensor\|MB$\|^\[" | tee e2e.log | tail -12
           grep -E "^RESULT|^part|::error" e2e.log | while IFS= read -r l; do echo "::notice title=App separator::$l"; done
+          # Peak memory for a 4-minute song with 1, 2 and 4 workers (iOS closes apps that use too much).
+          for w in 1 2 4; do
+            /usr/bin/time -l ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/sep$w 240 $w > run$w.log 2> time$w.log || true
+            rss=$(awk '/maximum resident set size/ {print $1}' time$w.log)
+            res=$(grep "^RESULT separated" run$w.log || echo "failed")
+            echo "::notice title=Memory $w workers::peak $((rss / 1048576)) MB — $res"
+          done
       - name: Show e2e logs
         if: always()
         working-directory: Native/build
