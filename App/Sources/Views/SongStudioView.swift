@@ -47,9 +47,11 @@ struct SongStudioView: View {
                     if model.songPosition != nil, !(song.chordGuide ?? []).isEmpty {
                         LiveGuideStrip(song: song, time: model.songPosition, melodyOffset: AutoArranger.guideOffset(for: model.activeArrangement))
                     }
-                    MyKeyboardCard(song: song, onChangeSound: changeSound, onEditSound: editSound)
-                    BackgroundCard(song: song)
+                    SeparationCard(song: song)
+                    MyKeyboardCard(song: song, onChangeSound: changeSound, onEditSound: editSound, onEditTone: { editingTone = ToneEditTarget(id: $0) })
+                    SongPartsCard(song: song)
                     AIPartsCard(song: song, onEditNotes: { showMelodyGuide = true })
+                    AIExtrasCard(song: song)
                     StudioSectionsCard(song: song, onChangeSound: changeSound, onEditSound: editSound,
                                        onGuide: { guideFor = $0 }, onEditTiming: { editingSection = $0 })
                 }
@@ -330,6 +332,55 @@ struct WaveformTimeline: View {
     }
 }
 
+// MARK: Separation
+
+/// Moises-style separation status: separate the song into vocals, drums, bass and music.
+struct SeparationCard: View {
+    @EnvironmentObject var model: AppModel
+    let song: Song
+
+    var body: some View {
+        let separated = !model.stemKinds(for: song).isEmpty
+        if let p = model.separationProgress[song.id] {
+            Card(title: "Separating the song") {
+                ProgressView(value: p) {
+                    Text("Vocals, drums, bass and music — on this iPhone").font(.subheadline)
+                }
+                HStack {
+                    Text("\(Int(p * 100))%").monospacedDigit()
+                    if let left = model.separationTimeLeft(song.id) {
+                        Text("· about \(max(1, Int((left / 60).rounded(.up)))) min left")
+                    }
+                    Spacer()
+                    Button("Cancel") { model.cancelSeparation(song.id) }
+                }
+                .font(.caption)
+                Text("Keep TonePilot open (the screen stays on). You can already play with the full recording.")
+                    .font(.caption2).foregroundStyle(.secondary)
+            }
+        } else if !separated, model.audioURL(for: song) != nil {
+            Card(title: "Separate the parts") {
+                Text("Split this song into **Vocals**, **Drums**, **Bass** and **Music** so you can switch off the singer and play along with the real band — like Moises, but on your iPhone.")
+                    .font(.footnote)
+                if let e = model.separationError[song.id] { Text(e).font(.caption).foregroundStyle(Theme.bad) }
+                if model.canSeparate {
+                    Button {
+                        model.separateStems(song.id)
+                    } label: {
+                        Label(model.separationError[song.id] == nil ? "Separate parts" : "Try again", systemImage: "scissors")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(song.analysisStatus == .running)
+                    Text(song.analysisStatus == .running ? "Starts automatically after the analysis." : "Takes a few minutes (about 1¼× the song's length).")
+                        .font(.caption2).foregroundStyle(.secondary)
+                } else {
+                    Text("The separation model isn't included in this build.").font(.caption).foregroundStyle(Theme.warn)
+                }
+            }
+        }
+    }
+}
+
 // MARK: My keyboard
 
 struct MyKeyboardCard: View {
@@ -337,10 +388,12 @@ struct MyKeyboardCard: View {
     let song: Song
     let onChangeSound: (UUID) -> Void
     let onEditSound: (UUID) -> Void
+    let onEditTone: (UUID) -> Void
 
     var body: some View {
         let switching = song.switching ?? SwitchingSettings()
         let sectionId = model.activeSectionId ?? song.orderedSections.first?.id
+        let usingMain = model.isUsingMainTone(song)
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Label("My keyboard", systemImage: "pianokeys").font(.headline)
@@ -355,6 +408,16 @@ struct MyKeyboardCard: View {
                 Label("Sound is coming from the iPhone speaker. Connect the audio cable to the Casio's AUDIO IN to hear it there.", systemImage: "speaker.wave.2")
                     .font(.caption).foregroundStyle(Theme.warn)
             }
+            if !song.sections.isEmpty {
+                Picker("Tone", selection: Binding(get: { usingMain }, set: { main in
+                    if main { model.useMainTone(song.id) } else { model.useSectionTones(song.id) }
+                })) {
+                    Text("Main tone").tag(true)
+                    Text("Tone per section").tag(false)
+                }
+                .pickerStyle(.segmented)
+                .accessibilityLabel("Keyboard tone")
+            }
             VStack(alignment: .leading, spacing: 2) {
                 Text(model.activeArrangement?.name.replacingOccurrences(of: " (My Version)", with: "") ?? "No tone selected")
                     .font(.title3.weight(.bold)).lineLimit(2)
@@ -362,9 +425,14 @@ struct MyKeyboardCard: View {
                     Text(a.layers.filter { !$0.muted }.compactMap { model.library.patch(id: $0.patchId)?.name }.joined(separator: " + "))
                         .font(.caption).foregroundStyle(.secondary).lineLimit(2)
                 }
+                Text(usingMain ? "One tone for the whole song." : "The tone changes with each section.")
+                    .font(.caption2).foregroundStyle(.secondary)
             }
-            if let sectionId {
-                HStack {
+            HStack {
+                if usingMain, let main = model.mainTone(of: song) {
+                    Button { onEditTone(main.id) } label: { Label("Edit main tone", systemImage: "slider.horizontal.3") }
+                        .buttonStyle(.borderedProminent)
+                } else if let sectionId {
                     Button { onChangeSound(sectionId) } label: { Label("Change sound", systemImage: "music.note.list") }
                         .buttonStyle(.borderedProminent)
                     Button { onEditSound(sectionId) } label: { Label("Edit sound", systemImage: "slider.horizontal.3") }
@@ -374,7 +442,7 @@ struct MyKeyboardCard: View {
             if let track = model.studioTracks(for: song).first(where: { $0.id == SongStudio.keyboard }) {
                 TrackRow(track: track, songId: song.id, showHeader: false)
             }
-            if !song.sections.isEmpty {
+            if !usingMain, !song.sections.isEmpty {
                 Toggle(isOn: Binding(get: { switching.mode == .automatic },
                                      set: { auto in
                                          var s = switching
@@ -383,8 +451,8 @@ struct MyKeyboardCard: View {
                                          model.updateSwitching(s)
                                      })) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Change tone with each section")
-                        Text(switching.mode == .automatic ? "Follows the song position automatically." : "TonePilot shows the next section's tone; tap it to switch.")
+                        Text("Switch automatically")
+                        Text(switching.mode == .automatic ? "Follows the song position." : "TonePilot shows the next section's tone; tap it to switch.")
                             .font(.caption2).foregroundStyle(.secondary)
                     }
                 }
@@ -406,45 +474,80 @@ struct MyKeyboardCard: View {
     }
 }
 
-// MARK: AI background
+// MARK: Song parts (from the recording)
 
-struct BackgroundCard: View {
+struct SongPartsCard: View {
     @EnvironmentObject var model: AppModel
     let song: Song
 
     var body: some View {
-        let tracks = model.studioTracks(for: song).filter { $0.group == .background }
+        let tracks = model.studioTracks(for: song).filter { $0.group == .songParts }
         let acc = song.accompaniment ?? AccompanimentSettings()
-        VStack(alignment: .leading, spacing: 12) {
-            Label("AI background", systemImage: "music.mic").font(.headline)
-            Text("The band behind you. Switch parts on or off any time — the song keeps playing. Turn off anything that clashes with what you play.")
-                .font(.caption).foregroundStyle(.secondary)
-            if tracks.isEmpty {
-                Text(song.analysisStatus == .running ? "Background parts appear when the analysis finishes." : "No background parts are available for this song yet.")
-                    .font(.footnote).foregroundStyle(.secondary)
-            }
-            ForEach(tracks) { track in
-                TrackRow(track: track, songId: song.id)
-                if track.id == SongStudio.drums, track.enabled {
-                    Picker("Rhythm style", selection: Binding(get: { acc.drumStyle }, set: { model.setDrumStyle($0, songId: song.id) })) {
-                        ForEach(AccompanimentSettings.DrumStyle.allCases, id: \.self) { Text($0.displayName).tag($0) }
+        let separated = tracks.contains { $0.id != SongStudio.original }
+        if !tracks.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                Label("Song parts", systemImage: "waveform").font(.headline)
+                Text(separated
+                     ? "The song's own parts, always in time with the music. Switch off what you want to play yourself."
+                     : "The full recording. Separate the parts (above) to switch the vocals, drums, bass and music on and off.")
+                    .font(.caption).foregroundStyle(.secondary)
+                ForEach(tracks) { track in
+                    TrackRow(track: track, songId: song.id)
+                    if SongStudio.isGated(track.id, acc) {
+                        Label("Plays only in the sections chosen under “AI plays difficult parts”.", systemImage: "wand.and.stars")
+                            .font(.caption2).foregroundStyle(Theme.accent).padding(.leading, 38)
                     }
-                    .font(.footnote)
+                    if track.id != tracks.last?.id { Divider().overlay(Color.white.opacity(0.06)) }
                 }
-                if track.id == SongStudio.chords, track.enabled {
-                    Picker("Chord sound", selection: Binding(get: { acc.chordStyle ?? .pad }, set: { model.setChordStyle($0, songId: song.id) })) {
-                        ForEach(AccompanimentSettings.ChordStyle.allCases, id: \.self) { Text($0.displayName).tag($0) }
-                    }
-                    .pickerStyle(.segmented)
-                }
-                if track.id != tracks.last?.id { Divider().overlay(Color.white.opacity(0.06)) }
             }
-            if !model.output.supportsAccompaniment {
-                Text("Generated parts need the TonePilot engine (Settings › Sound engine).").font(.caption).foregroundStyle(Theme.warn)
-            }
+            .padding(14)
+            .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
         }
-        .padding(14)
-        .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+// MARK: AI extras (generated, not from the recording)
+
+struct AIExtrasCard: View {
+    @EnvironmentObject var model: AppModel
+    let song: Song
+    @State private var expanded = false
+
+    var body: some View {
+        let tracks = model.studioTracks(for: song).filter { $0.group == .aiExtras }
+        let acc = song.accompaniment ?? AccompanimentSettings()
+        let anyOn = tracks.contains { $0.enabled }
+        if !tracks.isEmpty {
+            DisclosureGroup(isExpanded: Binding(get: { expanded || anyOn }, set: { expanded = $0 })) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Parts TonePilot generates from its analysis — they are not in the recording. Useful when a song has no separated parts, or to add a click.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    ForEach(tracks) { track in
+                        TrackRow(track: track, songId: song.id)
+                        if track.id == SongStudio.drums, track.enabled {
+                            Picker("Rhythm style", selection: Binding(get: { acc.drumStyle }, set: { model.setDrumStyle($0, songId: song.id) })) {
+                                ForEach(AccompanimentSettings.DrumStyle.allCases, id: \.self) { Text($0.displayName).tag($0) }
+                            }
+                            .font(.footnote)
+                        }
+                        if track.id == SongStudio.chords, track.enabled {
+                            Picker("Chord sound", selection: Binding(get: { acc.chordStyle ?? .pad }, set: { model.setChordStyle($0, songId: song.id) })) {
+                                ForEach(AccompanimentSettings.ChordStyle.allCases, id: \.self) { Text($0.displayName).tag($0) }
+                            }
+                            .pickerStyle(.segmented)
+                        }
+                    }
+                    if !model.output.supportsAccompaniment {
+                        Text("Generated parts need the TonePilot engine (Settings › Sound engine).").font(.caption).foregroundStyle(Theme.warn)
+                    }
+                }
+                .padding(.top, 8)
+            } label: {
+                Label("AI extras\(anyOn ? " · on" : "")", systemImage: "sparkles").font(.headline)
+            }
+            .padding(14)
+            .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
+        }
     }
 }
 
@@ -536,40 +639,66 @@ struct AIPartsCard: View {
     @State private var pickingSound = false
 
     var body: some View {
-        let melody = model.studioTracks(for: song).first { $0.id == SongStudio.melody }
+        let tracks = model.studioTracks(for: song)
         let acc = song.accompaniment ?? AccompanimentSettings()
+        // What can play the difficult parts: the recording's own vocals or music, or the AI melody.
+        let sources: [StudioTrack] = tracks.filter { [SongStudio.stem(.other), SongStudio.stem(.vocals)].contains($0.id) }
+            + tracks.filter { $0.id == SongStudio.melody }
+        let current = acc.aiPartTrack.flatMap { id in sources.first { $0.id == id } } ?? sources.first { $0.id == SongStudio.melody }
+        let on = SongStudio.aiPartsOn(acc) && current != nil
         VStack(alignment: .leading, spacing: 12) {
             Label("AI plays difficult parts", systemImage: "wand.and.stars").font(.headline)
-            if let melody {
-                Text("Can't play a passage yet? The AI plays the melody in the sections you pick, and leaves the rest for you.")
+            if sources.isEmpty {
+                Text(song.analysisStatus == .running ? "Available when the analysis finishes." : "Separate the parts or analyse the song to use this.")
+                    .font(.footnote).foregroundStyle(.secondary)
+            } else {
+                Text("Can't play a passage yet? Pick what fills in, and the sections where it plays. Everywhere else, it's you.")
                     .font(.caption).foregroundStyle(.secondary)
-                TrackRow(track: melody, songId: song.id)
-                if melody.enabled {
+                Toggle(isOn: Binding(get: { on }, set: { model.setAIParts($0, songId: song.id) })) {
+                    Text("Fill in difficult parts")
+                }
+                if on, let current {
+                    Picker("Played by", selection: Binding(get: { current.id }, set: { model.setAIPartSource($0, songId: song.id) })) {
+                        ForEach(sources) { t in Text(sourceName(t)).tag(t.id) }
+                    }
+                    .font(.footnote)
+                    Text(current.kind == .audio ? "The recording's own part, in time with the song." : "The detected tune played with an instrument sound.")
+                        .font(.caption2).foregroundStyle(.secondary)
                     Text("Plays in").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                     FlowSections(song: song, selected: acc.guideSections) { model.toggleAIPart($0, songId: song.id) }
                     HStack {
-                        Button("Suggested") { model.setAIPartSections(SongStudio.suggestedAIParts(song), songId: song.id) }
+                        Button("Suggested") { model.setAIPartSections(SongStudio.suggestedAIParts(song, source: acc.aiPartTrack), songId: song.id) }
                         Button("Whole song") { model.setAIPartSections(nil, songId: song.id) }
                         Spacer()
                     }
                     .font(.footnote).buttonStyle(.bordered)
-                    HStack {
-                        Text("Sound").font(.footnote)
-                        Spacer()
-                        Button(acc.guidePatchId.flatMap { model.library.patch(id: $0)?.name } ?? "Section's lead sound") { pickingSound = true }
-                            .font(.footnote)
+                    if current.kind == .audio {
+                        TrackRow(track: { var t = current; t.enabled = true; return t }(), songId: song.id, showHeader: false)
+                    } else {
+                        TrackRow(track: current, songId: song.id, showHeader: false)
+                        HStack {
+                            Text("Sound").font(.footnote)
+                            Spacer()
+                            Button(acc.guidePatchId.flatMap { model.library.patch(id: $0)?.name } ?? "Section's lead sound") { pickingSound = true }
+                                .font(.footnote)
+                        }
+                        Button(action: onEditNotes) { Label("Check or fix the melody notes", systemImage: "music.note.list") }.font(.footnote)
                     }
-                    Button(action: onEditNotes) { Label("Check or fix the melody notes", systemImage: "music.note.list") }.font(.footnote)
                 }
-            } else {
-                Text(song.analysisStatus == .running ? "Available when the analysis finishes." : "No melody was detected in this song, so the AI can't play it for you.")
-                    .font(.footnote).foregroundStyle(.secondary)
             }
         }
         .padding(14)
         .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
         .sheet(isPresented: $pickingSound) {
             PatchPicker { model.setAIPartSound($0.id, songId: song.id) }.environmentObject(model)
+        }
+    }
+
+    private func sourceName(_ t: StudioTrack) -> String {
+        switch t.id {
+        case SongStudio.stem(.vocals): return "The original vocals"
+        case SongStudio.stem(.other): return "The original music (instruments)"
+        default: return "AI melody (instrument sound)"
         }
     }
 }
@@ -642,7 +771,7 @@ struct StudioSectionRow: View {
         let tone = song.arrangement(for: section)
         let isCurrent = model.activeSectionId == section.id
         let acc = song.accompaniment ?? AccompanimentSettings()
-        let aiPlays = acc.melodyGuide && (acc.guideSections?.contains(section.id) ?? true) && song.melody != nil
+        let aiPlays = SongStudio.aiPartsOn(acc) && (acc.guideSections?.contains(section.id) ?? true)
         HStack(spacing: 10) {
             RoundedRectangle(cornerRadius: 3).fill(SectionTimeline.color(for: section)).frame(width: 6)
             Button { model.studioJump(to: section.id) } label: {

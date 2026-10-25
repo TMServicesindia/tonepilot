@@ -46,6 +46,17 @@ final class AppModel: ObservableObject {
     @Published var waveforms: [UUID: [Float]] = [:]
     /// A tone being auditioned from the tone picker (not yet assigned to a section).
     @Published var previewingToneId: UUID?
+    // Stem separation (on this iPhone)
+    @Published var separationProgress: [UUID: Double] = [:]
+    @Published var separationError: [UUID: String] = [:]
+    var separationStart: [UUID: Date] = [:]
+    let separationCancels = CancelFlags()
+    /// Section under the playhead last time the section-gated parts were applied.
+    var lastGateSection: UUID?
+    /// Separate parts automatically after the first analysis of an imported song.
+    @Published var autoSeparate: Bool = UserDefaults.standard.object(forKey: "autoSeparate") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(autoSeparate, forKey: "autoSeparate") }
+    }
     @Published var activeArrangement: Arrangement?
     @Published var activeSectionId: UUID?
     @Published var outputPeak: Float = 0
@@ -371,6 +382,11 @@ final class AppModel: ObservableObject {
             time = nil
         }
         songPosition = time
+        // Parts that play only in chosen sections ("AI plays difficult parts" from the recording).
+        if let t = time ?? (isSectionPlaying ? nil : cursor) {
+            let current = song.orderedSections.last { $0.startTime <= t + 0.02 }?.id
+            if current != lastGateSection { lastGateSection = current; applyAudioLevels(song) }
+        }
         guard let time, var s = scheduler else { return }
         let action = s.update(time: time)
         scheduler = s
@@ -457,8 +473,10 @@ final class AppModel: ObservableObject {
     /// Sets each audio track's level; tracks that are off stay in sync at zero volume.
     func applyAudioLevels(_ song: Song, forceAudible: Bool = false) {
         let s = song.accompaniment ?? AccompanimentSettings()
+        let t = songPosition ?? cursor
+        let section = song.orderedSections.last { $0.startTime <= t + 0.02 }?.id
         for id in sectionPlayer.trackIds {
-            var level = SongStudio.effectiveLevel(id, s)
+            var level = SongStudio.effectiveLevel(id, s, section: section)
             if forceAudible && level == 0 && s.soloTrack == nil { level = SongStudio.level(id, s) }
             sectionPlayer.setLevel(Float(level), for: id)
         }
@@ -756,6 +774,13 @@ final class AppModel: ObservableObject {
                         await MainActor.run { self?.analysisNotice[songId] = "Server analysis unavailable (\(message)). Analysed on this iPhone instead." }
                     }
                 }
+                // Parts separated on this iPhone: analyse from them (beat from drums, chords from
+                // the instruments, melody from the vocals).
+                if stems.isEmpty, let local = await MainActor.run(body: { self?.audioTracks(for: snapshot) }) {
+                    let parts = local.compactMap { t in SongStudio.stemKind(t.id).map { ($0, t.url) } }
+                    if !parts.isEmpty { await stage("Reading the separated parts…", 0.02) }
+                    for (kind, file) in parts { stems[kind] = try AudioFileDecoder.decodeMono(url: file) }
+                }
                 await stage("Decoding audio…", progressBase + 0.02)
                 let audio = try AudioFileDecoder.decodeMono(url: url)
                 await stage("Analysing tempo, key, chords, melody and sections…", progressBase + 0.05)
@@ -774,6 +799,11 @@ final class AppModel: ObservableObject {
                     self.analysisStage[songId] = nil
                     self.update(s)
                     if self.activeSongId == songId { self.startPerformance(songId: songId) }
+                    // First analysis done: separate the parts (Moises-style) in the background.
+                    if self.autoSeparate, s.sourceType == .importedFile, self.stemKinds(for: s).isEmpty,
+                       self.separationError[songId] == nil {
+                        self.separateStems(songId)
+                    }
                 }
             } catch {
                 await MainActor.run {

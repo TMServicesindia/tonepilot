@@ -37,7 +37,9 @@ final class SongStudioTests: XCTestCase {
         let withStems = SongStudio.tracks(for: song(), hasAudio: true, stems: [.vocals, .drums, .bass, .other])
         XCTAssertFalse(withStems.contains { $0.id == SongStudio.original }, "stems replace the full mix")
         let vocals = withStems.first { $0.id == SongStudio.stem(.vocals) }
-        XCTAssertEqual(vocals?.name, "Original vocals")
+        XCTAssertEqual(vocals?.name, "Vocals")
+        XCTAssertEqual(vocals?.group, .songParts)
+        XCTAssertEqual(withStems.first { $0.id == SongStudio.drums }?.group, .aiExtras, "generated rhythm is an optional extra")
         XCTAssertEqual(vocals?.kind, .audio, "a stem is audio, not editable notes")
         XCTAssertEqual(withStems.first { $0.id == SongStudio.chords }?.kind, .generated)
         XCTAssertEqual(withStems.first { $0.id == SongStudio.keyboard }?.kind, .live)

@@ -85,7 +85,18 @@ public enum SongAnalyzer {
         }) else { throw SongAnalysisError.cancelled }
         guard (features.rms.max() ?? 0) > 1e-4 else { throw SongAnalysisError.silent }
 
-        let tempo = TempoAnalyzer.analyze(features, config: config)
+        // With separated stems: the beat comes from the drums (+ bass), the harmony from the
+        // pitched instruments only — vocals and drums no longer blur the chords.
+        let percussive = mixStems(options.stems, [.drums: 1, .bass: 0.5], length: audio.samples.count)
+        let harmonic = mixStems(options.stems, [.other: 1, .bass: 0.8, .piano: 1, .guitar: 1], length: audio.samples.count)
+        var tempoFeatures = features
+        if let p = percussive, let f = FeatureExtractor.extract(p, config: config, progress: { _ in progress?(0.46) ?? true }),
+           (f.rms.max() ?? 0) > 1e-4 { tempoFeatures = f }
+        var harmonyFeatures = features
+        if let h = harmonic, let f = FeatureExtractor.extract(h, config: config, progress: { _ in progress?(0.48) ?? true }),
+           (f.rms.max() ?? 0) > 1e-4 { harmonyFeatures = f }
+
+        let tempo = TempoAnalyzer.analyze(tempoFeatures, config: config) ?? (percussive != nil ? TempoAnalyzer.analyze(features, config: config) : nil)
         if progress?(0.5) == false { throw SongAnalysisError.cancelled }
 
         // Beat grid; fall back to a fixed 0.5 s grid when tempo could not be found.
@@ -93,13 +104,13 @@ public enum SongAnalyzer {
         if beats.count < 8 { beats = stride(from: 0.0, to: audio.duration, by: 0.5).map { $0 } }
         if let last = beats.last, last < audio.duration { beats.append(audio.duration) }
 
-        let key = HarmonyAnalyzer.estimateKey(chroma: features.chroma)
-        let beatChroma = HarmonyAnalyzer.beatSynchronous(features.chroma, beats: beats, frameRate: features.frameRate, dims: 12)
+        let key = HarmonyAnalyzer.estimateKey(chroma: harmonyFeatures.chroma)
+        let beatChroma = HarmonyAnalyzer.beatSynchronous(harmonyFeatures.chroma, beats: beats, frameRate: harmonyFeatures.frameRate, dims: 12)
         let beatBands = HarmonyAnalyzer.beatSynchronous(features.bands, beats: beats, frameRate: features.frameRate, dims: 12)
         let beatRMS = HarmonyAnalyzer.beatSynchronous(features.rms.map { [$0] }, beats: beats,
                                                      frameRate: features.frameRate, dims: 1).map { $0[0] }
-        let beatOnset = HarmonyAnalyzer.beatSynchronous(features.onsetEnvelope.map { [$0] }, beats: beats,
-                                                       frameRate: features.frameRate, dims: 1).map { $0[0] }
+        let beatOnset = HarmonyAnalyzer.beatSynchronous(tempoFeatures.onsetEnvelope.map { [$0] }, beats: beats,
+                                                       frameRate: tempoFeatures.frameRate, dims: 1).map { $0[0] }
         let chords = HarmonyAnalyzer.estimateChords(beatChroma: beatChroma, beats: beats, energy: beatRMS)
         let meter = tempo == nil ? nil : SectionInsights.timeSignature(beatStrength: beatOnset)
 
@@ -137,7 +148,7 @@ public enum SongAnalyzer {
             sections[i].activity = SectionInsights.activity(.init(timbre: t, leadVoiced: lead, leadMeanPitch: meanPitch, stemLevels: levels))
             // Local key: only flag when clearly different from the song key.
             let a = max(0, Int(section.startTime * features.frameRate)), b = min(features.frameCount, Int(section.endTime * features.frameRate))
-            if b - a > Int(features.frameRate * 8), let local = HarmonyAnalyzer.estimateKey(chroma: Array(features.chroma[a..<b])),
+            if b - a > Int(features.frameRate * 8), let local = HarmonyAnalyzer.estimateKey(chroma: Array(harmonyFeatures.chroma[a..<min(b, harmonyFeatures.frameCount)])),
                let global = key, local.value != global.value, local.confidence > 0.55 {
                 sections[i].key = local
             }
@@ -161,12 +172,12 @@ public enum SongAnalyzer {
         let bass = tempo == nil ? [] : BassAnalyzer.bassLine(bassSource, beats: beats)
         if bass.isEmpty { gaps.append("Bass line") }
         var chromaTotal = [Double](repeating: 0, count: 12)
-        for frame in features.chroma { let nf = Stats.normalized(frame); for i in 0..<12 { chromaTotal[i] += Double(nf[i]) } }
+        for frame in harmonyFeatures.chroma { let nf = Stats.normalized(frame); for i in 0..<12 { chromaTotal[i] += Double(nf[i]) } }
         let maxC = chromaTotal.max() ?? 0
         let scale = maxC > 0 ? Array(chromaTotal.indices.filter { chromaTotal[$0] >= 0.45 * maxC }.sorted { chromaTotal[$0] > chromaTotal[$1] }.prefix(8)) : []
         let insights = SongInsights(
             scaleNotes: scale,
-            rhythmicFeel: tempo == nil ? "Free / rubato (no steady beat detected)" : RhythmAnalyzer.feel(onsetEnvelope: features.onsetEnvelope, frameRate: features.frameRate, beats: beats),
+            rhythmicFeel: tempo == nil ? "Free / rubato (no steady beat detected)" : RhythmAnalyzer.feel(onsetEnvelope: tempoFeatures.onsetEnvelope, frameRate: tempoFeatures.frameRate, beats: beats),
             style: StyleDescriber.describe(bpm: tempo?.bpm, beatsPerBar: meter?.value, sections: sections),
             bassLine: bass,
             gaps: gaps)
@@ -192,6 +203,18 @@ public enum SongAnalyzer {
     }
 
     /// Recomputes lead/vocal activity and instrumental labels after the melody was replaced.
+    /// Weighted sum of the given stems (nil when none of them exist).
+    static func mixStems(_ stems: [StemInfo.Kind: AudioBuffer], _ weights: [StemInfo.Kind: Float], length: Int) -> AudioBuffer? {
+        let present = weights.filter { stems[$0.key] != nil }
+        guard !present.isEmpty, let rate = stems[present.keys.first!]?.sampleRate else { return nil }
+        var out = [Float](repeating: 0, count: length)
+        for (kind, w) in present {
+            let x = stems[kind]!.samples
+            for i in 0..<min(length, x.count) { out[i] += x[i] * w }
+        }
+        return AudioBuffer(samples: out, sampleRate: rate)
+    }
+
     public static func refreshLeadActivity(_ input: SongAnalysisResult) -> SongAnalysisResult {
         var r = input
         var lead: [UUID: Double] = [:]

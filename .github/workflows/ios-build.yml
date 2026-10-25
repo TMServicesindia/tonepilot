@@ -40,6 +40,11 @@ jobs:
           curl -fsSL -o App/Resources/SoundFonts/GeneralUser-GS-LICENSE.txt https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/documentation/LICENSE.txt
           ls -la App/Resources/SoundFonts
 
+      - name: Stem separator sources and weights (demucs.cpp MIT, Eigen MPL-2.0, htdemucs MIT)
+        run: |
+          Native/fetch-demucs.sh --weights
+          curl -fsSL -o App/Resources/Models/DEMUCS-LICENSE.txt https://raw.githubusercontent.com/facebookresearch/demucs/main/LICENSE || true
+
       - name: Generate Xcode project
         run: |
           brew install xcodegen
@@ -58,6 +63,9 @@ jobs:
           grep -q "BUILD SUCCEEDED" xcodebuild.log
           test -f build/Build/Products/Release-iphoneos/TonePilot.app/TonePilot
           file build/Build/Products/Release-iphoneos/TonePilot.app/TonePilot | grep -q arm64
+          # The separator must be linked in and its model bundled.
+          nm build/Build/Products/Release-iphoneos/TonePilot.app/TonePilot | grep -q tp_demucs_separate
+          test -s build/Build/Products/Release-iphoneos/TonePilot.app/Models/ggml-model-htdemucs-4s-f16.bin
 
       # Logs need a login to download; annotations are public, so surface errors there.
       - name: Report errors as annotations

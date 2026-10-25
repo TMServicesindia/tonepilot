@@ -12,9 +12,16 @@ public struct StudioTrack: Identifiable, Hashable, Sendable {
         case live
     }
 
-    /// Where the track appears in "My Playing + AI Background".
+    /// Where the track appears in the Song Studio.
     public enum Group: String, Sendable {
-        case myKeyboard, background, aiParts
+        /// Your keys.
+        case myKeyboard
+        /// The recording: its separated parts (vocals, drums, bass, music) or the full mix.
+        case songParts
+        /// Optional parts TonePilot generates from its analysis (not from the recording).
+        case aiExtras
+        /// The AI melody used by "AI plays difficult parts".
+        case aiParts
     }
 
     public var id: String
@@ -45,6 +52,10 @@ public enum SongStudio {
     public static let melody = "gen.melody"
     public static let keyboard = "live.keyboard"
 
+    public static func stemKind(_ id: String) -> StemInfo.Kind? {
+        StemInfo.Kind.allCases.first { stem($0) == id }
+    }
+
     /// Tracks available for `song`.
     /// - Parameters:
     ///   - hasAudio: the imported recording is on this device.
@@ -63,37 +74,47 @@ public enum SongStudio {
         ]
         if hasAudio {
             if stems.isEmpty {
-                out.append(track(original, "Original song", "The recording itself — vocals and all instruments", .audio, .background, "waveform"))
+                out.append(track(original, "Original song", "The full recording — vocals and every instrument together", .audio, .songParts, "waveform"))
             } else {
                 for kind in StemInfo.Kind.allCases where stems.contains(kind) {
-                    out.append(track(stem(kind), stemName(kind), "Separated from the recording (audio, not editable notes)", .audio, .background, stemSymbol(kind)))
+                    out.append(track(stem(kind), stemName(kind), stemDetail(kind), .audio, .songParts, stemSymbol(kind)))
                 }
             }
         }
         if hasBeats {
-            out.append(track(drums, "Rhythm", "Drum pattern on the song's beat — \((s.drumStyle).displayName)", .generated, .background, "metronome"))
+            out.append(track(drums, "AI rhythm", "A drum pattern TonePilot plays on the detected beat (\(s.drumStyle.displayName)) — not from the recording", .generated, .aiExtras, "metronome"))
         }
         if hasChords {
-            out.append(track(bass, "Bass", "Root → fifth on each chord, generated from the chord guide", .generated, .background, "waveform.path"))
-            out.append(track(chords, "Background chords", "\((s.chordStyle ?? .pad).displayName) following the song's chords", .generated, .background, "music.quarternote.3"))
+            out.append(track(bass, "AI bass", "Root → fifth on each detected chord — not from the recording", .generated, .aiExtras, "waveform.path"))
+            out.append(track(chords, "AI chords", "\((s.chordStyle ?? .pad).displayName) on the detected chords — not from the recording", .generated, .aiExtras, "music.quarternote.3"))
         }
         if hasMelody {
-            out.append(track(melody, "AI melody", "The AI plays the tune where you can't (choose the sections)", .generated, .aiParts, "music.note"))
+            out.append(track(melody, "AI melody", "The detected tune played with an instrument sound", .generated, .aiParts, "music.note"))
         }
         if hasBeats {
-            out.append(track(metronome, "Metronome", "Click on every beat", .generated, .background, "metronome.fill"))
+            out.append(track(metronome, "Click", "A click on every detected beat", .generated, .aiExtras, "metronome.fill"))
         }
         return out
     }
 
     public static func stemName(_ kind: StemInfo.Kind) -> String {
         switch kind {
-        case .vocals: return "Original vocals"
-        case .drums: return "Original drums"
-        case .bass: return "Original bass"
-        case .other: return "Original instruments"
-        case .piano: return "Original piano"
-        case .guitar: return "Original guitar"
+        case .vocals: return "Vocals"
+        case .drums: return "Drums & percussion"
+        case .bass: return "Bass"
+        case .other: return "Music & instruments"
+        case .piano: return "Piano"
+        case .guitar: return "Guitar"
+        }
+    }
+
+    static func stemDetail(_ kind: StemInfo.Kind) -> String {
+        switch kind {
+        case .vocals: return "The singers, separated from the recording"
+        case .drums: return "The song's own rhythm — drums, tabla, percussion"
+        case .bass: return "The song's own bass line"
+        case .other: return "Background score — strings, flute, keys, guitar and the rest"
+        case .piano, .guitar: return "Separated from the recording"
         }
     }
 
@@ -132,7 +153,7 @@ public enum SongStudio {
         case chords: return s.chordsLevel ?? 0.5
         case metronome: return s.metronomeLevel
         case melody: return s.guideLevel
-        default: return s.stemLevels?[id] ?? s.backingTrackLevel
+        default: return s.stemLevels?[id] ?? 0.9
         }
     }
 
@@ -178,12 +199,23 @@ public enum SongStudio {
         if s.soloTrack == id { s.soloTrack = nil } else { s.soloTrack = id; setOn(id, true, &s) }
     }
 
-    /// The level each track should actually play at, after on/off and solo. Your keyboard is
-    /// never silenced by another track's solo — you're always heard.
-    public static func effectiveLevel(_ id: String, _ s: AccompanimentSettings) -> Double {
-        guard isOn(id, s) else { return 0 }
+    /// The level each track should actually play at, after on/off, solo and — for the "AI plays
+    /// difficult parts" source — the chosen sections. Your keyboard is never silenced by a solo.
+    /// - Parameter section: the section playing now (needed for section-gated parts).
+    public static func effectiveLevel(_ id: String, _ s: AccompanimentSettings, section: UUID? = nil) -> Double {
         if let solo = s.soloTrack, solo != id, id != keyboard { return 0 }
+        if isGated(id, s) {
+            guard let section else { return 0 }
+            return (s.guideSections?.contains(section) ?? true) ? level(id, s) : 0
+        }
+        guard isOn(id, s) else { return 0 }
         return level(id, s)
+    }
+
+    /// True for the recording part that "AI plays difficult parts" plays only in chosen sections.
+    public static func isGated(_ id: String, _ s: AccompanimentSettings) -> Bool {
+        guard let source = s.aiPartTrack, source == id, id.hasPrefix("audio.stem.") else { return false }
+        return s.aiPartsEnabled == true
     }
 
     /// Settings used to build the sequencer events: every generated part the song can play is
@@ -203,7 +235,42 @@ public enum SongStudio {
         s.studioDefaultsApplied = true
     }
 
+    /// When the song has just been separated: the band plays (drums, bass, music) and the vocals
+    /// are off so you can play the melody; generated extras are off. Applied once per song.
+    public static func applyStemDefaults(_ s: inout AccompanimentSettings, stems: [StemInfo.Kind]) {
+        guard s.stemDefaultsApplied != true, !stems.isEmpty else { return }
+        s.backingTrack = true
+        s.stemsOff = stems.contains(.vocals) ? [stem(.vocals)] : []
+        s.bass = false; s.drums = false; s.chords = false; s.metronome = false
+        s.soloTrack = nil
+        if s.aiPartTrack == nil, stems.contains(.other) { s.aiPartTrack = stem(.other) }
+        s.stemDefaultsApplied = true
+    }
+
     // MARK: AI plays difficult parts
+
+    /// Whether "AI plays difficult parts" is on (for its current source).
+    public static func aiPartsOn(_ s: AccompanimentSettings) -> Bool {
+        s.aiPartTrack != nil ? s.aiPartsEnabled == true : s.melodyGuide
+    }
+
+    public static func setAIParts(_ on: Bool, _ s: inout AccompanimentSettings) {
+        if s.aiPartTrack != nil { s.aiPartsEnabled = on } else { s.melodyGuide = on }
+    }
+
+    /// Choose what plays the difficult parts: a recording part (stem id) or the AI melody (`melody`).
+    public static func setAIPartSource(_ id: String, _ s: inout AccompanimentSettings) {
+        let wasOn = aiPartsOn(s)
+        if id == melody {
+            s.aiPartTrack = nil
+            s.aiPartsEnabled = false
+            s.melodyGuide = wasOn
+        } else {
+            s.aiPartTrack = id
+            s.aiPartsEnabled = wasOn
+            s.melodyGuide = false
+        }
+    }
 
     /// Time ranges where the AI melody plays (nil = everywhere).
     public static func guideRanges(_ song: Song) -> [ClosedRange<Double>]? {
@@ -211,16 +278,23 @@ public enum SongStudio {
         return song.sections.filter { ids.contains($0.id) }.map { $0.startTime...max($0.startTime, $0.endTime) }
     }
 
-    /// Sections the AI suggests playing for you: instrumental passages that have a melody line,
-    /// and sections containing phrases flagged as difficult.
-    public static func suggestedAIParts(_ song: Song) -> [UUID] {
+    /// Sections the AI suggests playing for you. For the recording's music or the AI melody:
+    /// instrumental passages (intro, interludes, outro) that carry a melody line, plus sections
+    /// with difficult phrases. For the vocals: the sung sections containing difficult phrases
+    /// (or every sung section when none were flagged).
+    public static func suggestedAIParts(_ song: Song, source: String? = nil) -> [UUID] {
         let instrumental: Set<SectionType> = [.intro, .instrumentalIntro, .interlude, .instrumentalBreak, .outro]
         let notes = song.melody?.notes ?? []
         let hard = song.melody?.difficultPhrases ?? []
+        func hasMelody(_ sec: SongSection) -> Bool { notes.contains { $0.start >= sec.startTime && $0.start < sec.endTime } }
+        func difficult(_ sec: SongSection) -> Bool { hard.contains { $0.lowerBound < sec.endTime && $0.upperBound > sec.startTime } }
+        if source == stem(.vocals) {
+            let sung = song.orderedSections.filter { !instrumental.contains($0.type) && hasMelody($0) }
+            let hardSung = sung.filter(difficult)
+            return (hardSung.isEmpty ? sung : hardSung).map(\.id)
+        }
         return song.orderedSections.filter { sec in
-            let hasMelody = notes.contains { $0.start >= sec.startTime && $0.start < sec.endTime }
-            let difficult = hard.contains { $0.lowerBound < sec.endTime && $0.upperBound > sec.startTime }
-            return hasMelody && (instrumental.contains(sec.type) || difficult)
+            instrumental.contains(sec.type) && (hasMelody(sec) || source != nil) || (hasMelody(sec) && difficult(sec))
         }.map(\.id)
     }
 

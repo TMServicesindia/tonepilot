@@ -151,6 +151,13 @@ public struct AccompanimentSettings: Codable, Hashable, Sendable {
     public var stemsOff: [String]?
     /// Set once the Song Studio has applied its first-open defaults.
     public var studioDefaultsApplied: Bool?
+    /// "AI plays difficult parts" source: a stem track id (the recording's own vocals or
+    /// instruments, heard only in the chosen sections). nil = the AI melody (notes).
+    public var aiPartTrack: String?
+    /// On/off for a stem source (the AI melody uses `melodyGuide`).
+    public var aiPartsEnabled: Bool?
+    /// Set once the separated-parts defaults were applied (vocals off, the rest on).
+    public var stemDefaultsApplied: Bool?
 
     public enum ChordStyle: String, Codable, CaseIterable, Sendable {
         case pad, strings, piano
