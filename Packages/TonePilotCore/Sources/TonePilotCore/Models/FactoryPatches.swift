@@ -222,9 +222,14 @@ public extension Library {
             public var songId: UUID?
             public var subtitle: String
         }
+        public struct InstrumentGroup: Identifiable, Sendable {
+            public var id: InstrumentFamily { family }
+            public var family: InstrumentFamily
+            public var entries: [Entry]
+        }
         public var songTones: [Entry]
         public var myTones: [Entry]
-        public var instruments: [(family: InstrumentFamily, entries: [Entry])]
+        public var instruments: [InstrumentGroup]
     }
 
     func toneList(search: String = "") -> ToneList {
@@ -251,10 +256,10 @@ public extension Library {
             .map { ToneList.Entry(tone: $0, songId: nil, subtitle: layerNames($0)) }
         let hidden: Set<UUID> = [FactoryPatches.clickId, FactoryPatches.drumKitId]
         let playable = patches.filter { !hidden.contains($0.id) && matches($0.name) }
-        let instruments = InstrumentFamily.allCases.compactMap { family -> (InstrumentFamily, [ToneList.Entry])? in
+        let instruments = InstrumentFamily.allCases.compactMap { family -> ToneList.InstrumentGroup? in
             let entries = playable.filter { $0.family == family }
                 .map { ToneList.Entry(tone: .single($0), songId: nil, subtitle: $0.sourceType.displayName) }
-            return entries.isEmpty ? nil : (family, entries)
+            return entries.isEmpty ? nil : ToneList.InstrumentGroup(family: family, entries: entries)
         }
         return ToneList(songTones: songTones, myTones: myTones, instruments: instruments)
     }

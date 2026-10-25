@@ -44,7 +44,7 @@ struct ToneSelectorView: View {
                 if list.myTones.isEmpty { Text("Save any tone here with ⋯ › Save to My Tones.").font(.caption).foregroundStyle(.secondary) }
                 ForEach(list.myTones) { entry in row(entry, canSave: false) }
             } header: { Text("My tones") }
-            ForEach(list.instruments, id: \.family) { group in
+            ForEach(list.instruments) { group in
                 Section(group.family.displayName) {
                     ForEach(group.entries) { entry in row(entry, canSave: true) }
                 }

@@ -110,7 +110,7 @@ struct ListenModeView: View {
         await startListening()
         guard capture.isListening else { return }
         message = "Listening… play the song from the start. Come back to TonePilot any time — the arrangement builds by itself when the song ends."
-        await UIApplication.shared.open(link.url)
+        _ = await UIApplication.shared.open(link.url)
     }
 
     private func finish() {
@@ -138,6 +138,8 @@ struct ListenModeView: View {
 /// Lets one button switch between bordered and prominent styles.
 struct AnyButtonStyle: PrimitiveButtonStyle {
     private let make: (Configuration) -> AnyView
-    init<S: PrimitiveButtonStyle>(_ style: S) { make = { AnyView(Button(role: $0.role, action: $0.trigger) { $0.label }.buttonStyle(style)) } }
+    init<S: PrimitiveButtonStyle>(_ style: S) {
+        make = { config in AnyView(Button(role: config.role, action: config.trigger) { config.label }.buttonStyle(style)) }
+    }
     func makeBody(configuration: Configuration) -> some View { make(configuration) }
 }

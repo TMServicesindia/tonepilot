@@ -4,7 +4,8 @@ Apple only lets an app onto an iPhone if it is **signed**. That decides what's p
 
 | Route | Cost | "Tap a link to install"? | Needs a computer? | Lasts |
 |---|---|---|---|---|
-| **A. GitHub Actions + Sideloadly** (recommended free route) | Free | No: one USB install from a PC | Windows PC or Mac, only to install | 7 days, then re-install (one click) |
+| **A1. SideStore** (recommended free route) | Free | Almost: after a one-time PC setup, open the `.ipa` in SideStore on the iPhone | Once, for setup | Refreshes itself every 7 days on the phone (Wi-Fi + LocalDevVPN) |
+| A2. Sideloadly | Free | No: one USB install from a PC | Windows PC or Mac, every 7 days | 7 days, then re-install (one click) |
 | **B. TestFlight** | Apple Developer Program, US$99/year | **Yes**: an invite link opens TestFlight and installs | No (after the one-time setup) | 90 days per build; new builds arrive automatically |
 | C. Xcode on a Mac | Free | No | Mac | 7 days with a free Apple ID |
 
@@ -21,13 +22,29 @@ There is **no legitimate free service** that turns an app into a link that insta
    * runs all core tests on macOS,
    * bundles the GeneralUser GS sounds,
    * compiles the app for iPhone,
-   * produces **TonePilot-unsigned.ipa**.
+   * produces **TonePilot.ipa**.
 4. When it's green, open the run and download **TonePilot-ipa** under *Artifacts*. You can also push a tag like `v0.3.0`, and the `.ipa` will be attached to a **Release** with a permanent download link.
 
-### 2. Put it on the iPhone 15 (free Apple ID)
+### 2a. Put it on the iPhone 15 with SideStore (free Apple ID, refreshes on the phone)
+[SideStore](https://github.com/SideStore/SideStore) installs apps with your Apple ID and keeps them refreshed from the iPhone itself.
+1. **One-time setup (needs a computer, ~15 min):**
+   * On the iPhone, set a passcode and turn on **Settings › Privacy & Security › Developer Mode**.
+   * Install **LocalDevVPN** from the App Store on the iPhone.
+   * On a Windows PC or Mac, install iTunes (Windows: from Apple's website) and **iloader** from its official source: <https://github.com/nab138/iloader> (or iloader.app).
+   * Connect the iPhone by USB and use iloader to install SideStore. iloader also places the pairing file SideStore needs.
+   * On the iPhone, trust your Apple ID under **Settings › General › VPN & Device Management**.
+2. **Install TonePilot (no computer):**
+   * On the iPhone, open the TonePilot release page and download **TonePilot.ipa**.
+   * Connect to Wi-Fi and turn on LocalDevVPN.
+   * In SideStore, tap **My Apps › +** and choose the `.ipa`. Sign in with your Apple ID when asked.
+3. **Every week:** open SideStore with LocalDevVPN on and Wi-Fi connected. It refreshes TonePilot before its 7-day signature runs out, and your songs and tones are kept.
+
+Free Apple ID limit: 3 sideloaded apps at once, and SideStore itself counts as one. Current steps: <https://docs.sidestore.io>.
+
+### 2b. Or with Sideloadly (USB from a computer each time)
 1. On a Windows PC or Mac, install **Sideloadly** from <https://sideloadly.io>. On Windows, also install iTunes and iCloud from Apple's website, not the Microsoft Store versions.
 2. Connect the iPhone 15 with a USB-C cable and tap **Trust** on the phone.
-3. Drag `TonePilot-unsigned.ipa` into Sideloadly, enter your Apple ID (a free one works), and click **Start**.
+3. Drag `TonePilot.ipa` into Sideloadly, enter your Apple ID (a free one works), and click **Start**.
 4. On the iPhone:
    * **Settings › Privacy & Security › Developer Mode** → On (the phone restarts).
    * **Settings › General › VPN & Device Management** → trust your Apple ID.
