@@ -381,9 +381,16 @@ final class EngineTests: XCTestCase {
         let bank = try SoundFontBank(url: URL(fileURLWithPath: path))
         XCTAssertGreaterThan(bank.presets.count, 100)
         // Every factory patch must resolve in the default bank.
-        for patch in FactoryPatches.all {
+        for patch in FactoryPatches.generalMIDI {
             let ref = patch.soundFont!
             XCTAssertFalse(try bank.regions(bank: 0, program: Int(ref.program)).isEmpty, patch.name)
+        }
+        // Extended patches (incl. the GM drum kit on bank 128) load through the cache.
+        let dir = URL(fileURLWithPath: path).deletingLastPathComponent()
+        let cache = InstrumentCache(soundFontDirectory: dir, sampleDirectory: dir)
+        cache.register(bank: bank, as: FactoryPatches.defaultSoundFontFile)
+        for patch in FactoryPatches.extended {
+            XCTAssertNoThrow(try cache.instrument(for: patch), patch.name)
         }
         XCTAssertTrue(bank.hasPreset(bank: 128, program: 0), "GM drum kit")
         let piano = try LoadedInstrument(bank: bank, bankNumber: 0, program: 0)

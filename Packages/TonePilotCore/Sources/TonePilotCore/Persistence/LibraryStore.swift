@@ -51,6 +51,8 @@ public enum LibraryCodec {
             throw LibraryStoreError.unsupportedFutureSchema(version)
         }
         if version < 2 { object = migrateV1toV2(object) }
+        // v2 -> v3 added only optional fields (melody, chord guide, stems, switching, layer
+        // expression/filter/EQ, arrangement origin) which decode as absent; no rewrite needed.
         object["schemaVersion"] = Library.currentSchemaVersion
         let migrated = try JSONSerialization.data(withJSONObject: object)
         do {
@@ -88,11 +90,17 @@ public final class LibraryStore: @unchecked Sendable {
     public var backupURL: URL { rootDirectory.appendingPathComponent("library.backup.json") }
     public var audioDirectory: URL { rootDirectory.appendingPathComponent("Audio", isDirectory: true) }
     public var soundFontDirectory: URL { rootDirectory.appendingPathComponent("SoundFonts", isDirectory: true) }
+    /// Authorised user samples for sample-based patches.
+    public var sampleDirectory: URL { rootDirectory.appendingPathComponent("Samples", isDirectory: true) }
+    /// Separated stems per song: Stems/<song id>/vocals.wav …
+    public func stemDirectory(for songId: UUID) -> URL {
+        rootDirectory.appendingPathComponent("Stems", isDirectory: true).appendingPathComponent(songId.uuidString, isDirectory: true)
+    }
 
     public init(rootDirectory: URL) throws {
         self.rootDirectory = rootDirectory
         let fm = FileManager.default
-        for dir in [rootDirectory, audioDirectory, soundFontDirectory] {
+        for dir in [rootDirectory, audioDirectory, soundFontDirectory, sampleDirectory] {
             try fm.createDirectory(at: dir, withIntermediateDirectories: true)
         }
     }
@@ -139,6 +147,28 @@ public final class LibraryStore: @unchecked Sendable {
         }
         try fm.copyItem(at: source, to: directory.appendingPathComponent(name))
         return name
+    }
+
+    /// Copies metadata, samples and stems (not SoundFonts or imported songs unless asked) into
+    /// `destination` for backup. Returns the backup folder.
+    public func exportBackup(to destination: URL, includeSongAudio: Bool = false) throws -> URL {
+        let fm = FileManager.default
+        let stamp = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        let folder = destination.appendingPathComponent("TonePilot Backup \(stamp)", isDirectory: true)
+        try fm.createDirectory(at: folder, withIntermediateDirectories: true)
+        if fm.fileExists(atPath: libraryURL.path) { try fm.copyItem(at: libraryURL, to: folder.appendingPathComponent("library.json")) }
+        var dirs = [sampleDirectory, rootDirectory.appendingPathComponent("Stems")]
+        if includeSongAudio { dirs.append(audioDirectory) }
+        for dir in dirs where fm.fileExists(atPath: dir.path) {
+            try fm.copyItem(at: dir, to: folder.appendingPathComponent(dir.lastPathComponent))
+        }
+        return folder
+    }
+
+    /// Deletes a song's separated stems.
+    public func deleteStems(for songId: UUID) throws {
+        let dir = stemDirectory(for: songId)
+        if FileManager.default.fileExists(atPath: dir.path) { try FileManager.default.removeItem(at: dir) }
     }
 
     /// Deletes a song's imported audio file (used by data-retention controls).

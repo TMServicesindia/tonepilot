@@ -102,9 +102,15 @@ public enum HarmonyAnalyzer {
         var events: [ChordEvent] = []
         var start = 0
         for i in 1...b where i == b || path[i] != path[start] {
-            let conf = (start..<i).map { emit[$0][path[start]] }.reduce(0, +) / Float(i - start)
+            let span = Float(i - start)
+            let mean = (0..<k).map { j in (start..<i).map { emit[$0][j] }.reduce(0, +) / span }
+            let conf = mean[path[start]]
+            // Close runners-up are offered as alternative interpretations (e.g. C vs Am share two notes).
+            let alternatives = (0..<(k - 1)).filter { $0 != path[start] && mean[$0] >= conf - 0.12 }
+                .sorted { mean[$0] > mean[$1] }.prefix(2).map { chordLabels[$0] }
             events.append(ChordEvent(time: beats[start], duration: beats[i] - beats[start],
-                                     symbol: chordLabels[path[start]], confidence: Double(max(0, min(1, conf)))))
+                                     symbol: chordLabels[path[start]], confidence: Double(max(0, min(1, conf))),
+                                     alternatives: alternatives.isEmpty ? nil : Array(alternatives)))
             start = i
         }
         return events

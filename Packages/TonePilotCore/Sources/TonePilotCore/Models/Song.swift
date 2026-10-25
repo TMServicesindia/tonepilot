@@ -37,6 +37,12 @@ public struct SongSection: Codable, Hashable, Identifiable, Sendable {
     /// Group id of sections the analyser thinks repeat each other (A, B, ...).
     public var repetitionGroup: String?
     public var notes: String?
+    /// What the analysis heard in this section (lead line, pad, bass, percussion…).
+    public var activity: [SectionActivity]?
+    /// Local key when it differs from the song key (key change).
+    public var key: Estimate<MusicalKey>?
+    /// Sound-character measurements, kept so a section can be re-arranged without re-analysis.
+    public var timbre: SectionTimbre?
 
     public init(id: UUID = UUID(), type: SectionType, label: String? = nil, startTime: Double, endTime: Double,
                 startBar: Int? = nil, endBar: Int? = nil, confidence: Double = 1,
@@ -65,12 +71,15 @@ public struct ChordEvent: Codable, Hashable, Sendable {
     /// e.g. "Am", "C", "N" for no chord.
     public var symbol: String
     public var confidence: Double
+    /// Next-best readings, most likely first.
+    public var alternatives: [String]?
 
-    public init(time: Double, duration: Double, symbol: String, confidence: Double) {
+    public init(time: Double, duration: Double, symbol: String, confidence: Double, alternatives: [String]? = nil) {
         self.time = time
         self.duration = duration
         self.symbol = symbol
         self.confidence = confidence
+        self.alternatives = alternatives
     }
 }
 
@@ -115,6 +124,20 @@ public struct Song: Codable, Hashable, Identifiable, Sendable {
     public var isFavorite: Bool
     public var createdAt: Date
     public var updatedAt: Date
+    /// Lead/vocal melody estimate (editable).
+    public var melody: MelodyTrack?
+    /// Left-hand Root → Fifth → Root guidance (editable).
+    public var chordGuide: [ChordGuideStep]?
+    /// Beats per bar estimate (3 or 4).
+    public var timeSignature: Estimate<Int>?
+    /// Separated stems produced by the optional backend.
+    public var stems: [StemInfo]?
+    /// How tones change while performing this song.
+    public var switching: SwitchingSettings?
+    /// Accompaniment the app can play along (all off by default).
+    public var accompaniment: AccompanimentSettings?
+    /// Semitones applied to guides and accompaniment (the user's chosen performance key).
+    public var performanceTranspose: Int?
 
     public init(id: UUID = UUID(), title: String, artist: String? = nil, film: String? = nil,
                 composer: String? = nil, language: String? = nil, tags: [String] = [],
@@ -169,5 +192,46 @@ public struct Playlist: Codable, Hashable, Identifiable, Sendable {
         self.id = id
         self.name = name
         self.songIds = songIds
+    }
+}
+
+
+/// Evidence-based description of what plays in a section.
+public struct SectionActivity: Codable, Hashable, Sendable {
+    public enum Source: String, Codable, Sendable {
+        /// Inferred from spectral features of the full mix.
+        case mixFeatures
+        /// Measured on separated stems (backend).
+        case stems
+    }
+    public var role: MusicalRole
+    /// 0...1 how strongly the role is present.
+    public var level: Double
+    public var evidence: String
+    public var source: Source
+
+    public init(role: MusicalRole, level: Double, evidence: String, source: Source) {
+        self.role = role
+        self.level = max(0, min(1, level))
+        self.evidence = evidence
+        self.source = source
+    }
+}
+
+public struct StemInfo: Codable, Hashable, Sendable {
+    public enum Kind: String, Codable, CaseIterable, Sendable { case vocals, drums, bass, other, piano, guitar }
+    public var kind: Kind
+    /// File name in the song's stem folder.
+    public var fileName: String
+    /// Model that produced it, e.g. "htdemucs" or "htdemucs_6s".
+    public var model: String
+    /// Per-section RMS level (section id -> 0...1), for activity detection.
+    public var sectionLevels: [UUID: Double]?
+
+    public init(kind: Kind, fileName: String, model: String, sectionLevels: [UUID: Double]? = nil) {
+        self.kind = kind
+        self.fileName = fileName
+        self.model = model
+        self.sectionLevels = sectionLevels
     }
 }

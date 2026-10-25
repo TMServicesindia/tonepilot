@@ -33,7 +33,7 @@ public struct ToneSuggestion: Codable, Hashable, Identifiable, Sendable {
 /// Everything the user owns, persisted as one versioned JSON document.
 /// Large audio files live in separate directories and are referenced by file name.
 public struct Library: Codable, Hashable, Sendable {
-    public static let currentSchemaVersion = 2
+    public static let currentSchemaVersion = 3
 
     public var schemaVersion: Int
     public var songs: [Song]
