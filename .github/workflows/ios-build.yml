@@ -66,7 +66,8 @@ jobs:
           # The separator must be linked in and its model bundled.
           APP=build/Build/Products/Release-iphoneos/TonePilot.app
           find "$APP" -name "*.bin" | sed 's/^/::notice title=Bundled model::/'
-          if ! nm "$APP/TonePilot" 2>/dev/null | grep -q tp_demucs_separate && ! strings "$APP/TonePilot" | grep -q "htdemucs"; then
+          # (no grep -q here: it exits early and pipefail then reports nm's SIGPIPE as a failure)
+          if [ "$(nm "$APP/TonePilot" 2>/dev/null | grep -c tp_demucs_separate)" = "0" ]; then
             echo "::error title=Separator::tp_demucs symbols not found in the app binary"; exit 1
           fi
           if [ -z "$(find "$APP" -name 'ggml-model-htdemucs-4s-f16.bin' -size +10M)" ]; then
