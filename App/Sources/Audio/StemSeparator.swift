@@ -41,12 +41,13 @@ enum StemSeparator {
 
     /// Parallel workers: one per performance core plus some efficiency cores, leaving one free
     /// for audio and the UI.
-    /// Parallel workers. Each one briefly needs about 1.1 GB (measured: Demucs' time decoder), and
-    /// iOS closes apps that go over their memory limit (≈3 GB on an iPhone 15) — so this is based
-    /// on the memory actually available, not the number of cores. Usually 1.
+    /// Parallel workers. iOS closes apps that go over their memory limit (≈3 GB on an iPhone 15),
+    /// so this is based on the memory actually available, not the number of cores. Measured on
+    /// Apple Silicon with TonePilot's optimised engine: ~0.8 GB per worker at its peak (2 workers
+    /// 1.6 GB), so an iPhone 15 runs 2 — re-checked before every block.
     static var workers: Int {
         if let w = workersOverride { return w }
-        let perWorker = 1_300 * 1_048_576, reserve = 700 * 1_048_576
+        let perWorker = 1_000 * 1_048_576, reserve = 700 * 1_048_576
         let available = availableMemory
         guard available > 0 else { return 1 }
         return max(1, min(2, (available - reserve) / perWorker))

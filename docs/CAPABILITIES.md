@@ -166,3 +166,14 @@ One screen per song for playing, mixing and changing section tones. It replaces 
 | **AI plays difficult parts** from the recording itself: the original music or vocals play only in the sections you choose (or the AI melody) | ✅ core · 🟡 UI | Same test |
 | Generated rhythm, bass, chords and click grouped as **AI extras**, off by default | ✅ | They are clearly labelled as not from the recording |
 | Main tone (one tone for the whole song) or a tone per section | 🟡 | Main tone = the song's own tone not tied to a section |
+
+### Separation: memory, speed and quality (measured on Apple Silicon in CI)
+
+| | Original demucs.cpp | TonePilot build |
+|---|---|---|
+| Output | reference | identical (difference 123 dB below the signal, max 1.4e-6) |
+| Peak memory per worker | 2,040 MB | 786 MB |
+| Time, 1 worker | 3.13× the audio length | 2.27× |
+| Time, 2 workers | — (doesn't fit an iPhone) | 1.34× (1.6 GB) |
+
+The speed-ups change only how the same sums are computed: transposed convolutions without the zero-stuffed matrix (`Native/CDemucs/conv_tr_fast.inc`) and matrix products on Apple Accelerate. Earlier builds ran 4 workers at ~2 GB each, so iOS closed the app during separation. The worker count now follows the memory available (2 on an iPhone 15) and is re-checked before every block.
