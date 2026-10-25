@@ -7,7 +7,7 @@ Status key:
 * ⏳ **Planned**
 * ⛔ **Blocked** (licensing, hardware or technical)
 
-Totals: **114 Swift tests** (111 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
+Totals: **118 Swift tests** (115 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
 
 ## 1. Live playing on the Casio CT-X870IN (priority 1)
 
@@ -154,3 +154,15 @@ One screen per song for playing, mixing and changing section tones. It replaces 
 | Tones change automatically at section boundaries (driven by the playback position, never by key presses), or assisted with a tap to switch | ✅ core · 🟡 UI | Existing `SectionScheduler` |
 | Per-section track volumes | ⏳ | Track levels apply to the whole song. Tones and the AI melody can differ per section |
 | Editing or regenerating notes of rhythm/bass/chords | ⏳ | They're regenerated from the chord guide (fix chords in the Melody & chord guide). AI melody notes can be corrected there |
+
+## 13. Song parts — Moises-style separation on the iPhone
+
+| Capability | Status | Evidence / notes |
+|---|---|---|
+| Separate a song into **Vocals, Drums & percussion, Bass, Music & instruments** on the iPhone (Demucs v4 `htdemucs` 4-source via demucs.cpp; nothing is uploaded) | ✅ engine · 🟡 iPhone | CI on Apple Silicon (`stems-bench.yml`): the app's own `StemSeparator` code separates a 50 s song with four known parts in 78 s (1.57× real time, 3 workers). Drums, bass and music land in the right files (0.79 / 1.00 / 0.95 correlation); the synthetic "voice" (a pure tone) is not recognised as vocals, real singing should be. Expect ≈6 min for a 4-minute song on an iPhone 15 |
+| Runs automatically after the first analysis; progress, time left, cancel; parts saved as AAC per song | 🟡 | Blocks of 20 s with 1 s cross-faded overlaps in parallel (`StemChunkPlan`/`StemMerger`, exact reconstruction tested) |
+| Parts play in sync with on/off, volume, solo; vocals off by default after separation | ✅ core · 🟡 UI | `testSeparatedDefaultsAndAIPartsFromTheRecording` |
+| Re-analysis from the parts: beat from drums, chords from the instruments, melody from vocals | ✅ | `testStemsGiveCleanerChordsThanTheMix` |
+| **AI plays difficult parts** from the recording itself: the original music or vocals play only in the sections you choose (or the AI melody) | ✅ core · 🟡 UI | Same test |
+| Generated rhythm, bass, chords and click grouped as **AI extras**, off by default | ✅ | They are clearly labelled as not from the recording |
+| Main tone (one tone for the whole song) or a tone per section | 🟡 | Main tone = the song's own tone not tied to a section |

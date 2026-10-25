@@ -371,7 +371,7 @@ struct SeparationCard: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(song.analysisStatus == .running)
-                    Text(song.analysisStatus == .running ? "Starts automatically after the analysis." : "Takes a few minutes (about 1¼× the song's length).")
+                    Text(song.analysisStatus == .running ? "Starts automatically after the analysis." : "Takes a few minutes (about 1½× the song's length; about 6 min for a 4-minute song).")
                         .font(.caption2).foregroundStyle(.secondary)
                 } else {
                     Text("The separation model isn't included in this build.").font(.caption).foregroundStyle(Theme.warn)
