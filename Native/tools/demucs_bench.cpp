@@ -11,10 +11,23 @@
 #include <vector>
 
 static const int SR = 44100;
+#include <mach/mach.h>
+extern "C" void (*tp_demucs_debug_log)(const char *message);
+static long footprint_mb() {
+    task_vm_info_data_t info; mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
+    if (task_info(mach_task_self(), TASK_VM_INFO, (task_info_t)&info, &count) != KERN_SUCCESS) return -1;
+    return (long)(info.phys_footprint / 1048576);
+}
+static long peak_seen = 0;
+static void log_mem(const char *m) {
+    long f = footprint_mb();
+    if (f > peak_seen + 50) { peak_seen = f; std::printf("STEP %5ld MB  %s\n", f, m); std::fflush(stdout); }
+}
 
 int main(int argc, char **argv) {
     if (argc < 2) { std::fprintf(stderr, "usage: %s model.bin [threads] [seconds]\n", argv[0]); return 1; }
     int threads = argc > 2 ? std::atoi(argv[2]) : 3;
+    if (getenv("TP_TRACE")) tp_demucs_debug_log = log_mem;
     double seconds = argc > 3 ? std::atof(argv[3]) : 40;
     long n = (long)(seconds * SR);
     // Parts: 0 drums, 1 bass, 2 other (chords), 3 vocals — the model's output order.

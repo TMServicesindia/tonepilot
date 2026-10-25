@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+extern "C" void (*tp_demucs_debug_log)(const char *message) = nullptr;
+
 struct tp_demucs {
     demucscpp::demucs_model model;
 };
@@ -28,8 +30,9 @@ extern "C" int tp_demucs_separate(const tp_demucs *model, const float *left, con
     try {
         Eigen::MatrixXf audio(2, frames);
         for (long i = 0; i < frames; ++i) { audio(0, i) = left[i]; audio(1, i) = right[i]; }
-        demucscpp::ProgressCallback cb = [progress, context](float p, const std::string &) {
+        demucscpp::ProgressCallback cb = [progress, context](float p, const std::string &message) {
             if (progress) progress(context, p);
+            if (tp_demucs_debug_log) tp_demucs_debug_log(message.c_str());
         };
         Eigen::Tensor3dXf targets = demucscpp::demucs_inference(model->model, audio, cb);
         const int sources = tp_demucs_source_count(model);
