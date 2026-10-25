@@ -87,8 +87,18 @@ jobs:
           path: xcodebuild.log
           if-no-files-found: ignore
 
-      - name: Publish release download (on version tags)
-        if: startsWith(github.ref, 'refs/tags/v')
+      # Every successful build of main becomes a release, so this link always has the newest app:
+      # https://github.com/<owner>/<repo>/releases/latest/download/TonePilot.ipa
+      - name: Publish release download
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v0.3.{0}', github.run_number) }}
+          name: TonePilot ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('0.3.{0}', github.run_number) }}
+          target_commitish: ${{ github.sha }}
+          make_latest: true
+          body: |
+            Installable iPhone build of TonePilot (unsigned .ipa, includes GeneralUser GS sounds).
+            Install with SideStore or Sideloadly using your Apple ID — see docs/INSTALL_ON_IPHONE.md.
+            Built from ${{ github.sha }}.
           files: TonePilot.ipa

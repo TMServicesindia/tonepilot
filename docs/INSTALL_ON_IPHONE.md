@@ -23,7 +23,8 @@ There is **no legitimate free service** that turns an app into a link that insta
    * bundles the GeneralUser GS sounds,
    * compiles the app for iPhone,
    * produces **TonePilot.ipa**.
-4. When it's green, open the run and download **TonePilot-ipa** under *Artifacts*. You can also push a tag like `v0.3.0`, and the `.ipa` will be attached to a **Release** with a permanent download link.
+4. When it's green, every build of `main` is published as a Release. The newest app is always at
+   **https://github.com/TMServicesindia/tonepilot/releases/latest/download/TonePilot.ipa**
 
 ### 2a. Put it on the iPhone 15 with SideStore (free Apple ID, refreshes on the phone)
 [SideStore](https://github.com/SideStore/SideStore) installs apps with your Apple ID and keeps them refreshed from the iPhone itself.
