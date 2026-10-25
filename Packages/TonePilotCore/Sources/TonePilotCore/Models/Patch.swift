@@ -130,6 +130,9 @@ public struct FilterSettings: Codable, Hashable, Sendable {
     }
 }
 
+/// Per-layer effect amounts. In ToneEngine these are send levels (0...100) into the shared
+/// master reverb / chorus / delay buses; delay time and feedback then come from
+/// `MasterEffects`. (`delayTime`/`delayFeedback` here are used by the legacy Apple-sampler engine.)
 public struct EffectSettings: Codable, Hashable, Sendable {
     /// 0...100 wet/dry percentage.
     public var reverbMix: Double
@@ -137,10 +140,101 @@ public struct EffectSettings: Codable, Hashable, Sendable {
     /// Seconds.
     public var delayTime: Double
     public var delayFeedback: Double
+    /// 0...100 chorus send.
+    public var chorusMix: Double
+    public var eq: EQSettings
 
-    public init(reverbMix: Double = 15, delayMix: Double = 0, delayTime: Double = 0.35, delayFeedback: Double = 25) {
+    public init(reverbMix: Double = 15, delayMix: Double = 0, delayTime: Double = 0.35, delayFeedback: Double = 25,
+                chorusMix: Double = 0, eq: EQSettings = EQSettings()) {
         self.reverbMix = reverbMix
         self.delayMix = delayMix
+        self.delayTime = delayTime
+        self.delayFeedback = delayFeedback
+        self.chorusMix = chorusMix
+        self.eq = eq
+    }
+
+    enum CodingKeys: String, CodingKey { case reverbMix, delayMix, delayTime, delayFeedback, chorusMix, eq }
+
+    /// Fields added in schema v3 decode with defaults so older libraries still load.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        reverbMix = try c.decode(Double.self, forKey: .reverbMix)
+        delayMix = try c.decode(Double.self, forKey: .delayMix)
+        delayTime = try c.decode(Double.self, forKey: .delayTime)
+        delayFeedback = try c.decode(Double.self, forKey: .delayFeedback)
+        chorusMix = try c.decodeIfPresent(Double.self, forKey: .chorusMix) ?? 0
+        eq = try c.decodeIfPresent(EQSettings.self, forKey: .eq) ?? EQSettings()
+    }
+}
+
+public struct EQSettings: Codable, Hashable, Sendable {
+    public var lowDB: Double
+    public var midDB: Double
+    public var midFrequency: Double
+    public var highDB: Double
+
+    public init(lowDB: Double = 0, midDB: Double = 0, midFrequency: Double = 1200, highDB: Double = 0) {
+        self.lowDB = max(-15, min(15, lowDB))
+        self.midDB = max(-15, min(15, midDB))
+        self.midFrequency = max(200, min(8000, midFrequency))
+        self.highDB = max(-15, min(15, highDB))
+    }
+
+    public var isFlat: Bool { abs(lowDB) < 0.05 && abs(midDB) < 0.05 && abs(highDB) < 0.05 }
+}
+
+/// How a layer responds to playing: mono/legato with glide suits flute and violin leads
+/// (slides between notes approximate gamaka-like movement); vibrato adds life to sustained notes.
+public struct ExpressionSettings: Codable, Hashable, Sendable {
+    public var mono: Bool
+    /// Seconds to slide from the previous note (mono only). 0 = no glide.
+    public var glideTime: Double
+    /// Pitch-bend wheel range in semitones.
+    public var bendRange: Double
+    /// Vibrato depth in cents (0 = off), rate in Hz, delay before it fades in (s).
+    public var vibratoDepth: Double
+    public var vibratoRate: Double
+    public var vibratoDelay: Double
+    /// 0 = every note full volume, 1 = fully velocity-sensitive.
+    public var velocitySensitivity: Double
+
+    public init(mono: Bool = false, glideTime: Double = 0, bendRange: Double = 2, vibratoDepth: Double = 0,
+                vibratoRate: Double = 5.5, vibratoDelay: Double = 0.35, velocitySensitivity: Double = 1) {
+        self.mono = mono
+        self.glideTime = max(0, min(2, glideTime))
+        self.bendRange = max(0, min(24, bendRange))
+        self.vibratoDepth = max(0, min(100, vibratoDepth))
+        self.vibratoRate = max(0.5, min(12, vibratoRate))
+        self.vibratoDelay = max(0, min(3, vibratoDelay))
+        self.velocitySensitivity = max(0, min(1, velocitySensitivity))
+    }
+
+    public static let poly = ExpressionSettings()
+    public static let expressiveLead = ExpressionSettings(mono: true, glideTime: 0.06, bendRange: 2, vibratoDepth: 18)
+}
+
+/// Master bus of a composite tone.
+public struct MasterEffects: Codable, Hashable, Sendable {
+    public var eq: EQSettings
+    /// Return levels 0...1 of the shared effect buses.
+    public var reverbLevel: Double
+    public var reverbSize: Double
+    public var reverbDamping: Double
+    public var chorusLevel: Double
+    public var delayLevel: Double
+    public var delayTime: Double
+    /// 0...0.9
+    public var delayFeedback: Double
+
+    public init(eq: EQSettings = EQSettings(), reverbLevel: Double = 0.8, reverbSize: Double = 0.6, reverbDamping: Double = 0.5,
+                chorusLevel: Double = 0.7, delayLevel: Double = 0.6, delayTime: Double = 0.35, delayFeedback: Double = 0.3) {
+        self.eq = eq
+        self.reverbLevel = reverbLevel
+        self.reverbSize = reverbSize
+        self.reverbDamping = reverbDamping
+        self.chorusLevel = chorusLevel
+        self.delayLevel = delayLevel
         self.delayTime = delayTime
         self.delayFeedback = delayFeedback
     }
@@ -177,12 +271,26 @@ public struct InstrumentPatch: Codable, Hashable, Identifiable, Sendable {
     public var isFavorite: Bool
     public var license: LicenseInfo
     public var notes: String?
+    /// Oscillator definition when `sourceType == .synthesized`.
+    public var synth: SynthSettings?
+    /// Default playing behaviour (mono/glide/vibrato) — e.g. flute leads glide between notes.
+    public var expression: ExpressionSettings?
+    /// Free-form descriptors used by tone matching ("breathy", "bright", "bansuri-like").
+    public var tags: [String]?
+
+    /// Envelope rule: SoundFont patches use each SoundFont region's own envelope unless a layer
+    /// overrides it; user-sample and synth patches use `envelope`.
+    public var usesOwnEnvelope: Bool { sourceType != .soundFont }
 
     public init(id: UUID = UUID(), name: String, family: InstrumentFamily, sourceType: PatchSourceType,
                 soundFont: SoundFontReference? = nil, sampleZones: [SampleZone] = [],
                 envelope: Envelope = Envelope(), filter: FilterSettings = FilterSettings(),
                 effects: EffectSettings = EffectSettings(), isFavorite: Bool = false,
-                license: LicenseInfo = .unknown, notes: String? = nil) {
+                license: LicenseInfo = .unknown, notes: String? = nil, synth: SynthSettings? = nil,
+                expression: ExpressionSettings? = nil, tags: [String]? = nil) {
+        self.synth = synth
+        self.expression = expression
+        self.tags = tags
         self.id = id
         self.name = name
         self.family = family

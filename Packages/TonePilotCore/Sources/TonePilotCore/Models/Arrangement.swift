@@ -1,5 +1,29 @@
 import Foundation
 
+/// The job a sound does in the arrangement. Drives patch choice, key range and effects.
+public enum MusicalRole: String, Codable, CaseIterable, Sendable {
+    case lead, vocalMelody, harmony, pad, keys, accent, bass, percussion, texture, motif
+
+    public var displayName: String {
+        switch self {
+        case .lead: return "Lead"
+        case .vocalMelody: return "Vocal melody"
+        case .harmony: return "Harmony"
+        case .pad: return "Sustained pad / strings"
+        case .keys: return "Piano / keys"
+        case .accent: return "Plucked / bell accents"
+        case .bass: return "Bass"
+        case .percussion: return "Percussion"
+        case .texture: return "Background texture"
+        case .motif: return "Instrumental motif"
+        }
+    }
+}
+
+public enum ArrangementOrigin: String, Codable, Sendable {
+    case aiOriginal, myVersion, user
+}
+
 /// One voice inside a composite tone. Several layers can sound on the same key
 /// (stacking), or cover different key ranges (splits) or velocity ranges.
 public struct Layer: Codable, Hashable, Identifiable, Sendable {
@@ -26,12 +50,22 @@ public struct Layer: Codable, Hashable, Identifiable, Sendable {
     public var envelopeOverride: Envelope?
     /// Overrides the patch's effects when set.
     public var effectsOverride: EffectSettings?
+    /// Overrides the patch's filter when set.
+    public var filterOverride: FilterSettings?
+    /// Overrides the patch's mono/glide/vibrato/bend behaviour when set.
+    public var expressionOverride: ExpressionSettings?
+    /// What this layer does in the arrangement (set by the AutoArranger, editable).
+    public var role: MusicalRole?
 
     public init(id: UUID = UUID(), patchId: UUID, volume: Double = 0.8, pan: Double = 0, octave: Int = 0,
                 transpose: Int = 0, fineTuneCents: Double = 0, keyRange: KeyRange = .full,
                 velocityRange: VelocityRange = .full, enabled: Bool = true, muted: Bool = false,
                 solo: Bool = false, midiChannel: UInt8? = nil, envelopeOverride: Envelope? = nil,
-                effectsOverride: EffectSettings? = nil) {
+                effectsOverride: EffectSettings? = nil, filterOverride: FilterSettings? = nil,
+                expressionOverride: ExpressionSettings? = nil, role: MusicalRole? = nil) {
+        self.filterOverride = filterOverride
+        self.expressionOverride = expressionOverride
+        self.role = role
         self.id = id
         self.patchId = patchId
         self.volume = max(0, min(1, volume))
@@ -64,9 +98,23 @@ public struct Arrangement: Codable, Hashable, Identifiable, Sendable {
     public var isFavorite: Bool
     public var createdAt: Date
     public var updatedAt: Date
+    /// Master EQ / effect returns (nil = defaults).
+    public var master: MasterEffects?
+    /// AI Original (kept unchanged) vs My Version (user-editable copy) vs plain user tone.
+    public var origin: ArrangementOrigin?
+    /// For My Version: the AI Original it was copied from.
+    public var derivedFrom: UUID?
+    /// Why the AutoArranger built it this way (shown in the UI).
+    public var rationale: String?
 
     public init(id: UUID = UUID(), name: String, layers: [Layer] = [], masterGain: Double = 0.8,
-                isFavorite: Bool = false, createdAt: Date = Date(), updatedAt: Date = Date()) {
+                isFavorite: Bool = false, createdAt: Date = Date(), updatedAt: Date = Date(),
+                master: MasterEffects? = nil, origin: ArrangementOrigin? = nil, derivedFrom: UUID? = nil,
+                rationale: String? = nil) {
+        self.master = master
+        self.origin = origin
+        self.derivedFrom = derivedFrom
+        self.rationale = rationale
         self.id = id
         self.name = name
         self.layers = layers
@@ -83,5 +131,32 @@ public struct Arrangement: Codable, Hashable, Identifiable, Sendable {
         let soloed = enabled.filter { $0.solo }
         if !soloed.isEmpty { return soloed }
         return enabled.filter { !$0.muted }
+    }
+
+    public var masterEffects: MasterEffects { master ?? MasterEffects() }
+
+    /// Editable copy of an AI Original, keeping layer ids so section links stay valid.
+    public func makeMyVersion() -> Arrangement {
+        var copy = self
+        copy.id = UUID()
+        copy.origin = .myVersion
+        copy.derivedFrom = id
+        copy.name = name.replacingOccurrences(of: " (AI)", with: "") + " (My Version)"
+        copy.createdAt = Date()
+        copy.updatedAt = Date()
+        return copy
+    }
+
+    /// Duplicate with fresh ids (for "Duplicate tone").
+    public func duplicated(name newName: String? = nil) -> Arrangement {
+        var copy = self
+        copy.id = UUID()
+        copy.name = newName ?? name + " copy"
+        copy.origin = .user
+        copy.derivedFrom = nil
+        copy.layers = layers.map { var l = $0; l.id = UUID(); return l }
+        copy.createdAt = Date()
+        copy.updatedAt = Date()
+        return copy
     }
 }
