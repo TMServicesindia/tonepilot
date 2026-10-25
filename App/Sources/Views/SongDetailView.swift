@@ -10,7 +10,6 @@ struct SongDetailView: View {
     @State private var editingSection: SongSection?
     @State private var editingTone: ToneEditTarget?
     @State private var showLimitations = false
-    @State private var confirmServerUpload = false
     @State private var showListen = false
 
     private var song: Song? { model.song(songId) }
@@ -21,7 +20,7 @@ struct SongDetailView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     header(song)
                     statusCard(song)
-                    if song.analysisStatus == .completed { arrangementSummary(song) }
+                    if song.analysisStatus == .completed { overviewCard(song); arrangementSummary(song) }
                     if !song.sections.isEmpty || song.duration != nil {
                         Card(title: "Song timeline") {
                             SectionTimeline(song: song, selected: $selectedSection, playhead: model.activeSongId == songId ? model.songPosition : nil)
@@ -42,13 +41,6 @@ struct SongDetailView: View {
                 NavigationStack { ArrangementEditorView(songId: songId, arrangementId: target.id) }
                     .environmentObject(model)
             }
-            .confirmationDialog("Upload this song to your analysis server?", isPresented: $confirmServerUpload, titleVisibility: .visible) {
-                Button("Upload and analyse") { model.analyze(songId: songId, useServer: true) }
-                Button("Analyse on this iPhone only") { model.analyze(songId: songId) }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("The audio goes to \(model.serverSettings.baseURL) to separate vocals (Demucs) and transcribe the melody (Basic Pitch). TonePilot deletes it from the server after downloading the results.")
-            }
         } else {
             ContentUnavailableView("Song not found", systemImage: "questionmark")
         }
@@ -58,7 +50,7 @@ struct SongDetailView: View {
 
     private func header(_ song: Song) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text([song.film, song.composer, song.language].compactMap { $0 }.joined(separator: " · ").ifEmpty("Add film, composer and language in Library"))
+            Text([song.artist, song.album ?? song.film, song.composer, song.language].compactMap { $0 }.joined(separator: " · ").ifEmpty(" "))
                 .font(.subheadline).foregroundStyle(.secondary)
             if song.sourceType == .youtubeLink, let link = song.sourceReference, let url = URL(string: link) {
                 Link(destination: url) { Label("Open in YouTube", systemImage: "play.rectangle") }
@@ -70,7 +62,7 @@ struct SongDetailView: View {
 
     private func startAnalysis(_ song: Song) {
         if song.sourceType == .listened || song.sourceType == .youtubeLink { showListen = true; return }
-        if model.serverSettings.enabled { confirmServerUpload = true } else { model.analyze(songId: songId) }
+        model.analyze(songId: songId, useServer: model.serverSettings.enabled)
     }
 
     @ViewBuilder private func statusCard(_ song: Song) -> some View {
@@ -95,13 +87,10 @@ struct SongDetailView: View {
                     if song.sourceType == .listened {
                         Button { showListen = true } label: { Label("Listen again to analyse", systemImage: "ear") }.buttonStyle(.borderedProminent)
                     } else if song.sourceType == .importedFile {
-                        if song.userConfirmedRights {
-                            Button { startAnalysis(song) } label: { Label("Analyse & arrange automatically", systemImage: "wand.and.stars") }
-                                .buttonStyle(.borderedProminent)
-                        } else {
-                            Text("Confirm you own or are authorised to process this audio before analysing.").font(.footnote).foregroundStyle(.secondary)
-                            Button("I confirm") { var s = song; s.userConfirmedRights = true; model.update(s) }
+                        Button { startAnalysis(song) } label: {
+                            Label(song.analysisStatus == .failed ? "Try again" : "Analyse & arrange", systemImage: "wand.and.stars")
                         }
+                        .buttonStyle(.borderedProminent)
                     } else {
                         Text("No audio. Add sections manually below.").foregroundStyle(.secondary)
                     }
@@ -150,6 +139,35 @@ struct SongDetailView: View {
                 .font(.footnote)
                 Button(song.sourceType == .listened ? "Listen again to re-analyse" : "Re-analyse") { startAnalysis(song) }.font(.caption)
             }
+        }
+    }
+
+    private func overviewCard(_ song: Song) -> some View {
+        Card(title: "Song overview") {
+            VStack(alignment: .leading, spacing: 6) {
+                row("Key", song.key.map { k in
+                    let scale = song.insights?.scaleNoteNames.joined(separator: " ") ?? ""
+                    return "\(k.value.displayName) · tonic \(NoteName.sharpNames[k.value.tonic])\(scale.isEmpty ? "" : " · notes used: \(scale)")"
+                })
+                row("Tempo", song.bpm.map { "\(Int($0.value.rounded())) BPM" })
+                row("Time", song.timeSignature.map { $0.value == 3 ? "3/4 or 6/8 (3-feel)" : "\($0.value)/4" })
+                row("Feel", song.insights?.rhythmicFeel)
+                row("Style", song.insights.map { $0.style.joined(separator: " · ") })
+                if let movement = song.insights?.rootMovement(from: 0, to: 30), !movement.isEmpty { row("Bass (start)", movement) }
+                if let gaps = song.insights?.gaps, !gaps.isEmpty {
+                    Text("Not available for this audio: " + gaps.joined(separator: "; ")).font(.caption).foregroundStyle(Theme.warn)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private func row(_ label: String, _ value: String?) -> some View {
+        if let value, !value.isEmpty {
+            HStack(alignment: .top) {
+                Text(label).foregroundStyle(.secondary).frame(width: 84, alignment: .leading)
+                Text(value)
+            }
+            .font(.subheadline)
         }
     }
 
@@ -265,6 +283,7 @@ struct SectionToneRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(section.label).font(.headline)
+                        if section.isClimax == true { Text("CLIMAX").font(.caption2.bold()).padding(.horizontal, 5).background(Theme.accent.opacity(0.3), in: Capsule()) }
                         if section.provenance != .user { ConfidenceBadge(confidence: section.confidence, provenance: section.provenance) }
                     }
                     Text("\(section.startTime.mmss) – \(section.endTime.mmss)").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
@@ -335,6 +354,9 @@ struct SectionToneRow: View {
     }
 
     @ViewBuilder private var details: some View {
+        NavigationLink { SectionGuideView(songId: song.id, sectionId: section.id) } label: {
+            Label("Section guide & practice", systemImage: "music.note.list")
+        }
         if let rationale = song.aiOriginal(for: section)?.rationale ?? tone?.rationale {
             Text(rationale).font(.caption).foregroundStyle(.secondary)
         }

@@ -19,17 +19,28 @@ final class SectionPlayer {
         set { player.volume = newValue }
     }
 
+    /// Changes playback speed without changing pitch (practice at 50–100%).
+    private let timePitch = AVAudioUnitTimePitch()
+
+    /// 0.5...1.0 (1 = normal speed). Pitch stays the same.
+    var rate: Float {
+        get { timePitch.rate }
+        set { timePitch.rate = max(0.25, min(2, newValue)) }
+    }
+
     init(player: AVAudioPlayerNode, engine: AVAudioEngine) {
         self.player = player
         self.engine = engine
+        engine.attach(timePitch)
     }
 
     func load(url: URL) throws {
         if loadedURL == url, file != nil { return }
         stop()
         let f = try AVAudioFile(forReading: url)
-        // Match the player's connection to the file so no implicit conversion is needed.
-        engine.connect(player, to: engine.mainMixerNode, format: f.processingFormat)
+        // player -> time/pitch (slow practice) -> mixer, matching the file's format.
+        engine.connect(player, to: timePitch, format: f.processingFormat)
+        engine.connect(timePitch, to: engine.mainMixerNode, format: f.processingFormat)
         file = f
         loadedURL = url
     }

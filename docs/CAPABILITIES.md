@@ -7,7 +7,7 @@ Status key:
 * ⏳ **Planned**
 * ⛔ **Blocked** (licensing, hardware or technical)
 
-Totals: **88 Swift tests** (86 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
+Totals: **101 Swift tests** (99 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
 
 ## 1. Live playing on the Casio CT-X870IN (priority 1)
 
@@ -59,7 +59,11 @@ Totals: **88 Swift tests** (86 run by default; 2 need environment variables — 
 
 | Capability | Status | Notes |
 |---|---|---|
-| MP3/M4A/WAV/AIFF import with a rights confirmation; YouTube = link only | ✅ core · 🟡 UI | No YouTube downloading, by policy |
+| One-step MP3/M4A/WAV/AIFF import: pick a file, analysis starts automatically; title/artist from ID3 tags (v1/v2.2–2.4) or the filename; file never modified; unreadable files get a short error + Try again | ✅ core · 🟡 UI | `AudioFileTagsTests` (UTF-16 tags, v1 trailer, stripped/malformed tags) |
+| Tone Selector: pick any song tone, saved tone or instrument and play it on the Casio for any music; last tone restored at launch | ✅ core · 🟡 UI | `ToneListTests` |
+| Song overview: key + tonic + notes used, BPM, meter, rhythmic feel, style descriptors, bass/root movement; failed parts listed instead of guessed | ✅ | `BreakdownTests` (bass C→G→A→F recovered, straight vs shuffle, gaps reported; no BPM invented for a beatless drone) |
+| Section guide: instruments heard (with %), changes from the previous section, climax, tone to use, LH pattern by tempo/feel, RH phrases, chord voicings with smooth inversions, instructions, practice steps | ✅ core · 🟡 UI | `testVoicingsUseSmoothInversions`, `testFullBreakdownFromAnalysis` |
+| Practice: loop a section at 50/75/90/100% speed (pitch preserved), next/previous section | 🟡 | AVAudioUnitTimePitch; generated accompaniment pauses below 100% |
 | **Listen Mode** — analyse a song playing from a licensed streaming app via the microphone; audio kept in memory only and discarded | ✅ core · 🟡 capture/UI | `ListenSessionTests` (auto-stop at song end, silence trimming, noisy capture → full pipeline at 120 ± 3 BPM). Accuracy depends on volume and room noise; stems/server are not used for captures |
 | **Link → listen**: paste a YouTube/YouTube Music/Spotify/JioSaavn/Apple Music link; TonePilot fetches the public title (oEmbed), starts the mic, opens the link in its app, keeps listening in the background and builds the arrangement when the song ends | ✅ core · 🟡 app | `SongLinkTests` (service detection, oEmbed URLs, title cleanup). Live oEmbed not reachable from the build environment. **Background recording while another app plays needs device verification** |
 | Direct streaming-service integration (Spotify/Apple Music audio) | ⛔ | Spotify blocked audio-analysis/audio-features for new apps (Nov 2024); MusicKit doesn't expose audio. Listen Mode is the supported route |

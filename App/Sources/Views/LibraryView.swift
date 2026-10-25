@@ -7,6 +7,8 @@ struct LibraryView: View {
     @State private var query = ""
     @State private var showImport = false
     @State private var showListen = false
+    @State private var pickMP3 = false
+    @State private var openedSong: UUID?
     @State private var showNewPlaylist = false
     @State private var newPlaylistName = ""
     @State private var filterPlaylist: UUID?
@@ -24,6 +26,12 @@ struct LibraryView: View {
 
     var body: some View {
         List {
+            if let error = model.importError {
+                Section {
+                    Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(Theme.bad).font(.footnote)
+                    Button("Try again") { model.importError = nil; pickMP3 = true }
+                }
+            }
             if !model.library.playlists.isEmpty {
                 Section("Playlists") {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -55,7 +63,7 @@ struct LibraryView: View {
                     } actions: {
                         if query.isEmpty {
                             Button("Listen to a song") { showListen = true }.buttonStyle(.borderedProminent)
-                            Button("Import an audio file") { showImport = true }
+                            Button("Import MP3") { pickMP3 = true }
                         }
                     }
                 }
@@ -85,13 +93,18 @@ struct LibraryView: View {
         }
         .navigationTitle("Library")
         .navigationDestination(for: UUID.self) { SongDetailView(songId: $0) }
+        .navigationDestination(item: $openedSong) { SongDetailView(songId: $0) }
+        .fileImporter(isPresented: $pickMP3, allowedContentTypes: [.mp3, .mpeg4Audio, .wav, .aiff, .audio]) { result in
+            if case .success(let url) = result, let id = model.importAndAnalyze(from: url) { openedSong = id }
+        }
         .searchable(text: $query, prompt: "Title, film, composer, language, tag")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) { ConnectionStatus(midi: model.midi) }
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
                     Button { showListen = true } label: { Label("Listen to a song (streaming app)", systemImage: "ear") }
-                    Button { showImport = true } label: { Label("Import an audio file", systemImage: "square.and.arrow.down") }
+                    Button { pickMP3 = true } label: { Label("Import MP3 / audio file", systemImage: "square.and.arrow.down") }
+                    Button { showImport = true } label: { Label("Save a YouTube link", systemImage: "link") }
                     Button { showNewPlaylist = true } label: { Label("New playlist", systemImage: "text.badge.plus") }
                 } label: { Image(systemName: "plus") }
             }
@@ -160,9 +173,6 @@ struct ImportSongView: View {
     @State private var composer = ""
     @State private var language = ""
     @State private var link = ""
-    @State private var rightsConfirmed = false
-    @State private var analyseNow = true
-    @State private var useServer = false
     @State private var pickFile = false
     @State private var error: String?
 
@@ -184,20 +194,10 @@ struct ImportSongView: View {
 
                 if mode == 0 {
                     Section {
-                        Toggle("I own this audio or am authorised to process it", isOn: $rightsConfirmed)
-                        Toggle("Analyse & arrange automatically", isOn: $analyseNow)
-                        if model.serverSettings.enabled && analyseNow {
-                            Toggle("Send to my analysis server for vocal separation", isOn: $useServer)
-                        }
+                        Button { pickFile = true } label: { Label("Choose MP3 / audio file…", systemImage: "folder") }
                     } footer: {
-                        Text(useServer && model.serverSettings.enabled
-                             ? "The song is uploaded to \(model.serverSettings.baseURL) to separate vocals and transcribe the melody, then deleted from the server."
-                             : "MP3, M4A, WAV and AIFF are supported. TonePilot analyses the song on this iPhone and builds tones for every section automatically — nothing is uploaded.")
+                        Text("MP3, M4A, WAV and AIFF. Analysis starts as soon as the file is added; title and artist come from the file's tags or its name.")
                     }
-                    Button { pickFile = true } label: {
-                        Label("Choose audio file…", systemImage: "folder")
-                    }
-                    .disabled(!rightsConfirmed)
                 } else {
                     Section {
                         TextField("https://www.youtube.com/watch?v=…", text: $link)
@@ -229,15 +229,14 @@ struct ImportSongView: View {
     }
 
     private func importFile(_ url: URL) {
-        do {
-            var song = try model.importAudio(from: url, title: title, rightsConfirmed: rightsConfirmed)
+        guard let id = model.importAndAnalyze(from: url) else { error = model.importError; return }
+        // Details typed in the form (optional) override the file's tags.
+        if var song = model.song(id) {
+            if !title.isEmpty { song.title = title }
             applyDetails(&song)
             model.update(song)
-            if analyseNow { model.analyze(songId: song.id, useServer: useServer && model.serverSettings.enabled) }
-            dismiss()
-        } catch {
-            self.error = "Import failed: \(error.localizedDescription)"
         }
+        dismiss()
     }
 
     private func saveLink() {

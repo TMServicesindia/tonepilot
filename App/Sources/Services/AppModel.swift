@@ -309,15 +309,16 @@ final class AppModel: ObservableObject {
     }
 
     /// Plays the imported song from `time` as backing/clock. The engine's sequencer follows it.
-    func playBackingTrack(from time: Double, to end: Double? = nil, loop: Bool = false) {
+    func playBackingTrack(from time: Double, to end: Double? = nil, loop: Bool = false, rate: Float = 1) {
         guard let song = song(activeSongId), let url = audioURL(for: song) else { return }
         do { try sectionPlayer.load(url: url) } catch { engineError = "Playback failed: \(error.localizedDescription)"; return }
         let acc = song.accompaniment ?? AccompanimentSettings()
         // With the backing track switched off it still runs silently as the timing reference.
         sectionPlayer.volume = acc.backingTrack ? Float(acc.backingTrackLevel) : 0
+        sectionPlayer.rate = rate
         sectionPlayer.play(from: time, to: end, loop: loop)
         isSectionPlaying = true
-        host?.controller.setTransport(playing: true, seconds: time)
+        if sectionPlayer.rate == 1 { host?.controller.setTransport(playing: true, seconds: time) }
     }
 
     func stopBackingTrack() {
@@ -345,7 +346,7 @@ final class AppModel: ObservableObject {
             time = sectionPlayer.currentTime
             if !sectionPlayer.isPlaying, isSectionPlaying { isSectionPlaying = false }
             // Keep the accompaniment clock locked to the backing track.
-            if let t = time, let host, !host.core.isTransportPlaying || abs(host.core.transportSeconds - t) > 0.06 {
+            if let t = time, let host, sectionPlayer.rate == 1, !host.core.isTransportPlaying || abs(host.core.transportSeconds - t) > 0.06 {
                 host.controller.setTransport(playing: true, seconds: t)
             }
         case .timer:
@@ -490,19 +491,52 @@ final class AppModel: ObservableObject {
         return store.audioDirectory.appendingPathComponent(name)
     }
 
-    /// Copies a user-selected file into app storage and creates a song for it.
-    func importAudio(from url: URL, title: String, rightsConfirmed: Bool) throws -> Song {
+    /// Last import that failed because the audio couldn't be read (shown with a Retry button).
+    @Published var importError: String?
+
+    /// One-step import: copy the file, check it decodes, take title/artist from its tags (or the
+    /// filename), and start analysis immediately. The file itself is never modified.
+    @discardableResult
+    func importAndAnalyze(from url: URL) -> UUID? {
+        importError = nil
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
-        let name = try store.importFile(from: url, into: store.audioDirectory)
+        let name: String
+        do { name = try store.importFile(from: url, into: store.audioDirectory) } catch {
+            importError = "Couldn't copy “\(url.lastPathComponent)”: \(error.localizedDescription)"
+            return nil
+        }
         let stored = store.audioDirectory.appendingPathComponent(name)
-        var song = Song(title: title.isEmpty ? url.deletingPathExtension().lastPathComponent : title,
-                        sourceType: .importedFile, sourceReference: name, userConfirmedRights: rightsConfirmed,
-                        duration: AudioFileDecoder.duration(of: stored))
+        guard let duration = AudioFileDecoder.duration(of: stored), duration > 0 else {
+            try? store.deleteAudio(named: name)
+            importError = "“\(url.lastPathComponent)” couldn't be read as audio. Check that it plays, then try again."
+            return nil
+        }
+        let tags = AudioFileTags.read(url: stored)
+        var song = Song(title: tags.displayTitle(filename: url.lastPathComponent), artist: tags.artist,
+                        sourceType: .importedFile, sourceReference: name, userConfirmedRights: true, duration: duration)
+        song.album = tags.album
         song.arrangements = [.starterFilmStack(name: "Main tone")]
         update(song)
-        return song
+        analyze(songId: song.id, useServer: serverSettings.enabled)
+        return song.id
     }
+
+    // MARK: Practice
+
+    /// Loops a section at a practice speed (0.5–1.0). Generated accompaniment pauses below 100%
+    /// because it can't follow a slowed recording yet.
+    func practice(songId: UUID, sectionId: UUID, rate: Float) {
+        ensurePerformance(songId: songId)
+        guard let song = song(songId), let section = song.sections.first(where: { $0.id == sectionId }) else { return }
+        playBackingTrack(from: section.startTime, to: section.endTime, loop: true, rate: rate)
+        // Practice always plays the recording so you can hear the part.
+        sectionPlayer.volume = Float(song.accompaniment?.backingTrackLevel ?? 0.8)
+        if rate != 1 { host?.controller.setTransport(playing: false, seconds: section.startTime) }
+        activateSection(sectionId)
+    }
+
+    var practiceRate: Float { sectionPlayer.rate }
 
     func importSoundFont(from url: URL) throws {
         let scoped = url.startAccessingSecurityScopedResource()
@@ -622,7 +656,6 @@ final class AppModel: ObservableObject {
     /// - Parameter useServer: the user consented to upload this song to *their* analysis server.
     func analyze(songId: UUID, useServer: Bool = false) {
         guard var song = library.song(id: songId), let url = audioURL(for: song) else { return }
-        guard song.userConfirmedRights else { return }
         analysisTasks[songId]?.cancel()
         song.analysisStatus = .running
         song.analysisError = nil

@@ -10,7 +10,7 @@ Sound is generated on the iPhone (TonePilot's own sample/synth engine using Soun
 > * **Listen Mode** — play it in Spotify, YouTube Music, Apple Music, JioSaavn… (services you're licensed to listen to). TonePilot listens through the microphone, builds the arrangement, and discards the audio (never saved or uploaded).
 > * **Import an audio file you own** (MP3/M4A/WAV/AIFF), e.g. a purchased track.
 >
-> TonePilot does not download from YouTube or unlicensed sites, and won't analyse files from them.
+> Then pick any tone in **Play › Choose tone** — song tones, your tones, or instruments — and play any music with it on the Casio, like the keyboard's own Piano or Strings.
 
 * What works and how it was verified: **[docs/CAPABILITIES.md](docs/CAPABILITIES.md)**
 * Research, architecture, licences and hardware plan: **[docs/FEASIBILITY.md](docs/FEASIBILITY.md)**
@@ -19,7 +19,7 @@ Sound is generated on the iPhone (TonePilot's own sample/synth engine using Soun
 
 ## The one-click flow
 
-1. **Library › + › Listen to a song**: paste the song's YouTube/Spotify/JioSaavn/Apple Music link and tap **Open & listen** (or just play it yourself); TonePilot listens until it ends. Or **Import an audio file** you own (optionally sent to *your* analysis server for vocal separation).
+1. **Library › + › Import MP3**: pick the file. That's it: analysis starts immediately (title/artist from its tags or filename). Or **Listen to a song**: paste the song's YouTube/Spotify/JioSaavn/Apple Music link and tap **Open & listen** (or just play it yourself); TonePilot listens until it ends. Or **Import an audio file** you own (optionally sent to *your* analysis server for vocal separation).
 2. TonePilot runs, on the phone:
    * tempo and beats, key (and key changes), time signature
    * chords, with alternatives and a Sa–Pa drone where no clear chord exists
@@ -52,7 +52,7 @@ cd TonePilot && xcodegen generate && open TonePilot.xcodeproj
 ### Tests
 
 ```bash
-cd Packages/TonePilotCore && swift test     # 88 tests (macOS or Linux; Docker: swift:6.0-noble)
+cd Packages/TonePilotCore && swift test     # 101 tests (macOS or Linux; Docker: swift:6.0-noble)
 TONEPILOT_SF2=/path/GeneralUser-GS.sf2 swift test   # also tests the real SoundFont
 cd server && pip install -r requirements-dev.txt && pytest tests   # 8 tests
 ```

@@ -1,17 +1,19 @@
 import SwiftUI
 import TonePilotCore
+import UniformTypeIdentifiers
 
 /// Analyse tab: songs and their analysis state.
 struct AnalyseHomeView: View {
     @EnvironmentObject var model: AppModel
     @State private var showImport = false
     @State private var showListen = false
+    @State private var pickMP3 = false
 
     var body: some View {
         List {
             Section {
                 Button { showListen = true } label: { Label("Listen to a song from your streaming app", systemImage: "ear") }
-                Button { showImport = true } label: { Label("Import an audio file you own", systemImage: "square.and.arrow.down") }
+                Button { pickMP3 = true } label: { Label("Import MP3 / audio file", systemImage: "square.and.arrow.down") }
             } footer: {
                 Text("Analysis runs on this iPhone: tempo & beats, key, chords, section boundaries and repeated parts, plus tone suggestions.")
             }
@@ -36,5 +38,8 @@ struct AnalyseHomeView: View {
         .navigationDestination(for: UUID.self) { SongDetailView(songId: $0) }
         .sheet(isPresented: $showImport) { ImportSongView().environmentObject(model) }
         .sheet(isPresented: $showListen) { ListenModeView().environmentObject(model) }
+        .fileImporter(isPresented: $pickMP3, allowedContentTypes: [.mp3, .mpeg4Audio, .wav, .aiff, .audio]) { result in
+            if case .success(let url) = result { model.importAndAnalyze(from: url) }
+        }
     }
 }

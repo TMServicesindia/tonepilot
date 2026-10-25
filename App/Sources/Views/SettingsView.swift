@@ -44,7 +44,7 @@ struct SettingsView: View {
                     Button { backupURL = try? model.exportBackup() } label: { Label("Back up library & samples…", systemImage: "externaldrive") }
                 }
             } header: { Text("Your data") } footer: {
-                Text("Everything is stored on this iPhone (Files › On My iPhone › TonePilot). Songs are analysed on-device; audio is only sent to an analysis server you set up, after you confirm. Deleting a song also deletes its audio and stems. Backups include your library, sample files and stems, not the songs themselves.")
+                Text("Everything is stored on this iPhone (Files › On My iPhone › TonePilot). Songs are analysed on-device; audio is only sent to an analysis server you set up and switch on. Deleting a song also deletes its audio and stems. Backups include your library, sample files and stems, not the songs themselves.")
             }
             Section("About") {
                 NavigationLink("Licenses & credits") { LicensesView() }
@@ -259,7 +259,7 @@ struct AnalysisServerSettingsView: View {
                 }
                 Toggle("Transcribe vocal melody (Basic Pitch)", isOn: $model.serverSettings.transcribeVocals)
             } footer: {
-                Text("Run the server from the project's server/ folder on your Mac (see server/README.md). TonePilot asks before uploading each song and deletes it from the server after downloading the results. The token is stored in the iPhone Keychain.")
+                Text("Run the server from the project's server/ folder on your Mac (see server/README.md). While this is on, every imported song is sent to this server for vocal separation and deleted there after the results download. Turn it off to analyse on the iPhone only. The token is stored in the iPhone Keychain.")
             }
             Section {
                 Button(testing ? "Testing…" : "Test connection") {
