@@ -18,16 +18,32 @@ static long footprint_mb() {
     if (task_info(mach_task_self(), TASK_VM_INFO, (task_info_t)&info, &count) != KERN_SUCCESS) return -1;
     return (long)(info.phys_footprint / 1048576);
 }
-static long peak_seen = 0;
-static void log_mem(const char *m) {
-    long f = footprint_mb();
-    if (f > peak_seen + 50) { peak_seen = f; std::printf("STEP %5ld MB  %s\n", f, m); std::fflush(stdout); }
+#include <atomic>
+#include <mutex>
+#include <string>
+static std::mutex step_lock;
+static std::string current_step = "start", peak_step;
+static std::atomic<long> peak_mb{0};
+static std::atomic<bool> sampling{true};
+static void log_mem(const char *m) { std::lock_guard<std::mutex> g(step_lock); current_step = m; }
+// Samples the footprint every 2 ms and remembers which step was running at the peak.
+static void sampler() {
+    while (sampling) {
+        long f = footprint_mb();
+        if (f > peak_mb) {
+            peak_mb = f;
+            std::lock_guard<std::mutex> g(step_lock);
+            if (f > 600) std::printf("PEAK %5ld MB during: %s\n", f, current_step.c_str());
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
 }
 
 int main(int argc, char **argv) {
     if (argc < 2) { std::fprintf(stderr, "usage: %s model.bin [threads] [seconds]\n", argv[0]); return 1; }
     int threads = argc > 2 ? std::atoi(argv[2]) : 3;
-    if (getenv("TP_TRACE")) tp_demucs_debug_log = log_mem;
+    std::thread sampler_thread;
+    if (getenv("TP_TRACE")) { tp_demucs_debug_log = log_mem; sampler_thread = std::thread(sampler); }
     double seconds = argc > 3 ? std::atof(argv[3]) : 40;
     long n = (long)(seconds * SR);
     // Parts: 0 drums, 1 bass, 2 other (chords), 3 vocals — the model's output order.
@@ -95,5 +111,8 @@ int main(int argc, char **argv) {
     }
     std::printf("RESULT %d/4 parts land in the right stem\n", correct);
     tp_demucs_free(model);
+    sampling = false;
+    if (sampler_thread.joinable()) sampler_thread.join();
+    std::printf("PEAK final %ld MB\n", peak_mb.load());
     return correct >= 3 ? 0 : 3;
 }
