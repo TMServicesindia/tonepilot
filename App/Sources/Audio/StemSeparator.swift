@@ -26,8 +26,11 @@ enum StemSeparator {
     static let order: [StemInfo.Kind] = [.drums, .bass, .other, .vocals]
     static let sampleRate = 44_100.0
 
+    /// Tests point this at the weights file.
+    nonisolated(unsafe) static var modelOverride: URL?
+
     static var modelURL: URL? {
-        Bundle.main.url(forResource: modelName, withExtension: "bin", subdirectory: "Models")
+        modelOverride ?? Bundle.main.url(forResource: modelName, withExtension: "bin", subdirectory: "Models")
             ?? Bundle.main.url(forResource: modelName, withExtension: "bin")
     }
 
