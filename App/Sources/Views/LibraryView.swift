@@ -156,6 +156,7 @@ struct ImportSongView: View {
     @State private var link = ""
     @State private var rightsConfirmed = false
     @State private var analyseNow = true
+    @State private var useServer = false
     @State private var pickFile = false
     @State private var error: String?
 
@@ -178,9 +179,14 @@ struct ImportSongView: View {
                 if mode == 0 {
                     Section {
                         Toggle("I own this audio or am authorised to process it", isOn: $rightsConfirmed)
-                        Toggle("Analyse after import", isOn: $analyseNow)
+                        Toggle("Analyse & arrange automatically", isOn: $analyseNow)
+                        if model.serverSettings.enabled && analyseNow {
+                            Toggle("Send to my analysis server for vocal separation", isOn: $useServer)
+                        }
                     } footer: {
-                        Text("MP3, M4A, WAV and AIFF are supported. Audio is copied into TonePilot and analysed on this iPhone — nothing is uploaded.")
+                        Text(useServer && model.serverSettings.enabled
+                             ? "The song is uploaded to \(model.serverSettings.baseURL) to separate vocals and transcribe the melody, then deleted from the server."
+                             : "MP3, M4A, WAV and AIFF are supported. TonePilot analyses the song on this iPhone and builds tones for every section automatically — nothing is uploaded.")
                     }
                     Button { pickFile = true } label: {
                         Label("Choose audio file…", systemImage: "folder")
@@ -221,7 +227,7 @@ struct ImportSongView: View {
             var song = try model.importAudio(from: url, title: title, rightsConfirmed: rightsConfirmed)
             applyDetails(&song)
             model.update(song)
-            if analyseNow { model.analyze(songId: song.id) }
+            if analyseNow { model.analyze(songId: song.id, useServer: useServer && model.serverSettings.enabled) }
             dismiss()
         } catch {
             self.error = "Import failed: \(error.localizedDescription)"

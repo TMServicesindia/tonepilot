@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @EnvironmentObject var model: AppModel
+    @State private var backupURL: URL?
 
     var body: some View {
         List {
@@ -15,18 +16,35 @@ struct SettingsView: View {
                     ForEach(VelocityCurve.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
                 }
             }
-            Section("Sounds") {
+            Section {
+                Picker("Sound engine", selection: Binding(get: { model.engineKind }, set: { model.setEngine($0) })) {
+                    ForEach(EngineKind.allCases) { Text($0.displayName).tag($0) }
+                }
                 NavigationLink { SoundFontSettingsView() } label: {
                     Label("SoundFonts", systemImage: "music.quarternote.3")
                     Spacer()
                     if !model.defaultSoundFontInstalled { Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Theme.warn) }
                 }
+                NavigationLink { SamplePatchCreatorView() } label: { Label("Create a sample instrument", systemImage: "waveform.badge.plus") }
+            } header: { Text("Sounds") } footer: {
+                Text("The TonePilot engine supports per-layer envelope, filter, EQ, chorus, glide/vibrato, and the generated accompaniment. The Apple sampler is a simpler fallback.")
             }
-            Section("Your data") {
+            Section("AI analysis") {
+                NavigationLink { AnalysisServerSettingsView() } label: {
+                    Label("Analysis server (vocal separation)", systemImage: "server.rack")
+                    Spacer()
+                    Text(model.serverSettings.enabled ? "On" : "Off").foregroundStyle(.secondary)
+                }
+            }
+            Section {
                 LabeledContent("Songs", value: "\(model.library.songs.count)")
-                LabeledContent("Storage", value: model.store.rootDirectory.lastPathComponent)
-                Text("Everything is stored on this iPhone (Files › On My iPhone › TonePilot). Audio is analysed on-device and never uploaded. Deleting a song also deletes its imported audio.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                if let backupURL {
+                    ShareLink(item: backupURL) { Label("Share backup folder", systemImage: "square.and.arrow.up") }
+                } else {
+                    Button { backupURL = try? model.exportBackup() } label: { Label("Back up library & samples…", systemImage: "externaldrive") }
+                }
+            } header: { Text("Your data") } footer: {
+                Text("Everything is stored on this iPhone (Files › On My iPhone › TonePilot). Songs are analysed on-device; audio is only sent to an analysis server you set up, after you confirm. Deleting a song also deletes its audio and stems. Backups include your library, sample files and stems, not the songs themselves.")
             }
             Section("About") {
                 NavigationLink("Licenses & credits") { LicensesView() }
@@ -61,7 +79,7 @@ struct MIDIDiagnosticsView: View {
                 Button("Rescan devices") { midi.refreshSources() }
             }
             Section("Audio output") {
-                Text(model.engine.routeDescription).font(.footnote)
+                Text(model.output.routeDescription).font(.footnote)
                 OutputMeter()
                 if model.patchLoadErrors.isEmpty == false {
                     ForEach(model.patchLoadErrors, id: \.self) { Text($0).font(.footnote).foregroundStyle(Theme.bad) }
@@ -167,11 +185,11 @@ struct LicensesView: View {
             Section("Sounds") {
                 Text("General MIDI presets reference GeneralUser GS by S. Christian Collins (GeneralUser GS License v2.0) when installed. The author notes sample origins can't be 100% verified; review before commercial distribution.")
             }
-            Section("Analysis") {
-                Text("Tempo, key, chord and structure analysis are implemented in TonePilotCore (this project) using published methods: Ellis 2007 beat tracking, Krumhansl–Kessler key profiles, Foote 2000 novelty segmentation.")
+            Section("On-device analysis & sound") {
+                Text("Implemented in TonePilotCore (this project) from published methods: Ellis 2007 beat tracking, Krumhansl–Kessler key profiles, Foote 2000 novelty segmentation, Salamon & Gómez 2012-style predominant melody, Freeverb (public domain) reverb.")
             }
-            Section("Planned (not included yet)") {
-                Text("Demucs (MIT) for stem separation and Spotify Basic Pitch (Apache-2.0) for note transcription, run on a Mac/server or as Core ML models after license and size review.")
+            Section("Optional analysis server") {
+                Text("Demucs (MIT, github.com/adefossez/demucs) for stem separation and Spotify Basic Pitch (Apache-2.0, github.com/spotify/basic-pitch) for vocal transcription run on your own Mac/server — not bundled in the app.")
             }
         }
         .navigationTitle("Licenses")
@@ -217,5 +235,44 @@ struct SetupWizardView: View {
             }
             .padding(24)
         }
+    }
+}
+
+
+struct AnalysisServerSettingsView: View {
+    @EnvironmentObject var model: AppModel
+    @State private var token = ""
+    @State private var status: String?
+    @State private var testing = false
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle("Use my analysis server", isOn: $model.serverSettings.enabled)
+                TextField("http://192.168.1.20:8765", text: $model.serverSettings.baseURL)
+                    .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
+                SecureField("Access token", text: $token)
+                    .onSubmit { model.serverToken = token }
+                Picker("Separation model", selection: $model.serverSettings.model) {
+                    Text("htdemucs · vocals/drums/bass/other").tag("htdemucs")
+                    Text("htdemucs_6s · + piano/guitar (weaker)").tag("htdemucs_6s")
+                }
+                Toggle("Transcribe vocal melody (Basic Pitch)", isOn: $model.serverSettings.transcribeVocals)
+            } footer: {
+                Text("Run the server from the project's server/ folder on your Mac (see server/README.md). TonePilot asks before uploading each song and deletes it from the server after downloading the results. The token is stored in the iPhone Keychain.")
+            }
+            Section {
+                Button(testing ? "Testing…" : "Test connection") {
+                    model.serverToken = token
+                    testing = true
+                    Task { status = await model.testServer(); testing = false }
+                }
+                .disabled(testing)
+                if let status { Text(status).font(.footnote) }
+            }
+        }
+        .navigationTitle("Analysis server")
+        .onAppear { token = model.serverToken ?? "" }
+        .onDisappear { model.serverToken = token }
     }
 }

@@ -23,6 +23,16 @@ enum AudioFileDecoder {
         return Double(file.length) / file.processingFormat.sampleRate
     }
 
+    /// Mono at the file's own sample rate (for user samples, where resampling would waste quality).
+    static func decodeMonoNative(url: URL) throws -> (frames: [Float], sampleRate: Double) {
+        let rate: Double
+        do { rate = try AVAudioFile(forReading: url).processingFormat.sampleRate } catch {
+            throw AudioDecodeError.unreadable(error.localizedDescription)
+        }
+        let buffer = try decodeMono(url: url, sampleRate: rate)
+        return (buffer.samples, rate)
+    }
+
     static func decodeMono(url: URL, sampleRate: Double = AnalysisConfig().sampleRate) throws -> AudioBuffer {
         let file: AVAudioFile
         do { file = try AVAudioFile(forReading: url) } catch { throw AudioDecodeError.unreadable(error.localizedDescription) }

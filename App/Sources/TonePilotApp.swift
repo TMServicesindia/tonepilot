@@ -23,10 +23,9 @@ struct TonePilotApp: App {
 
 struct RootView: View {
     @EnvironmentObject var model: AppModel
-    @State private var tab = 0
 
     var body: some View {
-        TabView(selection: $tab) {
+        TabView(selection: $model.selectedTab) {
             NavigationStack { LibraryView() }
                 .tabItem { Label("Library", systemImage: "music.note.list") }.tag(0)
             NavigationStack { AnalyseHomeView() }

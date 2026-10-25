@@ -27,8 +27,26 @@ Tick each item on a real iPhone. Note the iPhone model, iOS version and adapters
 - [ ] CLIP light stays off at normal playing. Hard chords with 4+ layers: the limiter prevents harsh distortion.
 - [ ] PANIC silences everything instantly.
 
-## D. Song workflow
-- [ ] Import an MP3 you own; analysis completes (time for a 4-min song: ____ s).
+## D. Engine & tones
+- [ ] Settings › Sound engine = TonePilot engine. Diagnostics shows a voice count while you play.
+- [ ] Layer envelope override: a long attack audibly fades in; release changes the tail.
+- [ ] Filter, EQ, chorus and reverb sliders change the sound while you hold a chord.
+- [ ] Bansuri-like Flute: legato playing glides between notes; vibrato fades in on held notes; the pitch wheel bends ±2 semitones.
+- [ ] 8 layers × 10-note chords with sustain: no crackle. Record the max clean layer count: ____ (iPhone model ____).
+- [ ] Legacy Apple sampler engine still plays (fallback).
+
+## E. One-click song workflow
+- [ ] Import an MP3 you own with *Analyse & arrange automatically* on; it completes (4-min song: ____ s) and every section has a tone.
+- [ ] Sections with singing get a right-hand lead; instrumental interludes get a motif tone. Note any wrong labels.
+- [ ] *Play on My Casio* opens Perform with the first section's tone.
+- [ ] Left hand: the guide's Root → Fifth → Root matches the song for most chords; corrections stick after re-analysis.
+- [ ] Right hand: the melody guide's keys match the tune for most phrases (note the octave shift for male voices).
+- [ ] Automatic switching with the backing track changes tone at each section; held notes don't cut off.
+- [ ] Assisted mode highlights the next section and switches on tap. Timer mode works when started on beat 1.
+- [ ] Bass, drums, metronome and melody guide each switch on and off independently; with everything off only your tones sound.
+- [ ] Reference Learning plays the melody; Live Play doesn't.
+- [ ] Regenerate this section changes only that section; Restore AI Original undoes your edits.
+- [ ] Analysis server (optional): the upload asks first; stems and vocal melody arrive; the server job folder is deleted afterwards.
 - [ ] BPM is right or off by exactly ×2/÷2 (the fix buttons work).
 - [ ] Section buttons in Perform switch tones instantly while playing; held notes release cleanly.
 - [ ] Section play/loop plays the song section through the Casio while you play along.

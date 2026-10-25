@@ -2,12 +2,34 @@ import AVFoundation
 import SwiftUI
 import TonePilotCore
 
+enum EngineKind: String, CaseIterable, Identifiable {
+    /// TonePilot's own engine: full layer controls, accompaniment, melody guide.
+    case tonePilot
+    /// Apple's AVAudioUnitSampler — fallback with fewer controls.
+    case appleSampler
+    var id: String { rawValue }
+    var displayName: String { self == .tonePilot ? "TonePilot engine (recommended)" : "Apple sampler (legacy)" }
+}
+
+/// Lets the CoreMIDI thread reach the current output while the main thread may swap engines.
+final class OutputBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _value: ToneOutput
+    init(_ v: ToneOutput) { _value = v }
+    var value: ToneOutput {
+        get { lock.lock(); defer { lock.unlock() }; return _value }
+        set { lock.lock(); _value = newValue; lock.unlock() }
+    }
+}
+
 /// App-wide state. Owns the library, the sound engine, MIDI input and the note router,
 /// and is the only place that mutates the library (then saves it, debounced).
 @MainActor
 final class AppModel: ObservableObject {
     @Published var library = Library()
     @Published var activeSongId: UUID?
+    /// Root tab selection (Library, Analyse, Tone Studio, Perform, Settings).
+    @Published var selectedTab = 0
     @Published var activeArrangement: Arrangement?
     @Published var activeSectionId: UUID?
     @Published var outputPeak: Float = 0
@@ -15,18 +37,37 @@ final class AppModel: ObservableObject {
     @Published var engineError: String?
     @Published var patchLoadErrors: [String] = []
     @Published var analysisProgress: [UUID: Double] = [:]
+    @Published var analysisStage: [UUID: String] = [:]
+    @Published var analysisNotice: [UUID: String] = [:]
     @Published var isSectionPlaying = false
+    /// Song position from the active timing reference (backing track or timer), for the UI.
+    @Published var songPosition: Double?
+    /// Assisted switching: the section waiting for confirmation.
+    @Published var pendingSuggestion: UUID?
     @Published var velocityCurve: VelocityCurve = .linear {
         didSet { router.velocityCurve = velocityCurve }
     }
+    @Published private(set) var engineKind: EngineKind
+    @Published var serverSettings: AnalysisServerSettings {
+        didSet { if let d = try? JSONEncoder().encode(serverSettings) { UserDefaults.standard.set(d, forKey: "serverSettings") } }
+    }
 
     let store: LibraryStore
-    let engine: SoundEngine
     let midi = MIDIInputManager()
     let router = NoteRouter()
-    private(set) lazy var sectionPlayer = SectionPlayer(player: engine.songPlayer, engine: engine.engine)
+    let cache: InstrumentCache
+    private let outputBox: OutputBox
+    private(set) var sectionPlayer: SectionPlayer
+    private var scheduler: SectionScheduler?
+    private var performanceTimer: Timer?
+    private var maintenanceTimer: Timer?
+    private var lastPreloadedSection: UUID?
+    private var performingSongId: UUID?
     private var saveTask: Task<Void, Never>?
     private var analysisTasks: [UUID: Task<Void, Never>] = [:]
+
+    var output: ToneOutput { outputBox.value }
+    var host: ToneEngineHost? { output as? ToneEngineHost }
 
     init() {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -34,7 +75,14 @@ final class AppModel: ObservableObject {
         // Directory creation only fails if the disk is full or sandbox is broken; surface it but continue.
         let store = (try? LibraryStore(rootDirectory: root)) ?? (try! LibraryStore(rootDirectory: FileManager.default.temporaryDirectory))
         self.store = store
-        self.engine = SoundEngine(soundFontDirectory: store.soundFontDirectory)
+        cache = InstrumentCache(soundFontDirectory: store.soundFontDirectory, sampleDirectory: store.sampleDirectory)
+        cache.sampleDecoder = { try AudioFileDecoder.decodeMonoNative(url: $0) }
+        let kind = EngineKind(rawValue: UserDefaults.standard.string(forKey: "engineKind") ?? "") ?? .tonePilot
+        engineKind = kind
+        let out: ToneOutput = kind == .tonePilot ? ToneEngineHost() : SoundEngine(soundFontDirectory: store.soundFontDirectory)
+        outputBox = OutputBox(out)
+        sectionPlayer = SectionPlayer(player: out.songPlayerNode, engine: out.avEngine)
+        serverSettings = (UserDefaults.standard.data(forKey: "serverSettings")).flatMap { try? JSONDecoder().decode(AnalysisServerSettings.self, from: $0) } ?? AnalysisServerSettings()
 
         do {
             library = try store.load()
@@ -44,8 +92,13 @@ final class AppModel: ObservableObject {
         library.mergeFactoryPatches(FactoryPatches.all)
         installBundledSoundFonts()
         wireMIDI()
+        wireMeter()
         observeAudioSession()
         startEngine()
+        preloadDefaultSoundFont()
+        maintenanceTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.maintenance() }
+        }
     }
 
     // MARK: Setup
@@ -58,6 +111,19 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// Parses the 30 MB General MIDI bank off the main thread so the first tone loads instantly.
+    private func preloadDefaultSoundFont() {
+        let url = store.soundFontDirectory.appendingPathComponent(FactoryPatches.defaultSoundFontFile)
+        guard engineKind == .tonePilot, FileManager.default.fileExists(atPath: url.path) else { return }
+        Task.detached(priority: .userInitiated) { [weak self] in
+            guard let bank = try? SoundFontBank(url: url) else { return }
+            await MainActor.run {
+                self?.cache.register(bank: bank, as: FactoryPatches.defaultSoundFontFile)
+                self?.applyActiveArrangement()
+            }
+        }
+    }
+
     var installedSoundFonts: [String] {
         (try? FileManager.default.contentsOfDirectory(atPath: store.soundFontDirectory.path))?
             .filter { ["sf2", "dls"].contains(($0 as NSString).pathExtension.lowercased()) }.sorted() ?? []
@@ -67,17 +133,21 @@ final class AppModel: ObservableObject {
 
     private func wireMIDI() {
         let router = self.router
-        let engine = self.engine
+        let box = outputBox
         midi.onEvents = { events in
             // CoreMIDI thread: route and play immediately, nothing else.
-            for e in events { engine.perform(router.handle(e)) }
+            let out = box.value
+            for e in events { out.perform(router.handle(e)) }
         }
         midi.onSourcesChanged = { [weak self] removed in
             // A cable pulled mid-note never sends note-off: release everything.
             if removed { self?.panic() }
         }
         midi.start()
-        engine.onMeter = { [weak self] peak, clipped in
+    }
+
+    private func wireMeter() {
+        output.onMeter = { [weak self] peak, clipped in
             self?.outputPeak = peak
             if clipped { self?.outputClipped = true }
         }
@@ -85,11 +155,38 @@ final class AppModel: ObservableObject {
 
     private func startEngine() {
         do {
-            try engine.start()
+            try output.start()
             engineError = nil
             applyActiveArrangement()
         } catch {
             engineError = "Audio engine failed to start: \(error.localizedDescription)"
+        }
+    }
+
+    /// Switches sound engine live (stops held notes first).
+    func setEngine(_ kind: EngineKind) {
+        guard kind != engineKind else { return }
+        panic()
+        sectionPlayer.stop()
+        output.stop()
+        let new: ToneOutput = kind == .tonePilot ? ToneEngineHost() : SoundEngine(soundFontDirectory: store.soundFontDirectory)
+        outputBox.value = new
+        sectionPlayer = SectionPlayer(player: new.songPlayerNode, engine: new.avEngine)
+        engineKind = kind
+        UserDefaults.standard.set(kind.rawValue, forKey: "engineKind")
+        wireMeter()
+        observeEngineConfiguration()
+        startEngine()
+        if let song = song(activeSongId) { configureAccompaniment(for: song) }
+    }
+
+    private var configObserver: NSObjectProtocol?
+
+    private func observeEngineConfiguration() {
+        if let configObserver { NotificationCenter.default.removeObserver(configObserver) }
+        configObserver = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: output.avEngine, queue: .main) { [weak self] _ in
+            // A route or sample-rate change stops the engine; restart it.
+            Task { @MainActor in self?.startEngine() }
         }
     }
 
@@ -99,22 +196,25 @@ final class AppModel: ObservableObject {
             guard let raw = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
                   let type = AVAudioSession.InterruptionType(rawValue: raw) else { return }
             Task { @MainActor in
-                if type == .began { self?.panic() } else { self?.startEngine() }
+                if type == .began { self?.panic(); self?.stopBackingTrack() } else { self?.startEngine() }
             }
         }
         nc.addObserver(forName: AVAudioSession.routeChangeNotification, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in self?.objectWillChange.send() }
         }
-        nc.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine.engine, queue: .main) { [weak self] _ in
-            // Route/sample-rate change stops the engine; restart it.
-            Task { @MainActor in self?.startEngine() }
-        }
+        observeEngineConfiguration()
+    }
+
+    private func maintenance() {
+        guard let host else { return }
+        for c in cache.maintenance(inUse: host.controller.instrumentsInUse) { host.core.send(c) }
+        host.controller.collectSequenceBuffers()
     }
 
     // MARK: Performance
 
     func panic() {
-        engine.perform(router.panic())
+        output.perform(router.panic())
     }
 
     func resetClip() { outputClipped = false }
@@ -124,21 +224,178 @@ final class AppModel: ObservableObject {
         activeArrangement = arrangement
         if let songId { activeSongId = songId }
         activeSectionId = sectionId
+        if let sectionId { scheduler?.didSelect(sectionId) }
+        if pendingSuggestion == sectionId { pendingSuggestion = nil }
         applyActiveArrangement()
+        if let song = song(activeSongId), song.accompaniment?.melodyGuide == true, song.accompaniment?.guidePatchId == nil {
+            configureGuideVoice(for: song)
+        }
+    }
+
+    func activateSection(_ sectionId: UUID) {
+        guard let song = song(activeSongId), let section = song.sections.first(where: { $0.id == sectionId }) else { return }
+        activate(song.arrangement(for: section), songId: song.id, sectionId: sectionId)
     }
 
     func applyActiveArrangement() {
-        let patches = Dictionary(uniqueKeysWithValues: library.patches.map { ($0.id, $0) })
-        engine.perform(router.setArrangement(activeArrangement))
-        engine.apply(activeArrangement, patches: patches) { [weak self] failures in
-            self?.patchLoadErrors = failures
+        let patches = Dictionary(library.patches.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        output.perform(router.setArrangement(activeArrangement))
+        if let host {
+            patchLoadErrors = host.controller.apply(activeArrangement, patches: patches, cache: cache)
+        } else if let legacy = output as? SoundEngine {
+            legacy.apply(activeArrangement, patches: patches) { [weak self] failures in self?.patchLoadErrors = failures }
         }
     }
 
     /// Plays a note from the on-screen audition strip through the exact same path as the Casio.
     func audition(note: UInt8, on: Bool) {
         let event: MIDIEvent = on ? .noteOn(channel: 1, note: note, velocity: 96) : .noteOff(channel: 1, note: note, velocity: 0)
-        engine.perform(router.handle(event))
+        output.perform(router.handle(event))
+    }
+
+    /// Opens a song for playing: first section's tone, scheduler and accompaniment ready.
+    func startPerformance(songId: UUID) {
+        guard let song = song(songId) else { return }
+        activeSongId = songId
+        performingSongId = songId
+        scheduler = SectionScheduler(sections: song.sections, settings: song.switching ?? SwitchingSettings())
+        lastPreloadedSection = nil
+        configureAccompaniment(for: song)
+        if let first = song.orderedSections.first {
+            activate(song.arrangement(for: first), songId: songId, sectionId: first.id)
+        } else {
+            activate(song.arrangements.first, songId: songId)
+        }
+        if let url = audioURL(for: song) { try? sectionPlayer.load(url: url) }
+        performanceTimer?.invalidate()
+        performanceTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.tick() }
+        }
+    }
+
+    /// Starts a performance session for the song unless it is already running (keeps the current section).
+    func ensurePerformance(songId: UUID) {
+        if performingSongId != songId || performanceTimer == nil { startPerformance(songId: songId) }
+    }
+
+    func updateSwitching(_ settings: SwitchingSettings) {
+        guard var song = song(activeSongId) else { return }
+        song.switching = settings
+        update(song)
+        scheduler?.settings = settings
+        if settings.effectiveMode != .assisted { pendingSuggestion = nil }
+    }
+
+    func confirmSuggestion() {
+        guard let id = scheduler?.confirmSuggestion() ?? pendingSuggestion else { return }
+        pendingSuggestion = nil
+        activateSection(id)
+    }
+
+    /// Plays the imported song from `time` as backing/clock. The engine's sequencer follows it.
+    func playBackingTrack(from time: Double, to end: Double? = nil, loop: Bool = false) {
+        guard let song = song(activeSongId), let url = audioURL(for: song) else { return }
+        do { try sectionPlayer.load(url: url) } catch { engineError = "Playback failed: \(error.localizedDescription)"; return }
+        let acc = song.accompaniment ?? AccompanimentSettings()
+        // With the backing track switched off it still runs silently as the timing reference.
+        sectionPlayer.volume = acc.backingTrack ? Float(acc.backingTrackLevel) : 0
+        sectionPlayer.play(from: time, to: end, loop: loop)
+        isSectionPlaying = true
+        host?.controller.setTransport(playing: true, seconds: time)
+    }
+
+    func stopBackingTrack() {
+        sectionPlayer.stop()
+        isSectionPlaying = false
+        if song(activeSongId)?.switching?.reference != .timer { host?.controller.setTransport(playing: false, seconds: songPosition ?? 0) }
+    }
+
+    /// Timer reference: starts the internal song clock (tap on the song's first beat).
+    func startTimerClock(at seconds: Double = 0) {
+        host?.controller.setTransport(playing: true, seconds: seconds)
+    }
+
+    func stopTimerClock() {
+        host?.controller.setTransport(playing: false, seconds: 0)
+        songPosition = nil
+    }
+
+    private func tick() {
+        guard let song = song(activeSongId) else { return }
+        let reference = song.switching?.reference ?? .backingTrack
+        var time: Double?
+        switch reference {
+        case .backingTrack:
+            time = sectionPlayer.currentTime
+            if !sectionPlayer.isPlaying, isSectionPlaying { isSectionPlaying = false }
+            // Keep the accompaniment clock locked to the backing track.
+            if let t = time, let host, !host.core.isTransportPlaying || abs(host.core.transportSeconds - t) > 0.06 {
+                host.controller.setTransport(playing: true, seconds: t)
+            }
+        case .timer:
+            if let host, host.core.isTransportPlaying { time = host.core.transportSeconds }
+        case .none:
+            time = nil
+        }
+        songPosition = time
+        guard let time, var s = scheduler else { return }
+        let action = s.update(time: time)
+        scheduler = s
+        switch action {
+        case .switchTo(let id)?: activateSection(id)
+        case .suggest(let id)?: if id != activeSectionId { pendingSuggestion = id }
+        case nil: break
+        }
+        // Preload the next section's instruments well before its boundary.
+        if let next = s.upcoming(after: time), next.id != lastPreloadedSection, let arr = song.arrangement(for: next) {
+            lastPreloadedSection = next.id
+            cache.preload(arr.layers.compactMap { library.patch(id: $0.patchId) })
+        }
+    }
+
+    // MARK: Accompaniment & melody guide
+
+    /// Configures bass/drums/metronome/melody-guide slots and their event list for `song`.
+    func configureAccompaniment(for song: Song) {
+        guard let host else { return }
+        let s = song.accompaniment ?? AccompanimentSettings()
+        let c = host.controller
+        func patch(_ id: UUID) -> InstrumentPatch? { library.patch(id: id) }
+        var errors: [String] = []
+        errors += [c.setAccompaniment(.bass, patch: s.bass ? patch(FactoryPatches.id(forProgram: 33)) : nil, volume: s.bassLevel, cache: cache),
+                   c.setAccompaniment(.drums, patch: s.drums ? patch(FactoryPatches.drumKitId) : nil, volume: s.drumLevel, cache: cache),
+                   c.setAccompaniment(.metronome, patch: s.metronome ? patch(FactoryPatches.clickId) : nil, volume: s.metronomeLevel, cache: cache)]
+            .compactMap { $0 }
+        configureGuideVoice(for: song)
+        let handles = AccompanimentGenerator.Handles(bass: c.accompanimentHandle(.bass), drums: c.accompanimentHandle(.drums),
+                                                     guide: c.accompanimentHandle(.melodyGuide), metronome: c.accompanimentHandle(.metronome))
+        let events = AccompanimentGenerator.events(beats: song.beatTimes, beatsPerBar: song.timeSignature?.value ?? 4,
+                                                   chordGuide: song.chordGuide ?? [], melody: song.melody?.notes ?? [],
+                                                   settings: s, handles: handles, sampleRate: host.core.sampleRate,
+                                                   transpose: song.performanceTranspose ?? 0)
+        c.setSequence(events)
+        c.setAccompanimentLevel(1, arrangement: activeArrangement)
+        if isSectionPlaying { sectionPlayer.volume = s.backingTrack ? Float(s.backingTrackLevel) : 0 }
+        if !errors.isEmpty { patchLoadErrors = errors }
+    }
+
+    /// Reference Learning Mode voice: the chosen guide patch, else the active tone's lead patch.
+    private func configureGuideVoice(for song: Song) {
+        guard let host else { return }
+        let s = song.accompaniment ?? AccompanimentSettings()
+        guard s.melodyGuide else { _ = host.controller.setAccompaniment(.melodyGuide, patch: nil, volume: 0, cache: cache); return }
+        let leadId = activeArrangement?.layers.first { [.lead, .vocalMelody, .motif].contains($0.role) }?.patchId
+        let id = s.guidePatchId ?? leadId ?? FactoryPatches.bansuriId
+        if let error = host.controller.setAccompaniment(.melodyGuide, patch: library.patch(id: id), volume: s.guideLevel, cache: cache) {
+            patchLoadErrors = [error]
+        }
+    }
+
+    func updateAccompaniment(_ settings: AccompanimentSettings) {
+        guard var song = song(activeSongId) else { return }
+        song.accompaniment = settings
+        update(song)
+        configureAccompaniment(for: song)
     }
 
     // MARK: Library mutations
@@ -164,6 +421,8 @@ final class AppModel: ObservableObject {
     }
 
     func updateArrangement(_ arrangement: Arrangement, inSong songId: UUID?) {
+        // AI Originals are preserved unchanged; edits go to My Version.
+        guard arrangement.origin != .aiOriginal else { return }
         var a = arrangement
         a.updatedAt = Date()
         if let songId, var song = library.song(id: songId) {
@@ -177,10 +436,33 @@ final class AppModel: ObservableObject {
         if activeArrangement?.id == a.id { activate(a, sectionId: activeSectionId) }
     }
 
+    func regenerateSection(songId: UUID, sectionId: UUID) {
+        guard let song = song(songId) else { return }
+        let out = AutoArranger.arrange(song, patches: library.patches, onlySection: sectionId)
+        update(out.song)
+        if activeSectionId == sectionId { activateSection(sectionId) }
+    }
+
+    func restoreAIOriginal(songId: UUID, sectionId: UUID) {
+        guard var song = song(songId) else { return }
+        song.restoreAIOriginal(for: sectionId)
+        update(song)
+        if activeSectionId == sectionId { activateSection(sectionId) }
+    }
+
+    /// Gives one section its own copy of a shared tone so edits don't change its repeats.
+    func detachTone(songId: UUID, sectionId: UUID) -> Arrangement? {
+        guard var song = song(songId) else { return nil }
+        let a = song.detachArrangement(for: sectionId)
+        update(song)
+        return a
+    }
+
     func deleteSong(_ id: UUID) {
         if let song = library.song(id: id), song.sourceType == .importedFile, let file = song.sourceReference {
             try? store.deleteAudio(named: file)
         }
+        try? store.deleteStems(for: id)
         analysisTasks[id]?.cancel()
         library.deleteSong(id: id)
         if activeSongId == id { activeSongId = nil; activate(nil) }
@@ -211,12 +493,118 @@ final class AppModel: ObservableObject {
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
         _ = try store.importFile(from: url, into: store.soundFontDirectory)
         objectWillChange.send()
+        preloadDefaultSoundFont()
         applyActiveArrangement()
     }
 
-    // MARK: Analysis
+    // MARK: Melody & chord corrections
 
-    func analyze(songId: UUID) {
+    func correctChord(songId: UUID, stepId: UUID, to symbol: String) {
+        guard var song = song(songId), let i = song.chordGuide?.firstIndex(where: { $0.id == stepId }),
+              let fixed = ChordGuide.correct(song.chordGuide![i], to: symbol) else { return }
+        song.chordGuide![i] = fixed
+        update(song)
+        if activeSongId == songId { configureAccompaniment(for: song) }
+    }
+
+    func editMelodyNote(songId: UUID, noteId: UUID, semitones: Int? = nil, delete: Bool = false) {
+        guard var song = song(songId), var melody = song.melody, let i = melody.notes.firstIndex(where: { $0.id == noteId }) else { return }
+        if delete { melody.notes.remove(at: i) } else if let s = semitones {
+            melody.notes[i].midi = max(0, min(127, melody.notes[i].midi + s))
+            melody.notes[i].userEdited = true
+        }
+        // Mark the track as edited so re-analysis keeps it.
+        if delete, let first = melody.notes.indices.first { melody.notes[first].userEdited = true }
+        song.melody = melody
+        update(song)
+        if activeSongId == songId { configureAccompaniment(for: song) }
+    }
+
+    func shiftMelody(songId: UUID, by semitones: Int) {
+        guard var song = song(songId), let melody = song.melody else { return }
+        var t = melody.transposed(by: semitones)
+        if !t.notes.isEmpty { t.notes[0].userEdited = true }
+        song.melody = t
+        update(song)
+        if activeSongId == songId { configureAccompaniment(for: song) }
+    }
+
+    func setPerformanceTranspose(songId: UUID, _ semitones: Int) {
+        guard var song = song(songId) else { return }
+        song.performanceTranspose = max(-12, min(12, semitones))
+        update(song)
+        if activeSongId == songId { configureAccompaniment(for: song) }
+    }
+
+    // MARK: Presets, samples, backup
+
+    func exportPresets(_ arrangements: [Arrangement], name: String) throws -> URL {
+        let data = try PresetExchange.export(arrangements, from: library)
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(name).tonepilot.json")
+        try data.write(to: url, options: .atomic)
+        return url
+    }
+
+    func importPresets(from url: URL) throws -> [String] {
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        var lib = library
+        let (_, missing) = try PresetExchange.importPresets(Data(contentsOf: url), into: &lib)
+        library = lib
+        save()
+        return missing
+    }
+
+    func exportBackup() throws -> URL {
+        try store.exportBackup(to: FileManager.default.temporaryDirectory)
+    }
+
+    struct SampleInput {
+        var url: URL
+        var rootNote: UInt8
+        var keyRange: KeyRange
+        var velocityRange: VelocityRange = .full
+        var trimStart: Double = 0
+        var trimEnd: Double?
+        var loop: ClosedRange<Double>?
+    }
+
+    /// Creates a playable patch from authorised samples. Returns the patch and an honesty
+    /// warning when one sample is stretched over a wide range.
+    func createSamplePatch(name: String, family: InstrumentFamily, samples: [SampleInput], envelope: Envelope,
+                           license: LicenseInfo) throws -> (InstrumentPatch, String?) {
+        var zones: [SampleZone] = []
+        for s in samples {
+            let scoped = s.url.startAccessingSecurityScopedResource()
+            defer { if scoped { s.url.stopAccessingSecurityScopedResource() } }
+            let fileName = try store.importFile(from: s.url, into: store.sampleDirectory)
+            let rate = (try? AVAudioFile(forReading: store.sampleDirectory.appendingPathComponent(fileName)))?.processingFormat.sampleRate ?? 44_100
+            func frame(_ t: Double) -> Int { Int(t * rate) }
+            zones.append(SampleZone(fileName: fileName, rootNote: s.rootNote, keyRange: s.keyRange, velocityRange: s.velocityRange,
+                                    startFrame: frame(s.trimStart), endFrame: s.trimEnd.map(frame),
+                                    loopStart: s.loop.map { frame($0.lowerBound) }, loopEnd: s.loop.map { frame($0.upperBound) }))
+        }
+        let patch = InstrumentPatch(name: name, family: family, sourceType: .userSample, sampleZones: zones,
+                                    envelope: envelope, license: license)
+        let instrument = try cache.instrument(for: patch)
+        library.upsert(patch)
+        save()
+        var warning: String?
+        if instrument.maxStretchSemitones > 7 {
+            warning = "Some keys are \(instrument.maxStretchSemitones) semitones away from their sample, so they'll sound unnatural (pitch-shifted). Add samples recorded at other pitches for a realistic instrument, or narrow the key range."
+        }
+        return (patch, warning)
+    }
+
+    // MARK: Analysis (one-click: analyse → arrange → ready to play)
+
+    var serverToken: String? {
+        get { Keychain.get("analysisServerToken") }
+        set { Keychain.set(newValue, for: "analysisServerToken"); objectWillChange.send() }
+    }
+
+    /// - Parameter useServer: the user consented to upload this song to *their* analysis server.
+    func analyze(songId: UUID, useServer: Bool = false) {
         guard var song = library.song(id: songId), let url = audioURL(for: song) else { return }
         guard song.userConfirmedRights else { return }
         analysisTasks[songId]?.cancel()
@@ -224,21 +612,63 @@ final class AppModel: ObservableObject {
         song.analysisError = nil
         update(song)
         analysisProgress[songId] = 0
+        analysisNotice[songId] = nil
+        let patches = library.patches
+        let client = useServer ? AnalysisServerClient(settings: serverSettings, token: serverToken) : nil
+        let settings = serverSettings
+        let stemDir = store.stemDirectory(for: songId)
+        let snapshot = song
 
         analysisTasks[songId] = Task.detached(priority: .userInitiated) { [weak self] in
+            func stage(_ text: String, _ p: Double) async {
+                await MainActor.run { self?.analysisStage[songId] = text; self?.analysisProgress[songId] = p }
+            }
             do {
+                var stems: [StemInfo.Kind: AudioBuffer] = [:]
+                var stemInfos: [StemInfo] = []
+                var serverMelody: MelodyTrack?
+                var progressBase = 0.0
+                if let client {
+                    do {
+                        await stage("Uploading to your analysis server…", 0.02)
+                        let job = try await client.submit(audioFile: url, consent: true, model: settings.model, transcribeVocals: settings.transcribeVocals)
+                        await stage("Separating vocals and instruments (Demucs)…", 0.05)
+                        let result = try await client.waitForResult(job: job) { p in
+                            Task { @MainActor in self?.analysisProgress[songId] = 0.05 + 0.35 * p }
+                        }
+                        await stage("Downloading stems…", 0.4)
+                        for stem in result.stems {
+                            guard let kind = StemInfo.Kind(rawValue: stem.kind) else { continue }
+                            let file = try await client.downloadStem(stem, to: stemDir)
+                            stems[kind] = try AudioFileDecoder.decodeMono(url: file)
+                            stemInfos.append(StemInfo(kind: kind, fileName: file.lastPathComponent, model: stem.model))
+                        }
+                        serverMelody = result.melody
+                        try? await client.delete(job: job) // don't leave the user's audio on the server
+                        progressBase = 0.45
+                    } catch {
+                        let message = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                        await MainActor.run { self?.analysisNotice[songId] = "Server analysis unavailable (\(message)). Analysed on this iPhone instead." }
+                    }
+                }
+                await stage("Decoding audio…", progressBase + 0.02)
                 let audio = try AudioFileDecoder.decodeMono(url: url)
-                await MainActor.run { self?.analysisProgress[songId] = 0.1 }
-                let result = try SongAnalyzer.analyze(audio) { p in
+                await stage("Analysing tempo, key, chords, melody and sections…", progressBase + 0.05)
+                let current = await MainActor.run { self?.library.song(id: songId) } ?? snapshot
+                let base = progressBase + 0.05
+                let output = try SongPipeline.run(song: current, audio: audio, stems: stems, melodyOverride: serverMelody, patches: patches) { p in
                     if Task.isCancelled { return false }
-                    Task { @MainActor in self?.analysisProgress[songId] = 0.1 + 0.9 * p }
+                    Task { @MainActor in self?.analysisProgress[songId] = base + (0.95 - base) * p }
                     return true
                 }
                 await MainActor.run {
-                    guard let self, var s = self.library.song(id: songId) else { return }
-                    s.apply(result)
+                    guard let self else { return }
+                    var s = output.song
+                    if !stemInfos.isEmpty { s.stems = stemInfos }
                     self.analysisProgress[songId] = nil
+                    self.analysisStage[songId] = nil
                     self.update(s)
+                    if self.activeSongId == songId { self.startPerformance(songId: songId) }
                 }
             } catch {
                 await MainActor.run {
@@ -246,6 +676,7 @@ final class AppModel: ObservableObject {
                     s.analysisStatus = error is CancellationError || (error as? SongAnalysisError) == .cancelled ? .notStarted : .failed
                     s.analysisError = Self.describe(error)
                     self.analysisProgress[songId] = nil
+                    self.analysisStage[songId] = nil
                     self.update(s)
                 }
             }
@@ -259,7 +690,7 @@ final class AppModel: ObservableObject {
         case .tooShort: return "The audio is shorter than 8 seconds."
         case .silent: return "The audio appears to be silent."
         case .cancelled: return "Analysis was cancelled."
-        case nil: return error.localizedDescription
+        case nil: return (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }
 
@@ -267,6 +698,16 @@ final class AppModel: ObservableObject {
     func resumeInterruptedAnalyses() {
         for song in library.songs where song.analysisStatus == .running && analysisTasks[song.id] == nil {
             analyze(songId: song.id)
+        }
+    }
+
+    func testServer() async -> String {
+        guard let client = AnalysisServerClient(settings: serverSettings, token: serverToken) else { return "Enter a valid http(s) address and enable the server." }
+        do {
+            let h = try await client.health()
+            return "Connected · Demucs \(h.demucs ? "ready" : "not installed") · Basic Pitch \(h.basicPitch ? "ready" : "not installed") · files kept \(Int(h.retentionHours)) h"
+        } catch {
+            return (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
         }
     }
 }

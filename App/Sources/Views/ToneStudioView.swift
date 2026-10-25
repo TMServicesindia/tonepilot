@@ -6,9 +6,13 @@ struct ToneStudioHomeView: View {
     @EnvironmentObject var model: AppModel
     @State private var editing: (songId: UUID?, arrangementId: UUID)?
     @State private var showEditor = false
+    @State private var importingPresets = false
+    @State private var showSampleCreator = false
+    @State private var importMessage: String?
 
     var body: some View {
         List {
+            if let importMessage { Text(importMessage).font(.footnote).foregroundStyle(.secondary) }
             Section {
                 ForEach(model.library.globalArrangements) { a in row(a, songId: nil) }
                 Button {
@@ -21,12 +25,27 @@ struct ToneStudioHomeView: View {
             }
             ForEach(model.library.songs.filter { !$0.arrangements.isEmpty }) { song in
                 Section(song.title) {
-                    ForEach(song.arrangements) { a in row(a, songId: song.id) }
+                    ForEach(song.arrangements.filter { $0.origin != .aiOriginal }) { a in row(a, songId: song.id) }
                 }
             }
         }
         .navigationTitle("Tone Studio")
-        .toolbar { ToolbarItem(placement: .topBarLeading) { ConnectionStatus(midi: model.midi) } }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) { ConnectionStatus(midi: model.midi) }
+            ToolbarItem(placement: .topBarTrailing) {
+                Menu {
+                    Button { importingPresets = true } label: { Label("Import presets…", systemImage: "square.and.arrow.down") }
+                    Button { showSampleCreator = true } label: { Label("New sample instrument…", systemImage: "waveform.badge.plus") }
+                } label: { Image(systemName: "ellipsis.circle") }
+            }
+        }
+        .fileImporter(isPresented: $importingPresets, allowedContentTypes: [.json]) { result in
+            do {
+                let missing = try model.importPresets(from: result.get())
+                importMessage = missing.isEmpty ? "Presets imported." : "Imported. Provide these samples to hear every layer: \(missing.joined(separator: ", "))"
+            } catch { importMessage = "That file isn't a TonePilot preset." }
+        }
+        .navigationDestination(isPresented: $showSampleCreator) { SamplePatchCreatorView() }
         .navigationDestination(isPresented: $showEditor) {
             if let e = editing { ArrangementEditorView(songId: e.songId, arrangementId: e.arrangementId) }
         }
@@ -41,7 +60,10 @@ struct ToneStudioHomeView: View {
         Button { open(songId, a.id) } label: {
             HStack {
                 VStack(alignment: .leading) {
-                    Text(a.name).font(.headline)
+                    HStack(spacing: 6) {
+                        Text(a.name).font(.headline)
+                        if a.origin == .myVersion { Text("AI-built").font(.caption2).padding(.horizontal, 5).background(Theme.accent.opacity(0.25), in: Capsule()) }
+                    }
                     Text("\(a.layers.count) layer\(a.layers.count == 1 ? "" : "s") · " +
                          a.layers.compactMap { model.library.patch(id: $0.patchId)?.name }.joined(separator: " + "))
                         .font(.caption).foregroundStyle(.secondary).lineLimit(1)
@@ -62,6 +84,7 @@ struct ArrangementEditorView: View {
     @State private var expandedLayer: UUID?
     @State private var pickingPatchForLayer: UUID?
     @State private var addingLayer = false
+    @State private var exportURL: URL?
 
     private static let layerColors: [Color] = [.orange, .teal, .purple, .pink, .yellow, .mint]
 
@@ -73,6 +96,15 @@ struct ArrangementEditorView: View {
     var body: some View {
         if let arrangement {
             Form {
+                if arrangement.origin == .aiOriginal {
+                    Section {
+                        Label("AI Original — kept unchanged so you can always go back.", systemImage: "lock")
+                        Text("Edit the section's My Version instead (Song › section ⋯ › Edit tone).").font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                if let rationale = arrangement.rationale {
+                    Section("Why the AI built this") { Text(rationale).font(.footnote) }
+                }
                 Section {
                     TextField("Tone name", text: binding(\.name))
                     HStack {
@@ -101,14 +133,15 @@ struct ArrangementEditorView: View {
                                     color: Self.layerColors[index % Self.layerColors.count],
                                     expanded: expandedLayer == layer.id,
                                     onToggle: { expandedLayer = expandedLayer == layer.id ? nil : layer.id },
-                                    onChangePatch: { pickingPatchForLayer = layer.id })
+                                    onChangePatch: { pickingPatchForLayer = layer.id },
+                                    fullControls: model.engineKind == .tonePilot)
                     }
                     .onDelete { offsets in mutate { $0.layers.remove(atOffsets: offsets) } }
                     .onMove { from, to in mutate { $0.layers.move(fromOffsets: from, toOffset: to) } }
-                    if arrangement.layers.count < SoundEngine.maxLayers {
+                    if arrangement.layers.count < maxLayers {
                         Button { addingLayer = true } label: { Label("Add layer", systemImage: "plus") }
                     } else {
-                        Text("Maximum \(SoundEngine.maxLayers) layers on this device.").font(.caption).foregroundStyle(.secondary)
+                        Text("Maximum \(maxLayers) layers with this engine.").font(.caption).foregroundStyle(.secondary)
                     }
                 } header: { Text("Layers") } footer: {
                     Text("Layers on the same keys sound together. Use key ranges for splits (e.g. bass on the left hand) and velocity ranges to switch sounds by how hard you play.")
@@ -121,8 +154,20 @@ struct ArrangementEditorView: View {
                     }
                 }
 
+                if model.engineKind == .tonePilot { masterSection(arrangement) }
+
                 Section { AuditionStrip() }
+
+                Section {
+                    Button { duplicate(arrangement) } label: { Label("Duplicate tone", systemImage: "plus.square.on.square") }
+                    if let exportURL {
+                        ShareLink(item: exportURL) { Label("Share preset file", systemImage: "square.and.arrow.up") }
+                    } else {
+                        Button { exportURL = try? model.exportPresets([arrangement], name: arrangement.name) } label: { Label("Export preset…", systemImage: "square.and.arrow.up") }
+                    }
+                }
             }
+            .disabled(arrangement.origin == .aiOriginal)
             .navigationTitle(arrangement.name)
             .toolbar { EditButton() }
             .onAppear { model.activate(arrangement, songId: songId) }
@@ -143,8 +188,32 @@ struct ArrangementEditorView: View {
         }
     }
 
+    private var maxLayers: Int { model.engineKind == .tonePilot ? ToneEngine.liveSlotCount : SoundEngine.maxLayers }
+
+    private func duplicate(_ a: Arrangement) {
+        let copy = a.duplicated()
+        model.updateArrangement(copy, inSong: songId)
+    }
+
+    private func masterSection(_ arrangement: Arrangement) -> some View {
+        let m = Binding(get: { arrangement.masterEffects }, set: { v in mutate { $0.master = v } })
+        return Section {
+            HStack { Text("Reverb").frame(width: 80, alignment: .leading); Slider(value: m.reverbLevel, in: 0...1.5) }
+            HStack { Text("Room size").frame(width: 80, alignment: .leading); Slider(value: m.reverbSize, in: 0...1) }
+            HStack { Text("Chorus").frame(width: 80, alignment: .leading); Slider(value: m.chorusLevel, in: 0...1.5) }
+            HStack { Text("Delay").frame(width: 80, alignment: .leading); Slider(value: m.delayLevel, in: 0...1.5) }
+            HStack { Text("Delay \(Int(m.wrappedValue.delayTime * 1000)) ms").frame(width: 110, alignment: .leading); Slider(value: m.delayTime, in: 0.05...1.2) }
+            HStack { Text("Feedback").frame(width: 80, alignment: .leading); Slider(value: m.delayFeedback, in: 0...0.85) }
+            HStack { Text("EQ low").frame(width: 80, alignment: .leading); Slider(value: m.eq.lowDB, in: -12...12, step: 0.5) }
+            HStack { Text("EQ mid").frame(width: 80, alignment: .leading); Slider(value: m.eq.midDB, in: -12...12, step: 0.5) }
+            HStack { Text("EQ high").frame(width: 80, alignment: .leading); Slider(value: m.eq.highDB, in: -12...12, step: 0.5) }
+        } header: { Text("Master effects") } footer: {
+            Text("Layers send to these shared effects by their own reverb/chorus/delay amounts. A limiter keeps the output from clipping into the Casio's AUDIO IN.")
+        }
+    }
+
     private func mutate(_ change: (inout Arrangement) -> Void) {
-        guard var a = arrangement else { return }
+        guard var a = arrangement, a.origin != .aiOriginal else { return }
         change(&a)
         model.updateArrangement(a, inSong: songId)
     }
@@ -170,6 +239,8 @@ struct LayerEditor: View {
     let expanded: Bool
     let onToggle: () -> Void
     let onChangePatch: () -> Void
+    /// TonePilot engine: envelope, filter, EQ, chorus and expression are available.
+    var fullControls = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -235,16 +306,78 @@ struct LayerEditor: View {
             Text("Any").tag(UInt8?.none)
             ForEach(1...16, id: \.self) { Text("\($0)").tag(UInt8?.some(UInt8($0))) }
         }
+        Picker("Role", selection: $layer.role) {
+            Text("None").tag(MusicalRole?.none)
+            ForEach(MusicalRole.allCases, id: \.self) { Text($0.displayName).tag(MusicalRole?.some($0)) }
+        }
         let effects = Binding(get: { layer.effectsOverride ?? patch?.effects ?? EffectSettings() },
                               set: { layer.effectsOverride = $0 })
-        HStack { Text("Reverb"); Slider(value: effects.reverbMix, in: 0...100) }
-        HStack { Text("Delay"); Slider(value: effects.delayMix, in: 0...100) }
-        if effects.wrappedValue.delayMix > 0 {
-            HStack { Text("Delay time"); Slider(value: effects.delayTime, in: 0.05...1.5) }
-            HStack { Text("Feedback"); Slider(value: effects.delayFeedback, in: 0...90) }
+        DisclosureGroup("Effects & EQ") {
+            HStack { Text("Reverb"); Slider(value: effects.reverbMix, in: 0...100) }
+            HStack { Text("Chorus"); Slider(value: effects.chorusMix, in: 0...100) }.disabled(!fullControls)
+            HStack { Text("Delay"); Slider(value: effects.delayMix, in: 0...100) }
+            if !fullControls, effects.wrappedValue.delayMix > 0 {
+                HStack { Text("Delay time"); Slider(value: effects.delayTime, in: 0.05...1.5) }
+                HStack { Text("Feedback"); Slider(value: effects.delayFeedback, in: 0...90) }
+            }
+            if fullControls {
+                eqSlider("Low", effects.eq.lowDB)
+                eqSlider("Mid", effects.eq.midDB)
+                eqSlider("High", effects.eq.highDB)
+            }
         }
-        Text("Attack/release come from the SoundFont preset in this version; per-layer envelope editing arrives with the sample engine (Milestone 3).")
-            .font(.caption2).foregroundStyle(.secondary)
+        if fullControls {
+            DisclosureGroup("Envelope (attack · decay · sustain · release)") {
+                Toggle(patch?.usesOwnEnvelope == true ? "Override the patch envelope" : "Override the SoundFont's envelope",
+                       isOn: Binding(get: { layer.envelopeOverride != nil },
+                                     set: { layer.envelopeOverride = $0 ? (patch?.envelope ?? Envelope()) : nil }))
+                if layer.envelopeOverride != nil {
+                    let env = Binding(get: { layer.envelopeOverride ?? Envelope() }, set: { layer.envelopeOverride = $0 })
+                    timeSlider("Attack", env.attack, 0.001...3)
+                    timeSlider("Decay", env.decay, 0.01...5)
+                    HStack { Text("Sustain \(Int(env.wrappedValue.sustain * 100))%"); Slider(value: env.sustain, in: 0...1) }
+                    timeSlider("Release", env.release, 0.01...6)
+                }
+            }
+            DisclosureGroup("Filter") {
+                let filter = Binding(get: { layer.filterOverride ?? patch?.filter ?? FilterSettings() }, set: { layer.filterOverride = $0 })
+                Toggle("Low-pass filter", isOn: filter.enabled)
+                if filter.wrappedValue.enabled {
+                    HStack {
+                        Text("Cutoff \(Int(filter.wrappedValue.cutoff)) Hz").frame(width: 130, alignment: .leading)
+                        Slider(value: Binding(get: { log10(filter.wrappedValue.cutoff) }, set: { filter.wrappedValue.cutoff = pow(10, $0) }), in: log10(80)...log10(18_000))
+                    }
+                    HStack { Text("Resonance \(Int(filter.wrappedValue.resonance)) dB").frame(width: 130, alignment: .leading); Slider(value: filter.resonance, in: 0...18) }
+                }
+            }
+            DisclosureGroup("Expression (mono · glide · vibrato · bend)") {
+                let ex = Binding(get: { layer.expressionOverride ?? patch?.expression ?? .poly }, set: { layer.expressionOverride = $0 })
+                Toggle("Mono / legato (one note at a time)", isOn: ex.mono)
+                if ex.wrappedValue.mono { timeSlider("Glide", ex.glideTime, 0...0.5) }
+                HStack { Text("Vibrato \(Int(ex.wrappedValue.vibratoDepth)) ct").frame(width: 110, alignment: .leading); Slider(value: ex.vibratoDepth, in: 0...60) }
+                if ex.wrappedValue.vibratoDepth > 0 {
+                    HStack { Text("Rate \(ex.wrappedValue.vibratoRate, specifier: "%.1f") Hz").frame(width: 110, alignment: .leading); Slider(value: ex.vibratoRate, in: 2...9) }
+                    timeSlider("Vibrato delay", ex.vibratoDelay, 0...1.5)
+                }
+                Stepper("Pitch-bend range ±\(Int(ex.wrappedValue.bendRange)) semitones", value: ex.bendRange, in: 1...12)
+                HStack { Text("Velocity response"); Slider(value: ex.velocitySensitivity, in: 0...1) }
+            }
+        } else {
+            Text("Envelope, filter, EQ, chorus and expression need the TonePilot engine (Settings › Sound engine).")
+                .font(.caption2).foregroundStyle(.secondary)
+        }
+    }
+
+    private func eqSlider(_ name: String, _ value: Binding<Double>) -> some View {
+        HStack { Text("\(name) \(value.wrappedValue >= 0 ? "+" : "")\(value.wrappedValue, specifier: "%.0f") dB").frame(width: 110, alignment: .leading); Slider(value: value, in: -12...12, step: 0.5) }
+    }
+
+    private func timeSlider(_ name: String, _ value: Binding<Double>, _ range: ClosedRange<Double>) -> some View {
+        HStack {
+            Text("\(name) \(value.wrappedValue < 1 ? "\(Int(value.wrappedValue * 1000)) ms" : String(format: "%.1f s", value.wrappedValue))")
+                .frame(width: 130, alignment: .leading)
+            Slider(value: value, in: range)
+        }
     }
 }
 

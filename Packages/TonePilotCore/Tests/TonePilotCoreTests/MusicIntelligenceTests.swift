@@ -421,3 +421,18 @@ final class PipelineTests: XCTestCase {
         XCTAssertEqual(again.song.bpm?.value, 121)
     }
 }
+
+extension PipelineTests {
+    func testServerMelodyOverrideDrivesArrangement() throws {
+        let audio = SyntheticSong.render(pattern: ["A", "B", "A", "B"], beatsPerSection: 32) // no melody in the mix
+        let sung: [MelodyNote] = (0..<40).map { (i: Int) -> MelodyNote in
+            MelodyNote(start: Double(i) * 0.4, duration: 0.35, midi: 67 + [0, 2, 4, 2, 0][i % 5], confidence: 0.9)
+        }
+        let override = MelodyTrack(notes: sung, source: .vocalStem, voicedRatio: 0.9)
+        let out = try SongPipeline.run(song: Song(title: "s"), audio: audio, melodyOverride: override, patches: FactoryPatches.all)
+        XCTAssertEqual(out.song.melody?.source, .vocalStem)
+        let first = out.song.orderedSections[0]
+        XCTAssertTrue((first.activity ?? []).contains { [.lead, .vocalMelody].contains($0.role) && $0.level > 0.5 }, "\(first.activity ?? [])")
+        XCTAssertNotNil(out.song.arrangement(for: first)?.layers.first { [.lead, .vocalMelody].contains($0.role) })
+    }
+}

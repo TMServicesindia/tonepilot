@@ -164,6 +164,33 @@ public enum SongAnalyzer {
         )
     }
 
+    /// Recomputes lead/vocal activity and instrumental labels after the melody was replaced.
+    public static func refreshLeadActivity(_ input: SongAnalysisResult) -> SongAnalysisResult {
+        var r = input
+        var lead: [UUID: Double] = [:]
+        for i in r.sections.indices {
+            let s = r.sections[i]
+            let notes = r.melody?.notes(in: s.startTime, s.endTime) ?? []
+            let covered = notes.reduce(0.0) { $0 + min($1.end, s.endTime) - max($1.start, s.startTime) }
+            let l = s.duration > 0 ? min(1, covered / s.duration) * leadPlausibility(notes, seconds: s.duration) : 0
+            lead[s.id] = l
+            guard let t = s.timbre ?? r.timbres[s.id] else { continue }
+            let meanPitch = notes.isEmpty ? nil : Double(notes.map(\.midi).reduce(0, +)) / Double(notes.count)
+            var levels: [StemInfo.Kind: Double] = [:]
+            for a in s.activity ?? [] where a.source == .stems {
+                switch a.role {
+                case .vocalMelody: levels[.vocals] = a.level
+                case .bass: levels[.bass] = a.level
+                case .percussion: levels[.drums] = a.level
+                default: break
+                }
+            }
+            r.sections[i].activity = SectionInsights.activity(.init(timbre: t, leadVoiced: l, leadMeanPitch: meanPitch, stemLevels: levels))
+        }
+        relabelInstrumentalSections(&r.sections, lead: lead)
+        return r
+    }
+
     /// A tracked pitch line only counts as a melody if it moves like one: melodies change notes
     /// (≈0.8+ notes/s) and use several pitches. A line sitting on chord tones for seconds at a
     /// time is sustained harmony (pad/strings/bass), not a lead.

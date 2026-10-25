@@ -1,81 +1,90 @@
-# TonePilot — AI-assisted instrument tone studio for the Casio CT-X870IN
+# TonePilot AI — Indian film-music keyboard studio for the Casio CT-X870IN
 
-Play layered film-song tones (piano + strings + bell, pads, flutes…) from your **Casio's own keys**, generated on your **iPhone** and heard through the **Casio's speakers**. Import an MP3 you own, let TonePilot analyse it on-device, then build a different tone for each intro, interlude and chorus.
+**Import a song → TonePilot analyses it → it builds the closest playable arrangement → connect your Casio and play.**
 
-> YouTube links are stored as references only. YouTube's terms forbid downloading or separating its audio, so the MVP analyses **imported audio files** (MP3/M4A/WAV/AIFF).
+Left hand: Root → Fifth → Root. Right hand: the melody. TonePilot does the setup: song sections, a layered tone for each section, effects, a chord guide for your left hand, a melody guide for your right hand, and optional backing.
 
-The research, architecture, licensing and hardware plan are in **[docs/FEASIBILITY.md](docs/FEASIBILITY.md)**.
+Sound is generated on the iPhone (TonePilot's own sample/synth engine using SoundFont instruments) and heard through the Casio's speakers via its AUDIO IN. The Casio keys drive it over USB MIDI.
 
-## What works today vs. what doesn't
+> YouTube links are stored as references only. YouTube's terms forbid downloading or separating its audio, so songs are analysed from **audio files you own** (MP3/M4A/WAV/AIFF).
 
-| Area | Status |
-|---|---|
-| Casio → iPhone USB MIDI (note on/off, velocity, sustain, pitch bend, hot-plug, stuck-note protection) | Implemented. Routing logic unit-tested; CoreMIDI code needs on-device testing |
-| Layered / split / velocity-switched tones, up to 6 layers, per-layer volume, pan, octave, transpose, fine-tune, key range, velocity range, MIDI channel, mute/solo, reverb, delay | Implemented. Router logic unit-tested |
-| Sound source: General MIDI presets from an SF2 SoundFont via `AVAudioUnitSampler` | Implemented. **You install the SoundFont** (see below) |
-| Peak limiter, gain headroom for stacks, output meter + clip light, panic | Implemented |
-| Song library, search, favourites, playlists, multiple tones per song, tone per section | Implemented |
-| MP3 import + on-device analysis: tempo & beats, key, chords (maj/min), section boundaries, repeated-section groups, section-type guesses | Implemented and **tested on synthetic audio**. Confidence shown; BPM/key/sections editable |
-| Section editor (rename, retype, resize, split, merge, delete, snap to beats) and section loop playback | Implemented |
-| Tone suggestions per section | **Heuristic** (brightness, attack, sustain rules), labelled as such. Not instrument recognition |
-| Performance mode (big section buttons, layer mutes, master, playlists, panic) | Implemented |
-| Per-layer attack/release, filter UI, user samples / multisample builder | **Not yet** (Milestone 3). SF2 envelopes are used as-is |
-| Stem separation (Demucs), note transcription (Basic Pitch), instrument recognition | **Not yet** (Milestones 4–5, Mac/server) |
+* What works and how it was verified: **[docs/CAPABILITIES.md](docs/CAPABILITIES.md)**
+* Research, architecture, licences and hardware plan: **[docs/FEASIBILITY.md](docs/FEASIBILITY.md)**
+* Testing with the real keyboard: **[docs/HARDWARE_TEST_CHECKLIST.md](docs/HARDWARE_TEST_CHECKLIST.md)**
+* Optional vocal separation server: **[server/README.md](server/README.md)**
+
+## The one-click flow
+
+1. **Library › + › Import song**: pick the MP3 and confirm you're authorised to use it. Optionally choose to send it to *your* analysis server for vocal separation.
+2. TonePilot runs, on the phone:
+   * tempo and beats, key (and key changes), time signature
+   * chords, with alternatives and a Sa–Pa drone where no clear chord exists
+   * the lead/vocal melody with slides and vibrato preserved
+   * sections and repeated parts
+   * what plays in each section (lead, pad/strings, keys, bells/plucks, bass, percussion)
+3. **AutoArranger** builds every section's tone:
+   * a right-hand lead matched to the melody (e.g. a Bansuri-like flute for ornamented, sustained lines)
+   * a left-hand accompaniment sound suited to Root–Fifth–Root
+   * support layers only where they were heard, plus key split and effects
+   * a written explanation of why
+   Each tone is saved twice, as an unchanged **AI Original** and an editable **My Version**.
+4. **Play on My Casio**. Tones switch by section **automatically** (following the backing track or a tap-started clock), **manually**, or **assisted** (the next tone is highlighted and switches when you tap). The live guide shows the current chord as root → fifth → root and the next melody keys.
+5. Refine anything: tones, layers, envelope/filter/EQ/effects, chords, melody notes, section timing. You can also **Regenerate this section** or **Restore AI Original**.
 
 ## Run it
 
-Requirements: a Mac with **Xcode 15+**, an iPhone on **iOS 17+**, and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
+You need a Mac with **Xcode 15+**, an iPhone on **iOS 17+**, and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```bash
 brew install xcodegen
-cd TonePilot
-xcodegen generate          # creates TonePilot.xcodeproj from project.yml
-open TonePilot.xcodeproj
+cd TonePilot && xcodegen generate && open TonePilot.xcodeproj
 ```
 
-1. In **Signing & Capabilities**, choose your team and change the bundle id if needed.
-2. Get the sounds: download **GeneralUser GS** (free) from <https://github.com/mrbumpy409/GeneralUser-GS> and rename the `.sf2` to `GeneralUser-GS.sf2`. Then do one of these:
-   * put it in `App/Resources/SoundFonts/` before building (it's bundled and installed on first launch), or
-   * AirDrop it to the phone and import it in **Settings › SoundFonts**.
-3. Run on your iPhone. The Simulator works for the UI and analysis, but has no USB MIDI.
-4. Connect the Casio. Follow the in-app **Settings › Connect your Casio CT-X870IN** and [docs/HARDWARE_TEST_CHECKLIST.md](docs/HARDWARE_TEST_CHECKLIST.md).
+1. Set your signing team and bundle id.
+2. Sounds: download **GeneralUser GS** from <https://github.com/mrbumpy409/GeneralUser-GS> (`GeneralUser-GS.sf2`). Put it in `App/Resources/SoundFonts/`, or import it in **Settings › SoundFonts**.
+3. Run on the iPhone. The Simulator works for the UI and analysis, but has no USB MIDI.
+4. Connect the Casio. Follow **Settings › Connect your Casio** and the hardware checklist.
 
 ### Tests
 
-The core logic (models, persistence and migrations, MIDI parsing and routing, analysis) is a Swift package with 38 unit tests:
-
 ```bash
-cd Packages/TonePilotCore && swift test            # macOS or Linux
-# no Swift installed? docker run --rm -v "$PWD":/pkg -w /pkg swift:6.0-noble swift test
+cd Packages/TonePilotCore && swift test     # 82 tests (macOS or Linux; Docker: swift:6.0-noble)
+TONEPILOT_SF2=/path/GeneralUser-GS.sf2 swift test   # also tests the real SoundFont
+cd server && pip install -r requirements-dev.txt && pytest tests   # 8 tests
 ```
 
-The analysis tests synthesize songs with known tempo, key, chords and an A-B-A-B structure, and check that the analyser recovers them.
+A short audio demo rendered by the engine with GeneralUser GS (left-hand Root→Fifth→Root on piano, right-hand Bansuri-like flute with strings and celesta) can be generated with `TONEPILOT_DEMO_OUT=demo.wav TONEPILOT_SF2=… swift test --filter DemoRenderTests`.
 
 ## Project layout
 
 ```
-project.yml                         XcodeGen spec (iOS 17 app + local package)
+project.yml                       XcodeGen spec (iOS 17 app + local package)
 App/Sources/
-  TonePilotApp.swift                App entry, tabs, first-run setup sheet
-  Services/AppModel.swift           Library state, MIDI→router→engine wiring, import, analysis jobs, audio-session handling
-  Audio/SoundEngine.swift           AVAudioEngine: 6 sampler slots (EQ→delay→reverb→mixer), limiter, meter
-  Audio/AudioFileDecoder.swift      MP3/M4A/WAV → mono 22.05 kHz floats for analysis
-  Audio/SectionPlayer.swift         Play/loop a song section through the same output
-  MIDI/MIDIInputManager.swift       CoreMIDI (UMP, MIDI 1.0), hot-plug, activity log
-  Views/                            Library, Import, Song detail & timeline, Tone Studio, Performance, Settings/Diagnostics
-App/Resources/SoundFonts/           Drop GeneralUser-GS.sf2 here (not committed)
-Packages/TonePilotCore/
-  Models/                           Song, Section, Arrangement, Layer, InstrumentPatch, Library, factory GM patches, section editing
-  Persistence/LibraryStore.swift    Versioned JSON, v1→v2 migration, atomic save + backup recovery
-  MIDI/                             Byte/UMP parser, NoteRouter (layers, splits, ref-counted voices, panic), velocity curves, gain staging
-  Analysis/                         FFT, features, tempo + DP beat tracking, key/chords, structure segmentation, SongAnalyzer
-  Suggestions/ToneSuggester.swift   Transparent rule-based tone suggestions
-docs/                               Feasibility report, hardware checklist
+  Services/AppModel.swift         Library, one-click pipeline, server upload (consented), section scheduler,
+                                  accompaniment, melody/chord corrections, presets, samples, backup
+  Audio/ToneEngineHost.swift      Hosts ToneEngine in AVAudioEngine (AVAudioSourceNode); audio session
+  Audio/SoundEngine.swift         Legacy Apple-sampler engine (fallback)
+  Audio/SectionPlayer.swift       Backing track / song clock
+  MIDI/MIDIInputManager.swift     CoreMIDI (UMP), hot-plug, activity log
+  Views/                          Library · Song page · Melody & chord guide · Tone Studio · Sample creator ·
+                                  Performance · Settings/Diagnostics/Analysis server
+Packages/TonePilotCore/           Platform-independent and fully tested
+  Engine/                         SF2 parser, sampler/synth voices, ADSR, SVF filter, EQ, chorus, delay,
+                                  Freeverb, limiter, sequencer, controller, instrument cache, WAV I/O
+  Analysis/                       FFT, features, tempo/beats, key/chords, structure, melody extraction,
+                                  chord guide, section insights, SongAnalyzer
+  Arrangement/                    AutoArranger, SongPipeline
+  Performance/                    Section scheduler (auto/manual/assisted), accompaniment generator
+  MIDI/                           Parser, NoteRouter (layers, splits, stuck-note safety), gain staging
+  Models/ Persistence/ Backend/   Data model (schema v3), library store, preset exchange, server client
+server/                           Optional FastAPI server: Demucs stems + Basic Pitch vocal melody
+docs/                             Capabilities, feasibility/architecture, hardware checklist
 ```
 
 ## Honest limitations
 
-* The iOS target was written against the iOS 17 SDK but **has not been compiled in this environment** (no Xcode on Linux). The `TonePilotCore` package is compiled and tested. Expect to fix minor compile issues in the app target on first build.
-* Analysis is classical DSP. It works well on clear rhythms and harmony, but is less reliable on dense film mixes, drones, modal melodies and tempo changes. Every value shows a confidence badge and can be corrected.
-* Section labels (intro, verse, chorus) are guesses from repetition and loudness. Vocals aren't detected yet.
-* The connection guide is based on general iOS/USB-MIDI behaviour and retailer specs. CT-X870IN-specific behaviour (Local Control, which controllers are sent over USB) is still unverified; use the checklist.
+* **The iOS app has not been compiled in this environment** (Linux, no Xcode). Every app file passes a Swift syntax parse, and all the logic it calls lives in the tested core package. Expect to fix small compile issues on the first Xcode build. The Casio workflow is **not complete until the hardware checklist passes**.
+* Instrument recommendations are evidence-based rules over measured sound character, melody and (optionally) stem levels. They are **not** a trained instrument classifier, and no claim is made to reproduce a composer's exact studio sounds.
+* Demucs separation is integrated on the server but **was not run here**: its model weights couldn't be downloaded. Basic Pitch **was** run.
+* The melody guide plays note pitches. Ornament bends are shown on screen but not yet replayed by the guide voice.
+* Analysis on dense film mixes is approximate. Every estimate shows a confidence level and can be corrected.

@@ -27,34 +27,35 @@ _Last researched: October 2026._
 | **Spotify Basic Pitch** | Audio → MIDI notes (polyphonic, instrument-agnostic) | **Apache-2.0**. Ships TF, Core ML, TFLite and ONNX models, so the Core ML model can run on-device. Works best on exposed or separated parts. → Milestone 4/5. |
 | **basic-pitch-ts** | TypeScript port | Not needed for a native app. |
 | **AudioKit** | Synths, samplers, DSP for Swift | MIT. Not needed for Milestone 1: Apple's `AVAudioUnitSampler` loads SF2 natively. AudioKit's DunneSampler/SFZ support is a candidate for Milestone 3's custom-sample engine. |
-| **AVAudioUnitSampler** (Apple) | SF2/DLS/EXS/AUPreset playback | **Used.** Note: program/bank must match the SF2. The melodic bank MSB is `0x79`, percussion `0x78`. |
+| **AVAudioUnitSampler** (Apple) | SF2/DLS/EXS/AUPreset playback | Legacy fallback engine. Program/bank must match the SF2 (melodic bank MSB `0x79`, percussion `0x78`). |
 | **GeneralUser GS** SoundFont | 259 GM-style presets, ~30 MB | License v2.0 allows private/commercial music use and use in software. The author can't fully verify sample origins, so review before shipping on the App Store. Not bundled in the repo; the user installs it. |
 
 ## 3. Architecture
 
 ```
-┌──────────────── iPhone app (SwiftUI) ────────────────┐
-│ Library · Analyse · Tone Studio · Perform · Settings │
-│                    AppModel (@MainActor)             │
-│      │ saves (debounced)       │ activate(tone)      │
-│ LibraryStore (JSON + files)    ▼                     │
-│                     NoteRouter (lock, no alloc spikes)│
-│ Casio ─USB MIDI─▶ MIDIInputManager ─events─▶ │       │
-│   (CoreMIDI thread, UMP MIDI 1.0)       SoundCommands│
-│                                              ▼       │
-│     SoundEngine: sampler→EQ→delay→reverb→mixer ×6    │
-│                  → tone bus → peak limiter → output ─┼─▶ 3.5 mm → Casio AUDIO IN
-│     SectionPlayer (song playback, loop) ─────▲       │
-│ Analysis (background Task): decode → TonePilotCore   │
-│   features → tempo/beats → key → chords → sections   │
-│   → tone suggestions → Song.apply (keeps user edits) │
-└──────────────────────────────────────────────────────┘
-        (Milestone 4: optional Mac/server job: Demucs + Basic Pitch → same result types)
+iPhone app (SwiftUI) — Library · Song page · Melody & chord guide · Tone Studio · Perform · Settings
+  AppModel (@MainActor): library, one-click pipeline, section scheduler, accompaniment, presets
+    │
+    ├─ Casio ─USB MIDI─▶ MIDIInputManager (CoreMIDI thread) ─▶ NoteRouter ─▶ ToneEngineController
+    │                                                                              │ lock-free-for-audio
+    │                                                                              ▼ command queue
+    │   ToneEngineHost: AVAudioEngine ── AVAudioSourceNode ── ToneEngine.render()  (no alloc/locks/IO)
+    │        8 live slots (layers) + 4 accompaniment slots (bass, drums, melody guide, click)
+    │        voices: SF2/user-sample (Hermite) or synth → ADSR → SVF filter → pan
+    │        slot bus: 3-band EQ → sends → chorus / delay / Freeverb → master EQ → limiter
+    │        sample-accurate sequencer locked to the backing track or a tap-started clock
+    │   SectionPlayer (backing track) ─────────────────────────────────┘──▶ output ─3.5 mm─▶ Casio AUDIO IN
+    │
+    └─ Analysis (background task): decode → SongPipeline
+         features → tempo/beats/meter → key → chords(+alternatives) → melody (contour→notes, bends kept)
+         → sections + activity → chord guide (Root→Fifth→Root / Sa–Pa drone) → AutoArranger
+         (AI Original + My Version per section)
+         optional, consented: upload → your server (Demucs stems + Basic Pitch vocal melody) → delete
 ```
 
-* **TonePilotCore** (Swift package, no Apple-only frameworks) holds the models, versioned persistence and migrations, MIDI parsing/routing, all analysis DSP and the suggestions. It builds and tests on Linux CI as well as on Xcode.
-* **Real-time rules:** the MIDI callback only parses, routes and calls `startNote`/`stopNote`. Preset loading runs on a background queue. Analysis runs in detached tasks. Nothing ever runs on the render thread except Apple's own nodes.
-* **Analysis interface:** the analysers produce `SongAnalysisResult`. A future server or Demucs backend returns the same type, so the UI doesn't change.
+**Engine decision.** Milestone 1 used Apple's `AVAudioUnitSampler`. It plays SF2 files, but it exposes no per-layer ADSR override or chorus, offers no sample-accurate sequencing for accompaniment, and can't be unit-tested off-device. TonePilot now renders through its own engine in `TonePilotCore`. It still **reuses the existing SoundFont assets** rather than inventing instruments; only the playback/DSP code is new. Every control is real DSP and is measured in offline tests. The Apple sampler remains selectable as a fallback. AudioKit's samplers were considered, but they can't be built or tested in this Linux environment; they remain an option if on-device profiling shows the Swift engine is too slow.
+
+**On-device vs server.** Everything required to play runs on the phone, and so does analysis (seconds for a song). Stem separation (Demucs, PyTorch) is too heavy for a phone app, so it runs on the user's own Mac/server, only with explicit per-song consent. Basic Pitch also ships a Core ML model (`nmp.mlpackage`, ~300 KB), so on-device transcription of stems is a realistic later step.
 
 ## 4. Licensing risks
 
@@ -73,18 +74,18 @@ _Last researched: October 2026._
 
 The [hardware checklist](HARDWARE_TEST_CHECKLIST.md) is the step-by-step verification.
 
-## 6. Phased plan
+## 6. Phased plan (status, October 2026)
 
 | Milestone | Scope | Status |
 |---|---|---|
-| 1. Foundation | SwiftUI app shell, library, models, persistence, MIDI input + diagnostics, sampler playback, MP3 import | **Built** (this repo) |
-| 2. Layered tones | 6-layer engine, splits/velocity layers, limiter/meter, audition | **Built.** Needs on-device verification |
-| 3. Preset library | Patch editor incl. envelopes, user samples (SFZ/WAV multisample), preset import/export | Partly built: layer editing, effects, save/load. Envelopes and user samples are not built. |
-| 4. Song analysis | On-device tempo/beats/key/chords/sections ✅. Stems (Demucs) and transcription (Basic Pitch) on a Mac/server or Core ML ⏳ | On-device part **built and tested** |
-| 5. AI tone suggestions | Heuristic suggestions ✅. Model-based instrument tagging on stems ⏳ | Heuristic only |
-| 6. Performance mode | Playlists, section buttons, layer mutes, master, panic | **Built** |
-| 7. Quality | Latency/CPU profiling, layer-count limits, interruption/route tests, crash recovery | Not started (needs device) |
+| 1. Foundation | App shell, library, models, MIDI, MP3 import | Built |
+| 2. Sample engine & layered tones | ToneEngine, SF2, user samples, synth, 8 layers | Built and tested offline. Needs on-device profiling |
+| 3. Tone Studio & presets | ADSR/filter/EQ/FX/expression, master FX, AI Original/My Version, export/import | Built |
+| 4. Song analysis | Tempo/key/meter/chords/structure/melody on-device; Demucs + Basic Pitch on the server | Built; Demucs not run here |
+| 5. AI arrangement | Activity, lead matching, AutoArranger, regenerate section | Built (rule-based; no trained classifier yet) |
+| 6. Performance | Auto/manual/assisted switching, chord & melody guide, accompaniment | Built |
+| 7. Quality | Latency/CPU on iPhone, interruption/route tests, CT-X870IN verification | **Pending hardware** |
 
-## 7. Milestone 1 files
+## 7. Files
 
-See [README.md](../README.md#project-layout).
+See [README.md](../README.md#project-layout) and [CAPABILITIES.md](CAPABILITIES.md).

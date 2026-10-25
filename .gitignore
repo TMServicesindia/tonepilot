@@ -7,3 +7,4 @@ DerivedData/
 Packages/TonePilotCore/.build/
 App/Resources/SoundFonts/*.sf2
 App/Resources/SoundFonts/*.dls
+docs/demo/*.wav

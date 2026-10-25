@@ -9,11 +9,21 @@ public enum SongPipeline {
         public var arrangedSections: [UUID]
     }
 
+    /// - Parameter melodyOverride: a better melody from elsewhere (e.g. Basic Pitch on the server's
+    ///   vocal stem). It replaces the on-device estimate before arranging, since the melody drives
+    ///   lead choice and the keyboard split.
     public static func run(song input: Song, audio: AudioBuffer, stems: [StemInfo.Kind: AudioBuffer] = [:],
-                           patches: [InstrumentPatch], progress: ((Double) -> Bool)? = nil) throws -> Output {
+                           melodyOverride: MelodyTrack? = nil, patches: [InstrumentPatch],
+                           progress: ((Double) -> Bool)? = nil) throws -> Output {
         var options = SongAnalyzer.Options()
         options.stems = stems
-        let result = try SongAnalyzer.analyze(audio, options: options) { p in progress?(p * 0.95) ?? true }
+        options.extractMelody = melodyOverride == nil
+        var result = try SongAnalyzer.analyze(audio, options: options) { p in progress?(p * 0.95) ?? true }
+        if var m = melodyOverride {
+            if m.difficultPhrases.isEmpty { m.difficultPhrases = MelodyExtractor.difficultPhrases(m.notes) }
+            result.melody = m
+            result = SongAnalyzer.refreshLeadActivity(result)
+        }
         var song = input
         song.apply(result)
         if song.switching == nil { song.switching = SwitchingSettings() }

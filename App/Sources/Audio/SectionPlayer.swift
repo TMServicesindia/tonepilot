@@ -1,13 +1,16 @@
 import AVFoundation
 import TonePilotCore
 
-/// Plays (and optionally loops) one section of the imported song through the same
-/// engine as the tones, so the user can practise along through the Casio speakers.
+/// Plays (and optionally loops) the imported song — a section or from any point — through the
+/// same output as the tones, so you can play along through the Casio speakers. Its position is
+/// the timing reference for automatic tone switching and accompaniment sync.
 final class SectionPlayer {
     private let player: AVAudioPlayerNode
     private let engine: AVAudioEngine
     private var file: AVAudioFile?
-    private var loopRange: (start: AVAudioFramePosition, count: AVAudioFrameCount)?
+    private(set) var loadedURL: URL?
+    private var range: (start: AVAudioFramePosition, count: AVAudioFrameCount)?
+    private var loop = false
     private var generation = 0
     private(set) var isPlaying = false
 
@@ -22,15 +25,22 @@ final class SectionPlayer {
     }
 
     func load(url: URL) throws {
+        if loadedURL == url, file != nil { return }
         stop()
         let f = try AVAudioFile(forReading: url)
         // Match the player's connection to the file so no implicit conversion is needed.
         engine.connect(player, to: engine.mainMixerNode, format: f.processingFormat)
         file = f
+        loadedURL = url
     }
 
-    /// Starts playback at `start` seconds; loops between start and end when `loop` is true.
-    func play(from start: Double, to end: Double?, loop: Bool) {
+    var duration: Double {
+        guard let file else { return 0 }
+        return Double(file.length) / file.processingFormat.sampleRate
+    }
+
+    /// Starts playback at `start` seconds until `end` (or the end of the song); loops when asked.
+    func play(from start: Double, to end: Double? = nil, loop: Bool = false) {
         // play() on a stopped engine raises an Objective-C exception.
         guard let file, engine.isRunning else { return }
         stop()
@@ -38,21 +48,32 @@ final class SectionPlayer {
         let startFrame = AVAudioFramePosition(max(0, start) * sr)
         let endFrame = min(file.length, end.map { AVAudioFramePosition($0 * sr) } ?? file.length)
         guard endFrame > startFrame else { return }
-        loopRange = (startFrame, AVAudioFrameCount(endFrame - startFrame))
+        range = (startFrame, AVAudioFrameCount(endFrame - startFrame))
+        self.loop = loop
         generation += 1
-        schedule(loop: loop, generation: generation)
+        schedule(generation: generation)
         player.play()
         isPlaying = true
     }
 
-    private func schedule(loop: Bool, generation: Int) {
-        guard let file, let range = loopRange else { return }
+    private func schedule(generation: Int) {
+        guard let file, let range else { return }
         player.scheduleSegment(file, startingFrame: range.start, frameCount: range.count, at: nil) { [weak self] in
             DispatchQueue.main.async {
                 guard let self, self.generation == generation, self.isPlaying else { return }
-                if loop { self.schedule(loop: true, generation: generation) } else { self.isPlaying = false }
+                if self.loop { self.schedule(generation: generation) } else { self.isPlaying = false }
             }
         }
+    }
+
+    /// Song position in seconds (accounts for loops), or nil when stopped.
+    var currentTime: Double? {
+        guard isPlaying, let file, let range, let nodeTime = player.lastRenderTime,
+              let playerTime = player.playerTime(forNodeTime: nodeTime) else { return nil }
+        let sr = file.processingFormat.sampleRate
+        var played = AVAudioFramePosition(Double(playerTime.sampleTime) * sr / playerTime.sampleRate)
+        if loop, range.count > 0 { played %= AVAudioFramePosition(range.count) }
+        return Double(range.start + max(0, played)) / sr
     }
 
     func stop() {
