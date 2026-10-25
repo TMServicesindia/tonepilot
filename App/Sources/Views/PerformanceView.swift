@@ -9,6 +9,7 @@ struct PerformanceView: View {
     @State private var playlistId: UUID?
     @State private var showSongs = false
     @State private var showBacking = false
+    @State private var showTones = false
 
     private var songs: [Song] {
         if let pid = playlistId, let p = model.library.playlists.first(where: { $0.id == pid }) {
@@ -28,6 +29,10 @@ struct PerformanceView: View {
                         .font(.caption).foregroundStyle(Theme.warn).frame(maxWidth: .infinity, alignment: .leading)
                 }
                 toneHeader
+                Button { showTones = true } label: {
+                    Label("Choose tone", systemImage: "pianokeys").font(.headline).frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
                 if let song = currentSong {
                     if let id = model.pendingSuggestion, let next = song.sections.first(where: { $0.id == id }) {
                         Button { model.confirmSuggestion() } label: {
@@ -48,13 +53,14 @@ struct PerformanceView: View {
                 }
                 layerControls
                 OutputMeter()
-                Button { showSongs = true } label: { Label(currentSong == nil ? "Choose a song" : "Change song", systemImage: "music.note.list").frame(maxWidth: .infinity) }
+                Button { showSongs = true } label: { Label(currentSong == nil ? "Play along with a song (optional)" : "Change song", systemImage: "music.note.list").frame(maxWidth: .infinity) }
                     .buttonStyle(.bordered)
             }
             .padding()
         }
         .background(Color.black.ignoresSafeArea())
         .sheet(isPresented: $showSongs) { songPicker }
+        .sheet(isPresented: $showTones) { NavigationStack { ToneSelectorView(inSheet: true) }.environmentObject(model) }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
             if let id = model.activeSongId { model.ensurePerformance(songId: id) }
@@ -81,7 +87,7 @@ struct PerformanceView: View {
             Text(currentSong.map { s in
                 let section = s.sections.first { $0.id == model.activeSectionId }?.label
                 return [s.title, section, model.songPosition?.mmss].compactMap { $0 }.joined(separator: " · ")
-            } ?? "Pick a song below")
+            } ?? "Any music — pick a tone and play")
             .font(.title3).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)

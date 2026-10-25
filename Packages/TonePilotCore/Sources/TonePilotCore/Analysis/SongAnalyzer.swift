@@ -26,13 +26,15 @@ public struct SongAnalysisResult: Sendable {
     public var melody: MelodyTrack?
     public var chordGuide: [ChordGuideStep]
     public var timeSignature: Estimate<Int>?
+    public var insights: SongInsights?
     /// Human-readable list of what this analysis did NOT do, shown in the UI.
     public var limitations: [String]
 
     public init(duration: Double, bpm: Estimate<Double>?, beats: [Double], key: Estimate<MusicalKey>?, chords: [ChordEvent],
                 sections: [SongSection], timbres: [UUID: SectionTimbre], suggestions: [ToneSuggestion],
                 melody: MelodyTrack? = nil, chordGuide: [ChordGuideStep] = [], timeSignature: Estimate<Int>? = nil,
-                limitations: [String]) {
+                insights: SongInsights? = nil, limitations: [String]) {
+        self.insights = insights
         self.duration = duration
         self.bpm = bpm
         self.beats = beats
@@ -144,6 +146,30 @@ public enum SongAnalyzer {
         relabelInstrumentalSections(&sections, lead: leadBySection)
 
         let guide = ChordGuide.build(chords: chords, key: key?.value)
+
+        // Climax flag.
+        let ordered = sections.indices.sorted { sections[$0].startTime < sections[$1].startTime }
+        if let c = ArrangementChanges.climaxIndex(ordered.map { sections[$0] }) { sections[ordered[c]].isClimax = true }
+
+        // Song-level insights. Each part is optional: what works is shown, what fails is listed.
+        var gaps: [String] = []
+        if tempo == nil { gaps.append("Tempo & beat grid (no steady beat found — a fixed grid was used)") }
+        if chords.filter({ $0.symbol != "N" }).isEmpty { gaps.append("Chords") }
+        if options.extractMelody, melody == nil || melody?.notes.isEmpty == true { gaps.append("Melody") }
+        if sections.count <= 1 { gaps.append("Song structure (only one section found)") }
+        let bassSource = options.stems[.bass] ?? audio
+        let bass = tempo == nil ? [] : BassAnalyzer.bassLine(bassSource, beats: beats)
+        if bass.isEmpty { gaps.append("Bass line") }
+        var chromaTotal = [Double](repeating: 0, count: 12)
+        for frame in features.chroma { let nf = Stats.normalized(frame); for i in 0..<12 { chromaTotal[i] += Double(nf[i]) } }
+        let maxC = chromaTotal.max() ?? 0
+        let scale = maxC > 0 ? Array(chromaTotal.indices.filter { chromaTotal[$0] >= 0.45 * maxC }.sorted { chromaTotal[$0] > chromaTotal[$1] }.prefix(8)) : []
+        let insights = SongInsights(
+            scaleNotes: scale,
+            rhythmicFeel: tempo == nil ? "Free / rubato (no steady beat detected)" : RhythmAnalyzer.feel(onsetEnvelope: features.onsetEnvelope, frameRate: features.frameRate, beats: beats),
+            style: StyleDescriber.describe(bpm: tempo?.bpm, beatsPerBar: meter?.value, sections: sections),
+            bassLine: bass,
+            gaps: gaps)
         _ = progress?(1)
 
         var limitations = baseLimitations
@@ -160,6 +186,7 @@ public enum SongAnalyzer {
             melody: melody,
             chordGuide: guide,
             timeSignature: meter,
+            insights: insights,
             limitations: limitations
         )
     }
@@ -289,6 +316,7 @@ public extension Song {
         if timeSignature?.provenance != .user { timeSignature = result.timeSignature }
         chordEvents = result.chords
         beatTimes = result.beats
+        insights = result.insights
         if !sections.contains(where: { $0.provenance == .user }) { sections = result.sections }
         else {
             // Keep the user's sections but refresh activity for ones that still match an analysed section.

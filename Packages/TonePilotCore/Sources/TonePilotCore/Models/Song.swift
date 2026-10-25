@@ -43,6 +43,8 @@ public struct SongSection: Codable, Hashable, Identifiable, Sendable {
     public var key: Estimate<MusicalKey>?
     /// Sound-character measurements, kept so a section can be re-arranged without re-analysis.
     public var timbre: SectionTimbre?
+    /// The song's peak section (loudest, late, clearly above the rest).
+    public var isClimax: Bool?
 
     public init(id: UUID = UUID(), type: SectionType, label: String? = nil, startTime: Double, endTime: Double,
                 startBar: Int? = nil, endBar: Int? = nil, confidence: Double = 1,
@@ -141,6 +143,10 @@ public struct Song: Codable, Hashable, Identifiable, Sendable {
     public var accompaniment: AccompanimentSettings?
     /// Semitones applied to guides and accompaniment (the user's chosen performance key).
     public var performanceTranspose: Int?
+    /// Scale notes, rhythmic feel, style, bass line, and any analysis parts that failed.
+    public var insights: SongInsights?
+    /// Artist / album read from the file's tags (display only).
+    public var album: String?
 
     public init(id: UUID = UUID(), title: String, artist: String? = nil, film: String? = nil,
                 composer: String? = nil, language: String? = nil, tags: [String] = [],

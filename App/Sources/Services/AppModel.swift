@@ -94,6 +94,7 @@ final class AppModel: ObservableObject {
         wireMIDI()
         wireMeter()
         observeAudioSession()
+        restoreLastTone()
         startEngine()
         preloadDefaultSoundFont()
         maintenanceTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
@@ -219,8 +220,23 @@ final class AppModel: ObservableObject {
 
     func resetClip() { outputClipped = false }
 
+    /// Finds any tone by id: song tones, My Tones, or a single-instrument tone.
+    func tone(id: UUID) -> Arrangement? {
+        if let a = library.globalArrangements.first(where: { $0.id == id }) { return a }
+        for song in library.songs { if let a = song.arrangements.first(where: { $0.id == id }) { return a } }
+        return library.patches.map(Arrangement.single).first { $0.id == id }
+    }
+
+    /// The keyboard is never silent on launch: last-used tone, else Grand Piano.
+    private func restoreLastTone() {
+        let saved = UserDefaults.standard.string(forKey: "lastToneId").flatMap(UUID.init(uuidString:)).flatMap { tone(id: $0) }
+        let piano = library.patch(id: FactoryPatches.id(forProgram: 0)).map(Arrangement.single)
+        activeArrangement = saved ?? piano
+    }
+
     /// Makes `arrangement` the sound you hear when playing the Casio.
     func activate(_ arrangement: Arrangement?, songId: UUID? = nil, sectionId: UUID? = nil) {
+        if let id = arrangement?.id { UserDefaults.standard.set(id.uuidString, forKey: "lastToneId") }
         activeArrangement = arrangement
         if let songId { activeSongId = songId }
         activeSectionId = sectionId

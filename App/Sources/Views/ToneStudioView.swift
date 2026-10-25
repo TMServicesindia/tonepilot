@@ -14,6 +14,9 @@ struct ToneStudioHomeView: View {
         List {
             if let importMessage { Text(importMessage).font(.footnote).foregroundStyle(.secondary) }
             Section {
+                NavigationLink { ToneSelectorView() } label: { Label("Choose a tone to play", systemImage: "pianokeys") }
+            }
+            Section {
                 ForEach(model.library.globalArrangements) { a in row(a, songId: nil) }
                 Button {
                     let a = Arrangement.starterFilmStack(name: "My tone \(model.library.globalArrangements.count + 1)")

@@ -192,3 +192,70 @@ public extension Arrangement {
         ])
     }
 }
+
+public extension Arrangement {
+    /// One instrument as a ready-to-play tone covering the whole keyboard (like selecting
+    /// "Piano" or "Strings" on the keyboard itself). The id is derived from the patch so it's stable.
+    static func single(_ patch: InstrumentPatch) -> Arrangement {
+        let hex = patch.id.uuidString.replacingOccurrences(of: "-", with: "")
+        let layerId = UUID(uuidString: "5A1E0000-0000-4000-8000-" + String(hex.suffix(12))) ?? UUID()
+        let toneId = UUID(uuidString: "5A1E0001-0000-4000-8000-" + String(hex.suffix(12))) ?? UUID()
+        return Arrangement(id: toneId, name: patch.name, layers: [Layer(id: layerId, patchId: patch.id, volume: 0.85)],
+                           masterGain: 0.8, origin: .user)
+    }
+
+    /// A copy saved as one of the user's own tones (new ids, independent of its song).
+    func savedAsMyTone(name newName: String) -> Arrangement {
+        var copy = duplicated(name: newName)
+        copy.rationale = rationale
+        return copy
+    }
+}
+
+public extension Library {
+    /// Every tone the user can pick and play, grouped like a keyboard's tone list.
+    struct ToneList: Sendable {
+        public struct Entry: Identifiable, Sendable {
+            public var id: UUID { tone.id }
+            public var tone: Arrangement
+            /// Song the tone came from (song tones), if any.
+            public var songId: UUID?
+            public var subtitle: String
+        }
+        public var songTones: [Entry]
+        public var myTones: [Entry]
+        public var instruments: [(family: InstrumentFamily, entries: [Entry])]
+    }
+
+    func toneList(search: String = "") -> ToneList {
+        let q = search.trimmingCharacters(in: .whitespaces).lowercased()
+        func matches(_ s: String) -> Bool { q.isEmpty || s.lowercased().contains(q) }
+        func layerNames(_ a: Arrangement) -> String { a.layers.compactMap { patch(id: $0.patchId)?.name }.joined(separator: " + ") }
+
+        var songTones: [ToneList.Entry] = []
+        for song in songs {
+            // The editable My Version of each section tone, once per arrangement.
+            var seen = Set<UUID>()
+            for section in song.orderedSections {
+                guard let a = song.arrangement(for: section), a.origin == .myVersion, !seen.contains(a.id) else { continue }
+                seen.insert(a.id)
+                let sectionsUsing = song.orderedSections.filter { $0.arrangementId == a.id }.map(\.label)
+                var named = a
+                named.name = "\(song.title) – \(sectionsUsing.first ?? section.label)"
+                if matches(named.name) || matches(layerNames(a)) {
+                    songTones.append(.init(tone: named, songId: song.id, subtitle: layerNames(a)))
+                }
+            }
+        }
+        let myTones = globalArrangements.filter { matches($0.name) || matches(layerNames($0)) }
+            .map { ToneList.Entry(tone: $0, songId: nil, subtitle: layerNames($0)) }
+        let hidden: Set<UUID> = [FactoryPatches.clickId, FactoryPatches.drumKitId]
+        let playable = patches.filter { !hidden.contains($0.id) && matches($0.name) }
+        let instruments = InstrumentFamily.allCases.compactMap { family -> (InstrumentFamily, [ToneList.Entry])? in
+            let entries = playable.filter { $0.family == family }
+                .map { ToneList.Entry(tone: .single($0), songId: nil, subtitle: $0.sourceType.displayName) }
+            return entries.isEmpty ? nil : (family, entries)
+        }
+        return ToneList(songTones: songTones, myTones: myTones, instruments: instruments)
+    }
+}

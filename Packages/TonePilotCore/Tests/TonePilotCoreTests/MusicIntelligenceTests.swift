@@ -376,7 +376,7 @@ final class PresetAndSchemaTests: XCTestCase {
 
 final class PipelineTests: XCTestCase {
     /// Accompaniment A-B-A-B plus a sung-style melody only in the A sections.
-    func songWithMelody() -> AudioBuffer {
+    static func songWithMelody() -> AudioBuffer {
         var acc = SyntheticSong.render(pattern: ["A", "B", "A", "B"], beatsPerSection: 32)
         let phrase = SyntheticMelody.tune
         let mel = SyntheticMelody.render(seconds: 64, vibratoCents: 15, accompaniment: false) { t in
@@ -390,7 +390,7 @@ final class PipelineTests: XCTestCase {
     }
 
     func testOneClickPipelineProducesPlayableSongAwareArrangement() throws {
-        let audio = songWithMelody()
+        let audio = Self.songWithMelody()
         let input = Song(title: "Pipeline", sourceType: .importedFile, userConfirmedRights: true)
         let out = try SongPipeline.run(song: input, audio: audio, patches: FactoryPatches.all)
         let song = out.song

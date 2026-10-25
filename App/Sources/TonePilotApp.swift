@@ -33,7 +33,7 @@ struct RootView: View {
             NavigationStack { ToneStudioHomeView() }
                 .tabItem { Label("Tone Studio", systemImage: "slider.vertical.3") }.tag(2)
             PerformanceView()
-                .tabItem { Label("Perform", systemImage: "pianokeys") }.tag(3)
+                .tabItem { Label("Play", systemImage: "pianokeys") }.tag(3)
             NavigationStack { SettingsView() }
                 .tabItem { Label("Settings", systemImage: "gearshape") }.tag(4)
         }

@@ -16,6 +16,16 @@ public enum TempoAnalyzer {
         var env = features.onsetEnvelope
         guard env.count > Int(fr * 4) else { return nil } // need at least ~4 s
 
+        // Refuse to invent a tempo for audio without real rhythmic activity (a held drone or pad
+        // has one onset at the start and then almost none): require sustained onset energy and
+        // at least six clear onsets after the first second.
+        let peak = env.max() ?? 0
+        let body = Array(env.dropFirst(Int(fr)))
+        guard peak > 0, Stats.mean(body) >= 0.01 * peak else { return nil }
+        var onsets = 0
+        for i in 1..<max(1, body.count - 1) where body[i] > 0.2 * peak && body[i] >= body[i - 1] && body[i] > body[i + 1] { onsets += 1 }
+        guard onsets >= 6 else { return nil }
+
         // Normalise: subtract local mean (removes slow loudness changes), clip negatives, unit std.
         env = highPass(env, window: Int(fr))
         let sd = Stats.std(env)
