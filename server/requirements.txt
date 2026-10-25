@@ -1,0 +1,11 @@
+# TonePilot analysis server. Python 3.10–3.11 (Basic Pitch 0.4.0 does not support 3.13 yet).
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+# Basic Pitch (Apache-2.0). On Linux it pulls TensorFlow, which needs numpy<2.
+basic-pitch==0.4.0
+numpy<2
+# resampy (a Basic Pitch dependency) still imports pkg_resources.
+setuptools<70
+# Demucs (MIT). Pulls PyTorch; downloads model weights on first run. MP3 input needs ffmpeg.
+demucs>=4.0.1,<5
