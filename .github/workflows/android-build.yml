@@ -78,7 +78,7 @@ jobs:
           set -euo pipefail
           trap 'echo "::error title=Collect native libraries::line $LINENO: $BASH_COMMAND"' ERR
           find Packages/TonePilotCore/.build -name '*.so' | while read -r f; do echo "::notice title=Built::$f"; done
-          LIB=$(find Packages/TonePilotCore/.build -name libTonePilotBridge.so -path '*release*' | head -1)
+          LIB=$(find Packages/TonePilotCore/.build -name libTonePilotBridge.so -ipath '*release*' | head -1)
           test -n "$LIB"
           file "$LIB"
           file "$LIB" | grep -q "ARM aarch64"
