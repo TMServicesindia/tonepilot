@@ -85,7 +85,8 @@ jobs:
           OUT=jniLibs/arm64-v8a
           mkdir -p "$OUT"
           cp "$LIB" "$OUT/"
-          READELF=$(find "$ANDROID_NDK_HOME" -name llvm-readelf -type f | head -1)
+          READELF=$(find "$ANDROID_NDK_HOME" -name llvm-readelf | head -1)
+          test -x "$READELF"
           cp "$(find "$ANDROID_NDK_HOME" -path '*aarch64-linux-android/libc++_shared.so' | head -1)" "$OUT/"
           # Copy any Swift runtime libraries that weren't linked statically.
           SYSTEM="libc.so libm.so libdl.so liblog.so libandroid.so libz.so libc++_shared.so libaaudio.so libOpenSLES.so"
@@ -101,7 +102,9 @@ jobs:
             done
           done
           ls -la "$OUT"
-          "$READELF" -d "$OUT/libTonePilotBridge.so" | grep -E "NEEDED|SONAME"
+          for f in "$OUT"/*.so; do
+            echo "::notice title=$(basename "$f")::$("$READELF" -d "$f" | grep -E 'NEEDED|SONAME' | awk '{print $5}' | tr '\n' ' ')"
+          done
 
       - uses: actions/upload-artifact@v4
         with:
