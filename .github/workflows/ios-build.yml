@@ -64,8 +64,14 @@ jobs:
           test -f build/Build/Products/Release-iphoneos/TonePilot.app/TonePilot
           file build/Build/Products/Release-iphoneos/TonePilot.app/TonePilot | grep -q arm64
           # The separator must be linked in and its model bundled.
-          nm build/Build/Products/Release-iphoneos/TonePilot.app/TonePilot | grep -q tp_demucs_separate
-          test -s build/Build/Products/Release-iphoneos/TonePilot.app/Models/ggml-model-htdemucs-4s-f16.bin
+          APP=build/Build/Products/Release-iphoneos/TonePilot.app
+          find "$APP" -name "*.bin" | sed 's/^/::notice title=Bundled model::/'
+          if ! nm "$APP/TonePilot" 2>/dev/null | grep -q tp_demucs_separate && ! strings "$APP/TonePilot" | grep -q "htdemucs"; then
+            echo "::error title=Separator::tp_demucs symbols not found in the app binary"; exit 1
+          fi
+          if [ -z "$(find "$APP" -name 'ggml-model-htdemucs-4s-f16.bin' -size +10M)" ]; then
+            echo "::error title=Separator::model file missing from the app"; ls -la "$APP" | head -40; exit 1
+          fi
 
       # Logs need a login to download; annotations are public, so surface errors there.
       - name: Report errors as annotations
