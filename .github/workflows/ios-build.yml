@@ -91,14 +91,22 @@ jobs:
           path: xcodebuild.log
           if-no-files-found: ignore
 
+      # v0.3.1–v0.3.5 were published by a faulty check without the app executable; remove them.
+      - name: Remove broken early releases
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for t in v0.3.1 v0.3.2 v0.3.3 v0.3.4 v0.3.5; do gh release delete "$t" --repo "$GITHUB_REPOSITORY" --yes --cleanup-tag 2>/dev/null || true; done
+
       # Every successful build of main becomes a release, so this link always has the newest app:
       # https://github.com/<owner>/<repo>/releases/latest/download/TonePilot.ipa
       - name: Publish release download
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v0.3.{0}', github.run_number) }}
-          name: TonePilot ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('0.3.{0}', github.run_number) }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v0.3.{0}', github.run_number + 100) }}
+          name: TonePilot ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('0.3.{0}', github.run_number + 100) }}
           target_commitish: ${{ github.sha }}
           make_latest: true
           body: |

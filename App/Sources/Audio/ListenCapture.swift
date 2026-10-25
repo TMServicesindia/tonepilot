@@ -68,7 +68,7 @@ final class ListenCapture: ObservableObject {
     }
 
     /// Stops listening and returns the captured song (memory is released from the session).
-    func stop() -> AudioBuffer? {
+    func stop() -> TonePilotCore.AudioBuffer? {
         guard isListening else { return nil }
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()

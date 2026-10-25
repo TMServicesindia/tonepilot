@@ -33,7 +33,7 @@ enum AudioFileDecoder {
         return (buffer.samples, rate)
     }
 
-    static func decodeMono(url: URL, sampleRate: Double = AnalysisConfig().sampleRate) throws -> AudioBuffer {
+    static func decodeMono(url: URL, sampleRate: Double = AnalysisConfig().sampleRate) throws -> TonePilotCore.AudioBuffer {
         let file: AVAudioFile
         do { file = try AVAudioFile(forReading: url) } catch { throw AudioDecodeError.unreadable(error.localizedDescription) }
         let inFormat = file.processingFormat
@@ -78,6 +78,6 @@ enum AudioFileDecoder {
             }
             if status == .endOfStream || (status == .inputRanDry && reachedEnd) { break }
         }
-        return AudioBuffer(samples: samples, sampleRate: sampleRate)
+        return TonePilotCore.AudioBuffer(samples: samples, sampleRate: sampleRate)
     }
 }

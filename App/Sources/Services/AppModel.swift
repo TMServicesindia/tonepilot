@@ -673,7 +673,7 @@ final class AppModel: ObservableObject {
                 await MainActor.run { self?.analysisStage[songId] = text; self?.analysisProgress[songId] = p }
             }
             do {
-                var stems: [StemInfo.Kind: AudioBuffer] = [:]
+                var stems: [StemInfo.Kind: TonePilotCore.AudioBuffer] = [:]
                 var stemInfos: [StemInfo] = []
                 var serverMelody: MelodyTrack?
                 var progressBase = 0.0
@@ -735,7 +735,7 @@ final class AppModel: ObservableObject {
     /// Listen Mode: analyses audio captured from the microphone while the song played from the
     /// user's streaming app. On-device only — the captured audio is never stored or uploaded, and
     /// is released when analysis finishes.
-    func analyzeListened(songId: UUID, audio: AudioBuffer) {
+    func analyzeListened(songId: UUID, audio: TonePilotCore.AudioBuffer) {
         guard var song = library.song(id: songId) else { return }
         analysisTasks[songId]?.cancel()
         song.analysisStatus = .running
