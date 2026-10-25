@@ -7,13 +7,15 @@ struct StudioTab: View {
     @EnvironmentObject var model: AppModel
 
     var body: some View {
+        // A new identity per song: pages pushed for the previous song are closed too.
         NavigationStack {
             if let id = model.activeSongId, model.song(id) != nil {
-                SongStudioView(songId: id).id(id)
+                SongStudioView(songId: id)
             } else {
                 FreePlayView()
             }
         }
+        .id(model.activeSongId)
     }
 }
 

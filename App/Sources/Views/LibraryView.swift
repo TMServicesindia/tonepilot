@@ -241,6 +241,7 @@ struct ImportSongView: View {
             applyDetails(&song)
             model.update(song)
         }
+        model.openStudio(id)
         dismiss()
     }
 
@@ -249,6 +250,7 @@ struct ImportSongView: View {
         song.arrangements = [.starterFilmStack(name: "Main tone")]
         applyDetails(&song)
         model.update(song)
+        model.openStudio(song.id)
         dismiss()
     }
 }

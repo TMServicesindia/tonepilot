@@ -93,7 +93,7 @@ struct ToneSelectorView: View {
     private func select(_ entry: Library.ToneList.Entry) {
         // Song tones keep their real identity so edits made elsewhere stay in sync.
         if let songId = entry.songId, let song = model.song(songId), let real = song.arrangements.first(where: { $0.id == entry.tone.id }) {
-            model.activate(real, songId: songId)
+            model.activate(real, songId: songId == model.activeSongId ? songId : nil)
         } else {
             model.activate(entry.tone)
         }

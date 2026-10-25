@@ -18,7 +18,8 @@ extension AppModel {
             SongStudio.applyFirstOpenDefaults(&acc, hasAudio: audioURL(for: song) != nil)
             if acc != before { song.accompaniment = acc; update(song) }
         }
-        ensurePerformance(songId: songId)
+        // Always switch the performance to this song (another song may still be loaded).
+        if activeSongId != songId { startPerformance(songId: songId) } else { ensurePerformance(songId: songId) }
         selectedTab = .studio
         loadWaveform(songId)
     }

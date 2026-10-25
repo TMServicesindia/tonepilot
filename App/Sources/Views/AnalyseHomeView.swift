@@ -39,7 +39,7 @@ struct AnalyseHomeView: View {
         .sheet(isPresented: $showImport) { ImportSongView().environmentObject(model) }
         .sheet(isPresented: $showListen) { ListenModeView().environmentObject(model) }
         .fileImporter(isPresented: $pickMP3, allowedContentTypes: [.mp3, .mpeg4Audio, .wav, .aiff, .audio]) { result in
-            if case .success(let url) = result { model.importAndAnalyze(from: url) }
+            if case .success(let url) = result, let id = model.importAndAnalyze(from: url) { model.openStudio(id) }
         }
     }
 }

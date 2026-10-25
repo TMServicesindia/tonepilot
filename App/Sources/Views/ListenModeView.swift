@@ -131,6 +131,7 @@ struct ListenModeView: View {
             id = song.id
         }
         model.analyzeListened(songId: id, audio: audio)
+        model.openStudio(id)
         dismiss()
     }
 }

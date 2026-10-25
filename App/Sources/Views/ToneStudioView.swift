@@ -116,7 +116,7 @@ struct ArrangementEditorView: View {
                     }
                     OutputMeter()
                     Button {
-                        model.activate(arrangement, songId: songId)
+                        model.activate(arrangement, songId: songId == model.activeSongId ? songId : nil)
                     } label: {
                         Label(model.activeArrangement?.id == arrangement.id ? "Playing on keyboard" : "Use on keyboard",
                               systemImage: "pianokeys")
@@ -173,7 +173,7 @@ struct ArrangementEditorView: View {
             .disabled(arrangement.origin == .aiOriginal)
             .navigationTitle(arrangement.name)
             .toolbar { EditButton() }
-            .onAppear { model.activate(arrangement, songId: songId) }
+            .onAppear { model.activate(arrangement, songId: songId == model.activeSongId ? songId : nil) }
             .sheet(isPresented: $addingLayer) {
                 PatchPicker { patch in
                     mutate { $0.layers.append(Layer(patchId: patch.id, volume: 0.6)) }
