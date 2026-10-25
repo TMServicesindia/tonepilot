@@ -40,6 +40,8 @@ enum StemSeparator {
     /// for audio and the UI.
     static var workers: Int { workersOverride ?? max(1, min(4, ProcessInfo.processInfo.activeProcessorCount - 2)) }
     nonisolated(unsafe) static var workersOverride: Int?
+    /// Tests: called after each block is written.
+    nonisolated(unsafe) static var blockDone: ((Int) -> Void)?
 
     /// Blocking; run on a background thread. Returns the stems written to `outputDir`.
     static func separate(input: URL, outputDir: URL, progress: @escaping (Double) -> Void,
@@ -100,6 +102,7 @@ enum StemSeparator {
                 let done = merger.add(c.index, tracks)
                 for s in 0..<sources { try write(files[s].2, left: done[s * 2], right: done[s * 2 + 1]) }
                 tracker.finished(c.index)
+                blockDone?(c.index)
             }
         }
         return files.map { StemInfo(kind: $0.0, fileName: $0.1.lastPathComponent, model: "htdemucs (on this iPhone)") }

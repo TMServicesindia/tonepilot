@@ -49,6 +49,14 @@ struct SourceTypeBadge: View {
 struct OutputMeter: View {
     @EnvironmentObject var model: AppModel
 
+    var body: some View { MeterBar(model: model, live: model.live) }
+}
+
+/// Observes only the meter values, so the meter redraws without redrawing its screen.
+private struct MeterBar: View {
+    let model: AppModel
+    @ObservedObject var live: LiveState
+
     var body: some View {
         HStack(spacing: 8) {
             GeometryReader { geo in
@@ -56,18 +64,17 @@ struct OutputMeter: View {
                     Capsule().fill(Color.white.opacity(0.1))
                     Capsule()
                         .fill(LinearGradient(colors: [.green, .yellow, .red], startPoint: .leading, endPoint: .trailing))
-                        .frame(width: geo.size.width * CGFloat(model.outputPeak))
-                        .animation(.linear(duration: 0.05), value: model.outputPeak)
+                        .frame(width: geo.size.width * CGFloat(min(1, live.peak)))
                 }
             }
             .frame(height: 8)
             Button { model.resetClip() } label: {
                 Text("CLIP").font(.caption2.bold())
-                    .foregroundStyle(model.outputClipped ? Color.white : Color.secondary)
+                    .foregroundStyle(live.clipped ? Color.white : Color.secondary)
                     .padding(.horizontal, 5).padding(.vertical, 2)
-                    .background(model.outputClipped ? Theme.bad : Color.clear, in: RoundedRectangle(cornerRadius: 4))
+                    .background(live.clipped ? Theme.bad : Color.clear, in: RoundedRectangle(cornerRadius: 4))
             }
-            .accessibilityLabel(model.outputClipped ? "Output clipped, tap to reset" : "No clipping")
+            .accessibilityLabel(live.clipped ? "Output clipped, tap to reset" : "No clipping")
         }
     }
 }

@@ -29,6 +29,10 @@ jobs:
           sysctl -n machdep.cpu.brand_string hw.ncpu || true
           ./build/bench ../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin 3 40 2>&1 | grep -v "^Loading tensor\|MB$" | tee bench.log | tail -20
           grep -E "^RESULT|^part" bench.log | while IFS= read -r l; do echo "::notice title=Stems::$l"; done
+          for secs in 8 22; do
+            /usr/bin/time -l ./build/bench ../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin 1 $secs > /dev/null 2> t$secs.log || true
+            echo "::notice title=demucs.cpp one block::$secs s → peak $(( $(awk '/maximum resident set size/ {print $1}' t$secs.log) / 1048576 )) MB"
+          done
       - name: End-to-end test of the app's separator code (Swift)
         working-directory: Native
         run: |
@@ -48,7 +52,9 @@ jobs:
           ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/septest 2>&1 | grep -v "^Loading tensor\|MB$\|^\[" | tee e2e.log | tail -12
           grep -E "^RESULT|^part|::error" e2e.log | while IFS= read -r l; do echo "::notice title=App separator::$l"; done
           # Peak memory for a 4-minute song with 1, 2 and 4 workers (iOS closes apps that use too much).
-          for w in 1 2 4; do
+          ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/memtrace 120 1 > memtrace.log 2>&1 || true
+          grep "^MEM" memtrace.log | while IFS= read -r l; do echo "::notice title=Footprint::$l"; done
+          for w in 1; do
             /usr/bin/time -l ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/sep$w 240 $w > run$w.log 2> time$w.log || true
             rss=$(awk '/maximum resident set size/ {print $1}' time$w.log)
             res=$(grep "^RESULT separated" run$w.log || echo "failed")

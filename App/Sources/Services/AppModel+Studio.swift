@@ -16,6 +16,7 @@ extension AppModel {
             var acc = song.accompaniment ?? AccompanimentSettings()
             let before = acc
             SongStudio.applyFirstOpenDefaults(&acc, hasAudio: audioURL(for: song) != nil)
+            SongStudio.retireGeneratedExtras(&acc)
             if acc != before { song.accompaniment = acc; update(song) }
         }
         // Always switch the performance to this song (another song may still be loaded).
@@ -128,7 +129,7 @@ extension AppModel {
         var acc = song.accompaniment ?? AccompanimentSettings()
         SongStudio.setLevel(id, level, &acc)
         song.accompaniment = acc
-        applyMix(song)
+        if id.hasPrefix("audio.") { applyAudioLevels(song) } else { applyMix(song) }
     }
 
     func toggleSolo(_ id: String, songId: UUID) {

@@ -53,14 +53,16 @@ final class AppModel: ObservableObject {
     let separationCancels = CancelFlags()
     /// Section under the playhead last time the section-gated parts were applied.
     var lastGateSection: UUID?
+    /// What each accompaniment slot was last set to (skip redundant engine updates).
+    var accompanimentSlotState: [String: String] = [:]
     /// Separate parts automatically after the first analysis of an imported song.
     @Published var autoSeparate: Bool = UserDefaults.standard.object(forKey: "autoSeparate") as? Bool ?? true {
         didSet { UserDefaults.standard.set(autoSeparate, forKey: "autoSeparate") }
     }
     @Published var activeArrangement: Arrangement?
     @Published var activeSectionId: UUID?
-    @Published var outputPeak: Float = 0
-    @Published var outputClipped = false
+    /// High-frequency values (position, meter) for the few views that show them.
+    let live = LiveState()
     @Published var engineError: String?
     @Published var patchLoadErrors: [String] = []
     @Published var analysisProgress: [UUID: Double] = [:]
@@ -68,7 +70,9 @@ final class AppModel: ObservableObject {
     @Published var analysisNotice: [UUID: String] = [:]
     @Published var isSectionPlaying = false
     /// Song position from the active timing reference (backing track or timer), for the UI.
-    @Published var songPosition: Double?
+    var songPosition: Double? {
+        didSet { live.setPosition(songPosition) }
+    }
     /// Assisted switching: the section waiting for confirmation.
     @Published var pendingSuggestion: UUID?
     @Published var velocityCurve: VelocityCurve = .linear {
@@ -176,8 +180,7 @@ final class AppModel: ObservableObject {
 
     private func wireMeter() {
         output.onMeter = { [weak self] peak, clipped in
-            self?.outputPeak = peak
-            if clipped { self?.outputClipped = true }
+            self?.live.setPeak(peak, clipped: clipped)
         }
     }
 
@@ -194,6 +197,7 @@ final class AppModel: ObservableObject {
     /// Switches sound engine live (stops held notes first).
     func setEngine(_ kind: EngineKind) {
         guard kind != engineKind else { return }
+        accompanimentSlotState = [:]
         panic()
         sectionPlayer.stop()
         output.stop()
@@ -245,7 +249,7 @@ final class AppModel: ObservableObject {
         output.perform(router.panic())
     }
 
-    func resetClip() { outputClipped = false }
+    func resetClip() { live.clipped = false }
 
     /// Finds any tone by id: song tones, My Tones, or a single-instrument tone.
     func tone(id: UUID) -> Arrangement? {
@@ -414,11 +418,14 @@ final class AppModel: ObservableObject {
         let handles = AccompanimentGenerator.Handles(bass: c.accompanimentHandle(.bass), drums: c.accompanimentHandle(.drums),
                                                      guide: c.accompanimentHandle(.melodyGuide), metronome: c.accompanimentHandle(.metronome),
                                                      chords: c.accompanimentHandle(.chords))
-        let events = AccompanimentGenerator.events(beats: song.beatTimes, beatsPerBar: song.timeSignature?.value ?? 4,
+        // The Song Studio plays the recording's own parts; generated parts (rhythm, bass, chords,
+        // melody) are only sequenced when a song has them switched on from before.
+        let generated = SongStudio.generatedPartsOn(s)
+        let events = generated ? AccompanimentGenerator.events(beats: song.beatTimes, beatsPerBar: song.timeSignature?.value ?? 4,
                                                    chordGuide: song.chordGuide ?? [], melody: song.melody?.notes ?? [],
-                                                   settings: SongStudio.sequencingSettings(s), handles: handles,
+                                                   settings: s, handles: handles,
                                                    sampleRate: host.core.sampleRate, transpose: song.performanceTranspose ?? 0,
-                                                   guideRanges: SongStudio.guideRanges(song))
+                                                   guideRanges: SongStudio.guideRanges(song)) : []
         c.setSequence(events)
         applyMix(song)
     }
@@ -432,6 +439,11 @@ final class AppModel: ObservableObject {
         func patch(_ id: UUID) -> InstrumentPatch? { library.patch(id: id) }
         func slot(_ slot: ToneEngine.AccompanimentSlot, _ track: String, _ patchId: UUID) -> String? {
             let level = SongStudio.effectiveLevel(track, s)
+            // Unchanged slots are left alone (re-sending them costs main-thread time).
+            let key = "\(slot.rawValue)"
+            let state = level > 0 ? "\(patchId)@\(level)" : "off"
+            guard accompanimentSlotState[key] != state else { return nil }
+            accompanimentSlotState[key] = state
             return c.setAccompaniment(slot, patch: level > 0 ? patch(patchId) : nil, volume: level, cache: cache)
         }
         let leadId = activeArrangement?.layers.first { [.lead, .vocalMelody, .motif].contains($0.role) }?.patchId
@@ -786,9 +798,11 @@ final class AppModel: ObservableObject {
                 await stage("Analysing tempo, key, chords, melody and sections…", progressBase + 0.05)
                 let current = await MainActor.run { self?.library.song(id: songId) } ?? snapshot
                 let base = progressBase + 0.05
+                let throttle = ProgressThrottle()
                 let output = try SongPipeline.run(song: current, audio: audio, stems: stems, melodyOverride: serverMelody, patches: patches) { p in
                     if Task.isCancelled { return false }
-                    Task { @MainActor in self?.analysisProgress[songId] = base + (0.95 - base) * p }
+                    let value = base + (0.95 - base) * p
+                    if throttle.shouldSend(value) { Task { @MainActor in self?.analysisProgress[songId] = value } }
                     return true
                 }
                 await MainActor.run {
@@ -836,9 +850,10 @@ final class AppModel: ObservableObject {
         analysisTasks[songId] = Task.detached(priority: .userInitiated) { [weak self] in
             do {
                 let current = await MainActor.run { self?.library.song(id: songId) } ?? snapshot
+                let throttle = ProgressThrottle()
                 let output = try SongPipeline.run(song: current, audio: audio, patches: patches) { p in
                     if Task.isCancelled { return false }
-                    Task { @MainActor in self?.analysisProgress[songId] = p }
+                    if throttle.shouldSend(p) { Task { @MainActor in self?.analysisProgress[songId] = p } }
                     return true
                 }
                 await MainActor.run {

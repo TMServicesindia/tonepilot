@@ -247,6 +247,18 @@ public enum SongStudio {
         s.stemDefaultsApplied = true
     }
 
+    /// Whether any generated part (rhythm, bass, chords, click, AI melody) needs sequencing.
+    public static func generatedPartsOn(_ s: AccompanimentSettings) -> Bool {
+        s.bass || s.drums || s.metronome || s.chords == true || (s.melodyGuide && s.aiPartTrack == nil)
+    }
+
+    /// The Song Studio no longer offers generated rhythm, bass, chords or click (the recording's
+    /// own parts replace them): switch them off for songs saved by earlier versions.
+    public static func retireGeneratedExtras(_ s: inout AccompanimentSettings) {
+        s.bass = false; s.drums = false; s.metronome = false; s.chords = false
+        if let solo = s.soloTrack, solo.hasPrefix("gen.") { s.soloTrack = nil }
+    }
+
     // MARK: AI plays difficult parts
 
     /// Whether "AI plays difficult parts" is on (for its current source).

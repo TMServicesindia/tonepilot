@@ -24,7 +24,7 @@ struct SongDetailView: View {
                     if song.analysisStatus == .completed { overviewCard(song); arrangementSummary(song) }
                     if !song.sections.isEmpty || song.duration != nil {
                         Card(title: "Song timeline") {
-                            SectionTimeline(song: song, selected: $selectedSection, playhead: model.activeSongId == songId ? model.songPosition : nil)
+                            SectionTimeline(song: song, selected: $selectedSection, playhead: nil)
                         }
                     }
                     sectionsCard(song)

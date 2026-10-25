@@ -2,6 +2,18 @@ import Foundation
 import TonePilotCore
 import UIKit
 
+/// Lets through progress updates of at least 1% (each one redraws the screen).
+final class ProgressThrottle: @unchecked Sendable {
+    private let lock = NSLock()
+    private var last = -1.0
+    func shouldSend(_ p: Double) -> Bool {
+        lock.lock(); defer { lock.unlock() }
+        guard p - last >= 0.01 || p >= 1 else { return false }
+        last = p
+        return true
+    }
+}
+
 /// Thread-safe set of song ids whose background work should stop.
 final class CancelFlags: @unchecked Sendable {
     private let lock = NSLock()

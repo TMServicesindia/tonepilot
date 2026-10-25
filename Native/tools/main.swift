@@ -43,6 +43,14 @@ do {
     try file.write(from: buf)
 }
 
+func footprintMB() -> Int {
+    var info = task_vm_info_data_t()
+    var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
+    let kr = withUnsafeMutablePointer(to: &info) { $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count) } }
+    return kr == KERN_SUCCESS ? Int(info.phys_footprint / 1_048_576) : -1
+}
+print("MEM before separation \(footprintMB()) MB")
+StemSeparator.blockDone = { i in print("MEM after block \(i): \(footprintMB()) MB") }
 let start = Date()
 var reports = 0
 let stems = try StemSeparator.separate(input: input, outputDir: work.appendingPathComponent("stems"),
