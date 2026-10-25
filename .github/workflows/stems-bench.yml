@@ -22,6 +22,18 @@ jobs:
           mkdir -p build
           clang++ -std=c++17 -O3 -DNDEBUG -DEIGEN_NO_DEBUG -Idemucs/src -Ieigen -ICDemucs \
             demucs/src/*.cpp CDemucs/tp_demucs.cpp tools/demucs_bench.cpp -o build/bench
+      - name: Speed with Apple Accelerate (BLAS on the matrix units)
+        working-directory: Native
+        run: |
+          set -o pipefail
+          clang++ -std=c++17 -O3 -DNDEBUG -DEIGEN_NO_DEBUG -DEIGEN_USE_BLAS -Idemucs/src -Ieigen -ICDemucs \
+            demucs/src/*.cpp CDemucs/tp_demucs.cpp tools/demucs_bench.cpp -framework Accelerate -o build/bench_blas 2>&1 | grep -E "error" | head -5 || true
+          for b in bench bench_blas; do
+            [ -x build/$b ] || { echo "::notice title=Speed::$b failed to build"; continue; }
+            /usr/bin/time -l ./build/$b ../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin 1 20 > $b.log 2> $b.time || true
+            echo "::notice title=Speed $b::$(grep '^RESULT' $b.log | tr '\n' ' ') peak $(( $(awk '/maximum resident set size/ {print $1}' $b.time) / 1048576 )) MB"
+          done
+
       - name: Run (3 threads, 40 s of audio)
         working-directory: Native
         run: |
@@ -35,7 +47,7 @@ jobs:
             echo "::notice title=demucs.cpp one block::$secs s → peak $(( $(awk '/maximum resident set size/ {print $1}' t$secs.log) / 1048576 )) MB"
           done
       - name: End-to-end test of the app's separator code (Swift)
-        if: ${{ !contains(github.event.head_commit.message, '[trace-only]') }}
+        if: ${{ !contains(github.event.head_commit.message, '[trace-only]') && !contains(github.event.head_commit.message, '[speed]') }}
         working-directory: Native
         run: |
           set -euo pipefail
