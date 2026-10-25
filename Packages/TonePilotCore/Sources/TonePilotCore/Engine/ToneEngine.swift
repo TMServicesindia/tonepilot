@@ -127,12 +127,21 @@ public struct SequencerEvent: Sendable, Equatable {
     public var note: UInt8
     /// 0 = note off.
     public var velocity: UInt8
+    /// When set, this is a pitch-bend event (14-bit, centre 8192) and note/velocity are ignored.
+    public var bend: UInt16?
 
     public init(frame: Int64, handle: UInt32, note: UInt8, velocity: UInt8) {
         self.frame = frame
         self.handle = handle
         self.note = note
         self.velocity = velocity
+        self.bend = nil
+    }
+
+    public static func pitchBend(frame: Int64, handle: UInt32, value: UInt16) -> SequencerEvent {
+        var e = SequencerEvent(frame: frame, handle: handle, note: 0, velocity: 0)
+        e.bend = value
+        return e
     }
 }
 
@@ -375,7 +384,9 @@ public final class ToneEngine: @unchecked Sendable {
             if transportPlaying, let events = seqEvents {
                 while seqCursor < seqCount, events[seqCursor].frame <= transportFrame {
                     let e = events[seqCursor]
-                    if e.velocity > 0 { noteOn(e.handle, e.note, e.velocity, sequencer: true) } else { noteOff(e.handle, e.note) }
+                    if let bend = e.bend {
+                        handles[ensureHandle(e.handle)].bendCents = (Float(bend) - 8192) / 8192 * 200
+                    } else if e.velocity > 0 { noteOn(e.handle, e.note, e.velocity, sequencer: true) } else { noteOff(e.handle, e.note) }
                     seqCursor += 1
                 }
                 if seqCursor < seqCount {

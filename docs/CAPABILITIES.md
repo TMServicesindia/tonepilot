@@ -7,7 +7,7 @@ Status key:
 * ⏳ **Planned**
 * ⛔ **Blocked** (licensing, hardware or technical)
 
-Totals: **101 Swift tests** (99 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
+Totals: **102 Swift tests** (100 run by default; 2 need environment variables — the live server round trip and the demo render — and both passed when run) and **8 Python tests**, all passing. They include tests against the real GeneralUser GS SoundFont (287 presets) and real Spotify Basic Pitch 0.4.0.
 
 ## 1. Live playing on the Casio CT-X870IN (priority 1)
 
@@ -96,7 +96,8 @@ Totals: **101 Swift tests** (99 run by default; 2 need environment variables —
 | Live Play Mode (play the melody with the section's lead tone; guide shows the keys, octave-compensated) | ✅ core · 🟡 UI | |
 | Reference Learning Mode (app plays the melody through the guide voice) | ✅ core · 🟡 UI | Sample-accurate sequencer |
 | Note correction, octave shift, transposition, guide patch change | ✅ core · 🟡 UI | |
-| Pitch-bend playback of ornaments in the guide voice | ⏳ | The guide plays note pitches; bends are shown, not yet sent |
+| Pitch-bend playback of ornaments in the guide voice | ✅ | Sample-accurate bend events, ±12 semitone guide range; `testMelodyGuideReplaysOrnamentBends` (A4 → +300 ct measured) |
+| Cloud build of the iOS app (GitHub Actions, macOS) → unsigned `.ipa` | 🟡 written, not yet run | `.github/workflows/ios-build.yml`; needs a GitHub repo to run |
 
 ## 8. Chord guidance for Root → Fifth → Root (priority 8)
 

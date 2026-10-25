@@ -1,0 +1,73 @@
+# Builds TonePilot for iPhone on a free GitHub-hosted Mac and publishes an unsigned .ipa.
+# Install it on your iPhone with Sideloadly (free Apple ID) — see docs/INSTALL_ON_IPHONE.md.
+name: Build iPhone app
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write   # to attach the .ipa to a GitHub Release on version tags
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+
+      - name: Core tests (macOS)
+        working-directory: Packages/TonePilotCore
+        run: swift test
+
+      - name: Bundle GeneralUser GS sounds (GeneralUser GS License v2.0)
+        run: |
+          curl -fsSL -o App/Resources/SoundFonts/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+          curl -fsSL -o App/Resources/SoundFonts/GeneralUser-GS-LICENSE.txt https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/documentation/LICENSE.txt
+          ls -la App/Resources/SoundFonts
+
+      - name: Generate Xcode project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+
+      - name: Build for iPhone (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild -project TonePilot.xcodeproj -scheme TonePilot -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build | tee xcodebuild.log | grep -E "error:|warning: .*TonePilot|BUILD (SUCCEEDED|FAILED)" || true
+          test -d build/Build/Products/Release-iphoneos/TonePilot.app
+
+      - name: Package .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/TonePilot.app Payload/
+          zip -qry TonePilot-unsigned.ipa Payload
+          ls -la TonePilot-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TonePilot-ipa
+          path: TonePilot-unsigned.ipa
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: build-log
+          path: xcodebuild.log
+          if-no-files-found: ignore
+
+      - name: Publish release download (on version tags)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: TonePilot-unsigned.ipa

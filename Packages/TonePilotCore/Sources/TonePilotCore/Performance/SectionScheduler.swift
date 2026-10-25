@@ -168,6 +168,15 @@ public enum AccompanimentGenerator {
     static let kick: UInt8 = 36, snare: UInt8 = 38, sideStick: UInt8 = 37, clap: UInt8 = 39
     static let closedHat: UInt8 = 42, openHat: UInt8 = 46, ride: UInt8 = 51, highBongo: UInt8 = 60, lowBongo: UInt8 = 61
 
+    /// Semitone range the melody-guide voice uses for pitch bend.
+    public static let guideBendRange = 12.0
+
+    /// Cents -> 14-bit bend value for the guide voice's ±12 semitone range.
+    public static func guideBendValue(cents: Double) -> UInt16 {
+        let v = 8192 + cents / (guideBendRange * 100) * 8192
+        return UInt16(max(0, min(16_383, v.rounded())))
+    }
+
     public static func events(beats: [Double], beatsPerBar: Int, chordGuide: [ChordGuideStep], melody: [MelodyNote],
                               settings: AccompanimentSettings, handles: Handles, sampleRate: Double,
                               transpose: Int = 0) -> [SequencerEvent] {
@@ -219,8 +228,20 @@ public enum AccompanimentGenerator {
             }
         }
         if settings.melodyGuide {
-            for n in melody { add(n.start, max(0.05, n.duration - 0.01), handles.guide, n.midi + transpose, UInt8(70 + 40 * min(1, n.confidence))) }
+            for n in melody {
+                add(n.start, max(0.05, n.duration - 0.01), handles.guide, n.midi + transpose, UInt8(70 + 40 * min(1, n.confidence)))
+                // Replay slides/vibrato/gamaka as pitch bend (guide voice uses a ±12 semitone bend range).
+                guard !n.bendCents.isEmpty else { continue }
+                for (i, cents) in n.bendCents.enumerated() {
+                    let t = n.start + Double(i) * MelodyNote.bendStep
+                    guard t < n.end else { break }
+                    out.append(.pitchBend(frame: frame(t), handle: handles.guide, value: guideBendValue(cents: Double(cents))))
+                }
+                out.append(.pitchBend(frame: frame(n.end), handle: handles.guide, value: 8192))
+            }
         }
-        return out.sorted { ($0.frame, $0.velocity) < ($1.frame, $1.velocity) }
+        // At equal frames: note-offs, then note-ons, then bends (so a bend applies to the new note).
+        func rank(_ e: SequencerEvent) -> Int { e.bend != nil ? 2 : (e.velocity == 0 ? 0 : 1) }
+        return out.sorted { ($0.frame, rank($0)) < ($1.frame, rank($1)) }
     }
 }

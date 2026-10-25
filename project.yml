@@ -42,6 +42,3 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.yourname.tonepilot
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: ""
-    scheme:
-      testTargets:
-        - package: TonePilotCore/TonePilotCoreTests

@@ -37,6 +37,10 @@ Sound is generated on the iPhone (TonePilot's own sample/synth engine using Soun
 
 ## Run it
 
+**On your iPhone without a Mac:** see **[docs/INSTALL_ON_IPHONE.md](docs/INSTALL_ON_IPHONE.md)**. A free GitHub Actions Mac builds the `.ipa`, and Sideloadly installs it with a free Apple ID. For a tap-to-install link you need TestFlight (Apple Developer Program).
+
+**With a Mac:**
+
 You need a Mac with **Xcode 15+**, an iPhone on **iOS 17+**, and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```bash
@@ -52,7 +56,7 @@ cd TonePilot && xcodegen generate && open TonePilot.xcodeproj
 ### Tests
 
 ```bash
-cd Packages/TonePilotCore && swift test     # 101 tests (macOS or Linux; Docker: swift:6.0-noble)
+cd Packages/TonePilotCore && swift test     # 102 tests (macOS or Linux; Docker: swift:6.0-noble)
 TONEPILOT_SF2=/path/GeneralUser-GS.sf2 swift test   # also tests the real SoundFont
 cd server && pip install -r requirements-dev.txt && pytest tests   # 8 tests
 ```
@@ -90,5 +94,4 @@ docs/                             Capabilities, feasibility/architecture, hardwa
 * **The iOS app has not been compiled in this environment** (Linux, no Xcode). Every app file passes a Swift syntax parse, and all the logic it calls lives in the tested core package. Expect to fix small compile issues on the first Xcode build. The Casio workflow is **not complete until the hardware checklist passes**.
 * Instrument recommendations are evidence-based rules over measured sound character, melody and (optionally) stem levels. They are **not** a trained instrument classifier, and no claim is made to reproduce a composer's exact studio sounds.
 * Demucs separation is integrated on the server but **was not run here**: its model weights couldn't be downloaded. Basic Pitch **was** run.
-* The melody guide plays note pitches. Ornament bends are shown on screen but not yet replayed by the guide voice.
 * Analysis on dense film mixes is approximate. Every estimate shows a confidence level and can be corrected.

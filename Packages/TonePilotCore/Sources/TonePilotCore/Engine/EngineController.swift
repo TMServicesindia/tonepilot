@@ -210,6 +210,7 @@ public final class ToneEngineController: @unchecked Sendable {
                                            instrument: inst, handle: handle(for: id), headroomGain: volume)
             c.isAccompaniment = true
             c.mono = false
+            if slot == .melodyGuide { c.bendRange = Float(AccompanimentGenerator.guideBendRange) }
             engine.send(.setSlot(index: slot.rawValue, config: c))
             return nil
         } catch {
@@ -242,7 +243,9 @@ public final class ToneEngineController: @unchecked Sendable {
     /// Installs a new event list (sorted by frame). Old buffers are freed once the engine moved on.
     public func setSequence(_ events: [SequencerEvent]) {
         sequenceGeneration += 1
-        let sorted = events.sorted { ($0.frame, $0.velocity) < ($1.frame, $1.velocity) } // note-offs first at equal frames
+        // At equal frames: note-offs, then note-ons, then pitch bends.
+        func rank(_ e: SequencerEvent) -> Int { e.bend != nil ? 2 : (e.velocity == 0 ? 0 : 1) }
+        let sorted = events.sorted { ($0.frame, rank($0)) < ($1.frame, rank($1)) }
         let buf = UnsafeMutableBufferPointer<SequencerEvent>.allocate(capacity: max(1, sorted.count))
         _ = buf.initialize(from: sorted)
         sequenceBuffers.append((sequenceGeneration, buf))

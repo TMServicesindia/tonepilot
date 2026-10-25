@@ -306,7 +306,11 @@ final class PerformanceLogicTests: XCTestCase {
         XCTAssertEqual(all.filter { $0.handle == 4 && $0.velocity > 0 }.count, 8)
         XCTAssertEqual(all.filter { $0.handle == 3 && $0.velocity > 0 }.map(\.note), [64])
         XCTAssertTrue(all.contains { $0.handle == 2 && $0.note == 36 })
-        XCTAssertEqual(all, all.sorted { ($0.frame, $0.velocity) < ($1.frame, $1.velocity) })
+        // Time-ordered; at equal frames note-offs precede note-ons (no cut-off of a re-struck note).
+        for (a, b) in zip(all, all.dropFirst()) {
+            XCTAssertLessThanOrEqual(a.frame, b.frame)
+            if a.frame == b.frame { XCTAssertFalse(a.velocity > 0 && b.velocity == 0 && a.bend == nil && b.bend == nil) }
+        }
         XCTAssertEqual(all.filter { $0.velocity > 0 }.count, all.filter { $0.velocity == 0 }.count, "every note has a note-off")
     }
 
@@ -434,5 +438,33 @@ extension PipelineTests {
         let first = out.song.orderedSections[0]
         XCTAssertTrue((first.activity ?? []).contains { [.lead, .vocalMelody].contains($0.role) && $0.level > 0.5 }, "\(first.activity ?? [])")
         XCTAssertNotNil(out.song.arrangement(for: first)?.layers.first { [.lead, .vocalMelody].contains($0.role) })
+    }
+}
+
+extension PerformanceLogicTests {
+    func testMelodyGuideReplaysOrnamentBends() throws {
+        // One note A4 held 1 s whose second half is bent up +300 cents (a meend-like slide to C5).
+        let bends: [Int16] = (0..<50).map { $0 < 25 ? 0 : 300 }
+        let note = MelodyNote(start: 0, duration: 1.0, midi: 69, bendCents: bends, confidence: 1, isOrnamented: true)
+        let e = ToneEngine(sampleRate: 48_000)
+        let c = ToneEngineController(engine: e)
+        let cache = InstrumentCache(soundFontDirectory: FileManager.default.temporaryDirectory, sampleDirectory: FileManager.default.temporaryDirectory)
+        let sine = InstrumentPatch(name: "Guide", family: .flute, sourceType: .synthesized, envelope: Envelope(attack: 0.005, decay: 0.1, sustain: 1, release: 0.05),
+                                   effects: EffectSettings(reverbMix: 0), synth: SynthSettings(waveform: .sine, detuneCents: 0))
+        XCTAssertNil(c.setAccompaniment(.melodyGuide, patch: sine, volume: 0.8, cache: cache))
+        let h = AccompanimentGenerator.Handles(bass: 1, drums: 2, guide: c.accompanimentHandle(.melodyGuide), metronome: 4)
+        let events = AccompanimentGenerator.events(beats: [], beatsPerBar: 4, chordGuide: [], melody: [note],
+                                                   settings: AccompanimentSettings(melodyGuide: true), handles: h, sampleRate: 48_000)
+        XCTAssertTrue(events.contains { $0.bend != nil })
+        var m = EngineMasterConfig(); m.reverbLevel = 0; m.chorusLevel = 0; m.delayLevel = 0
+        e.send(.setMaster(m))
+        c.setSequence(events)
+        c.setTransport(playing: true, seconds: 0)
+        var l = [Float](repeating: 0, count: 48_000), r = l
+        l.withUnsafeMutableBufferPointer { lp in r.withUnsafeMutableBufferPointer { rp in
+            for b in 0..<(48_000 / 480) { e.render(frames: 480, left: lp.baseAddress! + b * 480, right: rp.baseAddress! + b * 480) }
+        } }
+        XCTAssertEqual(Measure.frequency(l, sampleRate: 48_000, range: 4_800..<20_000), 440, accuracy: 3)
+        XCTAssertEqual(Measure.frequency(l, sampleRate: 48_000, range: 30_000..<45_000), 440 * pow(2, 3.0 / 12), accuracy: 4, "slide replayed")
     }
 }
