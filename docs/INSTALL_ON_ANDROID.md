@@ -4,7 +4,7 @@ Android installs apps straight from a file, with no computer, cable or Apple-sty
 
 **Download:** <https://github.com/TMServicesindia/tonepilot/releases/download/android-latest/TonePilot.apk>
 
-1. Open the link on the phone (Chrome or any browser). The file is about 40 MB.
+1. Open the link on the phone (Chrome or any browser). The file is about 73 MB (most of it is the instrument sounds).
 2. Tap the downloaded **TonePilot.apk**. If Android asks, allow **Install unknown apps** for your browser or Files app, then tap **Install**.
 3. Open TonePilot. The first launch takes a few seconds while it unpacks the instrument sounds.
 

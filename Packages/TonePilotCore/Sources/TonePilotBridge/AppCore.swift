@@ -113,8 +113,11 @@ public final class AppCore: @unchecked Sendable {
             guard let self else { return }
             do {
                 let bank = try SoundFontBank(url: url)
-                self.stateLock.lock()
+                // The cache is only touched under engineLock (MIDI and tone changes use it too).
+                self.engineLock.lock()
                 self.cache.register(bank: bank, as: FactoryPatches.defaultSoundFontFile)
+                self.engineLock.unlock()
+                self.stateLock.lock()
                 self.soundFontReady = true
                 self.stateLock.unlock()
                 self.applyActiveArrangement()
