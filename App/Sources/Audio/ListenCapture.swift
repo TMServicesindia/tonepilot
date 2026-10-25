@@ -12,6 +12,9 @@ final class ListenCapture: ObservableObject {
     @Published private(set) var tooQuiet = false
     @Published private(set) var songEnded = false
     @Published var error: String?
+    /// Called once when the song seems to have ended. Fires even while TonePilot is in the
+    /// background (the streaming app is in front), because it's driven by audio callbacks, not views.
+    var onSongEnded: (() -> Void)?
 
     private let engine = AVAudioEngine()
     private var session = ListenSession()
@@ -58,7 +61,10 @@ final class ListenCapture: ObservableObject {
         elapsed = session.elapsed
         level = session.currentLevel
         tooQuiet = session.isTooQuiet
-        if session.shouldAutoStop { songEnded = true }
+        if session.shouldAutoStop, !songEnded {
+            songEnded = true
+            onSongEnded?()
+        }
     }
 
     /// Stops listening and returns the captured song (memory is released from the session).

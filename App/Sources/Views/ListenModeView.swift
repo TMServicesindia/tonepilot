@@ -1,5 +1,6 @@
 import SwiftUI
 import TonePilotCore
+import UIKit
 
 /// Listen Mode: play the song in Spotify, YouTube Music, Apple Music, JioSaavn… and TonePilot
 /// listens through the microphone, then builds the full arrangement. Nothing is recorded to disk.
@@ -14,12 +15,22 @@ struct ListenModeView: View {
     @State private var service = "Spotify"
     @State private var licensed = false
     @State private var message: String?
+    @State private var linkText = ""
+    @State private var fetchingTitle = false
 
     private let services = ["Spotify", "YouTube Music", "Apple Music", "JioSaavn", "Amazon Music", "Other"]
 
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    TextField("Paste a YouTube, Spotify, JioSaavn or Apple Music link", text: $linkText)
+                        .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
+                        .onChange(of: linkText) { _, text in linkChanged(text) }
+                    if fetchingTitle { ProgressView("Looking up the title…") }
+                } header: { Text("Song link (optional)") } footer: {
+                    Text("TonePilot opens the link in its own app so you hear it there, and listens through the microphone. It reads only the public title — it never downloads the audio.")
+                }
                 if songId == nil {
                     Section("Song") {
                         TextField("Title (e.g. Hukum – Thalaivar Alappara)", text: $title)
@@ -51,9 +62,16 @@ struct ListenModeView: View {
                         Button("Stop & build arrangement") { finish() }.buttonStyle(.borderedProminent)
                         Button("Cancel", role: .destructive) { capture.cancel() }
                     } else {
-                        Button { Task { await capture.start() } } label: { Label("Start listening", systemImage: "mic.fill") }
+                        if let link = SongLink(linkText) {
+                            Button { Task { await openAndListen(link) } } label: {
+                                Label("Open in \(link.service == .other ? "browser" : link.service.rawValue) & listen", systemImage: "ear")
+                            }
                             .buttonStyle(.borderedProminent)
-                            .disabled(!licensed || (songId == nil && title.trimmingCharacters(in: .whitespaces).isEmpty))
+                            .disabled(!canStart)
+                        }
+                        Button { Task { await startListening() } } label: { Label(SongLink(linkText) == nil ? "Start listening" : "Just listen (I'll play it myself)", systemImage: "mic.fill") }
+                            .buttonStyle(SongLink(linkText) == nil ? AnyButtonStyle(.borderedProminent) : AnyButtonStyle(.bordered))
+                            .disabled(!canStart)
                     }
                     if let e = capture.error { Text(e).font(.footnote).foregroundStyle(Theme.bad) }
                     if let message { Text(message).font(.footnote) }
@@ -61,11 +79,42 @@ struct ListenModeView: View {
             }
             .navigationTitle("Listen Mode")
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Close") { capture.cancel(); dismiss() } } }
-            .onChange(of: capture.songEnded) { _, ended in if ended { finish() } }
+            .onAppear {
+                if linkText.isEmpty, let song = model.song(songId), let ref = song.sourceReference, SongLink(ref) != nil { linkText = ref }
+            }
         }
     }
 
+    private var canStart: Bool { licensed && (songId != nil || !title.trimmingCharacters(in: .whitespaces).isEmpty) }
+
+    private func linkChanged(_ text: String) {
+        guard let link = SongLink(text) else { return }
+        if link.service != .other { service = link.service == .youtube ? "YouTube Music" : link.service.rawValue }
+        guard songId == nil, title.isEmpty else { return }
+        fetchingTitle = true
+        Task {
+            let meta = await link.fetchMetadata()
+            fetchingTitle = false
+            if title.isEmpty, let meta { title = meta.title }
+        }
+    }
+
+    private func startListening() async {
+        capture.onSongEnded = { finish() }
+        await capture.start()
+    }
+
+    /// Starts the microphone first, then hands the link to its app. TonePilot keeps listening in the
+    /// background (audio background mode) and builds the arrangement when the song ends.
+    private func openAndListen(_ link: SongLink) async {
+        await startListening()
+        guard capture.isListening else { return }
+        message = "Listening… play the song from the start. Come back to TonePilot any time — the arrangement builds by itself when the song ends."
+        await UIApplication.shared.open(link.url)
+    }
+
     private func finish() {
+        guard capture.isListening else { return }
         guard let audio = capture.stop() else {
             message = "That was too short to analyse — play at least 30 seconds."
             return
@@ -75,7 +124,8 @@ struct ListenModeView: View {
             id = songId
         } else {
             var song = Song(title: title.trimmingCharacters(in: .whitespaces), film: film.isEmpty ? nil : film,
-                            sourceType: .listened, sourceReference: service, userConfirmedRights: true)
+                            sourceType: .listened, sourceReference: SongLink(linkText)?.url.absoluteString ?? service,
+                            userConfirmedRights: true)
             song.arrangements = [.starterFilmStack(name: "Main tone")]
             model.update(song)
             id = song.id
@@ -83,4 +133,11 @@ struct ListenModeView: View {
         model.analyzeListened(songId: id, audio: audio)
         dismiss()
     }
+}
+
+/// Lets one button switch between bordered and prominent styles.
+struct AnyButtonStyle: PrimitiveButtonStyle {
+    private let make: (Configuration) -> AnyView
+    init<S: PrimitiveButtonStyle>(_ style: S) { make = { AnyView(Button(role: $0.role, action: $0.trigger) { $0.label }.buttonStyle(style)) } }
+    func makeBody(configuration: Configuration) -> some View { make(configuration) }
 }

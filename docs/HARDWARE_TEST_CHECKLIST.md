@@ -46,6 +46,8 @@ Tick each item on a real iPhone. Note the iPhone model, iOS version and adapters
 - [ ] Bass, drums, metronome and melody guide each switch on and off independently; with everything off only your tones sound.
 - [ ] Reference Learning plays the melody; Live Play doesn't.
 - [ ] Regenerate this section changes only that section; Restore AI Original undoes your edits.
+- [ ] Listen Mode with a link: paste a YouTube link → title fills in → *Open & listen* opens YouTube, TonePilot keeps listening in the background (orange mic dot), and the song appears analysed when it ends. Repeat with Spotify playing on the same iPhone.
+- [ ] Listen Mode quality: compare BPM/key/chords against a known song; note the volume/room that works best.
 - [ ] Analysis server (optional): the upload asks first; stems and vocal melody arrive; the server job folder is deleted afterwards.
 - [ ] BPM is right or off by exactly ×2/÷2 (the fix buttons work).
 - [ ] Section buttons in Perform switch tones instantly while playing; held notes release cleanly.

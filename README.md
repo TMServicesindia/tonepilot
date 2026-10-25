@@ -19,7 +19,7 @@ Sound is generated on the iPhone (TonePilot's own sample/synth engine using Soun
 
 ## The one-click flow
 
-1. **Library › + › Listen to a song**: start the song in your streaming app; TonePilot listens until it ends. Or **Import an audio file** you own (optionally sent to *your* analysis server for vocal separation).
+1. **Library › + › Listen to a song**: paste the song's YouTube/Spotify/JioSaavn/Apple Music link and tap **Open & listen** (or just play it yourself); TonePilot listens until it ends. Or **Import an audio file** you own (optionally sent to *your* analysis server for vocal separation).
 2. TonePilot runs, on the phone:
    * tempo and beats, key (and key changes), time signature
    * chords, with alternatives and a Sa–Pa drone where no clear chord exists
@@ -52,7 +52,7 @@ cd TonePilot && xcodegen generate && open TonePilot.xcodeproj
 ### Tests
 
 ```bash
-cd Packages/TonePilotCore && swift test     # 85 tests (macOS or Linux; Docker: swift:6.0-noble)
+cd Packages/TonePilotCore && swift test     # 88 tests (macOS or Linux; Docker: swift:6.0-noble)
 TONEPILOT_SF2=/path/GeneralUser-GS.sf2 swift test   # also tests the real SoundFont
 cd server && pip install -r requirements-dev.txt && pytest tests   # 8 tests
 ```
