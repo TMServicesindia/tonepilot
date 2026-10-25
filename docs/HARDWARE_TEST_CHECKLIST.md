@@ -1,0 +1,36 @@
+# Casio CT-X870IN hardware test checklist
+
+Tick each item on a real iPhone. Note the iPhone model, iOS version and adapters you used.
+
+## A. MIDI input
+- [ ] Casio on, USB TO HOST → cable → camera adapter / USB-C → iPhone.
+- [ ] Settings › MIDI & audio diagnostics lists the Casio (the name usually contains "CASIO"). If not, power the adapter and tap **Rescan**.
+- [ ] Pressing a key logs `Note On` with a velocity that changes with how hard you play (touch response on).
+- [ ] Releasing logs `Note Off` (or Note On vel 0, shown as Note Off).
+- [ ] Sustain pedal (if connected to the Casio) logs `CC 64 (Sustain) = 127/0`. **Record whether the CT-X870IN sends it over USB.**
+- [ ] Pitch bend wheel logs `Pitch bend`. **Record whether it is sent.**
+- [ ] Keyboard Transpose/Octave on the Casio: record whether it shifts the transmitted notes.
+- [ ] Unplug the cable while holding a chord: the sound stops (auto panic) and no note stays stuck.
+- [ ] Replug: the device reappears and plays without restarting the app.
+
+## B. Audio output to the Casio
+- [ ] 3.5 mm cable from the iPhone's audio output (hub/DAC) into Casio AUDIO IN.
+- [ ] Diagnostics › Audio output shows the expected route (not "Speaker").
+- [ ] Audition strip notes are audible through the Casio speakers.
+- [ ] No hum or distortion at ~60 % iPhone volume. Record the comfortable volume.
+- [ ] The Casio's own voice is silenced (tone volume down or Local Control off). Record which method works on this model.
+
+## C. Playing
+- [ ] Piano + Strings + Bell starter tone: all three sound, and the bell only from C4 up.
+- [ ] Measured latency in Diagnostics: ____ ms. Playing feels immediate (target < 15 ms).
+- [ ] 6 layers × 10-note chords with sustain: no dropouts or crackle. Record the max layer count that stays clean.
+- [ ] CLIP light stays off at normal playing. Hard chords with 4+ layers: the limiter prevents harsh distortion.
+- [ ] PANIC silences everything instantly.
+
+## D. Song workflow
+- [ ] Import an MP3 you own; analysis completes (time for a 4-min song: ____ s).
+- [ ] BPM is right or off by exactly ×2/÷2 (the fix buttons work).
+- [ ] Section buttons in Perform switch tones instantly while playing; held notes release cleanly.
+- [ ] Section play/loop plays the song section through the Casio while you play along.
+- [ ] Phone call / Siri interruption: sound stops, and comes back after the interruption without restarting the app.
+- [ ] Kill the app mid-analysis, relaunch: analysis resumes.
