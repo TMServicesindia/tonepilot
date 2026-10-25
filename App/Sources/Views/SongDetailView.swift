@@ -5,6 +5,7 @@ import TonePilotCore
 /// arrangement — sections, tones, chord and melody guidance — with one button to start playing.
 struct SongDetailView: View {
     @EnvironmentObject var model: AppModel
+    @Environment(\.dismiss) private var dismiss
     let songId: UUID
     @State private var selectedSection: UUID?
     @State private var editingSection: SongSection?
@@ -118,10 +119,10 @@ struct SongDetailView: View {
                 }
                 if let notice = model.analysisNotice[songId] { Text(notice).font(.caption).foregroundStyle(Theme.warn) }
                 Button {
-                    model.startPerformance(songId: songId)
-                    model.selectedTab = 3
+                    model.openStudio(songId)
+                    dismiss()
                 } label: {
-                    Label("Play on My Casio", systemImage: "pianokeys")
+                    Label("Play in Song Studio", systemImage: "pianokeys")
                         .font(.title3.weight(.semibold))
                         .frame(maxWidth: .infinity, minHeight: 48)
                 }

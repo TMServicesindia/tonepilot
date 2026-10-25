@@ -183,14 +183,26 @@ public final class ToneEngineController: @unchecked Sendable {
                                                 handle: handle(for: layer.id), headroomGain: headroom[i])
             engine.send(.setSlot(index: slot, config: config))
         }
-        var m = EngineMasterConfig(gain: arrangement?.masterGain ?? 0.8, effects: arrangement?.masterEffects ?? MasterEffects(),
-                                   accompanimentGain: Double(lastAccompanimentGain))
-        m.accompanimentGain = lastAccompanimentGain
-        engine.send(.setMaster(m))
+        sendMaster(arrangement)
         return failures
     }
 
     private var lastAccompanimentGain: Float = 0.8
+    private var lastLiveGain: Float = 1
+
+    private func sendMaster(_ arrangement: Arrangement?) {
+        var m = EngineMasterConfig(gain: arrangement?.masterGain ?? 0.8, effects: arrangement?.masterEffects ?? MasterEffects(),
+                                   accompanimentGain: Double(lastAccompanimentGain))
+        m.liveGain = lastLiveGain
+        engine.send(.setMaster(m))
+    }
+
+    /// Song Studio mixer: level of your live keyboard tone and of all generated backing parts.
+    public func setMixLevels(live: Double, accompaniment: Double, arrangement: Arrangement?) {
+        lastLiveGain = Float(max(0, min(1.5, live)))
+        lastAccompanimentGain = Float(max(0, min(1.5, accompaniment)))
+        sendMaster(arrangement)
+    }
 
     /// Configures an accompaniment slot (bass, drums, melody guide, metronome) or clears it with nil.
     @discardableResult
@@ -220,9 +232,7 @@ public final class ToneEngineController: @unchecked Sendable {
 
     public func setAccompanimentLevel(_ level: Double, arrangement: Arrangement?) {
         lastAccompanimentGain = Float(level)
-        let m = EngineMasterConfig(gain: arrangement?.masterGain ?? 0.8, effects: arrangement?.masterEffects ?? MasterEffects(),
-                                   accompanimentGain: level)
-        engine.send(.setMaster(m))
+        sendMaster(arrangement)
     }
 
     /// Fixed layer ids for accompaniment tracks, so sequencer events can address them.

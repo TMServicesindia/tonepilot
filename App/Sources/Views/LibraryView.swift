@@ -8,7 +8,6 @@ struct LibraryView: View {
     @State private var showImport = false
     @State private var showListen = false
     @State private var pickMP3 = false
-    @State private var openedSong: UUID?
     @State private var showNewPlaylist = false
     @State private var newPlaylistName = ""
     @State private var filterPlaylist: UUID?
@@ -68,7 +67,15 @@ struct LibraryView: View {
                     }
                 }
                 ForEach(songs) { song in
-                    NavigationLink(value: song.id) { SongRow(song: song) }
+                    Button { model.openStudio(song.id) } label: {
+                        HStack {
+                            SongRow(song: song)
+                            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .foregroundStyle(.primary)
+                    .accessibilityHint("Opens the song in Song Studio")
                         .swipeActions {
                             Button(role: .destructive) { model.deleteSong(song.id) } label: { Label("Delete", systemImage: "trash") }
                             Button {
@@ -92,10 +99,8 @@ struct LibraryView: View {
             }
         }
         .navigationTitle("Library")
-        .navigationDestination(for: UUID.self) { SongDetailView(songId: $0) }
-        .navigationDestination(item: $openedSong) { SongDetailView(songId: $0) }
         .fileImporter(isPresented: $pickMP3, allowedContentTypes: [.mp3, .mpeg4Audio, .wav, .aiff, .audio]) { result in
-            if case .success(let url) = result, let id = model.importAndAnalyze(from: url) { openedSong = id }
+            if case .success(let url) = result, let id = model.importAndAnalyze(from: url) { model.openStudio(id) }
         }
         .searchable(text: $query, prompt: "Title, film, composer, language, tag")
         .toolbar {

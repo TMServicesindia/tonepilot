@@ -103,8 +103,10 @@ public struct EngineMasterConfig: Sendable {
     public var delayLevel: Float = 0.6
     public var delayTime: Double = 0.35
     public var delayFeedback: Double = 0.3
-    /// Independent level for the accompaniment slots (bass/drums/guide/click).
+    /// Independent level for the accompaniment slots (bass/drums/guide/click/chords).
     public var accompanimentGain: Float = 0.8
+    /// Level of the live keyboard tone (slots 0..<8), separate from the backing.
+    public var liveGain: Float = 1
 
     public init() {}
 
@@ -218,13 +220,13 @@ final class CommandQueue: @unchecked Sendable {
 /// traffic (all hot state lives behind raw pointers), no I/O.
 public final class ToneEngine: @unchecked Sendable {
     public static let liveSlotCount = 8
-    /// Accompaniment slots: bass, drums, melody guide, metronome.
-    public static let accompanimentSlotRange = 8..<12
-    public static let slotCount = 12
+    /// Accompaniment slots: bass, drums, melody guide, metronome, background chords.
+    public static let accompanimentSlotRange = 8..<13
+    public static let slotCount = 13
     public static let maxVoices = 96
 
     public enum AccompanimentSlot: Int, CaseIterable, Sendable {
-        case bass = 8, drums = 9, melodyGuide = 10, metronome = 11
+        case bass = 8, drums = 9, melodyGuide = 10, metronome = 11, chords = 12
     }
 
     struct Voice {
@@ -408,7 +410,7 @@ public final class ToneEngine: @unchecked Sendable {
             let bl = busL + s * maxFrames, br = busR + s * maxFrames
             slots[s].eq.process(bl, br, n)
             let c = slots[s].config
-            let level: Float = Self.accompanimentSlotRange.contains(s) ? master.accompanimentGain : 1
+            let level: Float = Self.accompanimentSlotRange.contains(s) ? master.accompanimentGain : master.liveGain
             let rv = c.sendReverb * level, ch = c.sendChorus * level, dl = c.sendDelay * level
             anyReverb = anyReverb || rv > 0; anyChorus = anyChorus || ch > 0; anyDelay = anyDelay || dl > 0
             for i in 0..<n {

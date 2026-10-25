@@ -143,7 +143,7 @@ struct MelodyChordGuideView: View {
                 }
                 HStack { Text("Guide volume"); Slider(value: Binding(get: { acc.guideLevel }, set: { var a = acc; a.guideLevel = $0; model.updateAccompaniment(a) }), in: 0...1) }
                 if model.audioURL(for: song) != nil {
-                    Button { model.ensurePerformance(songId: songId); model.selectedTab = 3; model.playBackingTrack(from: 0) } label: { Label("Play with guide from the start", systemImage: "play.fill") }
+                    Button { model.openStudio(songId); model.cursor = 0; if !model.isStudioPlaying { model.studioTogglePlay() } } label: { Label("Play with guide from the start", systemImage: "play.fill") }
                 }
             }
         } header: { Text("Melody") } footer: {

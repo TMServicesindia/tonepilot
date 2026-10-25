@@ -134,6 +134,35 @@ public struct AccompanimentSettings: Codable, Hashable, Sendable {
     /// Patch used for the melody guide (nil = the arrangement's lead patch).
     public var guidePatchId: UUID?
 
+    // Song Studio additions (optional so libraries saved by older versions still load).
+
+    /// Background chords (pads/strings/piano) generated from the chord guide.
+    public var chords: Bool?
+    public var chordStyle: ChordStyle?
+    public var chordsLevel: Double?
+    /// "AI plays difficult parts": sections where the AI melody plays. nil = the whole song.
+    public var guideSections: [UUID]?
+    /// Your live keyboard tone's level in the mix (1 = unchanged).
+    public var keyboardLevel: Double?
+    /// The one track being soloed (Song Studio track id), if any.
+    public var soloTrack: String?
+    /// Separated audio stems (vocals, drums, bass, other…): levels and which are switched off.
+    public var stemLevels: [String: Double]?
+    public var stemsOff: [String]?
+    /// Set once the Song Studio has applied its first-open defaults.
+    public var studioDefaultsApplied: Bool?
+
+    public enum ChordStyle: String, Codable, CaseIterable, Sendable {
+        case pad, strings, piano
+        public var displayName: String {
+            switch self {
+            case .pad: return "Soft pad"
+            case .strings: return "Strings"
+            case .piano: return "Piano chords"
+            }
+        }
+    }
+
     public init(bass: Bool = false, drums: Bool = false, metronome: Bool = false, melodyGuide: Bool = false,
                 backingTrack: Bool = false, drumStyle: DrumStyle = .basic, bassLevel: Double = 0.7, drumLevel: Double = 0.6,
                 metronomeLevel: Double = 0.5, guideLevel: Double = 0.6, backingTrackLevel: Double = 0.8, guidePatchId: UUID? = nil) {
@@ -151,16 +180,16 @@ public struct AccompanimentSettings: Codable, Hashable, Sendable {
         self.guidePatchId = guidePatchId
     }
 
-    public var anyGenerated: Bool { bass || drums || metronome || melodyGuide }
+    public var anyGenerated: Bool { bass || drums || metronome || melodyGuide || chords == true }
 }
 
 /// Builds sample-accurate sequencer events for the optional accompaniment tracks from the
 /// song's beat grid, chord guide and melody.
 public enum AccompanimentGenerator {
     public struct Handles: Sendable {
-        public var bass: UInt32, drums: UInt32, guide: UInt32, metronome: UInt32
-        public init(bass: UInt32, drums: UInt32, guide: UInt32, metronome: UInt32) {
-            self.bass = bass; self.drums = drums; self.guide = guide; self.metronome = metronome
+        public var bass: UInt32, drums: UInt32, guide: UInt32, metronome: UInt32, chords: UInt32
+        public init(bass: UInt32, drums: UInt32, guide: UInt32, metronome: UInt32, chords: UInt32 = 0) {
+            self.bass = bass; self.drums = drums; self.guide = guide; self.metronome = metronome; self.chords = chords
         }
     }
 
@@ -177,9 +206,11 @@ public enum AccompanimentGenerator {
         return UInt16(max(0, min(16_383, v.rounded())))
     }
 
+    /// - Parameter guideRanges: when set, the melody guide only plays notes starting inside these
+    ///   time ranges ("AI plays difficult parts").
     public static func events(beats: [Double], beatsPerBar: Int, chordGuide: [ChordGuideStep], melody: [MelodyNote],
                               settings: AccompanimentSettings, handles: Handles, sampleRate: Double,
-                              transpose: Int = 0) -> [SequencerEvent] {
+                              transpose: Int = 0, guideRanges: [ClosedRange<Double>]? = nil) -> [SequencerEvent] {
         var out: [SequencerEvent] = []
         func frame(_ t: Double) -> Int64 { Int64((t * sampleRate).rounded()) }
         func add(_ t: Double, _ dur: Double, _ h: UInt32, _ note: Int, _ vel: UInt8) {
@@ -227,8 +258,35 @@ public enum AccompanimentGenerator {
                 }
             }
         }
+        if settings.chords == true, handles.chords != 0 {
+            var previous: [Int] = []
+            for step in chordGuide {
+                let voicing = chordVoicing(step, transpose: transpose, near: previous)
+                guard !voicing.isEmpty else { continue }
+                previous = voicing
+                let end = step.time + step.duration
+                switch settings.chordStyle ?? .pad {
+                case .pad, .strings:
+                    // Sustained, softly re-struck every 8 s so long chords don't fade out completely.
+                    var t = step.time
+                    while t < end - 0.05 {
+                        let len = min(8, end - t)
+                        for n in voicing { add(t, len * 0.98, handles.chords, n, step.isDrone ? 58 : 66) }
+                        t += len
+                    }
+                case .piano:
+                    // Struck on each beat inside the chord (or once if there's no beat grid).
+                    let hits = beats.filter { $0 >= step.time - 0.01 && $0 < end - 0.05 }
+                    for (i, t) in (hits.isEmpty ? [step.time] : hits).enumerated() {
+                        let next = i + 1 < hits.count ? hits[i + 1] : end
+                        for n in voicing { add(t, max(0.1, (next - t) * 0.9), handles.chords, n, i == 0 ? 76 : 62) }
+                    }
+                }
+            }
+        }
         if settings.melodyGuide {
             for n in melody {
+                if let ranges = guideRanges, !ranges.contains(where: { $0.contains(n.start) }) { continue }
                 add(n.start, max(0.05, n.duration - 0.01), handles.guide, n.midi + transpose, UInt8(70 + 40 * min(1, n.confidence)))
                 // Replay slides/vibrato/gamaka as pitch bend (guide voice uses a ±12 semitone bend range).
                 guard !n.bendCents.isEmpty else { continue }
@@ -241,7 +299,37 @@ public enum AccompanimentGenerator {
             }
         }
         // At equal frames: note-offs, then note-ons, then bends (so a bend applies to the new note).
+        // (chordVoicing is below.)
         func rank(_ e: SequencerEvent) -> Int { e.bend != nil ? 2 : (e.velocity == 0 ? 0 : 1) }
         return out.sorted { ($0.frame, rank($0)) < ($1.frame, rank($1)) }
+    }
+
+    /// A close-position triad around middle C (G3–G4 for the lowest note), choosing the inversion
+    /// nearest the previous chord so the background moves smoothly. Drones give root + fifth.
+    public static func chordVoicing(_ step: ChordGuideStep, transpose: Int = 0, near previous: [Int] = []) -> [Int] {
+        let symbol = ChordSymbol(step.chord)
+        let rootPC: Int
+        if let symbol { rootPC = ((symbol.root + transpose) % 12 + 12) % 12 }
+        else if let first = step.pattern.first { rootPC = (((first + transpose) % 12) + 12) % 12 }
+        else { return [] }
+        let intervals: [Int] = step.isDrone || symbol == nil ? [0, 7] : [0, symbol!.quality == .minor ? 3 : 4, 7]
+        var candidates: [[Int]] = []
+        for inversion in 0..<intervals.count {
+            var pcs = intervals.map { (rootPC + $0) % 12 }
+            pcs = Array(pcs[inversion...] + pcs[..<inversion])
+            var notes: [Int] = []
+            var n = 55 + ((pcs[0] - 55 % 12) + 12) % 12      // lowest note in G3...F#4
+            for pc in pcs {
+                while n % 12 != pc { n += 1 }
+                notes.append(n)
+                n += 1
+            }
+            candidates.append(notes)
+        }
+        guard !previous.isEmpty else { return candidates[0] }
+        func distance(_ a: [Int]) -> Int {
+            a.map { x in previous.map { abs($0 - x) }.min() ?? 0 }.reduce(0, +)
+        }
+        return candidates.min { distance($0) < distance($1) } ?? candidates[0]
     }
 }

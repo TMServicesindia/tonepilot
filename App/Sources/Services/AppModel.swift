@@ -2,6 +2,11 @@ import AVFoundation
 import SwiftUI
 import TonePilotCore
 
+/// Bottom tabs. Playing, mixing and song-specific tone editing all live in the Song Studio.
+enum AppTab: Hashable {
+    case library, analyse, studio, settings
+}
+
 enum EngineKind: String, CaseIterable, Identifiable {
     /// TonePilot's own engine: full layer controls, accompaniment, melody guide.
     case tonePilot
@@ -28,8 +33,19 @@ final class OutputBox: @unchecked Sendable {
 final class AppModel: ObservableObject {
     @Published var library = Library()
     @Published var activeSongId: UUID?
-    /// Root tab selection (Library, Analyse, Tone Studio, Perform, Settings).
-    @Published var selectedTab = 0
+    /// Root tab selection (see `AppTab`).
+    @Published var selectedTab = AppTab.library
+    // Song Studio
+    /// Where playback resumes when you press Play (seconds).
+    @Published var cursor: Double = 0
+    /// The section being looped for practice, if any.
+    @Published var loopSectionId: UUID?
+    /// Practice speed (1 = normal; pitch is kept).
+    @Published var studioRate: Float = 1
+    /// Waveform peaks per song (computed once per session).
+    @Published var waveforms: [UUID: [Float]] = [:]
+    /// A tone being auditioned from the tone picker (not yet assigned to a section).
+    @Published var previewingToneId: UUID?
     @Published var activeArrangement: Arrangement?
     @Published var activeSectionId: UUID?
     @Published var outputPeak: Float = 0
@@ -243,8 +259,9 @@ final class AppModel: ObservableObject {
         if let sectionId { scheduler?.didSelect(sectionId) }
         if pendingSuggestion == sectionId { pendingSuggestion = nil }
         applyActiveArrangement()
+        // The AI melody plays with the section's lead sound unless another one was chosen.
         if let song = song(activeSongId), song.accompaniment?.melodyGuide == true, song.accompaniment?.guidePatchId == nil {
-            configureGuideVoice(for: song)
+            applyMix(song)
         }
     }
 
@@ -282,7 +299,7 @@ final class AppModel: ObservableObject {
         } else {
             activate(song.arrangements.first, songId: songId)
         }
-        if let url = audioURL(for: song) { try? sectionPlayer.load(url: url) }
+        try? loadSongAudio(song)
         performanceTimer?.invalidate()
         performanceTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.tick() }
@@ -310,11 +327,10 @@ final class AppModel: ObservableObject {
 
     /// Plays the imported song from `time` as backing/clock. The engine's sequencer follows it.
     func playBackingTrack(from time: Double, to end: Double? = nil, loop: Bool = false, rate: Float = 1) {
-        guard let song = song(activeSongId), let url = audioURL(for: song) else { return }
-        do { try sectionPlayer.load(url: url) } catch { engineError = "Playback failed: \(error.localizedDescription)"; return }
-        let acc = song.accompaniment ?? AccompanimentSettings()
-        // With the backing track switched off it still runs silently as the timing reference.
-        sectionPlayer.volume = acc.backingTrack ? Float(acc.backingTrackLevel) : 0
+        guard let song = song(activeSongId), audioURL(for: song) != nil else { return }
+        do { try loadSongAudio(song) } catch { engineError = "Playback failed: \(error.localizedDescription)"; return }
+        // Audio tracks that are switched off keep running silently as the timing reference.
+        applyAudioLevels(song)
         sectionPlayer.rate = rate
         sectionPlayer.play(from: time, to: end, loop: loop)
         isSectionPlaying = true
@@ -372,39 +388,79 @@ final class AppModel: ObservableObject {
 
     // MARK: Accompaniment & melody guide
 
-    /// Configures bass/drums/metronome/melody-guide slots and their event list for `song`.
+    /// Configures the generated parts (bass, rhythm, background chords, AI melody, metronome)
+    /// and their event list for `song`. Every part the song can play is sequenced once; switching
+    /// a part on/off or changing its level only touches its engine slot, so the song never stops.
     func configureAccompaniment(for song: Song) {
         guard let host else { return }
         let s = song.accompaniment ?? AccompanimentSettings()
         let c = host.controller
-        func patch(_ id: UUID) -> InstrumentPatch? { library.patch(id: id) }
-        var errors: [String] = []
-        errors += [c.setAccompaniment(.bass, patch: s.bass ? patch(FactoryPatches.id(forProgram: 33)) : nil, volume: s.bassLevel, cache: cache),
-                   c.setAccompaniment(.drums, patch: s.drums ? patch(FactoryPatches.drumKitId) : nil, volume: s.drumLevel, cache: cache),
-                   c.setAccompaniment(.metronome, patch: s.metronome ? patch(FactoryPatches.clickId) : nil, volume: s.metronomeLevel, cache: cache)]
-            .compactMap { $0 }
-        configureGuideVoice(for: song)
         let handles = AccompanimentGenerator.Handles(bass: c.accompanimentHandle(.bass), drums: c.accompanimentHandle(.drums),
-                                                     guide: c.accompanimentHandle(.melodyGuide), metronome: c.accompanimentHandle(.metronome))
+                                                     guide: c.accompanimentHandle(.melodyGuide), metronome: c.accompanimentHandle(.metronome),
+                                                     chords: c.accompanimentHandle(.chords))
         let events = AccompanimentGenerator.events(beats: song.beatTimes, beatsPerBar: song.timeSignature?.value ?? 4,
                                                    chordGuide: song.chordGuide ?? [], melody: song.melody?.notes ?? [],
-                                                   settings: s, handles: handles, sampleRate: host.core.sampleRate,
-                                                   transpose: song.performanceTranspose ?? 0)
+                                                   settings: SongStudio.sequencingSettings(s), handles: handles,
+                                                   sampleRate: host.core.sampleRate, transpose: song.performanceTranspose ?? 0,
+                                                   guideRanges: SongStudio.guideRanges(song))
         c.setSequence(events)
-        c.setAccompanimentLevel(1, arrangement: activeArrangement)
-        if isSectionPlaying { sectionPlayer.volume = s.backingTrack ? Float(s.backingTrackLevel) : 0 }
+        applyMix(song)
+    }
+
+    /// Applies on/off, solo and levels to every track without re-sequencing.
+    func applyMix(_ song: Song) {
+        applyAudioLevels(song)
+        guard let host else { return }
+        let s = song.accompaniment ?? AccompanimentSettings()
+        let c = host.controller
+        func patch(_ id: UUID) -> InstrumentPatch? { library.patch(id: id) }
+        func slot(_ slot: ToneEngine.AccompanimentSlot, _ track: String, _ patchId: UUID) -> String? {
+            let level = SongStudio.effectiveLevel(track, s)
+            return c.setAccompaniment(slot, patch: level > 0 ? patch(patchId) : nil, volume: level, cache: cache)
+        }
+        let leadId = activeArrangement?.layers.first { [.lead, .vocalMelody, .motif].contains($0.role) }?.patchId
+        let chordPatch: UUID
+        switch s.chordStyle ?? .pad {
+        case .pad: chordPatch = FactoryPatches.warmAnalogPadId
+        case .strings: chordPatch = FactoryPatches.id(forProgram: 49)
+        case .piano: chordPatch = FactoryPatches.id(forProgram: 0)
+        }
+        let errors = [slot(.bass, SongStudio.bass, FactoryPatches.id(forProgram: 33)),
+                      slot(.drums, SongStudio.drums, FactoryPatches.drumKitId),
+                      slot(.metronome, SongStudio.metronome, FactoryPatches.clickId),
+                      slot(.chords, SongStudio.chords, chordPatch),
+                      slot(.melodyGuide, SongStudio.melody, s.guidePatchId ?? leadId ?? FactoryPatches.bansuriId)].compactMap { $0 }
+        c.setMixLevels(live: SongStudio.effectiveLevel(SongStudio.keyboard, s), accompaniment: 1, arrangement: activeArrangement)
         if !errors.isEmpty { patchLoadErrors = errors }
     }
 
-    /// Reference Learning Mode voice: the chosen guide patch, else the active tone's lead patch.
-    private func configureGuideVoice(for song: Song) {
-        guard let host else { return }
+    /// The song's audio tracks: separated stems when they're on this iPhone, else the recording.
+    func audioTracks(for song: Song) -> [(id: String, url: URL)] {
+        guard let main = audioURL(for: song) else { return [] }
+        let dir = store.stemDirectory(for: song.id)
+        let stems = (song.stems ?? []).compactMap { stem -> (id: String, url: URL)? in
+            let url = dir.appendingPathComponent(stem.fileName)
+            return FileManager.default.fileExists(atPath: url.path) ? (SongStudio.stem(stem.kind), url) : nil
+        }
+        return stems.isEmpty ? [(SongStudio.original, main)] : stems
+    }
+
+    func stemKinds(for song: Song) -> [StemInfo.Kind] {
+        audioTracks(for: song).compactMap { t in StemInfo.Kind.allCases.first { SongStudio.stem($0) == t.id } }
+    }
+
+    func loadSongAudio(_ song: Song) throws {
+        let files = audioTracks(for: song)
+        if !files.isEmpty { try sectionPlayer.load(files) }
+    }
+
+    /// Sets each audio track's level; tracks that are off stay in sync at zero volume.
+    func applyAudioLevels(_ song: Song, forceAudible: Bool = false) {
         let s = song.accompaniment ?? AccompanimentSettings()
-        guard s.melodyGuide else { _ = host.controller.setAccompaniment(.melodyGuide, patch: nil, volume: 0, cache: cache); return }
-        let leadId = activeArrangement?.layers.first { [.lead, .vocalMelody, .motif].contains($0.role) }?.patchId
-        let id = s.guidePatchId ?? leadId ?? FactoryPatches.bansuriId
-        if let error = host.controller.setAccompaniment(.melodyGuide, patch: library.patch(id: id), volume: s.guideLevel, cache: cache) {
-            patchLoadErrors = [error]
+        for id in sectionPlayer.trackIds {
+            var level = SongStudio.effectiveLevel(id, s)
+            if forceAudible && level == 0 && s.soloTrack == nil { level = SongStudio.level(id, s) }
+            sectionPlayer.setLevel(Float(level), for: id)
         }
     }
 
@@ -531,7 +587,7 @@ final class AppModel: ObservableObject {
         guard let song = song(songId), let section = song.sections.first(where: { $0.id == sectionId }) else { return }
         playBackingTrack(from: section.startTime, to: section.endTime, loop: true, rate: rate)
         // Practice always plays the recording so you can hear the part.
-        sectionPlayer.volume = Float(song.accompaniment?.backingTrackLevel ?? 0.8)
+        applyAudioLevels(song, forceAudible: true)
         if rate != 1 { host?.controller.setTransport(playing: false, seconds: section.startTime) }
         activateSection(sectionId)
     }
