@@ -24,7 +24,10 @@ jobs:
 
       - name: Core tests (macOS)
         working-directory: Packages/TonePilotCore
-        run: swift test
+        run: |
+          set -o pipefail
+          swift test 2>&1 | tee ../../swifttest.log | grep -E "error:|failed|Executed .* tests" || true
+          ! grep -qE "error:|with [1-9][0-9]* failures?" ../../swifttest.log
 
       - name: Bundle GeneralUser GS sounds (GeneralUser GS License v2.0)
         run: |
@@ -43,8 +46,21 @@ jobs:
           xcodebuild -project TonePilot.xcodeproj -scheme TonePilot -configuration Release \
             -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            build | tee xcodebuild.log | grep -E "error:|warning: .*TonePilot|BUILD (SUCCEEDED|FAILED)" || true
+            build > xcodebuild.log 2>&1 || true
+          grep -E "error:|BUILD (SUCCEEDED|FAILED)" xcodebuild.log | sort -u | head -80 || true
           test -d build/Build/Products/Release-iphoneos/TonePilot.app
+
+      # Logs need a login to download; annotations are public, so surface errors there.
+      - name: Report errors as annotations
+        if: failure()
+        run: |
+          for f in swifttest.log xcodebuild.log; do
+            [ -f "$f" ] || continue
+            grep -E "error:" "$f" | sed -E 's#^/Users/runner/work/[^/]+/[^/]+/##' | sort -u | head -45 | while IFS= read -r line; do
+              echo "::error title=$f::${line}"
+            done
+          done
+          if [ -f xcodebuild.log ] && ! grep -q "error:" xcodebuild.log; then tail -30 xcodebuild.log | while IFS= read -r l; do echo "::warning title=xcodebuild tail::$l"; done; fi
 
       - name: Package .ipa
         run: |
