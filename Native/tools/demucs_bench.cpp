@@ -87,6 +87,12 @@ int main(int argc, char **argv) {
     for (auto &t : pool) t.join();
     auto t2 = std::chrono::steady_clock::now();
     double load = std::chrono::duration<double>(t1 - t0).count(), sep = std::chrono::duration<double>(t2 - t1).count();
+    if (const char *dump = getenv("TP_DUMP")) {
+        if (FILE *f = std::fopen(dump, "wb")) {
+            for (int k = 0; k < threads; ++k) std::fwrite(outs[k].data(), sizeof(float), outs[k].size(), f);
+            std::fclose(f);
+        }
+    }
     std::printf("RESULT load %.1f s, separate %.1f s for %.0f s of audio with %d threads = %.2f× real time\n",
                 load, sep, seconds, threads, sep / seconds);
     // Energy of each true part found in each stem (correlation of stem with part).

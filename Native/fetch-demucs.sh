@@ -14,6 +14,7 @@ fi
 if ! grep -q "#include <memory>" demucs/src/model.hpp; then
   { printf '#include <memory>\n'; cat demucs/src/model.hpp; } > demucs/src/model.hpp.new && mv demucs/src/model.hpp.new demucs/src/model.hpp
 fi
+python3 "$(dirname "$0")/patch-demucs.py"
 if [ ! -d eigen/Eigen ]; then
   rm -rf eigen
   git init -q eigen

@@ -21,22 +21,33 @@ jobs:
           set -euo pipefail
           mkdir -p build
           clang++ -std=c++17 -O3 -DNDEBUG -DEIGEN_NO_DEBUG -Idemucs/src -Ieigen -ICDemucs \
-            demucs/src/*.cpp CDemucs/tp_demucs.cpp tools/demucs_bench.cpp -o build/bench
-      - name: Speed with Apple Accelerate (BLAS on the matrix units)
+            -DEIGEN_USE_BLAS demucs/src/*.cpp CDemucs/tp_demucs.cpp tools/demucs_bench.cpp -framework Accelerate -o build/bench
+      - name: Same output, faster (original engine vs TonePilot's optimised build)
         working-directory: Native
         run: |
           set -o pipefail
           SRC="demucs/src/*.cpp CDemucs/tp_demucs.cpp tools/demucs_bench.cpp"
-          FLAGS="-std=c++17 -O3 -DNDEBUG -DEIGEN_NO_DEBUG -DEIGEN_USE_BLAS -Idemucs/src -Ieigen -ICDemucs"
-          clang++ $FLAGS $SRC -framework Accelerate -o build/bench_blas
-          clang++ $FLAGS -ffast-math $SRC -framework Accelerate -o build/bench_fast
+          FLAGS="-std=c++17 -O3 -DNDEBUG -DEIGEN_NO_DEBUG -Idemucs/src -Ieigen -ICDemucs"
+          clang++ $FLAGS -DTP_DEMUCS_REFERENCE $SRC -o build/bench_original
+          clang++ $FLAGS -DEIGEN_USE_BLAS $SRC -framework Accelerate -o build/bench_fast
+          M=../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin
           run() {  # name binary threads seconds
-            TP_TRACE=1 ./build/$2 ../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin $3 $4 > $1.log 2>/dev/null || true
-            echo "::notice title=Speed $1::$(grep '^RESULT' $1.log | tr '\n' ' ') footprint $(grep '^PEAK final' $1.log)"
+            TP_TRACE=1 TP_DUMP=$1.f32 ./build/$2 $M $3 $4 > $1.log 2>/dev/null || true
+            echo "::notice title=Speed $1::$(grep '^RESULT load' $1.log) — memory $(grep '^PEAK final' $1.log | sed 's/PEAK final //')"
           }
-          run blas-1worker bench_blas 1 20
-          run fastmath-1worker bench_fast 1 20
-          run blas-2workers bench_blas 2 40
+          run original bench_original 1 20
+          run fast bench_fast 1 20
+          python3 - <<'PY'
+          import array, math
+          a = array.array('f'); b = array.array('f')
+          a.frombytes(open('original.f32','rb').read()); b.frombytes(open('fast.f32','rb').read())
+          assert len(a) == len(b) and len(a) > 0, (len(a), len(b))
+          err = sum((x - y) ** 2 for x, y in zip(a, b)); sig = sum(x * x for x in a)
+          snr = 10 * math.log10(sig / max(err, 1e-30)); mx = max(abs(x - y) for x, y in zip(a, b))
+          print(f"::notice title=Quality::optimised vs original: difference {snr:.0f} dB below the signal, largest sample difference {mx:.2e}")
+          if snr < 90: print("::error title=Quality::optimised output differs from the original"); raise SystemExit(1)
+          PY
+          run fast-2workers bench_fast 2 40
 
       - name: Run (3 threads, 40 s of audio)
         working-directory: Native
@@ -59,20 +70,20 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_16.4.app || true
           mkdir -p build/obj && cd build/obj
           for f in ../../demucs/src/*.cpp ../../CDemucs/tp_demucs.cpp; do
-            clang++ -std=c++17 -O3 -DNDEBUG -DEIGEN_NO_DEBUG -I../../demucs/src -I../../eigen -I../../CDemucs -c "$f" -o "$(basename "$f").o" &
+            clang++ -std=c++17 -O3 -DNDEBUG -DEIGEN_NO_DEBUG -DEIGEN_USE_BLAS -I../../demucs/src -I../../eigen -I../../CDemucs -c "$f" -o "$(basename "$f").o" &
           done
           wait
           cd ..
           swiftc -O -wmo -parse-as-library -module-name TonePilotCore -emit-module -emit-module-path TonePilotCore.swiftmodule -emit-library -static \
             $(find ../../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') -o libTonePilotCore.a 2>&1 | tee core.log
           swiftc -O -I . -L . -lTonePilotCore -import-objc-header ../CDemucs/tp_demucs.h \
-            ../tools/main.swift ../../App/Sources/Audio/StemSeparator.swift obj/*.o -lc++ -o separate 2>&1 | tee cli.log
+            ../tools/main.swift ../../App/Sources/Audio/StemSeparator.swift obj/*.o -lc++ -framework Accelerate -o separate 2>&1 | tee cli.log
           ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/septest 2>&1 | grep -v "^Loading tensor\|MB$\|^\[" | tee e2e.log | tail -12
           grep -E "^RESULT|^part|::error" e2e.log | while IFS= read -r l; do echo "::notice title=App separator::$l"; done
           # Peak memory for a 4-minute song with 1, 2 and 4 workers (iOS closes apps that use too much).
           ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/memtrace 120 1 > memtrace.log 2>&1 || true
           grep "^MEM" memtrace.log | while IFS= read -r l; do echo "::notice title=Footprint::$l"; done
-          for w in 1; do
+          for w in 1 2; do
             /usr/bin/time -l ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/sep$w 120 $w > run$w.log 2> time$w.log || true
             rss=$(awk '/maximum resident set size/ {print $1}' time$w.log)
             res=$(grep "^RESULT separated" run$w.log || echo "failed")
