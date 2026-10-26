@@ -1,0 +1,36 @@
+name: Convert Demucs to Core ML
+
+# Converts the htdemucs network to Core ML (GPU / Neural Engine), checks it against PyTorch
+# and measures speed. The resulting model is attached as an artifact for the app build.
+on:
+  push:
+    branches: [main]
+    paths: ["Native/coreml/**", ".github/workflows/coreml-convert.yml"]
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install PyTorch, coremltools, Demucs
+        run: |
+          python -m pip install --quiet "torch==2.4.1" "torchaudio==2.4.1" "coremltools==8.1" "numpy<2" einops
+          python -m pip install --quiet "demucs==4.0.1"
+          python -c "import torch, coremltools; print(torch.__version__, coremltools.__version__)"
+      - name: Convert and verify
+        run: |
+          set -o pipefail
+          python Native/coreml/convert_htdemucs.py HTDemucs.mlpackage 2>&1 | tee convert.log | grep -vE "^\s*$" | tail -40
+          grep -E "^RESULT|^inputs|^outputs|^saved" convert.log | while IFS= read -r l; do echo "::notice title=Core ML::$l"; done
+          du -sh HTDemucs.mlpackage | sed 's/^/::notice title=Core ML size::/'
+      - name: Errors
+        if: failure()
+        run: grep -E "Error|error|Exception|not supported|Unsupported" convert.log | tail -15 | while IFS= read -r l; do echo "::error title=Convert::$l"; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HTDemucs-mlpackage
+          path: HTDemucs.mlpackage
