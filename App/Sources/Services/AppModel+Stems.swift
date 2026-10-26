@@ -75,7 +75,9 @@ extension AppModel {
                 }
             }
         }
-        thread.qualityOfService = .utility
+        // .userInitiated keeps the work on the performance cores (.utility moves it to the
+        // efficiency cores, which made separation several times slower).
+        thread.qualityOfService = .userInitiated
         thread.stackSize = 8 << 20
         thread.start()
     }

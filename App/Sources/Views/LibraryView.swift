@@ -52,27 +52,34 @@ struct LibraryView: View {
                 }
             }
 
-            Section {
-                if songs.isEmpty {
-                    ContentUnavailableView {
-                        Label(query.isEmpty ? "No songs yet" : "No matches", systemImage: "music.note")
-                    } description: {
-                        Text(query.isEmpty ? "Play a song from your streaming app and let TonePilot listen, or import an audio file you own. TonePilot builds tones for every section automatically."
-                                           : "Try a title, film, composer, language or tag.")
-                    } actions: {
-                        if query.isEmpty {
-                            Button("Listen to a song") { showListen = true }.buttonStyle(.borderedProminent)
-                            Button("Import MP3") { pickMP3 = true }
+            if query.isEmpty, filterPlaylist == nil {
+                Section { addSongCard }
+                    .listRowInsets(EdgeInsets()).listRowBackground(Color.clear)
+                if let id = model.activeSongId, let song = model.song(id) {
+                    Section("Continue") {
+                        Button { model.openStudio(id) } label: {
+                            HStack(spacing: 12) {
+                                SongArtwork(title: song.title, size: 52)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(song.title).font(.headline).lineLimit(1)
+                                    Text("Back to Song Studio").font(.caption).foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "play.circle.fill").font(.title).foregroundStyle(Theme.accent)
+                            }
+                            .contentShape(Rectangle())
                         }
+                        .foregroundStyle(.primary)
                     }
+                }
+            }
+            Section(songs.isEmpty ? "" : "Your songs") {
+                if songs.isEmpty, !query.isEmpty {
+                    ContentUnavailableView.search(text: query)
                 }
                 ForEach(songs) { song in
                     Button { model.openStudio(song.id) } label: {
-                        HStack {
-                            SongRow(song: song)
-                            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
-                        }
-                        .contentShape(Rectangle())
+                        SongRow(song: song, status: status(song)).contentShape(Rectangle())
                     }
                     .foregroundStyle(.primary)
                     .accessibilityHint("Opens the song in Song Studio")
@@ -98,7 +105,7 @@ struct LibraryView: View {
                 }
             }
         }
-        .navigationTitle("Library")
+        .navigationTitle("Songs")
         .fileImporter(isPresented: $pickMP3, allowedContentTypes: [.mp3, .mpeg4Audio, .wav, .aiff, .audio]) { result in
             if case .success(let url) = result, let id = model.importAndAnalyze(from: url) { model.openStudio(id) }
         }
@@ -111,7 +118,7 @@ struct LibraryView: View {
                     Button { pickMP3 = true } label: { Label("Import MP3 / audio file", systemImage: "square.and.arrow.down") }
                     Button { showImport = true } label: { Label("Save a YouTube link", systemImage: "link") }
                     Button { showNewPlaylist = true } label: { Label("New playlist", systemImage: "text.badge.plus") }
-                } label: { Image(systemName: "plus") }
+                } label: { Image(systemName: "plus.circle.fill").font(.title3).accessibilityLabel("Add") }
             }
         }
         .sheet(isPresented: $showImport) { ImportSongView().environmentObject(model) }
@@ -127,6 +134,48 @@ struct LibraryView: View {
         }
     }
 
+    /// The big "add a song" entry point (the main thing to do in an empty library).
+    private var addSongCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if model.library.songs.isEmpty {
+                Text("Play along with any song").font(.title2.weight(.bold))
+                Text("Add a song you own. TonePilot finds the tempo, key, chords and sections, separates the vocals, drums, bass and music, and sets up a tone for every section.")
+                    .font(.subheadline).foregroundStyle(.secondary)
+            }
+            HStack(spacing: 10) {
+                Button { pickMP3 = true } label: {
+                    Label("Import song", systemImage: "square.and.arrow.down")
+                        .font(.headline).frame(maxWidth: .infinity, minHeight: 50)
+                }
+                .buttonStyle(.borderedProminent)
+                Button { showListen = true } label: {
+                    Label("Listen", systemImage: "ear")
+                        .font(.headline).frame(maxWidth: .infinity, minHeight: 50)
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(LinearGradient(colors: [Theme.accent.opacity(0.22), Theme.panel], startPoint: .topLeading, endPoint: .bottomTrailing),
+                    in: RoundedRectangle(cornerRadius: 18))
+    }
+
+    /// What the song is ready for, in one pill.
+    private func status(_ song: Song) -> SongRow.Status {
+        if song.analysisStatus == .running {
+            return .init(text: "Analysing \(Int(((model.analysisProgress[song.id] ?? 0) * 100).rounded()))%", color: Theme.warn, symbol: "waveform")
+        }
+        if let p = model.separationProgress[song.id] {
+            return .init(text: "Separating \(Int((p * 100).rounded()))%", color: Theme.warn, symbol: "scissors")
+        }
+        if song.analysisStatus == .failed { return .init(text: "Needs attention", color: Theme.bad, symbol: "exclamationmark.triangle") }
+        if song.sourceType == .youtubeLink { return .init(text: "Link only", color: .secondary, symbol: "link") }
+        if !model.stemKinds(for: song).isEmpty { return .init(text: "Parts ready", color: Theme.good, symbol: "checkmark") }
+        if song.analysisStatus == .completed { return .init(text: "Ready", color: Theme.good, symbol: "checkmark") }
+        return .init(text: "Not analysed", color: .secondary, symbol: nil)
+    }
+
     private func chip(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title).font(.subheadline)
@@ -139,28 +188,30 @@ struct LibraryView: View {
 }
 
 struct SongRow: View {
+    struct Status { let text: String; let color: Color; let symbol: String? }
     let song: Song
+    var status: Status?
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: song.sourceType == .youtubeLink ? "link" : song.sourceType == .listened ? "ear" : "waveform")
-                .frame(width: 36, height: 36)
-                .background(Theme.panelRaised, in: RoundedRectangle(cornerRadius: 8))
-            VStack(alignment: .leading, spacing: 2) {
-                HStack {
+            SongArtwork(title: song.title, size: 48)
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 4) {
                     Text(song.title).font(.headline).lineLimit(1)
-                    if song.isFavorite { Image(systemName: "star.fill").font(.caption).foregroundStyle(.yellow) }
+                    if song.isFavorite { Image(systemName: "star.fill").font(.caption2).foregroundStyle(.yellow) }
                 }
-                Text([song.film, song.composer, song.language].compactMap { $0 }.joined(separator: " · ").ifEmpty("No details"))
+                Text([song.artist, song.film, song.composer].compactMap { $0 }.joined(separator: " · ").ifEmpty(details))
                     .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                if let status { StatusPill(text: status.text, color: status.color, symbol: status.symbol) }
             }
-            Spacer()
-            VStack(alignment: .trailing, spacing: 2) {
-                if let bpm = song.bpm { Text("\(Int(bpm.value.rounded())) BPM").font(.caption.monospacedDigit()) }
-                if let key = song.key { Text(key.value.displayName).font(.caption2).foregroundStyle(.secondary) }
-                if song.analysisStatus == .running { ProgressView().controlSize(.mini) }
-            }
+            Spacer(minLength: 4)
+            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
         }
+        .padding(.vertical, 2)
+    }
+
+    private var details: String {
+        [song.bpm.map { "\(Int($0.value.rounded())) BPM" }, song.key?.value.displayName].compactMap { $0 }.joined(separator: " · ").ifEmpty("No details")
     }
 }
 

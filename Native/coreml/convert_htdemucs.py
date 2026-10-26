@@ -118,8 +118,7 @@ if __name__ == "__main__":
                  "softmax", "pow", "sqrt", "rsqrt", "real_div", "exp", "log", "square", "erf"}
     variants = {
         "fp32": ct.precision.FLOAT32,
-        "mixed": ct.transform.FP16ComputePrecision(op_selector=lambda op: op.op_type not in SENSITIVE),
-        "fp16": ct.precision.FLOAT16,
+        # (Measured: mixed precision 36.9 dB and 16-bit -9.7 dB vs PyTorch — not good enough.)
     }
     feed = {"x": x.numpy(), "xt": xt.numpy()}
     chosen = None

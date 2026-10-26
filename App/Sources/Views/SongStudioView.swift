@@ -21,6 +21,26 @@ struct StudioTab: View {
 
 struct SectionRef: Identifiable, Hashable { let id: UUID }
 
+/// The Song Studio's three pages: the song's parts, your keyboard, and the sections.
+enum StudioPage: String, CaseIterable, Identifiable {
+    case mix, keyboard, sections
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .mix: return "Mix"
+        case .keyboard: return "My keys"
+        case .sections: return "Sections"
+        }
+    }
+    var symbol: String {
+        switch self {
+        case .mix: return "slider.vertical.3"
+        case .keyboard: return "pianokeys"
+        case .sections: return "list.bullet.rectangle"
+        }
+    }
+}
+
 /// One screen to play a song: timeline, your keyboard, the AI background band, the parts the AI
 /// plays for you, and each section's tone. "You choose what to play. TonePilot fills in the rest."
 struct SongStudioView: View {
@@ -35,25 +55,38 @@ struct SongStudioView: View {
     @State private var showSoundLibrary = false
     @State private var showListen = false
     @AppStorage("studioIntroDismissed") private var introDismissed = false
+    @AppStorage("studioPage") private var page = StudioPage.mix
 
     var body: some View {
         if let song = model.song(songId) {
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(spacing: 14) {
                     StudioHeader(song: song)
                     StudioAnalysisStatus(song: song, onListen: { showListen = true })
+                    SeparationCard(song: song)
                     if !introDismissed { intro }
                     StudioTimeline(song: song)
                     if !(song.chordGuide ?? []).isEmpty { LiveGuideHost(song: song, live: model.live) }
-                    SeparationCard(song: song)
-                    MyKeyboardCard(song: song, onChangeSound: changeSound, onEditSound: editSound, onEditTone: { editingTone = ToneEditTarget(id: $0) })
-                    SongPartsCard(song: song)
-                    AIPartsCard(song: song)
-                    StudioSectionsCard(song: song, onChangeSound: changeSound, onEditSound: editSound,
-                                       onGuide: { guideFor = $0 }, onEditTiming: { editingSection = $0 })
+                    Picker("Show", selection: $page) {
+                        ForEach(StudioPage.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .accessibilityLabel("Song Studio page")
+                    switch page {
+                    case .mix:
+                        SongPartsCard(song: song)
+                        AIPartsCard(song: song)
+                    case .keyboard:
+                        MyKeyboardCard(song: song, onChangeSound: changeSound, onEditSound: editSound, onEditTone: { editingTone = ToneEditTarget(id: $0) })
+                    case .sections:
+                        StudioSectionsCard(song: song, onChangeSound: changeSound, onEditSound: editSound,
+                                           onGuide: { guideFor = $0 }, onEditTiming: { editingSection = $0 })
+                    }
                 }
-                .padding()
+                .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, 24)
             }
+            .scrollIndicators(.hidden)
+            .safeAreaInset(edge: .bottom, spacing: 0) { TransportBar(song: song, live: model.live) }
             .background(Color.black.ignoresSafeArea())
             .navigationTitle("Song Studio")
             .navigationBarTitleDisplayMode(.inline)
@@ -93,7 +126,7 @@ struct SongStudioView: View {
                 Button { introDismissed = true } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(.secondary) }
                     .accessibilityLabel("Dismiss")
             }
-            Text("**You play** the parts you know on your Casio. **The song plays the rest**: TonePilot separates the recording into vocals, drums, bass and music — switch off what you want to play yourself, and let the original fill in the passages you can't play yet.")
+            Text("**1.** Press play.  **2.** In **Mix**, switch off the part you want to play.  **3.** Play it on your Casio — the song plays the rest.")
                 .font(.footnote)
         }
         .padding(14)
@@ -155,22 +188,21 @@ private struct StudioHeaderContent: View {
         let section = song.orderedSections.last { $0.startTime <= pos + 0.01 }
         let hasAudio = model.audioURL(for: song) != nil
         HStack(spacing: 14) {
-            Button { model.studioTogglePlay() } label: {
-                Image(systemName: playing ? "pause.fill" : "play.fill")
-                    .font(.system(size: 28, weight: .bold))
-                    .frame(width: 66, height: 66)
-                    .background(Theme.accent, in: Circle())
-                    .foregroundStyle(.black)
-            }
-            .accessibilityLabel(playing ? "Pause" : (hasAudio ? "Play" : "Start song clock"))
-            .disabled(song.sections.isEmpty && !hasAudio)
+            SongArtwork(title: song.title, size: 64)
             VStack(alignment: .leading, spacing: 3) {
-                Text(song.title).font(.headline).lineLimit(2)
+                Text(song.title).font(.title3.weight(.bold)).lineLimit(2)
                 let meta = [song.artist, song.film, song.composer].compactMap { $0 }.joined(separator: " · ")
-                if !meta.isEmpty { Text(meta).font(.caption).foregroundStyle(.secondary).lineLimit(1) }
-                Text("\(playing ? "Playing" : "Paused") · \(section?.label ?? "Start") · \(pos.mmss)\(song.duration.map { " / \($0.mmss)" } ?? "")")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(playing ? Theme.accent : .secondary)
+                if !meta.isEmpty { Text(meta).font(.subheadline).foregroundStyle(.secondary).lineLimit(1) }
+                HStack(spacing: 6) {
+                    if let section {
+                        Text(section.label).font(.caption.weight(.bold))
+                            .padding(.horizontal, 8).padding(.vertical, 3)
+                            .background(SectionTimeline.color(for: section).opacity(playing ? 0.9 : 0.35), in: Capsule())
+                            .foregroundStyle(playing ? .black : .primary)
+                    }
+                    if let bpm = song.bpm { Text("\(Int(bpm.value.rounded())) BPM").font(.caption.monospacedDigit()).foregroundStyle(.secondary) }
+                    if let key = song.key { Text(key.value.displayName).font(.caption).foregroundStyle(.secondary) }
+                }
                 if !hasAudio {
                     Text("No recording on this iPhone: Play starts the song clock — begin on beat 1.")
                         .font(.caption2).foregroundStyle(.secondary)
@@ -220,6 +252,94 @@ struct StudioAnalysisStatus: View {
     }
 }
 
+// MARK: Player bar
+
+/// Always-visible player at the bottom of the Song Studio (like Moises and Apple Music):
+/// progress, loop, back/forward 5 s, play and speed — reachable with one thumb.
+struct TransportBar: View {
+    @EnvironmentObject var model: AppModel
+    let song: Song
+    @ObservedObject var live: LiveState
+
+    var body: some View {
+        let playing = model.isStudioPlaying
+        let pos = live.position ?? model.cursor
+        let duration = max(song.duration ?? song.sections.map(\.endTime).max() ?? 1, 1)
+        let hasAudio = model.audioURL(for: song) != nil
+        VStack(spacing: 8) {
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.white.opacity(0.12))
+                    Capsule().fill(Theme.accent).frame(width: geo.size.width * min(1, max(0, pos / duration)))
+                }
+                .frame(height: 4)
+                .frame(maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .gesture(DragGesture(minimumDistance: 0).onEnded { v in
+                    model.studioSeek(to: Double(max(0, min(1, v.location.x / max(1, geo.size.width)))) * duration)
+                })
+            }
+            .frame(height: 16)
+            .accessibilityElement()
+            .accessibilityLabel("Position")
+            .accessibilityValue("\(pos.mmss) of \(duration.mmss)")
+            .accessibilityAdjustableAction { model.studioSeek(to: $0 == .increment ? pos + 10 : max(0, pos - 10)) }
+            HStack {
+                Text(pos.mmss)
+                Spacer()
+                Text(duration.mmss)
+            }
+            .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+            HStack(spacing: 0) {
+                barButton(model.loopSectionId == nil ? "repeat" : "repeat.1", label: model.loopSectionId == nil ? "Loop this section" : "Stop looping",
+                          active: model.loopSectionId != nil) { model.studioToggleLoop() }
+                    .disabled(song.sections.isEmpty || !hasAudio)
+                Spacer()
+                barButton("gobackward.5", label: "Back 5 seconds") { model.studioSeek(to: max(0, pos - 5)) }
+                Spacer()
+                Button { model.studioTogglePlay() } label: {
+                    Image(systemName: playing ? "pause.fill" : "play.fill")
+                        .font(.system(size: 26, weight: .bold))
+                        .frame(width: 62, height: 62)
+                        .background(Theme.accent, in: Circle())
+                        .foregroundStyle(.black)
+                }
+                .accessibilityLabel(playing ? "Pause" : (hasAudio ? "Play" : "Start song clock"))
+                .disabled(song.sections.isEmpty && !hasAudio)
+                Spacer()
+                barButton("goforward.5", label: "Forward 5 seconds") { model.studioSeek(to: min(duration, pos + 5)) }
+                Spacer()
+                Menu {
+                    ForEach([Float(0.5), 0.75, 0.9, 1], id: \.self) { r in
+                        Button { model.setStudioRate(r) } label: {
+                            if model.studioRate == r { Label("\(Int(r * 100))%", systemImage: "checkmark") } else { Text("\(Int(r * 100))%") }
+                        }
+                    }
+                } label: {
+                    Text(model.studioRate == 1 ? "1×" : "\(Int(model.studioRate * 100))%")
+                        .font(.subheadline.weight(.bold).monospacedDigit())
+                        .frame(width: 48, height: 48)
+                        .foregroundStyle(model.studioRate == 1 ? Color.primary : Theme.accent)
+                }
+                .accessibilityLabel("Speed \(Int(model.studioRate * 100)) percent")
+                .disabled(!hasAudio)
+            }
+        }
+        .padding(.horizontal, 20).padding(.top, 6).padding(.bottom, 8)
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .top) { Divider() }
+    }
+
+    private func barButton(_ symbol: String, label: String, active: Bool = false, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol).font(.title3.weight(.semibold))
+                .frame(width: 48, height: 48)
+                .foregroundStyle(active ? Theme.accent : .primary)
+        }
+        .accessibilityLabel(label)
+    }
+}
+
 // MARK: Timeline
 
 struct StudioTimeline: View {
@@ -241,7 +361,7 @@ private struct StudioTimelineContent: View {
         VStack(alignment: .leading, spacing: 10) {
             WaveformTimeline(song: song, duration: duration, position: pos, peaks: model.waveforms[song.id] ?? [],
                              loopSection: model.loopSectionId) { model.studioSeek(to: $0) }
-                .frame(height: 76)
+                .frame(height: 64)
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
@@ -268,27 +388,6 @@ private struct StudioTimelineContent: View {
                 .onChange(of: current?.id) { _, id in
                     if let id { withAnimation { proxy.scrollTo(id, anchor: .center) } }
                 }
-            }
-            HStack(spacing: 10) {
-                Button { model.studioToggleLoop() } label: {
-                    Label(model.loopSectionId == nil ? "Loop section" : "Looping", systemImage: "repeat")
-                        .font(.subheadline)
-                }
-                .buttonStyle(.bordered)
-                .tint(model.loopSectionId == nil ? .gray : Theme.accent)
-                .disabled(song.sections.isEmpty || model.audioURL(for: song) == nil)
-                Menu {
-                    ForEach([Float(0.5), 0.75, 0.9, 1], id: \.self) { r in
-                        Button { model.setStudioRate(r) } label: {
-                            if model.studioRate == r { Label("\(Int(r * 100))%", systemImage: "checkmark") } else { Text("\(Int(r * 100))%") }
-                        }
-                    }
-                } label: {
-                    Label("Speed \(Int(model.studioRate * 100))%", systemImage: "tortoise").font(.subheadline)
-                }
-                .buttonStyle(.bordered)
-                .disabled(model.audioURL(for: song) == nil)
-                Spacer()
             }
         }
         .padding(14)
@@ -365,42 +464,57 @@ struct SeparationCard: View {
     var body: some View {
         let separated = !model.stemKinds(for: song).isEmpty
         if let p = model.separationProgress[song.id] {
-            Card(title: "Separating the song") {
-                ProgressView(value: p) {
-                    Text("Vocals, drums, bass and music — on this iPhone").font(.subheadline)
-                }
-                HStack {
-                    Text("\(Int(p * 100))%").monospacedDigit()
-                    if let left = model.separationTimeLeft(song.id) {
-                        Text("· about \(max(1, Int((left / 60).rounded(.up)))) min left")
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 10) {
+                    ProgressView().controlSize(.small)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Separating vocals, drums, bass & music").font(.subheadline.weight(.semibold))
+                        Text(timeText(p)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Button("Cancel") { model.cancelSeparation(song.id) }
+                    Button("Cancel") { model.cancelSeparation(song.id) }.font(.caption.weight(.semibold))
                 }
-                .font(.caption)
-                Text("Keep TonePilot open (the screen stays on). You can already play with the full recording.")
+                ProgressView(value: p).tint(Theme.accent)
+                Text("You can already play with the full recording. Keep TonePilot open.")
                     .font(.caption2).foregroundStyle(.secondary)
             }
+            .padding(14)
+            .background(Theme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
         } else if !separated, model.audioURL(for: song) != nil {
-            Card(title: "Separate the parts") {
-                Text("Split this song into **Vocals**, **Drums**, **Bass** and **Music** so you can switch off the singer and play along with the real band — like Moises, but on your iPhone.")
-                    .font(.footnote)
-                if let e = model.separationError[song.id] { Text(e).font(.caption).foregroundStyle(Theme.bad) }
-                if model.canSeparate {
-                    Button {
-                        model.separateStems(song.id)
-                    } label: {
-                        Label(model.separationError[song.id] == nil ? "Separate parts" : "Try again", systemImage: "scissors")
+            HStack(alignment: .center, spacing: 12) {
+                Image(systemName: "scissors").font(.title3.weight(.semibold))
+                    .frame(width: 44, height: 44)
+                    .background(Theme.accent.opacity(0.2), in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(Theme.accent)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Separate the parts").font(.subheadline.weight(.semibold))
+                    if let e = model.separationError[song.id] {
+                        Text(e).font(.caption).foregroundStyle(Theme.bad).lineLimit(3)
+                    } else if !model.canSeparate {
+                        Text("The separation model isn't included in this build.").font(.caption).foregroundStyle(Theme.warn)
+                    } else {
+                        Text(song.analysisStatus == .running ? "Starts after the analysis." : "Vocals, drums, bass and music — on this iPhone.")
+                            .font(.caption).foregroundStyle(.secondary)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(song.analysisStatus == .running)
-                    Text(song.analysisStatus == .running ? "Starts automatically after the analysis." : "Takes about 5 minutes for a 4-minute song. Keep TonePilot open.")
-                        .font(.caption2).foregroundStyle(.secondary)
-                } else {
-                    Text("The separation model isn't included in this build.").font(.caption).foregroundStyle(Theme.warn)
+                }
+                Spacer(minLength: 4)
+                if model.canSeparate {
+                    Button(model.separationError[song.id] == nil ? "Start" : "Retry") { model.separateStems(song.id) }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(song.analysisStatus == .running)
                 }
             }
+            .padding(14)
+            .background(Theme.panel, in: RoundedRectangle(cornerRadius: 16))
         }
+    }
+
+    private func timeText(_ p: Double) -> String {
+        var t = "\(Int(p * 100))%"
+        if let left = model.separationTimeLeft(song.id) {
+            t += left < 60 ? " · less than a minute left" : " · about \(Int((left / 60).rounded(.up))) min left"
+        }
+        return t
     }
 }
 
@@ -506,26 +620,111 @@ struct SongPartsCard: View {
     var body: some View {
         let tracks = model.studioTracks(for: song).filter { $0.group == .songParts }
         let acc = song.accompaniment ?? AccompanimentSettings()
-        let separated = tracks.contains { $0.id != SongStudio.original }
+        let stems = tracks.filter { $0.id != SongStudio.original }
         if !tracks.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
-                Label("Song parts", systemImage: "waveform").font(.headline)
-                Text(separated
-                     ? "The song's own parts, always in time with the music. Switch off what you want to play yourself."
-                     : "The full recording. Separate the parts (above) to switch the vocals, drums, bass and music on and off.")
-                    .font(.caption).foregroundStyle(.secondary)
-                ForEach(tracks) { track in
-                    TrackRow(track: track, songId: song.id)
-                    if SongStudio.isGated(track.id, acc) {
-                        Label("Plays only in the sections chosen under “AI plays difficult parts”.", systemImage: "wand.and.stars")
-                            .font(.caption2).foregroundStyle(Theme.accent).padding(.leading, 38)
+                HStack {
+                    Label("Song parts", systemImage: "waveform").font(.headline)
+                    Spacer()
+                    if !stems.isEmpty, stems.contains(where: \.soloed) {
+                        Button("Clear solo") { stems.filter(\.soloed).forEach { model.toggleSolo($0.id, songId: song.id) } }
+                            .font(.caption.weight(.semibold))
                     }
-                    if track.id != tracks.last?.id { Divider().overlay(Color.white.opacity(0.06)) }
+                }
+                if stems.isEmpty {
+                    Text("The full recording. Separate the parts to switch the vocals, drums, bass and music on and off.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    ForEach(tracks) { TrackRow(track: $0, songId: song.id) }
+                } else {
+                    Text("Tap a part to mute it and play it yourself. Long-press to hear it alone.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                        ForEach(stems) { StemTile(track: $0, songId: song.id, gated: SongStudio.isGated($0.id, acc)) }
+                    }
+                    if let full = tracks.first(where: { $0.id == SongStudio.original }) {
+                        DisclosureGroup("Full recording") { TrackRow(track: full, songId: song.id).padding(.top, 6) }
+                            .font(.subheadline).tint(.secondary)
+                    }
                 }
             }
             .padding(14)
-            .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
+            .background(Theme.panel, in: RoundedRectangle(cornerRadius: 16))
         }
+    }
+}
+
+/// One separated part as a big, colourful tile: tap = on/off, long-press = solo, slider = volume.
+struct StemTile: View {
+    @EnvironmentObject var model: AppModel
+    let track: StudioTrack
+    let songId: UUID
+    let gated: Bool
+    @State private var level: Double = 0
+    @State private var dragging = false
+
+    private var color: Color {
+        switch track.id {
+        case SongStudio.stem(.vocals): return .pink
+        case SongStudio.stem(.drums): return .orange
+        case SongStudio.stem(.bass): return .purple
+        default: return .teal
+        }
+    }
+
+    var body: some View {
+        let on = track.enabled
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                Image(systemName: track.symbol)
+                    .font(.title2.weight(.semibold))
+                    .frame(width: 44, height: 44)
+                    .background((on ? color : Color.gray).opacity(on ? 0.28 : 0.15), in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(on ? color : .secondary)
+                Spacer()
+                if track.soloed {
+                    Text("SOLO").font(.caption2.bold()).padding(.horizontal, 6).padding(.vertical, 3)
+                        .background(Theme.accent, in: Capsule()).foregroundStyle(.black)
+                } else if gated {
+                    Image(systemName: "wand.and.stars").font(.caption).foregroundStyle(Theme.accent)
+                        .accessibilityLabel("Plays only in chosen sections")
+                }
+            }
+            VStack(alignment: .leading, spacing: 1) {
+                Text(track.name).font(.headline).lineLimit(1)
+                Text(on ? (gated ? "Fills in chosen parts" : "Playing") : "Muted — you play")
+                    .font(.caption).foregroundStyle(on ? Color.secondary : Theme.accent).lineLimit(1)
+            }
+            Slider(value: $level, in: 0...1) { editing in
+                dragging = editing
+                if !editing { model.setTrackLevel(track.id, level, songId: songId) }
+            }
+            .tint(color)
+            .disabled(!on)
+            .opacity(on ? 1 : 0.35)
+            .accessibilityLabel("\(track.name) volume")
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.panelRaised.opacity(on ? 1 : 0.5), in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(track.soloed ? Theme.accent : (on ? color.opacity(0.5) : .clear), lineWidth: 1.5))
+        .contentShape(RoundedRectangle(cornerRadius: 14))
+        .onTapGesture {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            model.setTrack(track.id, on: !on, songId: songId)
+        }
+        .onLongPressGesture(minimumDuration: 0.4) {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            model.toggleSolo(track.id, songId: songId)
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("\(track.name), \(on ? "on" : "muted")")
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction(named: on ? "Mute" : "Unmute") { model.setTrack(track.id, on: !on, songId: songId) }
+        .accessibilityAction(named: track.soloed ? "Stop solo" : "Solo") { model.toggleSolo(track.id, songId: songId) }
+        .onAppear { level = track.volume }
+        .onChange(of: track.volume) { _, v in if !dragging { level = v } }
+        .onChange(of: level) { _, v in if dragging { model.previewTrackLevel(track.id, v, songId: songId) } }
+        .animation(.easeOut(duration: 0.15), value: on)
     }
 }
 
@@ -884,6 +1083,6 @@ struct FreePlayView: View {
             }
             Section("Try a tone") { AuditionStrip() }
         }
-        .navigationTitle("Studio")
+        .navigationTitle("Play")
     }
 }

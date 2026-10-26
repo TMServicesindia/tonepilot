@@ -39,8 +39,6 @@ enum StemSeparator {
 
     static var isAvailable: Bool { modelURL != nil }
 
-    /// Parallel workers: one per performance core plus some efficiency cores, leaving one free
-    /// for audio and the UI.
     /// Parallel workers. iOS closes apps that go over their memory limit (≈3 GB on an iPhone 15),
     /// so this is based on the memory actually available, not the number of cores. Measured on
     /// Apple Silicon with TonePilot's optimised engine: ~0.8 GB per worker at its peak (2 workers
@@ -62,6 +60,10 @@ enum StemSeparator {
         #endif
     }
     nonisolated(unsafe) static var workersOverride: Int?
+    /// How the last separation ran (diagnostics and tests).
+    nonisolated(unsafe) static var lastRun: String?
+    /// Tests: every block's raw output (sources × 2 channels × frames) before it's merged.
+    nonisolated(unsafe) static var rawBlock: ((Int, [Float]) -> Void)?
     /// Tests: called after each block is written.
     nonisolated(unsafe) static var blockDone: ((Int) -> Void)?
 
@@ -75,6 +77,14 @@ enum StemSeparator {
         defer { tp_demucs_free(model) }
         let sources = Int(tp_demucs_source_count(model))
         guard sources == order.count else { throw Failure.modelLoad }
+        // The neural network runs on the GPU / Neural Engine when the Core ML model is in the app
+        // (several times faster, same output); otherwise everything runs on the CPU.
+        let network = CoreMLNetwork()
+        network?.install()
+        defer {
+            network?.uninstall()
+            if let network { lastRun = "Core ML: \(network.segments) segments in \(String(format: "%.1f", network.seconds)) s" }
+        }
 
         try FileManager.default.createDirectory(at: outputDir, withIntermediateDirectories: true)
         let files = try order.map { kind -> (StemInfo.Kind, URL, AVAudioFile) in
@@ -124,6 +134,7 @@ enum StemSeparator {
             for (j, c) in batch.enumerated() { try autoreleasepool {
                 let (out, code) = results.take(j)
                 guard code == 0 else { throw Failure.separation(code) }
+                rawBlock?(c.index, out)
                 let tracks = (0..<(sources * 2)).map { t in Array(out[(t * c.length)..<((t + 1) * c.length)]) }
                 let done = merger.add(c.index, tracks)
                 for s in 0..<sources { try write(files[s].2, left: done[s * 2], right: done[s * 2 + 1]) }

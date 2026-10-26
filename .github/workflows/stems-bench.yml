@@ -75,7 +75,7 @@ jobs:
           swiftc -O -wmo -parse-as-library -module-name TonePilotCore -emit-module -emit-module-path TonePilotCore.swiftmodule -emit-library -static \
             $(find ../../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') -o libTonePilotCore.a 2>&1 | tee core.log
           swiftc -O -I . -L . -lTonePilotCore -import-objc-header ../CDemucs/tp_demucs.h \
-            ../tools/main.swift ../../App/Sources/Audio/StemSeparator.swift obj/*.o -lc++ -framework Accelerate -o separate 2>&1 | tee cli.log
+            ../tools/main.swift ../../App/Sources/Audio/StemSeparator.swift ../../App/Sources/Audio/CoreMLNetwork.swift obj/*.o -lc++ -framework Accelerate -framework CoreML -o separate 2>&1 | tee cli.log
           ./separate ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin /tmp/septest 2>&1 | grep -v "^Loading tensor\|MB$\|^\[" | tee e2e.log | tail -12
           grep -E "^RESULT|^part|::error" e2e.log | while IFS= read -r l; do echo "::notice title=App separator::$l"; done
           # Peak memory for a 4-minute song with 1, 2 and 4 workers (iOS closes apps that use too much).

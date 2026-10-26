@@ -169,6 +169,42 @@ struct AuditionStrip: View {
     }
 }
 
+/// A song's cover: a gradient made from its title, with its initials (songs have no artwork).
+struct SongArtwork: View {
+    let title: String
+    var size: CGFloat = 48
+
+    var body: some View {
+        let hue = Double(title.unicodeScalars.reduce(0) { ($0 &* 31 &+ Int($1.value)) & 0xFFFF } % 360) / 360
+        let initials = title.split(separator: " ").prefix(2).compactMap { $0.first.map(String.init) }.joined().uppercased()
+        RoundedRectangle(cornerRadius: size * 0.22)
+            .fill(LinearGradient(colors: [Color(hue: hue, saturation: 0.65, brightness: 0.85),
+                                          Color(hue: (hue + 0.12).truncatingRemainder(dividingBy: 1), saturation: 0.75, brightness: 0.45)],
+                                 startPoint: .topLeading, endPoint: .bottomTrailing))
+            .frame(width: size, height: size)
+            .overlay(Text(initials.isEmpty ? "♪" : initials).font(.system(size: size * 0.36, weight: .bold, design: .rounded)).foregroundStyle(.white))
+            .accessibilityHidden(true)
+    }
+}
+
+/// A small coloured status capsule ("Ready", "Analysing 40%").
+struct StatusPill: View {
+    let text: String
+    let color: Color
+    var symbol: String? = nil
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if let symbol { Image(systemName: symbol) }
+            Text(text)
+        }
+        .font(.caption2.weight(.semibold))
+        .padding(.horizontal, 7).padding(.vertical, 3)
+        .background(color.opacity(0.18), in: Capsule())
+        .foregroundStyle(color)
+    }
+}
+
 extension Double {
     var mmss: String {
         guard isFinite else { return "--:--" }

@@ -46,6 +46,17 @@ jobs:
           Native/fetch-demucs.sh --weights
           curl -fsSL -o App/Resources/Models/DEMUCS-LICENSE.txt https://raw.githubusercontent.com/facebookresearch/demucs/main/LICENSE || true
 
+      - name: Separation model for the GPU / Neural Engine (Core ML, checked by coreml-convert.yml)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release download coreml-models -p HTDemucs.mlmodelc.zip -D /tmp/coreml --clobber; then
+            ditto -x -k /tmp/coreml/HTDemucs.mlmodelc.zip App/Resources/Models/
+            echo "::notice title=Core ML::bundled HTDemucs.mlmodelc ($(du -sh App/Resources/Models/HTDemucs.mlmodelc | cut -f1)) — fast separation"
+          else
+            echo "::warning title=Core ML::model not published yet — this build separates on the CPU only"
+          fi
+
       - name: Generate Xcode project
         run: |
           brew install xcodegen

@@ -26,12 +26,12 @@ struct RootView: View {
 
     var body: some View {
         TabView(selection: $model.selectedTab) {
+            // Three places: your songs, the song you're playing, and settings. (Analysis details are
+            // in each song's Studio menu, so there's no separate Analyse tab.)
             NavigationStack { LibraryView() }
-                .tabItem { Label("Library", systemImage: "music.note.list") }.tag(AppTab.library)
-            NavigationStack { AnalyseHomeView() }
-                .tabItem { Label("Analyse", systemImage: "waveform.badge.magnifyingglass") }.tag(AppTab.analyse)
+                .tabItem { Label("Songs", systemImage: "music.note.list") }.tag(AppTab.library)
             StudioTab()
-                .tabItem { Label("Studio", systemImage: "pianokeys") }.tag(AppTab.studio)
+                .tabItem { Label("Play", systemImage: "pianokeys") }.tag(AppTab.studio)
             NavigationStack { SettingsView() }
                 .tabItem { Label("Settings", systemImage: "gearshape") }.tag(AppTab.settings)
         }
