@@ -34,6 +34,7 @@ jobs:
           set -o pipefail
           swift test -c release 2>&1 | tee ../../swifttest.log | grep -E "error:|failed|Executed .* tests" || true
           ! grep -qE "error:|with [1-9][0-9]* failures?" ../../swifttest.log
+          grep "^SPEED" ../../swifttest.log | while IFS= read -r l; do echo "::notice title=Speed budget::$l"; done
 
       - name: Bundle GeneralUser GS sounds (GeneralUser GS License v2.0)
         run: |
@@ -87,6 +88,50 @@ jobs:
           fi
 
       # Logs need a login to download; annotations are public, so surface errors there.
+      # Speed & crash gate: the app is driven through every screen on an iPhone simulator. A crash,
+      # a freeze or a blown budget stops the build here, before anything is published.
+      - name: Speed & crash tests (iPhone simulator)
+        run: |
+          DEV=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)['devices']
+          phones = [x for k, v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPhone')]
+          pick = [x for x in phones if x['name'] in ('iPhone 16', 'iPhone 15')] or phones
+          print(pick[0]['udid'])")
+          echo "Simulator: $DEV"
+          code=0
+          xcodebuild test -project TonePilot.xcodeproj -scheme TonePilot -destination "id=$DEV" -derivedDataPath build-sim \
+            -resultBundlePath UITests.xcresult > uitest.log 2>&1 || code=$?
+          grep -E "Test Case .*(passed|failed)|error:|crashed|measured \[" uitest.log | sed -E 's/^.*Test Case .-\[TonePilotUITests\.//' | head -60
+          grep -E "measured \[" uitest.log | sed -E "s/.*measured \[([^]]+)\] average: ([0-9.]+).*/\1: \2/" | sort -u | while IFS= read -r l; do echo "::notice title=App speed::$l"; done
+          grep -E "error:|crashed" uitest.log | sort -u | head -15 | while IFS= read -r l; do echo "::error title=Speed & crash tests::$l"; done
+          # Budgets on the simulator: launch under 4 s, peak memory under 1.5 GB.
+          budgets=0
+          python3 - <<'PY' || budgets=$?
+          import re, sys
+          log = open("uitest.log").read()
+          def avg(name):
+              m = re.findall(r"measured \[" + re.escape(name) + r"\] average: ([0-9.]+)", log)
+              return max(map(float, m)) if m else None
+          bad = []
+          launch = avg("Duration (AppLaunch), s")
+          if launch is not None and launch > 4: bad.append(f"launch takes {launch:.2f} s (budget 4 s)")
+          peak = avg("Memory Peak Physical, kB")
+          if peak is not None and peak > 1.5e6: bad.append(f"peak memory {peak/1024:.0f} MB (budget 1500 MB)")
+          for b in bad: print(f"::error title=Speed budget::{b}")
+          sys.exit(1 if bad else 0)
+          PY
+          [ $code = 0 ] && [ $budgets = 0 ]
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: speed-and-crash-tests
+          path: |
+            uitest.log
+            UITests.xcresult
+          if-no-files-found: ignore
+
       - name: Report errors as annotations
         if: failure()
         run: |

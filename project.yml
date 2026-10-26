@@ -68,3 +68,29 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+
+  # Speed & crash tests on an iPhone simulator (App/UITests), run by the iPhone build workflow.
+  TonePilotUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: App/UITests
+    dependencies:
+      - target: TonePilot
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yourname.tonepilot.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: TonePilot
+
+schemes:
+  TonePilot:
+    build:
+      targets:
+        TonePilot: all
+        TonePilotUITests: [test]
+    test:
+      config: Release
+      targets:
+        - TonePilotUITests
+

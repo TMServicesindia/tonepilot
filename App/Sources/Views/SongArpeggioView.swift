@@ -98,6 +98,7 @@ struct SongArpeggioCard: View {
                     .font(.headline).frame(maxWidth: .infinity, minHeight: 48)
             }
             .buttonStyle(.borderedProminent)
+            .accessibilityIdentifier("arpeggio.preview")
             Menu {
                 ForEach(SongArpeggio.suggestedSounds, id: \.self) { id in
                     if let p = model.library.patch(id: id) {

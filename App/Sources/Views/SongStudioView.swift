@@ -309,6 +309,7 @@ struct TransportBar: View {
                         .foregroundStyle(.black)
                 }
                 .accessibilityLabel(playing ? "Pause" : (hasAudio ? "Play" : "Start song clock"))
+                .accessibilityIdentifier("transport.play")
                 .disabled(song.sections.isEmpty && !hasAudio)
                 Spacer()
                 barButton("goforward.5", label: "Forward 5 seconds") { model.studioSeek(to: min(duration, pos + 5)) }
@@ -703,6 +704,9 @@ struct StemTile: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("stem.header.\(track.id)")
+            .accessibilityAddTraits(.isButton)
             .onTapGesture {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 model.setTrack(track.id, on: !on, songId: songId)
@@ -720,6 +724,7 @@ struct StemTile: View {
                 }
                 .tint(color)
                 .accessibilityLabel("\(track.name) volume")
+                .accessibilityIdentifier("stem.volume.\(track.id)")
                 Text("\(Int((level * 100).rounded()))").font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
                     .frame(width: 24, alignment: .trailing)
             }

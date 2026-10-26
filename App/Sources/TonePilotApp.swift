@@ -5,6 +5,8 @@ struct TonePilotApp: App {
     @StateObject private var model = AppModel()
     @AppStorage("hasCompletedSetup") private var hasCompletedSetup = false
 
+    init() { UITestSeed.prepareDefaults() }
+
     var body: some Scene {
         WindowGroup {
             RootView()
@@ -16,7 +18,10 @@ struct TonePilotApp: App {
                         .environmentObject(model)
                         .interactiveDismissDisabled()
                 }
-                .onAppear { model.resumeInterruptedAnalyses() }
+                .onAppear {
+                    model.resumeInterruptedAnalyses()
+                    UITestSeed.seed(model)
+                }
         }
     }
 }

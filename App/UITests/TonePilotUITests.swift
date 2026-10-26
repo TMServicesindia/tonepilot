@@ -1,0 +1,103 @@
+import XCTest
+
+/// Speed & crash tests, run on an iPhone simulator for every build (see .github/workflows/ios-build.yml).
+/// The app is launched with `-TPUITest`, which adds a generated demo song (App/Sources/Services/UITestSeed.swift).
+/// A build is not published if the app crashes, freezes, or a screen takes too long to respond.
+final class TonePilotUITests: XCTestCase {
+    var app: XCUIApplication!
+
+    override func setUp() {
+        continueAfterFailure = false
+        app = XCUIApplication()
+        app.launchArguments = ["-TPUITest"]
+    }
+
+    /// Fails if the app is no longer running (crashed or was killed for using too much memory).
+    func assertAlive(_ step: String, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertEqual(app.state, .runningForeground, "TonePilot stopped running after: \(step)", file: file, line: line)
+    }
+
+    /// Taps and requires the next screen element to appear within `limit` seconds (a freeze fails).
+    func tap(_ element: XCUIElement, thenExpect next: XCUIElement? = nil, limit: TimeInterval = 3, _ step: String) {
+        XCTAssertTrue(element.waitForExistence(timeout: limit), "Not found in \(limit) s: \(step)")
+        element.tap()
+        if let next { XCTAssertTrue(next.waitForExistence(timeout: limit), "Screen didn't respond in \(limit) s after: \(step)") }
+        assertAlive(step)
+    }
+
+    func openDemoSong() {
+        tap(app.tabBars.buttons["Songs"], "Songs tab")
+        let row = app.staticTexts["Demo Song"].firstMatch
+        tap(row, thenExpect: element("transport.play"), limit: 8, "open the demo song")
+    }
+
+    func element(_ id: String) -> XCUIElement { app.descendants(matching: .any).matching(identifier: id).firstMatch }
+
+    func page(_ name: String) {
+        let segment = app.segmentedControls.buttons[name].firstMatch
+        tap(segment.waitForExistence(timeout: 2) ? segment : app.buttons[name].firstMatch, "Song Studio page \(name)")
+    }
+
+    func testLaunchIsQuick() {
+        measure(metrics: [XCTApplicationLaunchMetric()], options: { let o = XCTMeasureOptions(); o.iterationCount = 3; return o }()) {
+            app.launch()
+        }
+    }
+
+    /// Every screen and control, many times over, while measuring memory and CPU.
+    func testStressEveryScreenWithoutCrashing() {
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15), "app didn't start")
+        openDemoSong()
+        let options = XCTMeasureOptions()
+        options.iterationCount = 3
+        measure(metrics: [XCTMemoryMetric(application: app), XCTCPUMetric(application: app), XCTClockMetric()], options: options) {
+            for round in 1...4 {
+                let play = element("transport.play")
+                tap(play, "play (round \(round))")
+                page("Mix")
+                let vocals = element("stem.header.audio.stem.vocals")
+                if vocals.waitForExistence(timeout: 3) {
+                    vocals.tap(); assertAlive("mute vocals")
+                    vocals.tap(); assertAlive("unmute vocals")
+                    vocals.press(forDuration: 0.6); assertAlive("solo vocals")
+                    vocals.press(forDuration: 0.6); assertAlive("unsolo vocals")
+                }
+                let volume = element("stem.volume.audio.stem.drums")
+                if volume.waitForExistence(timeout: 2) { volume.adjust(toNormalizedSliderPosition: round % 2 == 0 ? 0.3 : 0.9); assertAlive("drums volume") }
+                page("My keys")
+                page("Arpeggio")
+                let preview = element("arpeggio.preview")
+                if preview.waitForExistence(timeout: 3) {
+                    tap(preview, "start arpeggio preview")
+                    tap(preview, "stop arpeggio preview")
+                }
+                page("Sections")
+                app.swipeUp(); app.swipeDown()
+                assertAlive("scroll Song Studio")
+                tap(element("transport.play"), "pause (round \(round))")
+                tap(app.tabBars.buttons["Settings"], "Settings tab")
+                tap(app.tabBars.buttons["Songs"], "Songs tab")
+                tap(app.tabBars.buttons["Play"], thenExpect: element("transport.play"), "back to Play")
+            }
+        }
+    }
+
+    /// Scrolling Song Studio while the song plays must stay smooth (hitch ratio reported).
+    func testScrollingIsSmoothWhilePlaying() {
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15))
+        openDemoSong()
+        tap(element("transport.play"), "play")
+        page("Sections")
+        let options = XCTMeasureOptions()
+        options.invocationOptions = [.manuallyStop]
+        options.iterationCount = 3
+        measure(metrics: [XCTOSSignpostMetric.scrollDecelerationMetric], options: options) {
+            app.swipeUp(velocity: .fast)
+            stopMeasuring()
+            app.swipeDown(velocity: .fast)
+        }
+        assertAlive("scrolling while playing")
+    }
+}
