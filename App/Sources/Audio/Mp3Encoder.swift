@@ -43,8 +43,10 @@ enum Mp3Encoder {
         var mp3 = [UInt8](repeating: 0, count: Int(chunk) * 5 / 4 + 7_200)
         let total = max(1, Double(file.length))
         var read: Double = 0
-        while true {
-            do { try file.read(into: buffer, frameCount: chunk) } catch { throw Failure.read(error.localizedDescription) }
+        // Read exactly up to the end (asking for frames past it can throw).
+        while file.framePosition < file.length {
+            let want = AVAudioFrameCount(min(AVAudioFramePosition(chunk), file.length - file.framePosition))
+            do { try file.read(into: buffer, frameCount: want) } catch { throw Failure.read(error.localizedDescription) }
             let n = Int(buffer.frameLength)
             if n == 0 { break }
             guard let data = buffer.floatChannelData else { throw Failure.read("unsupported format") }

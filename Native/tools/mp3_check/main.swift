@@ -14,12 +14,19 @@ do {
     b.frameLength = AVAudioFrameCount(n)
     try f.write(from: b)
 }
-let duration = try Mp3Encoder.encode(wav, to: mp3)
+let duration: Double
+do { duration = try Mp3Encoder.encode(wav, to: mp3) } catch {
+    print("ERROR encoding: \((error as? LocalizedError)?.errorDescription ?? "\(error)")")
+    exit(2)
+}
 let size = (try FileManager.default.attributesOfItem(atPath: mp3.path)[.size] as? Int) ?? 0
-let back = try AVAudioFile(forReading: mp3)
+print("RESULT MP3 file: \(size) bytes")
+guard let back = try? AVAudioFile(forReading: mp3), back.length > 0,
+      let buf = AVAudioPCMBuffer(pcmFormat: back.processingFormat, frameCapacity: AVAudioFrameCount(back.length)) else {
+    print("ERROR the MP3 can't be read back"); exit(3)
+}
 let readSeconds = Double(back.length) / back.processingFormat.sampleRate
-let buf = AVAudioPCMBuffer(pcmFormat: back.processingFormat, frameCapacity: AVAudioFrameCount(back.length))!
-try back.read(into: buf)
+do { try back.read(into: buf) } catch { print("ERROR reading the MP3 back: \(error)"); exit(4) }
 let x = buf.floatChannelData![0], m = Int(buf.frameLength)
 var energy = 0.0, crossings = 0
 for i in 1..<m { energy += Double(x[i] * x[i]); if (x[i - 1] < 0) != (x[i] < 0) { crossings += 1 } }
