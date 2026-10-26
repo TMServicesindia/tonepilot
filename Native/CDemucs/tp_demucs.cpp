@@ -105,9 +105,12 @@ bool tp::run_network(demucscpp::demucs_segment_buffers &b, int nb_sources) {
             for (int c = 0; c < C; ++c) x[((size_t)c * F + f) * T + t] = b.x(c, f, t);
     for (int l = 0; l < L; ++l)
         for (int c = 0; c < 2; ++c) xt[(size_t)c * L + l] = b.xt(0, c, l);
+    const bool dumping = std::getenv("TP_DUMP_NET") && !g_dumped_ml.exchange(true);
+    if (dumping) { dump("ml_x.f32", x); dump("ml_xt.f32", xt); }
     if (network(g_network_context, x.data(), xt.data(), x_out.data(), xt_out.data(), F, T, L) != 0) return false;
-    if (std::getenv("TP_DUMP_NET") && !g_dumped_ml.exchange(true)) {
-        dump("ml_x.f32", x); dump("ml_xt.f32", xt); dump("ml_x_out.f32", x_out); dump("ml_xt_out.f32", xt_out);
+    if (dumping) {
+        dump("ml_x_out.f32", x_out); dump("ml_xt_out.f32", xt_out);
+        dump("ml_x_after.f32", x);  // must equal ml_x: the network may not change its inputs
     }
     for (int t = 0; t < T; ++t)
         for (int f = 0; f < F; ++f)

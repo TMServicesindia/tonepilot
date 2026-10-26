@@ -48,10 +48,14 @@ final class CoreMLNetwork: @unchecked Sendable {
         if failed { return 1 }
         let start = Date()
         do {
-            let xa = try MLMultiArray(dataPointer: UnsafeMutableRawPointer(mutating: x), shape: [1, 4, bins, frames].map { NSNumber(value: $0) },
-                                      dataType: .float32, strides: [4 * bins * frames, bins * frames, frames, 1].map { NSNumber(value: $0) })
-            let xta = try MLMultiArray(dataPointer: UnsafeMutableRawPointer(mutating: xt), shape: [1, 2, samples].map { NSNumber(value: $0) },
-                                       dataType: .float32, strides: [2 * samples, samples, 1].map { NSNumber(value: $0) })
+            // Core ML gets inputs it owns: wrapping our buffers directly (dataPointer) let the
+            // prediction alter them and gave wrong output (measured in CI).
+            let xa = try MLMultiArray(shape: [1, 4, bins, frames].map { NSNumber(value: $0) }, dataType: .float32)
+            let xta = try MLMultiArray(shape: [1, 2, samples].map { NSNumber(value: $0) }, dataType: .float32)
+            guard Self.fill(xa, from: x, count: 4 * bins * frames), Self.fill(xta, from: xt, count: 2 * samples) else {
+                failed = true
+                return 1
+            }
             let out = try autoreleasepool {
                 try model.prediction(from: MLDictionaryFeatureProvider(dictionary: ["x": xa, "xt": xta]))
             }
@@ -66,6 +70,16 @@ final class CoreMLNetwork: @unchecked Sendable {
         segments += 1
         seconds += Date().timeIntervalSince(start)
         return 0
+    }
+
+    /// Copies row-major floats into a (dense, float32) Core ML array.
+    static func fill(_ a: MLMultiArray, from src: UnsafePointer<Float>, count: Int) -> Bool {
+        guard a.dataType == .float32, a.count == count else { return false }
+        var dense = [Int](repeating: 1, count: a.shape.count)
+        for i in stride(from: a.shape.count - 2, through: 0, by: -1) { dense[i] = dense[i + 1] * a.shape[i + 1].intValue }
+        guard a.strides.map(\.intValue) == dense else { return false }
+        a.withUnsafeMutableBytes { raw, _ in raw.bindMemory(to: Float.self).baseAddress!.update(from: src, count: count) }
+        return true
     }
 
     /// Copies a Core ML output (float32 or float16, any strides) into a row-major float buffer.

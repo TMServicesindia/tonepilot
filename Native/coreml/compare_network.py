@@ -15,6 +15,8 @@ load = lambda n, shape: np.fromfile(f"{d}/{n}", dtype=np.float32).reshape(shape)
 x, xt = load("cpu_x.f32", (1, 4, F, T)), load("cpu_xt.f32", (1, 2, L))
 mx, mxt = load("ml_x.f32", (1, 4, F, T)), load("ml_xt.f32", (1, 2, L))
 print(f"RESULT inputs identical in both engines: x {np.abs(x - mx).max():.2e}, xt {np.abs(xt - mxt).max():.2e}")
+after = load("ml_x_after.f32", (1, 4, F, T))
+print(f"RESULT Core ML left its input unchanged: max change {np.abs(after - mx).max():.2e}")
 
 with torch.no_grad():
     rx, rxt = (t.numpy() for t in Core(m).eval()(torch.from_numpy(x), torch.from_numpy(xt)))
