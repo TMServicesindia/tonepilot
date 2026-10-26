@@ -511,3 +511,17 @@ final class PatternPlayerTests: XCTestCase {
         XCTAssertTrue(ons.allSatisfy { (40...72).contains($0) }, "stays near the learned register: \(ons)")
     }
 }
+
+extension PatternPlayerTests {
+    func testPlaysOnceForALiveFillThenStops() {
+        let (e, c, h) = engine()
+        // Fill note 0.2 s into a 0.5 s bar; 0.05 s already passed since the player's root.
+        c.setPattern([SequencerEvent(frame: 9_600, handle: h, note: 60, velocity: 100),
+                      SequencerEvent(frame: 14_400, handle: h, note: 60, velocity: 0)], loopSeconds: 0.5)
+        c.playPatternOnce(elapsed: 0.05)
+        let out = render(e, seconds: 1.2)
+        XCTAssertEqual(out.firstIndex { abs($0) > 1e-6 }!, 9_600 - 2_400, accuracy: 1, "on time, counting the time already passed")
+        XCTAssertLessThan(Measure.rms(out, 26_000..<57_000), 1e-4, "plays once, no loop")
+        XCTAssertFalse(e.isPatternPlaying)
+    }
+}

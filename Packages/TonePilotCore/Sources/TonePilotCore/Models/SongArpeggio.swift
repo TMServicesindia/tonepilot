@@ -121,6 +121,12 @@ public struct SongArpeggio: Codable, Hashable, Sendable {
     public var volume: Double?
     /// Free-play tempo as a share of the song's tempo (nil = 1).
     public var tempoScale: Double?
+    /// Basic style chosen by the user per section (section id → style id); others use the suggestion.
+    public var styleChoices: [String: String]?
+    /// Notes below this MIDI note are the chord hand for live fill-in (nil = 60, middle C).
+    public var split: Int?
+    /// Live fill-in on.
+    public var liveFill: Bool?
 
     public static let currentVersion = 1
     /// Sounds that suit broken chords, offered first.
@@ -140,6 +146,7 @@ public struct SongArpeggio: Codable, Hashable, Sendable {
     public var effectiveSoundId: UUID { soundId ?? FactoryPatches.softPianoId }
     public var effectiveVolume: Double { volume ?? 0.7 }
     public var effectiveBPM: Double { bpm * (tempoScale ?? 1) }
+    public var effectiveSplit: Int { split ?? 60 }
 }
 
 public extension ArpeggioPattern {
@@ -212,7 +219,7 @@ public enum ArpeggioRenderer {
         let barLen = 60 / max(30, bpm) * Double(pattern.beatsPerBar)
         let count = max(1, min(maxBars, Int((section.duration / barLen).rounded(.down))))
         return (0..<count).map { b in
-            let t = section.startTime + (Double(b) + 0.1) * barLen
+            let t = section.startTime + (Double(b) + 0.5) * barLen   // mid-bar: robust to chord-change timing
             guard let c = song.chordEvents.last(where: { $0.time <= t && t < $0.time + $0.duration }),
                   let symbol = ChordSymbol(c.symbol) else { return Bar(chord: nil) }
             return Bar(chord: symbol, uncertain: c.confidence < 0.45)

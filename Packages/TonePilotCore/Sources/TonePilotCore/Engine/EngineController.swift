@@ -296,6 +296,12 @@ public final class ToneEngineController: @unchecked Sendable {
         }
     }
 
+    /// Plays the installed pattern once from its start; `elapsed` seconds have already passed
+    /// since the moment it refers to (so its notes stay in time).
+    public func playPatternOnce(elapsed: Double = 0) {
+        engine.send(.patternOnce(skipFrames: Int64(max(0, elapsed) * engine.sampleRate)))
+    }
+
     /// Starts (from the top of the loop) or stops the pattern player.
     public func setPatternPlaying(_ playing: Bool) { engine.send(.patternTransport(playing: playing)) }
 

@@ -166,6 +166,9 @@ public enum EngineCommand: @unchecked Sendable {
     /// independent of the song transport.
     case setPattern(events: UnsafePointer<SequencerEvent>?, count: Int, loopFrames: Int64, generation: Int)
     case patternTransport(playing: Bool)
+    /// Plays the pattern once from its start (Song Arpeggio live fill: one bar after your notes),
+    /// beginning `skipFrames` in (time that already passed since your note).
+    case patternOnce(skipFrames: Int64)
     /// Hard-stops any voice reading from this region table (sent before an instrument is freed).
     case killRegions(UnsafePointer<Region>)
 }
@@ -330,6 +333,7 @@ public final class ToneEngine: @unchecked Sendable {
     private var patLoop: Int64 = 0
     private var patPlaying = false
     private var patSounding = false
+    private var patOneShot = false
 
     /// Read by the UI thread. Single aligned writes; a torn read is harmless for a meter.
     public private(set) var meterPeak: Float = 0
@@ -432,7 +436,9 @@ public final class ToneEngine: @unchecked Sendable {
             if transportPlaying { transportFrame += Int64(len) }
             if patPlaying, patLoop > 0 {
                 patFrame += Int64(len)
-                if patFrame >= patLoop { patFrame -= patLoop; patCursor = 0 }
+                if patFrame >= patLoop {
+                    if patOneShot { patPlaying = false; patFrame = 0; patCursor = 0 } else { patFrame -= patLoop; patCursor = 0 }
+                }
             }
             offset += len
         }
@@ -646,7 +652,14 @@ public final class ToneEngine: @unchecked Sendable {
         case let .patternTransport(playing):
             if !playing { releasePatternVoices() }
             if playing && !patPlaying { patFrame = 0; patCursor = 0 }
+            patOneShot = false
             patPlaying = playing
+        case let .patternOnce(skip):
+            releasePatternVoices()
+            patOneShot = true
+            patFrame = max(0, min(skip, max(0, patLoop - 1)))
+            patCursor = firstPatternEvent(atOrAfter: patFrame)
+            patPlaying = patLoop > 0
         case let .transport(playing, frame):
             if frame != transportFrame || playing != transportPlaying { releaseSequencerVoices() }
             transportFrame = max(0, frame)

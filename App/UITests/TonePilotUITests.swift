@@ -66,6 +66,11 @@ final class TonePilotUITests: XCTestCase {
                 tap(element("tonemode.sections"), "tone per section")
                 tap(element("tonemode.main"), "main tone")
                 page("arpeggio")
+                let live = element("arpeggio.live")
+                if live.waitForExistence(timeout: 3) {
+                    tap(live, "live fill-in on")
+                    tap(live, "live fill-in off")
+                }
                 let preview = element("arpeggio.preview")
                 if preview.waitForExistence(timeout: 3) {
                     tap(preview, "start arpeggio preview")

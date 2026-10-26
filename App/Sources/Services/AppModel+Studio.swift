@@ -24,6 +24,7 @@ extension AppModel {
         if activeSongId != songId { startPerformance(songId: songId) } else { ensurePerformance(songId: songId) }
         selectedTab = .studio
         loadWaveform(songId)
+        refreshArpeggioLive()
     }
 
     /// Leaves the song (free play with any tone).
@@ -32,6 +33,7 @@ extension AppModel {
         stopBackingTrack()
         stopTimerClock()
         activeSongId = nil
+        refreshArpeggioLive()
         activeSectionId = nil
         loopSectionId = nil
         cursor = 0

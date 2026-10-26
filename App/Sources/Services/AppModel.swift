@@ -1,4 +1,6 @@
 import AVFoundation
+import os
+import QuartzCore
 import SwiftUI
 import TonePilotCore
 
@@ -48,6 +50,14 @@ final class AppModel: ObservableObject {
     @Published var previewingToneId: UUID?
     /// Song Arpeggio preview running on the engine's own pattern clock (independent of the song).
     @Published var arpeggioPreview: ArpeggioPreview?
+    /// Song Arpeggio live fill-in: the chord TonePilot heard in your last bar.
+    @Published var arpeggioLiveChord: String?
+    /// Section whose pattern live fill-in uses while the song is paused.
+    @Published var arpeggioSectionId: UUID?
+    var arpeggioFollower: ArpeggioFollower?
+    var arpeggioFollowerSection: UUID?
+    /// Read on the MIDI thread: forward chord-hand notes to live fill-in.
+    let arpeggioLiveFlag = OSAllocatedUnfairLock(initialState: false)
     // Stem separation (on this iPhone)
     @Published var separationProgress: [UUID: Double] = [:]
     @Published var separationError: [UUID: String] = [:]
@@ -178,10 +188,17 @@ final class AppModel: ObservableObject {
     private func wireMIDI() {
         let router = self.router
         let box = outputBox
-        midi.onEvents = { events in
+        let liveFlag = arpeggioLiveFlag
+        midi.onEvents = { [weak self] events in
             // CoreMIDI thread: route and play immediately, nothing else.
             let out = box.value
             for e in events { out.perform(router.handle(e)) }
+            // Song Arpeggio live fill-in: hand note-ons (with their arrival time) to the main thread.
+            guard liveFlag.withLock({ $0 }) else { return }
+            let now = CACurrentMediaTime()
+            for case let .noteOn(_, note, velocity) in events where velocity > 0 {
+                DispatchQueue.main.async { self?.arpeggioNote(Int(note), at: now) }
+            }
         }
         midi.onSourcesChanged = { [weak self] removed in
             // A cable pulled mid-note never sends note-off: release everything.
@@ -286,6 +303,8 @@ final class AppModel: ObservableObject {
         if let sectionId { scheduler?.didSelect(sectionId) }
         if pendingSuggestion == sectionId { pendingSuggestion = nil }
         applyActiveArrangement()
+        // Song Arpeggio fills in your tone: follow tone changes.
+        if arpeggioFollower != nil { refreshArpeggioLive() }
         // The AI melody plays with the section's lead sound unless another one was chosen.
         if let song = song(activeSongId), song.accompaniment?.melodyGuide == true, song.accompaniment?.guidePatchId == nil {
             applyMix(song)
