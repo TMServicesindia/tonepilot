@@ -7,7 +7,7 @@ name: Convert Demucs to Core ML
 on:
   push:
     branches: [main]
-    paths: ["Native/coreml/**", "Native/tools/coreml_check/**", "App/Sources/Audio/CoreMLNetwork.swift", ".github/workflows/coreml-convert.yml"]
+    paths: ["Native/coreml/**", "Native/CDemucs/**", "Native/patch-demucs.py", "Native/tools/coreml_check/**", "App/Sources/Audio/CoreMLNetwork.swift", ".github/workflows/coreml-convert.yml"]
   workflow_dispatch:
 
 permissions:
@@ -57,12 +57,19 @@ jobs:
             ../tools/coreml_check/main.swift ../../App/Sources/Audio/StemSeparator.swift ../../App/Sources/Audio/CoreMLNetwork.swift \
             obj/*.o -lc++ -framework Accelerate -framework CoreML -o coreml_check > cli.log 2>&1
           set +e
-          ./coreml_check ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin ../../HTDemucs.mlmodelc /tmp/mlcheck 30 > check.log 2>&1
+          mkdir -p /tmp/netdump && TP_DUMP_NET=/tmp/netdump ./coreml_check ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin ../../HTDemucs.mlmodelc /tmp/mlcheck 30 > check.log 2>&1
           code=$?
           set -e
           grep -E "^RESULT|^ERROR" check.log | while IFS= read -r l; do echo "::notice title=App separator::$l"; done
           [ $code = 0 ] || grep -vE "Loading tensor|^\[|MB$" check.log | tail -8 | while IFS= read -r l; do echo "::error title=Check (exit $code)::$l"; done
           exit $code
+      - name: Network-level check (same inputs, each engine vs PyTorch)
+        run: |
+          code=0
+          python Native/coreml/compare_network.py /tmp/netdump HTDemucs.mlpackage > net.log 2>&1 || code=$?
+          tail -6 net.log
+          grep "^RESULT" net.log | while IFS= read -r l; do echo "::notice title=Network::$l"; done
+          [ $code = 0 ] || tail -5 net.log | while IFS= read -r l; do echo "::error title=Network check::$l"; done
       - name: Referee — both engines vs the original PyTorch Demucs
         run: |
           code=0

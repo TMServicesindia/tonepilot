@@ -30,7 +30,7 @@ if "tp::run_network" not in s:
     i = s.index(start) + len(start)
     s = s[:i] + "\n\n    // TonePilot: Core ML runs the network when available.\n    if (!tp::run_network(buffers, model.is_4sources ? 4 : 6))\n    {" + s[i:]
     j = s.index(end, i)
-    s = s[:j] + "}\n\n    " + s[j:]
+    s = s[:j] + "    tp::after_cpu_network(buffers);\n    }\n\n    " + s[j:]
     inf.write_text(s)
     print("patched model_inference.cpp")
 else:

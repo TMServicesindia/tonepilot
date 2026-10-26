@@ -6,4 +6,6 @@ namespace tp {
 /// buffers.x_out and buffers.xt_out. Returns false when no external network is set (the
 /// original CPU code then runs).
 bool run_network(demucscpp::demucs_segment_buffers &buffers, int nb_sources);
+/// Called after the CPU network ran (diagnostics: TP_DUMP_NET).
+void after_cpu_network(demucscpp::demucs_segment_buffers &buffers);
 }
