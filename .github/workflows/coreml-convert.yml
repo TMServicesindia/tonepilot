@@ -7,7 +7,7 @@ name: Convert Demucs to Core ML
 on:
   push:
     branches: [main]
-    paths: ["Native/coreml/**", "Native/tools/coreml_check.swift", "App/Sources/Audio/CoreMLNetwork.swift", ".github/workflows/coreml-convert.yml"]
+    paths: ["Native/coreml/**", "Native/tools/coreml_check/**", "App/Sources/Audio/CoreMLNetwork.swift", ".github/workflows/coreml-convert.yml"]
   workflow_dispatch:
 
 permissions:
@@ -54,7 +54,7 @@ jobs:
           swiftc -O -wmo -parse-as-library -module-name TonePilotCore -emit-module -emit-module-path TonePilotCore.swiftmodule -emit-library -static \
             $(find ../../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') -o libTonePilotCore.a > core.log 2>&1
           swiftc -O -I . -L . -lTonePilotCore -import-objc-header ../CDemucs/tp_demucs.h \
-            ../tools/coreml_check.swift ../../App/Sources/Audio/StemSeparator.swift ../../App/Sources/Audio/CoreMLNetwork.swift \
+            ../tools/coreml_check/main.swift ../../App/Sources/Audio/StemSeparator.swift ../../App/Sources/Audio/CoreMLNetwork.swift \
             obj/*.o -lc++ -framework Accelerate -framework CoreML -o coreml_check > cli.log 2>&1
           set +e
           ./coreml_check ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin ../../HTDemucs.mlmodelc /tmp/mlcheck 30 > check.log 2>&1
