@@ -32,6 +32,10 @@ public struct SwitchingSettings: Codable, Hashable, Sendable {
     public var reference: TimingReference
     /// Switch this many seconds before the boundary so the first note of the new section uses the new tone.
     public var leadTime: Double
+    /// Your keyboard plays one main tone for the whole song (true, the default) or changes tone
+    /// with each section (false). Chosen per song in the Song Studio.
+    public var useMainTone: Bool?
+    public var playsMainTone: Bool { useMainTone ?? true }
 
     public init(mode: Mode = .assisted, reference: TimingReference = .backingTrack, leadTime: Double = 0.25) {
         self.mode = mode

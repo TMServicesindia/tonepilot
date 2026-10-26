@@ -142,7 +142,7 @@ extension AppModel {
         return song.arrangements.first { !used.contains($0.id) && $0.origin != .aiOriginal }
     }
 
-    /// Plays the main tone for the whole song (section changes stop switching the tone).
+    /// Plays the main tone for the whole song (section changes stop switching the tone). Saved per song.
     func useMainTone(_ songId: UUID) {
         guard var song = song(songId) else { return }
         if mainTone(of: song) == nil {
@@ -152,25 +152,33 @@ extension AppModel {
         guard let tone = mainTone(of: song) else { return }
         var sw = song.switching ?? SwitchingSettings()
         sw.mode = .manual
-        updateSwitching(sw)
-        activate(tone, songId: songId, sectionId: nil)
+        sw.useMainTone = true
+        saveSwitching(sw, songId: songId)
+        if activeSongId == songId { activate(tone, songId: songId, sectionId: activeSectionId) }
     }
 
-    /// Back to a tone per section, switching automatically.
+    /// Changes the keyboard's tone with each section of the song. Saved per song.
     func useSectionTones(_ songId: UUID) {
         guard let song = song(songId) else { return }
         var sw = song.switching ?? SwitchingSettings()
         sw.mode = .automatic
+        sw.useMainTone = false
         if audioURL(for: song) == nil, sw.reference == .backingTrack { sw.reference = .timer }
-        updateSwitching(sw)
+        saveSwitching(sw, songId: songId)
+        guard activeSongId == songId else { return }
         let t = songPosition ?? cursor
         if let section = song.orderedSections.last(where: { $0.startTime <= t + 0.01 }) ?? song.orderedSections.first {
             activateSection(section.id)
         }
     }
 
-    func isUsingMainTone(_ song: Song) -> Bool {
-        guard let main = mainTone(of: song) else { return false }
-        return activeSongId == song.id && activeArrangement?.id == main.id
+    private func saveSwitching(_ sw: SwitchingSettings, songId: UUID) {
+        if activeSongId == songId { updateSwitching(sw); return }
+        guard var song = song(songId) else { return }
+        song.switching = sw
+        update(song)
     }
+
+    /// The song's saved choice (not whichever tone happens to be active).
+    func isUsingMainTone(_ song: Song) -> Bool { (song.switching ?? SwitchingSettings()).playsMainTone }
 }

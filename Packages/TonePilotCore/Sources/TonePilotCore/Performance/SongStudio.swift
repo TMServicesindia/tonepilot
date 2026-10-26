@@ -121,7 +121,7 @@ public enum SongStudio {
     static func stemSymbol(_ kind: StemInfo.Kind) -> String {
         switch kind {
         case .vocals: return "music.mic"
-        case .drums: return "drum"
+        case .drums: return "metronome.fill"
         case .bass: return "waveform.path"
         case .other, .piano, .guitar: return "guitars"
         }

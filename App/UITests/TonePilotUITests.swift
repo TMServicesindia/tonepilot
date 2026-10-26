@@ -33,10 +33,7 @@ final class TonePilotUITests: XCTestCase {
 
     func element(_ id: String) -> XCUIElement { app.descendants(matching: .any).matching(identifier: id).firstMatch }
 
-    func page(_ name: String) {
-        let segment = app.segmentedControls.buttons[name].firstMatch
-        tap(segment.waitForExistence(timeout: 2) ? segment : app.buttons[name].firstMatch, "Song Studio page \(name)")
-    }
+    func page(_ id: String) { tap(element("page.\(id)"), "Song Studio page \(id)") }
 
     func testLaunchIsQuick() {
         measure(metrics: [XCTApplicationLaunchMetric()], options: { let o = XCTMeasureOptions(); o.iterationCount = 3; return o }()) {
@@ -55,7 +52,7 @@ final class TonePilotUITests: XCTestCase {
             for round in 1...4 {
                 let play = element("transport.play")
                 tap(play, "play (round \(round))")
-                page("Mix")
+                page("mix")
                 let vocals = element("stem.header.audio.stem.vocals")
                 if vocals.waitForExistence(timeout: 3) {
                     vocals.tap(); assertAlive("mute vocals")
@@ -65,14 +62,16 @@ final class TonePilotUITests: XCTestCase {
                 }
                 let volume = element("stem.volume.audio.stem.drums")
                 if volume.waitForExistence(timeout: 2) { volume.adjust(toNormalizedSliderPosition: round % 2 == 0 ? 0.3 : 0.9); assertAlive("drums volume") }
-                page("My keys")
-                page("Arpeggio")
+                page("keyboard")
+                tap(element("tonemode.sections"), "tone per section")
+                tap(element("tonemode.main"), "main tone")
+                page("arpeggio")
                 let preview = element("arpeggio.preview")
                 if preview.waitForExistence(timeout: 3) {
                     tap(preview, "start arpeggio preview")
                     tap(preview, "stop arpeggio preview")
                 }
-                page("Sections")
+                page("sections")
                 app.swipeUp(); app.swipeDown()
                 assertAlive("scroll Song Studio")
                 tap(element("transport.play"), "pause (round \(round))")
@@ -89,7 +88,7 @@ final class TonePilotUITests: XCTestCase {
         XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15))
         openDemoSong()
         tap(element("transport.play"), "play")
-        page("Sections")
+        page("sections")
         let options = XCTMeasureOptions()
         options.invocationOptions = [.manuallyStop]
         options.iterationCount = 3

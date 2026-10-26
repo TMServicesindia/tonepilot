@@ -123,13 +123,17 @@ final class AppModel: ObservableObject {
             engineError = "Library could not be loaded (\(error)). A new library was started; the old file was kept."
         }
         library.mergeFactoryPatches(FactoryPatches.all)
-        installBundledSoundFonts()
-        wireMIDI()
         wireMeter()
-        observeAudioSession()
         restoreLastTone()
-        startEngine()
-        preloadDefaultSoundFont()
+        // Audio, MIDI and the sound bank start right after the first frame is on screen, so the
+        // app opens immediately (they take a few hundred ms, and the first launch copies 30 MB).
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.observeAudioSession()
+            self.startEngine()
+            self.wireMIDI()
+            self.installBundledSoundFontsThenPreload()
+        }
         maintenanceTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.maintenance() }
         }
@@ -137,11 +141,17 @@ final class AppModel: ObservableObject {
 
     // MARK: Setup
 
-    private func installBundledSoundFonts() {
-        guard let bundled = Bundle.main.urls(forResourcesWithExtension: "sf2", subdirectory: "SoundFonts") else { return }
-        for url in bundled {
-            let dest = store.soundFontDirectory.appendingPathComponent(url.lastPathComponent)
-            if !FileManager.default.fileExists(atPath: dest.path) { try? FileManager.default.copyItem(at: url, to: dest) }
+    /// Copies the bundled sound banks into the library (first launch only) off the main thread,
+    /// then preloads the default bank.
+    private func installBundledSoundFontsThenPreload() {
+        let bundled = Bundle.main.urls(forResourcesWithExtension: "sf2", subdirectory: "SoundFonts") ?? []
+        let directory = store.soundFontDirectory
+        Task.detached(priority: .userInitiated) { [weak self] in
+            for url in bundled {
+                let dest = directory.appendingPathComponent(url.lastPathComponent)
+                if !FileManager.default.fileExists(atPath: dest.path) { try? FileManager.default.copyItem(at: url, to: dest) }
+            }
+            await MainActor.run { self?.preloadDefaultSoundFont() }
         }
     }
 
@@ -311,7 +321,10 @@ final class AppModel: ObservableObject {
         scheduler = SectionScheduler(sections: song.sections, settings: song.switching ?? SwitchingSettings())
         lastPreloadedSection = nil
         configureAccompaniment(for: song)
-        if let first = song.orderedSections.first {
+        if isUsingMainTone(song), !song.sections.isEmpty {
+            // The song's saved choice: one main tone for the whole song.
+            useMainTone(songId)
+        } else if let first = song.orderedSections.first {
             activate(song.arrangement(for: first), songId: songId, sectionId: first.id)
         } else {
             activate(song.arrangements.first, songId: songId)

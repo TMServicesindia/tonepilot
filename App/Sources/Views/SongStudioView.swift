@@ -69,11 +69,8 @@ struct SongStudioView: View {
                     if !introDismissed { intro }
                     StudioTimeline(song: song)
                     if !(song.chordGuide ?? []).isEmpty { LiveGuideHost(song: song, live: model.live) }
-                    Picker("Show", selection: $page) {
-                        ForEach(StudioPage.allCases) { Label($0.title, systemImage: $0.symbol).tag($0) }
-                    }
-                    .pickerStyle(.segmented)
-                    .accessibilityLabel("Song Studio page")
+                    if !song.sections.isEmpty { ToneModeSwitch(song: song) }
+                    StudioPageBar(page: $page)
                     switch page {
                     case .mix:
                         SongPartsCard(song: song)
@@ -251,6 +248,69 @@ struct StudioAnalysisStatus: View {
             if let notice = model.analysisNotice[song.id] {
                 Label(notice, systemImage: "info.circle").font(.caption).foregroundStyle(Theme.warn)
                     .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+}
+
+// MARK: Tone mode and pages
+
+/// Your keyboard's tone for this song: one main tone, or a tone per section. Saved with the song.
+struct ToneModeSwitch: View {
+    @EnvironmentObject var model: AppModel
+    let song: Song
+
+    var body: some View {
+        let main = model.isUsingMainTone(song)
+        HStack(spacing: 10) {
+            Image(systemName: "pianokeys").font(.subheadline).foregroundStyle(.secondary)
+            Text("Your keys").font(.subheadline.weight(.semibold))
+            Spacer(minLength: 4)
+            HStack(spacing: 0) {
+                option("Main tone", selected: main, id: "tonemode.main") { model.useMainTone(song.id) }
+                option("Per section", selected: !main, id: "tonemode.sections") { model.useSectionTones(song.id) }
+            }
+            .padding(3)
+            .background(Theme.panelRaised, in: Capsule())
+        }
+        .padding(.horizontal, 14).padding(.vertical, 10)
+        .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
+    }
+
+    private func option(_ title: String, selected: Bool, id: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title).font(.subheadline.weight(.semibold))
+                .padding(.horizontal, 12).frame(minHeight: 36)
+                .background(selected ? Theme.accent : Color.clear, in: Capsule())
+                .foregroundStyle(selected ? .black : .primary)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(id)
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+}
+
+/// The Song Studio's pages as large icon + label buttons.
+struct StudioPageBar: View {
+    @Binding var page: StudioPage
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(StudioPage.allCases) { p in
+                let on = p == page
+                Button { page = p } label: {
+                    VStack(spacing: 3) {
+                        Image(systemName: p.symbol).font(.system(size: 17, weight: .semibold))
+                        Text(p.title).font(.caption2.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.8)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .background(on ? Theme.accent : Theme.panel, in: RoundedRectangle(cornerRadius: 12))
+                    .foregroundStyle(on ? .black : .primary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("page.\(p.rawValue)")
+                .accessibilityLabel(p.title)
+                .accessibilityAddTraits(on ? .isSelected : [])
             }
         }
     }
@@ -549,16 +609,6 @@ struct MyKeyboardCard: View {
             if AudioSessionSetup.isBuiltInSpeaker {
                 Label("Sound is coming from the iPhone speaker. Connect the audio cable to the Casio's AUDIO IN to hear it there.", systemImage: "speaker.wave.2")
                     .font(.caption).foregroundStyle(Theme.warn)
-            }
-            if !song.sections.isEmpty {
-                Picker("Tone", selection: Binding(get: { usingMain }, set: { main in
-                    if main { model.useMainTone(song.id) } else { model.useSectionTones(song.id) }
-                })) {
-                    Text("Main tone").tag(true)
-                    Text("Tone per section").tag(false)
-                }
-                .pickerStyle(.segmented)
-                .accessibilityLabel("Keyboard tone")
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(model.activeArrangement?.name.replacingOccurrences(of: " (My Version)", with: "") ?? "No tone selected")

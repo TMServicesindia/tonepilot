@@ -145,11 +145,14 @@ struct LibraryView: View {
             HStack(spacing: 10) {
                 Button { pickMP3 = true } label: {
                     Label("Import song", systemImage: "square.and.arrow.down")
+                        .labelStyle(.titleAndIcon)
                         .font(.headline).frame(maxWidth: .infinity, minHeight: 50)
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityIdentifier("songs.import")
                 Button { showListen = true } label: {
                     Label("Listen", systemImage: "ear")
+                        .labelStyle(.titleAndIcon)
                         .font(.headline).frame(maxWidth: .infinity, minHeight: 50)
                 }
                 .buttonStyle(.bordered)
