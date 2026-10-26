@@ -55,6 +55,16 @@ let (ml, mlTime) = try separate(coreML: true)
 print("RESULT \(StemSeparator.lastRun ?? "Core ML not used")")
 print(String(format: "RESULT %.0f s of audio: CPU engine %.1f s, Core ML %.1f s (%.1f× faster)", seconds, cpuTime, mlTime, cpuTime / mlTime))
 
+// The first block's input and both outputs, for the comparison with PyTorch Demucs.
+if let a = cpu[0], let b = ml[0] {
+    let len = a.count / 8
+    let (l, r) = try StemSeparator.decodeStereo(input)
+    func save(_ name: String, _ v: [Float]) { v.withUnsafeBufferPointer { try? Data(buffer: $0).write(to: work.appendingPathComponent(name)) } }
+    save("block0_input.f32", Array(l[0..<len]) + Array(r[0..<len]))
+    save("block0_cpu.f32", a)
+    save("block0_coreml.f32", b)
+}
+
 // Per part: how far the Core ML output is from the CPU engine's (signal-to-difference ratio).
 let names = StemSeparator.order.map(\.rawValue)
 var worst = Double.infinity
@@ -71,4 +81,5 @@ for (s, name) in names.enumerated() {
 }
 // The CPU engine uses 16-bit weights and Core ML the original 32-bit ones, so they differ a
 // little; anything above 30 dB is far below what anyone could hear next to the music.
-exit(worst >= 30 ? 0 : 4)
+// The verdict comes from the comparison with PyTorch (compare_pytorch.py).
+print(worst >= 30 ? "RESULT engines agree" : "RESULT engines differ — see the PyTorch comparison")
