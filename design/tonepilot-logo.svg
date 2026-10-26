@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2A2F6B"/>
+      <stop offset="0.55" stop-color="#171A3D"/>
+      <stop offset="1" stop-color="#0B0C1E"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.38" r="0.55">
+      <stop offset="0" stop-color="#FF9F2E" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#FF9F2E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFC15A"/>
+      <stop offset="1" stop-color="#FF7A1A"/>
+    </linearGradient>
+    <linearGradient id="key" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E4E6F2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#glow)"/>
+
+  <!-- Piano keys: four white keys with three black keys -->
+  <g transform="translate(232 548)">
+    <rect x="0"   y="0" width="128" height="250" rx="22" fill="url(#key)"/>
+    <rect x="142" y="0" width="128" height="250" rx="22" fill="url(#key)"/>
+    <rect x="284" y="0" width="128" height="250" rx="22" fill="url(#key)"/>
+    <rect x="426" y="0" width="128" height="250" rx="22" fill="url(#key)"/>
+    <rect x="96"  y="-4" width="78" height="150" rx="14" fill="#141631"/>
+    <rect x="238" y="-4" width="78" height="150" rx="14" fill="#141631"/>
+    <rect x="380" y="-4" width="78" height="150" rx="14" fill="#141631"/>
+  </g>
+
+  <!-- A sound wave flying forward like a flight path: the pilot guiding your playing -->
+  <path d="M176 392 C 236 392, 250 312, 312 312 S 392 452, 452 452 S 532 300, 596 300 S 672 392, 724 392"
+        fill="none" stroke="url(#wave)" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M176 470 C 236 470, 256 430, 312 430 S 392 490, 452 490 S 532 420, 596 420 S 660 470, 700 470"
+        fill="none" stroke="#FFB347" stroke-opacity="0.35" stroke-width="16" stroke-linecap="round"/>
+  <!-- Paper-plane / pilot arrow -->
+  <g transform="translate(724 392) rotate(-8)">
+    <path d="M0 -62 L 128 0 L 0 62 L 26 0 Z" fill="#FF7A1A" stroke="#FF7A1A" stroke-width="14" stroke-linejoin="round"/>
+    <path d="M26 0 L 128 0" stroke="#FFC15A" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -37,6 +37,7 @@ targets:
       - path: App/Resources/SoundFonts
         type: folder
         buildPhase: resources
+      - path: App/Resources/Assets.xcassets
       - path: App/Resources/Models
         type: folder
         buildPhase: resources
@@ -65,4 +66,4 @@ targets:
         HEADER_SEARCH_PATHS: ["$(SRCROOT)/Native/CDemucs"]
         OTHER_LDFLAGS: ["$(inherited)", "-lc++", "-framework", "Accelerate"]
         TARGETED_DEVICE_FAMILY: "1,2"
-        ASSETCATALOG_COMPILER_APPICON_NAME: ""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

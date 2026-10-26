@@ -1,8 +1,0 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <!-- Three piano keys with a pilot "wave" above. -->
-    <path android:fillColor="#FFFFFFFF" android:pathData="M32,46h13v32h-13z M47.5,46h13v32h-13z M63,46h13v32h-13z" />
-    <path android:fillColor="#FF0F1115" android:pathData="M41,46h8v19h-8z M57,46h8v19h-8z" />
-    <path android:strokeColor="#FFFFB347" android:strokeWidth="4" android:fillColor="#00000000" android:strokeLineCap="round"
-        android:pathData="M30,36 C38,26 46,46 54,36 C62,26 70,46 78,36" />
-</vector>
