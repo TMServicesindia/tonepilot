@@ -162,6 +162,10 @@ public enum EngineCommand: @unchecked Sendable {
     case releaseHandle(UInt32)
     case setSequence(events: UnsafePointer<SequencerEvent>?, count: Int, generation: Int)
     case transport(playing: Bool, frame: Int64)
+    /// Song Arpeggio's own looping sequence (frames relative to the loop start) and its clock,
+    /// independent of the song transport.
+    case setPattern(events: UnsafePointer<SequencerEvent>?, count: Int, loopFrames: Int64, generation: Int)
+    case patternTransport(playing: Bool)
     /// Hard-stops any voice reading from this region table (sent before an instrument is freed).
     case killRegions(UnsafePointer<Region>)
 }
@@ -222,11 +226,13 @@ public final class ToneEngine: @unchecked Sendable {
     public static let liveSlotCount = 8
     /// Accompaniment slots: bass, drums, melody guide, metronome, background chords.
     public static let accompanimentSlotRange = 8..<13
-    public static let slotCount = 13
+    public static let slotCount = 14
     public static let maxVoices = 96
 
     public enum AccompanimentSlot: Int, CaseIterable, Sendable {
         case bass = 8, drums = 9, melodyGuide = 10, metronome = 11, chords = 12
+        /// Song Arpeggio (mixed at the keyboard's level: it's part of your playing).
+        case arpeggio = 13
     }
 
     struct Voice {
@@ -238,6 +244,7 @@ public final class ToneEngine: @unchecked Sendable {
         var released = false
         var heldBySustain = false
         var fromSequencer = false
+        var fromPattern = false
         // Sample playback
         var regions: UnsafePointer<Region>?
         var samples: UnsafePointer<Int16>?
@@ -315,12 +322,24 @@ public final class ToneEngine: @unchecked Sendable {
     private var seqCursor = 0
     private var transportFrame: Int64 = 0
     private var transportPlaying = false
+    // Pattern player (Song Arpeggio): loops on its own clock.
+    private var patEvents: UnsafePointer<SequencerEvent>?
+    private var patCount = 0
+    private var patCursor = 0
+    private var patFrame: Int64 = 0
+    private var patLoop: Int64 = 0
+    private var patPlaying = false
+    private var patSounding = false
 
     /// Read by the UI thread. Single aligned writes; a torn read is harmless for a meter.
     public private(set) var meterPeak: Float = 0
     public private(set) var limiterEngaged = false
     public private(set) var activeVoiceCount = 0
     public private(set) var sequenceGenerationInUse = 0
+    public private(set) var patternGenerationInUse = 0
+    /// Position inside the pattern loop in seconds (for the UI's beat display).
+    public var patternSeconds: Double { Double(patFrame) / sampleRate }
+    public var isPatternPlaying: Bool { patPlaying }
     /// Song position of the internal transport in seconds (timer-based reference when no backing track).
     public var transportSeconds: Double { Double(transportFrame) / sampleRate }
     public var isTransportPlaying: Bool { transportPlaying }
@@ -398,8 +417,23 @@ public final class ToneEngine: @unchecked Sendable {
                     if until > 0 { len = min(len, until) }
                 }
             }
+            if patPlaying, let events = patEvents, patLoop > 0 {
+                while patCursor < patCount, events[patCursor].frame <= patFrame {
+                    let e = events[patCursor]
+                    patSounding = true
+                    if e.velocity > 0 { noteOn(e.handle, e.note, e.velocity, sequencer: false, pattern: true) } else { noteOff(e.handle, e.note) }
+                    patCursor += 1
+                }
+                let next = patCursor < patCount ? events[patCursor].frame : patLoop
+                let until = Int(next - patFrame)
+                if until > 0 { len = min(len, until) }
+            }
             renderVoices(offset: offset, count: len)
             if transportPlaying { transportFrame += Int64(len) }
+            if patPlaying, patLoop > 0 {
+                patFrame += Int64(len)
+                if patFrame >= patLoop { patFrame -= patLoop; patCursor = 0 }
+            }
             offset += len
         }
 
@@ -601,6 +635,18 @@ public final class ToneEngine: @unchecked Sendable {
             seqCursor = firstEvent(atOrAfter: transportFrame)
             sequenceGenerationInUse = generation
             releaseSequencerVoices()
+        case let .setPattern(events, count, loopFrames, generation):
+            patEvents = events
+            patCount = events == nil ? 0 : count
+            patLoop = max(0, loopFrames)
+            patternGenerationInUse = generation
+            if patLoop > 0 { patFrame %= patLoop } else { patFrame = 0 }
+            patCursor = firstPatternEvent(atOrAfter: patFrame)
+            releasePatternVoices()
+        case let .patternTransport(playing):
+            if !playing { releasePatternVoices() }
+            if playing && !patPlaying { patFrame = 0; patCursor = 0 }
+            patPlaying = playing
         case let .transport(playing, frame):
             if frame != transportFrame || playing != transportPlaying { releaseSequencerVoices() }
             transportFrame = max(0, frame)
@@ -627,6 +673,25 @@ public final class ToneEngine: @unchecked Sendable {
             if ev[mid].frame < frame { lo = mid + 1 } else { hi = mid }
         }
         return lo
+    }
+
+    private func firstPatternEvent(atOrAfter frame: Int64) -> Int {
+        guard let ev = patEvents else { return 0 }
+        var lo = 0, hi = patCount
+        while lo < hi {
+            let mid = (lo + hi) / 2
+            if ev[mid].frame < frame { lo = mid + 1 } else { hi = mid }
+        }
+        return lo
+    }
+
+    private func releasePatternVoices() {
+        guard patSounding else { return }
+        patSounding = false
+        for v in 0..<Self.maxVoices where voices[v].active && voices[v].fromPattern {
+            voices[v].released = true
+            voices[v].env.release()
+        }
     }
 
     private func releaseSequencerVoices() {
@@ -683,7 +748,7 @@ public final class ToneEngine: @unchecked Sendable {
         return w > 0 ? base[w - 1] : nil
     }
 
-    private func noteOn(_ h: UInt32, _ note: UInt8, _ velocity: UInt8, sequencer: Bool) {
+    private func noteOn(_ h: UInt32, _ note: UInt8, _ velocity: UInt8, sequencer: Bool, pattern: Bool = false) {
         guard let s = slotIndex(forHandle: h) else { return }
         let c = slots[s].config
         let hi = ensureHandle(h)
@@ -700,13 +765,13 @@ public final class ToneEngine: @unchecked Sendable {
 
         let velGain = (1 - c.velocitySensitivity) + c.velocitySensitivity * powf(Float(velocity) / 127, 1.6)
         if c.isSynth {
-            startVoice(slot: s, config: c, region: nil, note: note, velGain: velGain, sequencer: sequencer)
+            startVoice(slot: s, config: c, region: nil, note: note, velGain: velGain, sequencer: sequencer, pattern: pattern)
             return
         }
         guard let regions = c.regions else { return }
         var started = 0
         for r in 0..<c.regionCount where regions[r].matches(note: note, velocity: velocity) {
-            startVoice(slot: s, config: c, region: r, note: note, velGain: velGain, sequencer: sequencer)
+            startVoice(slot: s, config: c, region: r, note: note, velGain: velGain, sequencer: sequencer, pattern: pattern)
             started += 1
             if started == 4 { break }
         }
@@ -736,7 +801,8 @@ public final class ToneEngine: @unchecked Sendable {
         return r.sampleRate / sampleRate * exp2(cents / 1200)
     }
 
-    private func startVoice(slot s: Int, config c: EngineLayerConfig, region ri: Int?, note: UInt8, velGain: Float, sequencer: Bool) {
+    private func startVoice(slot s: Int, config c: EngineLayerConfig, region ri: Int?, note: UInt8, velGain: Float, sequencer: Bool,
+                            pattern: Bool = false) {
         let vi = allocateVoice()
         var v = Voice()
         v.active = true
@@ -746,6 +812,7 @@ public final class ToneEngine: @unchecked Sendable {
         ageCounter += 1
         v.age = ageCounter
         v.fromSequencer = sequencer
+        v.fromPattern = pattern
         v.fineTune = c.fineTuneCents
         v.bendRange = c.bendRange
         v.vibDepth = c.vibratoDepth

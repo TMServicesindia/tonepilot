@@ -8,6 +8,7 @@ extension AppModel {
     /// Opens `songId` in the Song Studio tab, ready to play.
     func openStudio(_ songId: UUID) {
         if activeSongId != songId {
+            stopArpeggioPreview()
             stopBackingTrack()
             cursor = 0
             loopSectionId = nil
@@ -27,6 +28,7 @@ extension AppModel {
 
     /// Leaves the song (free play with any tone).
     func closeStudioSong() {
+        stopArpeggioPreview()
         stopBackingTrack()
         stopTimerClock()
         activeSongId = nil

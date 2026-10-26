@@ -434,3 +434,80 @@ final class EngineTests: XCTestCase {
         XCTAssertGreaterThan(factor, 1.5)
     }
 }
+
+/// Song Arpeggio's pattern player: its own looping clock, independent of the song transport.
+final class PatternPlayerTests: XCTestCase {
+    let sr = 48_000.0
+
+    func render(_ e: ToneEngine, seconds: Double) -> [Float] {
+        let total = Int(seconds * sr), block = 256
+        var l = [Float](repeating: 0, count: total), bl = [Float](repeating: 0, count: block), br = bl
+        var f = 0
+        while f < total {
+            let n = min(block, total - f)
+            bl.withUnsafeMutableBufferPointer { lp in br.withUnsafeMutableBufferPointer { rp in e.render(frames: n, left: lp.baseAddress!, right: rp.baseAddress!) } }
+            for i in 0..<n { l[f + i] = bl[i] }
+            f += n
+        }
+        return l
+    }
+
+    func engine() -> (ToneEngine, ToneEngineController, UInt32) {
+        let e = ToneEngine(sampleRate: sr)
+        let c = ToneEngineController(engine: e)
+        var m = EngineMasterConfig(); m.gain = 1; m.reverbLevel = 0; m.chorusLevel = 0; m.delayLevel = 0
+        e.send(.setMaster(m))
+        let h = c.accompanimentHandle(.arpeggio)
+        var cfg = EngineLayerConfig(); cfg.handle = h; cfg.isSynth = true; cfg.synthWave = 0; cfg.sendReverb = 0
+        cfg.envOverride = true; cfg.attack = 0.001; cfg.decay = 0.1; cfg.sustain = 1; cfg.release = 0.005
+        e.send(.setSlot(index: ToneEngine.AccompanimentSlot.arpeggio.rawValue, config: cfg))
+        return (e, c, h)
+    }
+
+    func testPlaysAndLoopsWithTheSongStopped() {
+        let (e, c, h) = engine()
+        // One note at 0.1–0.2 s in a 0.5 s loop; the song transport never starts.
+        c.setPattern([SequencerEvent(frame: 4_800, handle: h, note: 57, velocity: 100),
+                      SequencerEvent(frame: 9_600, handle: h, note: 57, velocity: 0)], loopSeconds: 0.5)
+        c.setPatternPlaying(true)
+        let out = render(e, seconds: 1.2)
+        XCTAssertFalse(e.isTransportPlaying)
+        XCTAssertEqual(out.firstIndex { abs($0) > 1e-6 }!, 4_800, accuracy: 1, "sample-accurate start")
+        XCTAssertLessThan(Measure.rms(out, 12_000..<28_000), 1e-4, "silent between loop repeats")
+        XCTAssertGreaterThan(Measure.rms(out, 29_000..<33_000), 0.01, "second loop plays at 0.6 s")
+        XCTAssertGreaterThan(Measure.rms(out, 53_000..<57_000), 0.01, "third loop at 1.1 s")
+    }
+
+    func testSongTransportDoesNotStopIt() {
+        let (e, c, h) = engine()
+        c.setPattern([SequencerEvent(frame: 0, handle: h, note: 57, velocity: 100),
+                      SequencerEvent(frame: 23_999, handle: h, note: 57, velocity: 0)], loopSeconds: 0.5)
+        c.setPatternPlaying(true)
+        _ = render(e, seconds: 0.1)
+        c.setTransport(playing: true, seconds: 10)
+        c.setTransport(playing: false, seconds: 10)
+        let out = render(e, seconds: 0.2)
+        XCTAssertGreaterThan(Measure.rms(out, 2_000..<8_000), 0.01, "playing/pausing the song leaves the arpeggio alone")
+        c.setPatternPlaying(false)
+        let after = render(e, seconds: 0.2)
+        XCTAssertLessThan(Measure.rms(after, 4_000..<9_000), 1e-4, "stopping it releases its notes")
+    }
+
+    func testRendererPlaysPatternOnEachChord() {
+        let p = ArpeggioPattern(beatsPerBar: 4, stepsPerBeat: 4,
+                                hits: [.init(step: 0, degree: .root, velocity: 1, length: 2), .init(step: 4, degree: .third, velocity: 0.6, length: 2),
+                                       .init(step: 8, degree: .fifth, velocity: 0.8, length: 2), .init(step: 12, degree: .octave, velocity: 0.8, length: 8)],
+                                centerNote: 55)
+        let bars = [ArpeggioRenderer.Bar(chord: ChordSymbol("C")), .init(chord: ChordSymbol("Am")), .init(chord: nil), .init(chord: ChordSymbol("G"), uncertain: true)]
+        let (events, seconds) = ArpeggioRenderer.loop(p, bars: bars, bpm: 120, handle: 7, sampleRate: sr)
+        XCTAssertEqual(seconds, 8, accuracy: 1e-9)
+        let ons = events.filter { $0.velocity > 0 }.map { Int($0.note) }
+        XCTAssertEqual(ons.count, 16, "bar without a chord repeats the previous one")
+        XCTAssertEqual(ons[1] - ons[0], 4, "C: major third")
+        XCTAssertEqual(ons[5] - ons[4], 3, "Am: minor third")
+        XCTAssertEqual(Array(ons[8..<12]), Array(ons[4..<8]), "no chord: keeps Am")
+        XCTAssertEqual(ons[13] - ons[12], 7, "uncertain G: fifth instead of a third")
+        XCTAssertTrue(events.allSatisfy { $0.frame < Int64(seconds * sr) }, "every note ends inside the loop")
+        XCTAssertTrue(ons.allSatisfy { (40...72).contains($0) }, "stays near the learned register: \(ons)")
+    }
+}

@@ -23,12 +23,13 @@ struct SectionRef: Identifiable, Hashable { let id: UUID }
 
 /// The Song Studio's three pages: the song's parts, your keyboard, and the sections.
 enum StudioPage: String, CaseIterable, Identifiable {
-    case mix, keyboard, sections
+    case mix, keyboard, arpeggio, sections
     var id: String { rawValue }
     var title: String {
         switch self {
         case .mix: return "Mix"
         case .keyboard: return "My keys"
+        case .arpeggio: return "Arpeggio"
         case .sections: return "Sections"
         }
     }
@@ -36,6 +37,7 @@ enum StudioPage: String, CaseIterable, Identifiable {
         switch self {
         case .mix: return "slider.vertical.3"
         case .keyboard: return "pianokeys"
+        case .arpeggio: return "pianokeys.inverse"
         case .sections: return "list.bullet.rectangle"
         }
     }
@@ -78,6 +80,8 @@ struct SongStudioView: View {
                         AIPartsCard(song: song)
                     case .keyboard:
                         MyKeyboardCard(song: song, onChangeSound: changeSound, onEditSound: editSound, onEditTone: { editingTone = ToneEditTarget(id: $0) })
+                    case .arpeggio:
+                        SongArpeggioCard(song: song)
                     case .sections:
                         StudioSectionsCard(song: song, onChangeSound: changeSound, onEditSound: editSound,
                                            onGuide: { guideFor = $0 }, onEditTiming: { editingSection = $0 })
@@ -636,7 +640,7 @@ struct SongPartsCard: View {
                         .font(.caption).foregroundStyle(.secondary)
                     ForEach(tracks) { TrackRow(track: $0, songId: song.id) }
                 } else {
-                    Text("Tap a part to mute it and play it yourself. Long-press to hear it alone.")
+                    Text("Tap a part's name to mute it and play it yourself; long-press to hear it alone. Slide to set its volume.")
                         .font(.caption).foregroundStyle(.secondary)
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
                         ForEach(stems) { StemTile(track: $0, songId: song.id, gated: SongStudio.isGated($0.id, acc)) }
@@ -674,48 +678,57 @@ struct StemTile: View {
     var body: some View {
         let on = track.enabled
         VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .top) {
-                Image(systemName: track.symbol)
-                    .font(.title2.weight(.semibold))
-                    .frame(width: 44, height: 44)
-                    .background((on ? color : Color.gray).opacity(on ? 0.28 : 0.15), in: RoundedRectangle(cornerRadius: 12))
-                    .foregroundStyle(on ? color : .secondary)
-                Spacer()
-                if track.soloed {
-                    Text("SOLO").font(.caption2.bold()).padding(.horizontal, 6).padding(.vertical, 3)
-                        .background(Theme.accent, in: Capsule()).foregroundStyle(.black)
-                } else if gated {
-                    Image(systemName: "wand.and.stars").font(.caption).foregroundStyle(Theme.accent)
-                        .accessibilityLabel("Plays only in chosen sections")
+            // Tap / long-press only on the top of the tile, so the volume slider below gets the drag.
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .top) {
+                    Image(systemName: track.symbol)
+                        .font(.title2.weight(.semibold))
+                        .frame(width: 44, height: 44)
+                        .background((on ? color : Color.gray).opacity(on ? 0.28 : 0.15), in: RoundedRectangle(cornerRadius: 12))
+                        .foregroundStyle(on ? color : .secondary)
+                    Spacer()
+                    if track.soloed {
+                        Text("SOLO").font(.caption2.bold()).padding(.horizontal, 6).padding(.vertical, 3)
+                            .background(Theme.accent, in: Capsule()).foregroundStyle(.black)
+                    } else if gated {
+                        Image(systemName: "wand.and.stars").font(.caption).foregroundStyle(Theme.accent)
+                            .accessibilityLabel("Plays only in chosen sections")
+                    }
+                }
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(track.name).font(.headline).lineLimit(1)
+                    Text(on ? (gated ? "Fills in chosen parts" : "Playing") : "Muted — you play")
+                        .font(.caption).foregroundStyle(on ? Color.secondary : Theme.accent).lineLimit(1)
                 }
             }
-            VStack(alignment: .leading, spacing: 1) {
-                Text(track.name).font(.headline).lineLimit(1)
-                Text(on ? (gated ? "Fills in chosen parts" : "Playing") : "Muted — you play")
-                    .font(.caption).foregroundStyle(on ? Color.secondary : Theme.accent).lineLimit(1)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                model.setTrack(track.id, on: !on, songId: songId)
             }
-            Slider(value: $level, in: 0...1) { editing in
-                dragging = editing
-                if !editing { model.setTrackLevel(track.id, level, songId: songId) }
+            .onLongPressGesture(minimumDuration: 0.4) {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                model.toggleSolo(track.id, songId: songId)
             }
-            .tint(color)
-            .disabled(!on)
-            .opacity(on ? 1 : 0.35)
-            .accessibilityLabel("\(track.name) volume")
+            HStack(spacing: 6) {
+                Image(systemName: level < 0.01 ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                    .font(.caption2).foregroundStyle(.secondary).frame(width: 16)
+                Slider(value: $level, in: 0...1) { editing in
+                    dragging = editing
+                    if !editing { model.setTrackLevel(track.id, level, songId: songId) }
+                }
+                .tint(color)
+                .accessibilityLabel("\(track.name) volume")
+                Text("\(Int((level * 100).rounded()))").font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                    .frame(width: 24, alignment: .trailing)
+            }
+            .opacity(on ? 1 : 0.5)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Theme.panelRaised.opacity(on ? 1 : 0.5), in: RoundedRectangle(cornerRadius: 14))
         .overlay(RoundedRectangle(cornerRadius: 14).stroke(track.soloed ? Theme.accent : (on ? color.opacity(0.5) : .clear), lineWidth: 1.5))
-        .contentShape(RoundedRectangle(cornerRadius: 14))
-        .onTapGesture {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            model.setTrack(track.id, on: !on, songId: songId)
-        }
-        .onLongPressGesture(minimumDuration: 0.4) {
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            model.toggleSolo(track.id, songId: songId)
-        }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("\(track.name), \(on ? "on" : "muted")")
         .accessibilityAddTraits(.isButton)

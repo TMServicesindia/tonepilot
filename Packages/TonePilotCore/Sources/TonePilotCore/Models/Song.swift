@@ -147,6 +147,8 @@ public struct Song: Codable, Hashable, Identifiable, Sendable {
     public var insights: SongInsights?
     /// Artist / album read from the file's tags (display only).
     public var album: String?
+    /// Song Arpeggio: broken-chord patterns learned per section.
+    public var arpeggio: SongArpeggio?
 
     public init(id: UUID = UUID(), title: String, artist: String? = nil, film: String? = nil,
                 composer: String? = nil, language: String? = nil, tags: [String] = [],

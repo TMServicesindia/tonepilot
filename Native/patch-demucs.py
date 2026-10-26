@@ -20,6 +20,14 @@ if "conv_tr_fast.inc" not in s:
 else:
     print("conv.hpp already patched")
 
+apply_cpp = src / "model_apply.cpp"
+a = apply_cpp.read_text()
+if "int offset = rand() % max_shift;" in a:
+    # Deterministic: no random time shift (same as PyTorch apply_model with shifts=0). With one
+    # shift the random offset isn't averaged away, it only makes every run come out different.
+    a = a.replace("int offset = rand() % max_shift;", "int offset = max_shift; // TonePilot: no random shift")
+    apply_cpp.write_text(a)
+    print("patched model_apply.cpp")
 inf = src / "model_inference.cpp"
 s = inf.read_text()
 if "tp::run_network" not in s:

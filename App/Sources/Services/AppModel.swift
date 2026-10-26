@@ -46,6 +46,8 @@ final class AppModel: ObservableObject {
     @Published var waveforms: [UUID: [Float]] = [:]
     /// A tone being auditioned from the tone picker (not yet assigned to a section).
     @Published var previewingToneId: UUID?
+    /// Song Arpeggio preview running on the engine's own pattern clock (independent of the song).
+    @Published var arpeggioPreview: ArpeggioPreview?
     // Stem separation (on this iPhone)
     @Published var separationProgress: [UUID: Double] = [:]
     @Published var separationError: [UUID: String] = [:]

@@ -27,14 +27,17 @@ public struct SongAnalysisResult: Sendable {
     public var chordGuide: [ChordGuideStep]
     public var timeSignature: Estimate<Int>?
     public var insights: SongInsights?
+    /// Song Arpeggio patterns learned from the separated Music part (nil without stems).
+    public var arpeggio: SongArpeggio?
     /// Human-readable list of what this analysis did NOT do, shown in the UI.
     public var limitations: [String]
 
     public init(duration: Double, bpm: Estimate<Double>?, beats: [Double], key: Estimate<MusicalKey>?, chords: [ChordEvent],
                 sections: [SongSection], timbres: [UUID: SectionTimbre], suggestions: [ToneSuggestion],
                 melody: MelodyTrack? = nil, chordGuide: [ChordGuideStep] = [], timeSignature: Estimate<Int>? = nil,
-                insights: SongInsights? = nil, limitations: [String]) {
+                insights: SongInsights? = nil, arpeggio: SongArpeggio? = nil, limitations: [String]) {
         self.insights = insights
+        self.arpeggio = arpeggio
         self.duration = duration
         self.bpm = bpm
         self.beats = beats
@@ -185,6 +188,11 @@ public enum SongAnalyzer {
 
         var limitations = baseLimitations
         if options.stems.isEmpty { limitations.append(noStemsLimitation) }
+        // Song Arpeggio: each section's broken-chord pattern, from the Music part only.
+        let arpeggio = options.stems[.other].flatMap { music in
+            tempo == nil ? nil : ArpeggioLearner.learn(.init(music: music, beats: beats, beatsPerBar: meter?.value ?? 4,
+                                                             chords: chords, sections: sections))
+        }
         return SongAnalysisResult(
             duration: audio.duration,
             bpm: tempo.map { Estimate(($0.bpm * 10).rounded() / 10, confidence: $0.confidence, provenance: .algorithm) },
@@ -198,6 +206,7 @@ public enum SongAnalyzer {
             chordGuide: guide,
             timeSignature: meter,
             insights: insights,
+            arpeggio: arpeggio,
             limitations: limitations
         )
     }
@@ -330,6 +339,27 @@ public enum SongAnalyzer {
     }
 }
 
+extension Song {
+    /// New patterns keyed by this song's sections (which may be the user's own, matched to the
+    /// analysed ones by start time); patterns the user corrected are kept.
+    static func mergedArpeggio(old: SongArpeggio?, new: SongArpeggio?, sections: [SongSection], analysed: [SongSection]) -> SongArpeggio? {
+        guard var merged = new ?? old else { return nil }
+        if let new {
+            merged.patterns = [:]
+            for s in sections {
+                if let match = analysed.min(by: { abs($0.startTime - s.startTime) < abs($1.startTime - s.startTime) }),
+                   abs(match.startTime - s.startTime) < 1, let p = new.pattern(for: match.id) {
+                    merged.patterns[s.id.uuidString] = p
+                }
+            }
+        }
+        for (k, p) in old?.patterns ?? [:] where p.userEdited && sections.contains(where: { $0.id.uuidString == k }) {
+            merged.patterns[k] = p
+        }
+        return merged.patterns.isEmpty ? nil : merged
+    }
+}
+
 public extension Song {
     /// Stores an analysis result without overwriting anything the user entered or corrected.
     mutating func apply(_ result: SongAnalysisResult) {
@@ -351,6 +381,7 @@ public extension Song {
         }
         if !(melody?.notes.contains { $0.userEdited } ?? false) { melody = result.melody }
         if !(chordGuide?.contains { $0.userEdited } ?? false) { chordGuide = result.chordGuide }
+        arpeggio = Self.mergedArpeggio(old: arpeggio, new: result.arpeggio, sections: sections, analysed: result.sections)
         let sectionIds = Set(sections.map(\.id))
         toneSuggestions = result.suggestions.filter { $0.sectionId.map(sectionIds.contains) ?? true }
         analysisStatus = .completed

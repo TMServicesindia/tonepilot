@@ -223,6 +223,8 @@ public final class ToneEngineController: @unchecked Sendable {
             c.isAccompaniment = true
             c.mono = false
             if slot == .melodyGuide { c.bendRange = Float(AccompanimentGenerator.guideBendRange) }
+            // The arpeggio plays with the song paused too, so it isn't silenced with the transport.
+            if slot == .arpeggio { c.isAccompaniment = false }
             engine.send(.setSlot(index: slot.rawValue, config: c))
             return nil
         } catch {
@@ -272,12 +274,40 @@ public final class ToneEngineController: @unchecked Sendable {
         }
     }
 
+    // MARK: Pattern player (Song Arpeggio)
+
+    private var patternBuffers: [(Int, UnsafeMutableBufferPointer<SequencerEvent>)] = []
+    private var patternGeneration = 0
+
+    /// Installs a looping pattern (`events` frames relative to the loop start, < `loopSeconds`).
+    /// The current loop position is kept, so a new chord or pattern takes over without a restart.
+    public func setPattern(_ events: [SequencerEvent], loopSeconds: Double) {
+        patternGeneration += 1
+        let sorted = events.sorted { ($0.frame, $0.velocity == 0 ? 0 : 1) < ($1.frame, $1.velocity == 0 ? 0 : 1) }
+        let buf = UnsafeMutableBufferPointer<SequencerEvent>.allocate(capacity: max(1, sorted.count))
+        _ = buf.initialize(from: sorted)
+        patternBuffers.append((patternGeneration, buf))
+        engine.send(.setPattern(events: UnsafePointer(buf.baseAddress), count: sorted.count,
+                                loopFrames: Int64(max(0, loopSeconds) * engine.sampleRate), generation: patternGeneration))
+        let inUse = engine.patternGenerationInUse
+        patternBuffers.removeAll { gen, b in
+            if gen < inUse { b.deallocate(); return true }
+            return false
+        }
+    }
+
+    /// Starts (from the top of the loop) or stops the pattern player.
+    public func setPatternPlaying(_ playing: Bool) { engine.send(.patternTransport(playing: playing)) }
+
     /// Starts/stops/seeks the engine's song clock (seconds on the song timeline).
     public func setTransport(playing: Bool, seconds: Double) {
         engine.send(.transport(playing: playing, frame: Int64(max(0, seconds) * engine.sampleRate)))
     }
 
-    deinit { sequenceBuffers.forEach { $0.1.deallocate() } }
+    deinit {
+        sequenceBuffers.forEach { $0.1.deallocate() }
+        patternBuffers.forEach { $0.1.deallocate() }
+    }
 }
 
 /// Minimal PCM/float WAV reader for user samples (16/24/32-bit int, 32-bit float; mixes to mono).
