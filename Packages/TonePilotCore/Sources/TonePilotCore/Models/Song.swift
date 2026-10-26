@@ -230,7 +230,11 @@ public struct SectionActivity: Codable, Hashable, Sendable {
 }
 
 public struct StemInfo: Codable, Hashable, Sendable {
-    public enum Kind: String, Codable, CaseIterable, Sendable { case vocals, drums, bass, other, piano, guitar }
+    public enum Kind: String, Codable, CaseIterable, Sendable {
+        case vocals, drums, bass, other, piano, guitar
+        /// The Music part split in two (LeadSplitter): its main melodic line, and everything else.
+        case lead, backing
+    }
     public var kind: Kind
     /// File name in the song's stem folder.
     public var fileName: String

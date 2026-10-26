@@ -76,7 +76,7 @@ public enum SongStudio {
             if stems.isEmpty {
                 out.append(track(original, "Original song", "The full recording — vocals and every instrument together", .audio, .songParts, "waveform"))
             } else {
-                for kind in StemInfo.Kind.allCases where stems.contains(kind) {
+                for kind in playableStems(stems) {
                     out.append(track(stem(kind), stemName(kind), stemDetail(kind), .audio, .songParts, stemSymbol(kind)))
                 }
             }
@@ -105,7 +105,17 @@ public enum SongStudio {
         case .other: return "Music & instruments"
         case .piano: return "Piano"
         case .guitar: return "Guitar"
+        case .lead: return "Lead instruments"
+        case .backing: return "Backing music"
         }
+    }
+
+    /// Parts that play, in mixer order. When the Music part has been split into Lead and
+    /// Backing, those two replace it (together they are the Music part).
+    public static func playableStems(_ stems: [StemInfo.Kind]) -> [StemInfo.Kind] {
+        let split = stems.contains(.lead) && stems.contains(.backing)
+        let order: [StemInfo.Kind] = [.vocals, .lead, .backing, .other, .piano, .guitar, .drums, .bass]
+        return order.filter { stems.contains($0) && !(split && $0 == .other) }
     }
 
     static func stemDetail(_ kind: StemInfo.Kind) -> String {
@@ -115,6 +125,8 @@ public enum SongStudio {
         case .bass: return "The song's own bass line"
         case .other: return "Background score — strings, flute, keys, guitar and the rest"
         case .piano, .guitar: return "Separated from the recording"
+        case .lead: return "The main melodic line of the music — flute, strings, nadaswaram, lead synth"
+        case .backing: return "Pads, chords, strums and everything behind the lead"
         }
     }
 
@@ -124,6 +136,8 @@ public enum SongStudio {
         case .drums: return "metronome.fill"
         case .bass: return "waveform.path"
         case .other, .piano, .guitar: return "guitars"
+        case .lead: return "music.quarternote.3"
+        case .backing: return "music.note.list"
         }
     }
 
@@ -243,7 +257,7 @@ public enum SongStudio {
         s.stemsOff = stems.contains(.vocals) ? [stem(.vocals)] : []
         s.bass = false; s.drums = false; s.chords = false; s.metronome = false
         s.soloTrack = nil
-        if s.aiPartTrack == nil, stems.contains(.other) { s.aiPartTrack = stem(.other) }
+        if s.aiPartTrack == nil { s.aiPartTrack = stems.contains(.lead) ? stem(.lead) : stems.contains(.other) ? stem(.other) : nil }
         s.stemDefaultsApplied = true
     }
 

@@ -61,6 +61,8 @@ final class AppModel: ObservableObject {
     // Stem separation (on this iPhone)
     @Published var separationProgress: [UUID: Double] = [:]
     @Published var separationError: [UUID: String] = [:]
+    /// Splitting the Music part into Lead instruments and Backing (0...1 while running).
+    @Published var musicSplitProgress: [UUID: Double] = [:]
     var separationStart: [UUID: Date] = [:]
     let separationCancels = CancelFlags()
     /// Section under the playhead last time the section-gated parts were applied.
@@ -500,10 +502,10 @@ final class AppModel: ObservableObject {
     func audioTracks(for song: Song) -> [(id: String, url: URL)] {
         guard let main = audioURL(for: song) else { return [] }
         let dir = store.stemDirectory(for: song.id)
-        let stems = (song.stems ?? []).compactMap { stem -> (id: String, url: URL)? in
-            let url = dir.appendingPathComponent(stem.fileName)
-            return FileManager.default.fileExists(atPath: url.path) ? (SongStudio.stem(stem.kind), url) : nil
-        }
+        let present = (song.stems ?? []).filter { FileManager.default.fileExists(atPath: dir.appendingPathComponent($0.fileName).path) }
+        // Lead + Backing replace the Music part when it has been split (they add up to it).
+        let playing = Set(SongStudio.playableStems(present.map(\.kind)))
+        let stems = present.filter { playing.contains($0.kind) }.map { (id: SongStudio.stem($0.kind), url: dir.appendingPathComponent($0.fileName)) }
         return stems.isEmpty ? [(SongStudio.original, main)] : stems
     }
 

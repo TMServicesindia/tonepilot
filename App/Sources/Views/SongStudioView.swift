@@ -696,6 +696,7 @@ struct SongPartsCard: View {
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
                         ForEach(stems) { StemTile(track: $0, songId: song.id, gated: SongStudio.isGated($0.id, acc)) }
                     }
+                    musicSplit
                     if let full = tracks.first(where: { $0.id == SongStudio.original }) {
                         DisclosureGroup("Full recording") { TrackRow(track: full, songId: song.id).padding(.top, 6) }
                             .font(.subheadline).tint(.secondary)
@@ -704,6 +705,27 @@ struct SongPartsCard: View {
             }
             .padding(14)
             .background(Theme.panel, in: RoundedRectangle(cornerRadius: 16))
+        }
+    }
+}
+
+extension SongPartsCard {
+    /// Split the Music part into Lead instruments and Backing (automatic after separation).
+    @ViewBuilder var musicSplit: some View {
+        if let p = model.musicSplitProgress[song.id] {
+            HStack(spacing: 10) {
+                ProgressView().controlSize(.small)
+                Text("Finding the lead instruments in the music… \(Int(p * 100))%").font(.caption)
+            }
+        } else if model.canSplitMusic(song) {
+            Button { model.splitMusic(song.id) } label: {
+                Label("Split Music into Lead & Backing", systemImage: "wand.and.rays").labelStyle(.titleAndIcon)
+                    .font(.subheadline.weight(.semibold)).frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier("parts.split")
+            Text("Separates the interlude melodies (flute, strings, nadaswaram) from the pads and chords, so the original can play just the lead parts for you.")
+                .font(.caption2).foregroundStyle(.secondary)
         }
     }
 }
@@ -722,6 +744,8 @@ struct StemTile: View {
         case SongStudio.stem(.vocals): return .pink
         case SongStudio.stem(.drums): return .orange
         case SongStudio.stem(.bass): return .purple
+        case SongStudio.stem(.lead): return .yellow
+        case SongStudio.stem(.backing): return .indigo
         default: return .teal
         }
     }
@@ -886,7 +910,7 @@ struct AIPartsCard: View {
     var body: some View {
         let tracks = model.studioTracks(for: song)
         let acc = song.accompaniment ?? AccompanimentSettings()
-        let sources = tracks.filter { [SongStudio.stem(.other), SongStudio.stem(.vocals)].contains($0.id) }
+        let sources = tracks.filter { [SongStudio.stem(.lead), SongStudio.stem(.other), SongStudio.stem(.vocals)].contains($0.id) }
         let current = acc.aiPartTrack.flatMap { id in sources.first { $0.id == id } } ?? sources.first
         let on = acc.aiPartTrack != nil && acc.aiPartsEnabled == true && current != nil
         VStack(alignment: .leading, spacing: 12) {
@@ -902,7 +926,9 @@ struct AIPartsCard: View {
                 }))
                 if on, let current {
                     Picker("Played by", selection: Binding(get: { current.id }, set: { model.setAIPartSource($0, songId: song.id) })) {
-                        ForEach(sources) { t in Text(t.id == SongStudio.stem(.vocals) ? "The original vocals" : "The original music").tag(t.id) }
+                        ForEach(sources) { t in
+                            Text(t.id == SongStudio.stem(.vocals) ? "Vocals" : t.id == SongStudio.stem(.lead) ? "Lead instruments" : "All music").tag(t.id)
+                        }
                     }
                     .pickerStyle(.segmented)
                     Text("Plays in").font(.caption.weight(.semibold)).foregroundStyle(.secondary)

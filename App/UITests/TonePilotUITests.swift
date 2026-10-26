@@ -53,6 +53,14 @@ final class TonePilotUITests: XCTestCase {
                 let play = element("transport.play")
                 tap(play, "play (round \(round))")
                 page("mix")
+                if round == 1 {
+                    let split = element("parts.split")
+                    if split.waitForExistence(timeout: 2) {
+                        tap(split, "split Music into Lead & Backing")
+                        XCTAssertTrue(element("stem.header.audio.stem.lead").waitForExistence(timeout: 60), "Lead instruments part appears")
+                        assertAlive("lead/backing split")
+                    }
+                }
                 let vocals = element("stem.header.audio.stem.vocals")
                 if vocals.waitForExistence(timeout: 3) {
                     vocals.tap(); assertAlive("mute vocals")

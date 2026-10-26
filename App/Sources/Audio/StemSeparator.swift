@@ -145,6 +145,18 @@ enum StemSeparator {
         return files.map { StemInfo(kind: $0.0, fileName: $0.1.lastPathComponent, model: "htdemucs (on this iPhone)") }
     }
 
+    /// Writes a stereo part as AAC (same format as the separated parts).
+    static func writeStem(left: [Float], right: [Float], to url: URL) throws {
+        try? FileManager.default.removeItem(at: url)
+        let settings: [String: Any] = [AVFormatIDKey: kAudioFormatMPEG4AAC, AVSampleRateKey: sampleRate,
+                                       AVNumberOfChannelsKey: 2, AVEncoderBitRateKey: 192_000]
+        let file: AVAudioFile
+        do { file = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false) } catch {
+            throw Failure.write(error.localizedDescription)
+        }
+        try write(file, left: left, right: right)
+    }
+
     private static func write(_ file: AVAudioFile, left: [Float], right: [Float]) throws {
         guard !left.isEmpty else { return }
         let step = 262_144

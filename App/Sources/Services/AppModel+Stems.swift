@@ -104,6 +104,72 @@ extension AppModel {
         }
         // Re-analyse from the parts: cleaner beat, chords and melody.
         analyze(songId: songId)
+        // Then split the Music part into Lead instruments and Backing.
+        splitMusic(songId)
+    }
+
+    // MARK: Lead instruments / Backing
+
+    func canSplitMusic(_ song: Song) -> Bool {
+        (song.stems ?? []).contains { $0.kind == .other } && !(song.stems ?? []).contains { $0.kind == .lead }
+    }
+
+    /// Splits the separated Music part into Lead instruments (its main melodic line) and Backing,
+    /// on a background thread; the two replace Music in the mixer.
+    func splitMusic(_ songId: UUID) {
+        guard musicSplitProgress[songId] == nil, let song = song(songId),
+              let music = song.stems?.first(where: { $0.kind == .other }) else { return }
+        let dir = store.stemDirectory(for: songId)
+        let input = dir.appendingPathComponent(music.fileName)
+        guard FileManager.default.fileExists(atPath: input.path) else { return }
+        musicSplitProgress[songId] = 0
+        let throttle = ProgressThrottle()
+        let thread = Thread { [weak self] in
+            var made: [StemInfo]?
+            var failure: String?
+            autoreleasepool {
+                do {
+                    let (l, r) = try StemSeparator.decodeStereo(input)
+                    guard let result = LeadSplitter.split(channels: [l, r], sampleRate: StemSeparator.sampleRate, progress: { p in
+                        if throttle.shouldSend(p) { Task { @MainActor in self?.musicSplitProgress[songId] = p * 0.9 } }
+                        return true
+                    }) else { failure = "The music part is too short to split."; return }
+                    try StemSeparator.writeStem(left: result.lead[0], right: result.lead[1], to: dir.appendingPathComponent("lead.m4a"))
+                    try StemSeparator.writeStem(left: result.backing[0], right: result.backing[1], to: dir.appendingPathComponent("backing.m4a"))
+                    made = [StemInfo(kind: .lead, fileName: "lead.m4a", model: "TonePilot lead split"),
+                            StemInfo(kind: .backing, fileName: "backing.m4a", model: "TonePilot lead split")]
+                } catch {
+                    failure = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                }
+            }
+            let failureText = failure, madeStems = made
+            Task { @MainActor in
+                guard let self else { return }
+                self.musicSplitProgress[songId] = nil
+                if let failure = failureText { self.separationError[songId] = "Lead/backing split: \(failure)"; return }
+                guard let made = madeStems, var song = self.song(songId) else { return }
+                song.stems = (song.stems ?? []).filter { $0.kind != .lead && $0.kind != .backing } + made
+                var acc = song.accompaniment ?? AccompanimentSettings()
+                // "Original plays the difficult parts" now uses just the lead instruments.
+                if acc.aiPartTrack == SongStudio.stem(.other) || acc.aiPartTrack == nil { acc.aiPartTrack = SongStudio.stem(.lead) }
+                // Music was off → keep both halves off.
+                if acc.stemsOff?.contains(SongStudio.stem(.other)) == true {
+                    acc.stemsOff = (acc.stemsOff ?? []) + [SongStudio.stem(.lead), SongStudio.stem(.backing)]
+                }
+                song.accompaniment = acc
+                self.update(song)
+                if self.activeSongId == songId {
+                    let wasPlaying = self.isStudioPlaying
+                    if wasPlaying { self.studioPause() }
+                    try? self.loadSongAudio(song)
+                    self.configureAccompaniment(for: song)
+                    if wasPlaying { self.studioTogglePlay() }
+                }
+            }
+        }
+        thread.qualityOfService = .userInitiated
+        thread.stackSize = 8 << 20
+        thread.start()
     }
 
     // MARK: AI plays difficult parts (recording or AI melody)
