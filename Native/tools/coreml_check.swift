@@ -49,7 +49,7 @@ func separate(coreML: Bool) throws -> ([Int: [Float]], Double) {
     return (blocks, Date().timeIntervalSince(start))
 }
 
-if CoreMLNetwork() == nil { print("::error title=Core ML::the model couldn't be loaded"); exit(2) }
+if CoreMLNetwork() == nil { print("ERROR the Core ML model couldn't be loaded: \(CoreMLNetwork.loadError ?? "not found at \(args[2])")"); exit(2) }
 let (cpu, cpuTime) = try separate(coreML: false)
 let (ml, mlTime) = try separate(coreML: true)
 print("RESULT \(StemSeparator.lastRun ?? "Core ML not used")")
@@ -61,7 +61,7 @@ var worst = Double.infinity
 for (s, name) in names.enumerated() {
     var sig = 0.0, err = 0.0
     for (k, a) in cpu {
-        guard let b = ml[k], a.count == b.count else { print("::error title=Core ML::block \(k) missing"); exit(3) }
+        guard let b = ml[k], a.count == b.count else { print("ERROR block \(k) missing"); exit(3) }
         let len = a.count / (names.count * 2)
         for i in (s * 2 * len)..<((s + 1) * 2 * len) { let d = Double(a[i] - b[i]); sig += Double(a[i]) * Double(a[i]); err += d * d }
     }

@@ -14,6 +14,8 @@ final class CoreMLNetwork: @unchecked Sendable {
     nonisolated(unsafe) static var modelOverride: URL?
     /// Tests: force the CPU engine.
     nonisolated(unsafe) static var disabled = false
+    /// Why the model couldn't be loaded (diagnostics).
+    nonisolated(unsafe) static var loadError: String?
 
     static var modelURL: URL? {
         modelOverride ?? Bundle.main.url(forResource: modelName, withExtension: "mlmodelc", subdirectory: "Models")
@@ -30,8 +32,10 @@ final class CoreMLNetwork: @unchecked Sendable {
         guard !Self.disabled, let url = Self.modelURL else { return nil }
         let config = MLModelConfiguration()
         config.computeUnits = computeUnits
-        guard let model = try? MLModel(contentsOf: url, configuration: config) else { return nil }
-        self.model = model
+        do { model = try MLModel(contentsOf: url, configuration: config) } catch {
+            Self.loadError = error.localizedDescription
+            return nil
+        }
     }
 
     /// One segment: x (1,4,bins,frames) and xt (1,2,samples) in, x_out (1,16,bins,frames) and

@@ -43,7 +43,7 @@ jobs:
         working-directory: Native
         run: |
           set -euo pipefail
-          trap 'grep -h "error:" build/*.log 2>/dev/null | head -20 | while IFS= read -r l; do echo "::error title=Compile::$l"; done' ERR
+          trap 'grep -h "error:" "$GITHUB_WORKSPACE"/Native/build/*.log 2>/dev/null | head -20 | while IFS= read -r l; do echo "::error title=Compile::$l"; done; echo "::error title=Check::failed at line $LINENO: $BASH_COMMAND"' ERR
           sudo xcode-select -s /Applications/Xcode_16.4.app || true
           mkdir -p build/obj && cd build/obj
           for f in ../../demucs/src/*.cpp ../../CDemucs/tp_demucs.cpp; do
@@ -60,8 +60,8 @@ jobs:
           ./coreml_check ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin ../../HTDemucs.mlmodelc /tmp/mlcheck 30 > check.log 2>&1
           code=$?
           set -e
-          grep -E "^RESULT|::error" check.log | while IFS= read -r l; do echo "::notice title=App separator::$l"; done
-          tail -5 check.log
+          grep -E "^RESULT|^ERROR" check.log | while IFS= read -r l; do echo "::notice title=App separator::$l"; done
+          [ $code = 0 ] || grep -vE "Loading tensor|^\[|MB$" check.log | tail -8 | while IFS= read -r l; do echo "::error title=Check (exit $code)::$l"; done
           exit $code
       - uses: actions/upload-artifact@v4
         with:
