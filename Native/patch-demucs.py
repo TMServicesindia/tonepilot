@@ -19,3 +19,19 @@ if "conv_tr_fast.inc" not in s:
     print("patched conv.hpp")
 else:
     print("conv.hpp already patched")
+
+inf = src / "model_inference.cpp"
+s = inf.read_text()
+if "tp::run_network" not in s:
+    s = s.replace('#include "crosstransformer.hpp"', '#include "crosstransformer.hpp"\n#include "tp_network_hook.hpp"', 1)
+    start = 'cb(current_progress + 0.0f, "Time branch: normalized");'
+    end = 'cb(current_progress + segment_progress, "Mask + istft");'
+    assert s.count(start) >= 1 and s.count(end) >= 1
+    i = s.index(start) + len(start)
+    s = s[:i] + "\n\n    // TonePilot: Core ML runs the network when available.\n    if (!tp::run_network(buffers, model.is_4sources ? 4 : 6))\n    {" + s[i:]
+    j = s.index(end, i)
+    s = s[:j] + "}\n\n    " + s[j:]
+    inf.write_text(s)
+    print("patched model_inference.cpp")
+else:
+    print("model_inference.cpp already patched")

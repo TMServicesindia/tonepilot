@@ -113,27 +113,48 @@ if __name__ == "__main__":
         traced = torch.jit.trace(core, (x, xt), check_trace=False)
     print("outputs", tuple(ref_x.shape), tuple(ref_xt.shape))
 
-    mlmodel = ct.convert(
-        traced,
-        inputs=[ct.TensorType(name="x", shape=tuple(x.shape)), ct.TensorType(name="xt", shape=tuple(xt.shape))],
-        outputs=[ct.TensorType(name="x_out"), ct.TensorType(name="xt_out")],
-        convert_to="mlprogram",
-        compute_precision=ct.precision.FLOAT16,
-        minimum_deployment_target=ct.target.iOS17,
-    )
-    mlmodel.short_description = "Demucs v4 htdemucs (4 sources) network core — Meta AI, MIT licence"
-    mlmodel.save(out_path)
-    print("saved", out_path)
-
+    # Numerically sensitive ops stay in float32; the heavy convolutions / matmuls run in float16.
+    SENSITIVE = {"layer_norm", "instance_norm", "batch_norm", "reduce_mean", "reduce_sum", "reduce_l2_norm",
+                 "softmax", "pow", "sqrt", "rsqrt", "real_div", "exp", "log", "square", "erf"}
+    variants = {
+        "fp32": ct.precision.FLOAT32,
+        "mixed": ct.transform.FP16ComputePrecision(op_selector=lambda op: op.op_type not in SENSITIVE),
+        "fp16": ct.precision.FLOAT16,
+    }
     feed = {"x": x.numpy(), "xt": xt.numpy()}
-    for units in ["CPU_AND_GPU", "CPU_AND_NE", "ALL", "CPU_ONLY"]:
+    chosen = None
+    for name, precision in variants.items():
+        path = f"HTDemucs-{name}.mlpackage"
         try:
-            mm = ct.models.MLModel(out_path, compute_units=getattr(ct.ComputeUnit, units))
-            mm.predict(feed)  # warm-up
-            t0 = time.time(); r = mm.predict(feed); dt = time.time() - t0
-            print(f"RESULT {units}: {dt:.2f} s per 7.8 s segment; "
-                  f"x_out {snr(ref_x.numpy(), r['x_out']):.1f} dB, xt_out {snr(ref_xt.numpy(), r['xt_out']):.1f} dB vs PyTorch")
+            mlmodel = ct.convert(
+                traced,
+                inputs=[ct.TensorType(name="x", shape=tuple(x.shape)), ct.TensorType(name="xt", shape=tuple(xt.shape))],
+                outputs=[ct.TensorType(name="x_out"), ct.TensorType(name="xt_out")],
+                convert_to="mlprogram",
+                compute_precision=precision,
+                minimum_deployment_target=ct.target.iOS17,
+            )
+            mlmodel.short_description = "Demucs v4 htdemucs (4 sources) network core — Meta AI, MIT licence"
+            mlmodel.save(path)
         except Exception as e:
-            print(f"RESULT {units}: failed ({e})")
+            print(f"RESULT {name}: conversion failed ({e})")
+            continue
+        for units in ["CPU_ONLY", "CPU_AND_GPU", "ALL"]:
+            try:
+                mm = ct.models.MLModel(path, compute_units=getattr(ct.ComputeUnit, units))
+                mm.predict(feed)
+                t0 = time.time(); r = mm.predict(feed); dt = time.time() - t0
+                q = min(snr(ref_x.numpy(), r["x_out"]), snr(ref_xt.numpy(), r["xt_out"]))
+                print(f"RESULT {name} {units}: {dt:.2f} s per 7.8 s segment, accuracy {q:.1f} dB vs PyTorch")
+                if units == "ALL" and q >= 40 and chosen is None:
+                    chosen = (name, path, q, dt)
+            except Exception as e:
+                print(f"RESULT {name} {units}: failed ({e})")
     with torch.no_grad():
         t0 = time.time(); core(x, xt); print(f"RESULT PyTorch CPU: {time.time() - t0:.2f} s per segment")
+    if chosen is None:
+        print("RESULT no variant reached 40 dB"); sys.exit(1)
+    import shutil
+    shutil.rmtree(out_path, ignore_errors=True)
+    shutil.copytree(chosen[1], out_path)
+    print(f"RESULT chosen {chosen[0]}: {chosen[2]:.1f} dB, {chosen[3]:.2f} s per segment -> {out_path}")

@@ -25,6 +25,15 @@ typedef void (*tp_demucs_progress)(void *context, float progress);
 int tp_demucs_separate(const tp_demucs *model, const float *left, const float *right, long frames,
                        float *out, tp_demucs_progress progress, void *context);
 
+/// Network core run outside demucs.cpp (e.g. Core ML). Arrays are row-major float32:
+/// x (4, bins, frames) and xt (2, samples) in; x_out (16, bins, frames) and xt_out (8, samples)
+/// out (4-source model). Return 0 on success; anything else falls back to the CPU network.
+typedef int (*tp_demucs_network)(void *context, const float *x, const float *xt, float *x_out, float *xt_out,
+                                 int bins, int frames, int samples);
+
+/// Sets (or clears with NULL) the network used for every segment.
+void tp_demucs_set_network(tp_demucs_network network, void *context);
+
 #ifdef __cplusplus
 }
 #endif
