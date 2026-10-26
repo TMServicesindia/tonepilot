@@ -448,9 +448,9 @@ struct LiveGuideHost: View {
     @ObservedObject var live: LiveState
 
     var body: some View {
-        if let t = live.position {
-            LiveGuideStrip(song: song, time: t, melodyOffset: AutoArranger.guideOffset(for: model.activeArrangement))
-        }
+        // Always shown (at the cursor when paused), so the screen doesn't jump on play/pause.
+        LiveGuideStrip(song: song, time: live.position ?? model.cursor, melodyOffset: AutoArranger.guideOffset(for: model.activeArrangement))
+            .animation(nil, value: live.position)
     }
 }
 

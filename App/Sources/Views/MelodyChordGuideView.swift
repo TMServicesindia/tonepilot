@@ -25,40 +25,48 @@ struct LiveGuideStrip: View {
                     Text("LEFT HAND").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
                     if let current {
                         Text(transposed(current).patternText).font(.system(size: 30, weight: .bold, design: .rounded))
+                            .lineLimit(1).minimumScaleFactor(0.6)
                         Text("\(transposed(current).chord) · \(transposed(current).patternNoteNames)")
-                            .font(.caption.monospaced()).foregroundStyle(.secondary)
+                            .font(.caption.monospaced()).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.7)
                     } else {
-                        Text(time == nil ? "Start the song clock" : "—").font(.title2.weight(.semibold)).foregroundStyle(.secondary)
+                        Text(time == nil ? "Press play to follow" : "—").font(.system(size: 30, weight: .bold, design: .rounded))
+                            .foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.6)
+                        Text(" ").font(.caption.monospaced())
                     }
                 }
-                Spacer()
-                if let next {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text("NEXT").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
-                        Text(transposed(next).chord).font(.title3.weight(.semibold))
-                        Text("in \(max(0, next.time - t), specifier: "%.1f") s").font(.caption2).foregroundStyle(.secondary)
-                    }
+                Spacer(minLength: 8)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("NEXT").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
+                    Text(next.map { transposed($0).chord } ?? "—").font(.title3.weight(.semibold)).lineLimit(1)
+                    Text(next.map { String(format: "in %.1f s", max(0, $0.time - t)) } ?? " ")
+                        .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
                 }
+                .frame(width: 86, alignment: .trailing)
+                .opacity(next == nil ? 0.4 : 1)
             }
-            if current?.isDrone == true {
-                Text("No clear chord here — play the Sa–Pa drone or follow the melody.").font(.caption2).foregroundStyle(Theme.warn)
-            }
+            // Always takes its line, so the strip doesn't jump when a drone section starts or ends.
+            Text("No clear chord here — play the Sa–Pa drone or follow the melody.").font(.caption2).foregroundStyle(Theme.warn)
+                .lineLimit(1).minimumScaleFactor(0.7)
+                .opacity(current?.isDrone == true ? 1 : 0)
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text("RIGHT HAND").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
-                    if difficult { Label("Tricky phrase", systemImage: "exclamationmark.triangle.fill").font(.caption2).foregroundStyle(Theme.warn) }
+                    Label("Tricky phrase", systemImage: "exclamationmark.triangle.fill").font(.caption2).foregroundStyle(Theme.warn)
+                        .opacity(difficult ? 1 : 0)
                 }
                 if melody.isEmpty {
                     Text(song.melody == nil ? "No melody estimate for this song" : "—").font(.caption).foregroundStyle(.secondary)
+                        .frame(height: 44, alignment: .leading)
                 } else {
                     HStack(spacing: 6) {
                         ForEach(Array(melody.enumerated()), id: \.element.id) { i, n in
                             let key = n.midi + melodyOffset + transpose
                             VStack(spacing: 1) {
                                 Text(NoteName.name(for: key)).font(i == 0 ? .headline.monospaced() : .caption.monospaced())
-                                if n.isOrnamented { Text("〰︎").font(.caption2).foregroundStyle(Theme.accent) }
+                                Text("〰︎").font(.caption2).foregroundStyle(Theme.accent).opacity(n.isOrnamented ? 1 : 0)
                             }
-                            .padding(.horizontal, 6).padding(.vertical, 4)
+                            .frame(minWidth: 34, minHeight: 36)
+                            .padding(.horizontal, 4).padding(.vertical, 2)
                             .background(i == 0 && n.start <= t ? Theme.accent.opacity(0.35) : Theme.panelRaised, in: RoundedRectangle(cornerRadius: 6))
                         }
                     }

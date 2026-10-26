@@ -221,7 +221,8 @@ final class ArrangementIntelligenceTests: XCTestCase {
         let lead = a.layers.first { $0.role == .vocalMelody }!
         XCTAssertEqual(lead.octave, -1, "played an octave up, sounds at the sung pitch")
         XCTAssertEqual(AutoArranger.guideOffset(for: a), 12)
-        XCTAssertTrue([FactoryPatches.vocalLeadId, FactoryPatches.bansuriId, FactoryPatches.expressiveViolinId, FactoryPatches.expressiveShehnaiId].contains(lead.patchId),
+        XCTAssertTrue([FactoryPatches.vocalLeadId, FactoryPatches.bansuriId, FactoryPatches.expressiveViolinId, FactoryPatches.expressiveShehnaiId,
+                       FactoryPatches.bansuriLowId, FactoryPatches.harmoniumId, FactoryPatches.singingSynthLeadId].contains(lead.patchId),
                       "ornamented vocal line gets an expressive lead")
         XCTAssertGreaterThanOrEqual(Int(lead.keyRange.low), 55)
         XCTAssertTrue(out.toneSuggestions.contains { $0.sectionId == section.id }, "alternatives offered for preview")

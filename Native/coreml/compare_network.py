@@ -23,7 +23,11 @@ with torch.no_grad():
 cx, cxt = load("cpu_x_out.f32", (1, 16, F, T)), load("cpu_xt_out.f32", (1, 8, L))
 ax, axt = load("ml_x_out.f32", (1, 16, F, T)), load("ml_xt_out.f32", (1, 8, L))
 print(f"RESULT network vs PyTorch — CPU engine: spec {snr(rx, cx):.1f} dB, wave {snr(rxt, cxt):.1f} dB")
-print(f"RESULT network vs PyTorch — Core ML in the app: spec {snr(rx, ax):.1f} dB, wave {snr(rxt, axt):.1f} dB")
+# The engines may hand over different first segments, so the app's Core ML output is judged
+# against PyTorch on its own inputs.
+with torch.no_grad():
+    mrx, mrxt = (t.numpy() for t in Core(m).eval()(torch.from_numpy(mx), torch.from_numpy(mxt)))
+print(f"RESULT network vs PyTorch — Core ML in the app (its own inputs): spec {snr(mrx, ax):.1f} dB, wave {snr(mrxt, axt):.1f} dB")
 
 import coremltools as ct  # noqa: E402
 for units in ["CPU_ONLY", "ALL"]:

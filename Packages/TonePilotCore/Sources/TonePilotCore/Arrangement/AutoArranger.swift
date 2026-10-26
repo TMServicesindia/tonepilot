@@ -41,8 +41,21 @@ public enum AutoArranger {
                   register: 62...96, vocalAffinity: 0.5, reason: "smooth sustained line with moderate ornamentation"),
         Candidate(patchId: FactoryPatches.expressiveViolinId, name: "Expressive Violin Lead", centroid: 1200...3600, sustain: 0.45...1, ornament: 0.8,
                   register: 55...92, vocalAffinity: 0.7, reason: "expressive, sliding, sustained line"),
+        Candidate(patchId: FactoryPatches.bansuriLowId, name: "Low Bansuri-like Flute", centroid: 500...2000, sustain: 0.4...0.95, ornament: 0.85,
+                  register: 52...80, vocalAffinity: 0.9, reason: "a sung melody in a low, breathy flute register"),
+        Candidate(patchId: FactoryPatches.harmoniumId, name: "Harmonium-like Reed", centroid: 600...2400, sustain: 0.5...1, ornament: 0.3,
+                  register: 48...84, vocalAffinity: 0.7, reason: "a sustained sung melody with a warm, reedy Indian colour"),
+        Candidate(patchId: FactoryPatches.singingSynthLeadId, name: "Singing Synth Lead", centroid: 600...2600, sustain: 0.4...0.95, ornament: 0.7,
+                  register: 50...88, vocalAffinity: 0.8, reason: "a sung melody with slides and vibrato, on a smooth synth"),
+        Candidate(patchId: FactoryPatches.warmSynthLeadId, name: "Warm Synth Lead", centroid: 1000...3500, sustain: 0.35...0.9, ornament: 0.4,
+                  register: 55...92, vocalAffinity: 0.5, reason: "a clear, warm electronic lead"),
+        Candidate(patchId: FactoryPatches.id(forProgram: 75), name: "Pan Flute", centroid: 800...2800, sustain: 0.35...0.9, ornament: 0.5,
+                  register: 60...90, vocalAffinity: 0.5, reason: "a soft, airy sustained line"),
+        Candidate(patchId: FactoryPatches.id(forProgram: 16), name: "Drawbar Organ", centroid: 700...3000, sustain: 0.6...1, ornament: 0.05,
+                  register: 48...90, vocalAffinity: 0.2, reason: "steady, held notes with no attack"),
+        // The vocal imitation isn't convincing enough to be a default: ranked lower, played softly.
         Candidate(patchId: FactoryPatches.vocalLeadId, name: "Vocal-like Lead", centroid: 500...2200, sustain: 0.4...0.95, ornament: 0.75,
-                  register: 48...84, vocalAffinity: 1.0, reason: "a sung melody in vocal range with pitch movement"),
+                  register: 48...84, vocalAffinity: 0.6, reason: "a sung melody in vocal range with pitch movement"),
         Candidate(patchId: FactoryPatches.id(forProgram: 0), name: "Grand Piano", centroid: 500...3000, sustain: 0...0.45, ornament: 0.05,
                   register: 48...96, vocalAffinity: 0.2, reason: "clear, steady notes with decaying attacks"),
         Candidate(patchId: FactoryPatches.softSynthLeadId, name: "Soft Synth Lead", centroid: 1800...5000, sustain: 0.3...0.9, ornament: 0.3,
@@ -79,6 +92,7 @@ public enum AutoArranger {
             s += 0.25 * (1 - abs(e.ornamentRatio * 1.6 - c.ornament).clamped(to: 0...1))
             if let p = e.medianPitch { s += 0.15 * closeness(p, c.register, scale: 6) } else { s += 0.075 }
             s += 0.1 * (e.fromVocals ? c.vocalAffinity : 0.5)
+            if c.patchId == FactoryPatches.vocalLeadId { s *= 0.7 }
             return (c, s)
         }.sorted { $0.1 > $1.1 }
     }
@@ -171,7 +185,8 @@ public enum AutoArranger {
         let ranked = rankLeads(evidence).filter { available[$0.0.patchId] != nil }
         if let (best, score) = ranked.first {
             let isInstrumental = !hasLead
-            let lead = Layer(patchId: best.patchId, volume: section.type == .chorus ? 0.85 : 0.75, octave: leadOctave,
+            let quiet = best.patchId == FactoryPatches.vocalLeadId
+            let lead = Layer(patchId: best.patchId, volume: quiet ? 0.45 : (section.type == .chorus ? 0.85 : 0.75), octave: leadOctave,
                              keyRange: rightRange, role: isInstrumental ? .motif : (fromVocals ? .vocalMelody : .lead))
             layers.append(lead)
             why.append("Right hand: \(best.name) — \(best.reason)\(isInstrumental ? " (instrumental motif)" : "").")

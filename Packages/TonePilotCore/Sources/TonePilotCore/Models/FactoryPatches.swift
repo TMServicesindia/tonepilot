@@ -27,6 +27,9 @@ public enum FactoryPatches {
         (12, "Marimba", .mallet),
         (14, "Tubular Bells", .bell),
         (16, "Drawbar Organ", .organ),
+        (17, "Percussive Organ", .organ),
+        (19, "Church Organ", .organ),
+        (20, "Reed Organ", .organ),
         (21, "Accordion", .reed),
         (24, "Nylon Guitar", .guitar),
         (25, "Steel Guitar", .guitar),
@@ -99,6 +102,10 @@ public enum FactoryPatches {
     public static let warmAnalogPadId = variantId(22)
     public static let pluckSynthId = variantId(23)
     public static let softPianoId = variantId(24)
+    public static let harmoniumId = variantId(25)
+    public static let warmSynthLeadId = variantId(26)
+    public static let singingSynthLeadId = variantId(27)
+    public static let bansuriLowId = variantId(28)
 
     static func sf(_ id: UUID, _ name: String, _ family: InstrumentFamily, program: UInt8, bankMSB: UInt8 = SoundFontReference.melodicBankMSB,
                    effects: EffectSettings = EffectSettings(), expression: ExpressionSettings? = nil, filter: FilterSettings = FilterSettings(),
@@ -151,6 +158,28 @@ public enum FactoryPatches {
               effects: EffectSettings(reverbMix: 30, delayMix: 10, chorusMix: 20, eq: EQSettings(lowDB: -4, midDB: 3, midFrequency: 1000, highDB: -3)),
               expression: ExpressionSettings(mono: true, glideTime: 0.09, bendRange: 2, vibratoDepth: 25, vibratoRate: 5.5, vibratoDelay: 0.25),
               tags: ["vocal", "lead", "ornamented", "breathy"]),
+        sf(harmoniumId, "Harmonium-like Reed", .organ, program: 20,
+           effects: EffectSettings(reverbMix: 20, chorusMix: 10, eq: EQSettings(lowDB: 1, midDB: 2, midFrequency: 800, highDB: -3)),
+           expression: ExpressionSettings(mono: false, bendRange: 2, vibratoDepth: 6, vibratoRate: 5),
+           tags: ["warm", "reedy", "lead", "indian", "accompaniment"],
+           notes: "GM reed organ shaped towards a harmonium (warm mids, softer top). Not a sampled harmonium."),
+        sf(bansuriLowId, "Low Bansuri-like Flute", .flute, program: 77,
+           effects: EffectSettings(reverbMix: 32, chorusMix: 5, eq: EQSettings(lowDB: 1, midDB: 1, midFrequency: 700, highDB: -3)),
+           expression: ExpressionSettings(mono: true, glideTime: 0.1, bendRange: 2, vibratoDepth: 20, vibratoRate: 5, vibratoDelay: 0.35),
+           tags: ["breathy", "ornamented", "lead", "indian", "warm"],
+           notes: "GM shakuhachi shaped towards a low bansuri (breathy, mono, glide). Not a sampled bansuri."),
+        synth(warmSynthLeadId, "Warm Synth Lead", .synthLead, SynthSettings(waveform: .square, detuneCents: 5, subLevel: 0.15),
+              envelope: Envelope(attack: 0.02, decay: 0.3, sustain: 0.85, release: 0.3),
+              filter: FilterSettings(enabled: true, cutoff: 2600, resonance: 2),
+              effects: EffectSettings(reverbMix: 28, delayMix: 12, chorusMix: 15, eq: EQSettings(lowDB: -2, midDB: 2, midFrequency: 1200, highDB: -2)),
+              expression: ExpressionSettings(mono: true, glideTime: 0.06, bendRange: 2, vibratoDepth: 15, vibratoRate: 5.5, vibratoDelay: 0.3),
+              tags: ["lead", "warm", "electronic", "ornamented"]),
+        synth(singingSynthLeadId, "Singing Synth Lead", .synthLead, SynthSettings(waveform: .triangle, detuneCents: 7, subLevel: 0.1, noise: 0.05),
+              envelope: Envelope(attack: 0.05, decay: 0.4, sustain: 0.9, release: 0.35),
+              filter: FilterSettings(enabled: true, cutoff: 3200, resonance: 3),
+              effects: EffectSettings(reverbMix: 32, delayMix: 15, chorusMix: 25, eq: EQSettings(lowDB: -3, midDB: 2.5, midFrequency: 1500, highDB: -1)),
+              expression: ExpressionSettings(mono: true, glideTime: 0.08, bendRange: 2, vibratoDepth: 22, vibratoRate: 5.6, vibratoDelay: 0.25),
+              tags: ["lead", "ornamented", "electronic", "expressive"]),
         synth(softSynthLeadId, "Soft Synth Lead", .synthLead, SynthSettings(waveform: .triangle, detuneCents: 4, subLevel: 0.2),
               envelope: Envelope(attack: 0.01, decay: 0.3, sustain: 0.8, release: 0.3),
               filter: FilterSettings(enabled: true, cutoff: 4500, resonance: 2),
