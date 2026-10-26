@@ -189,6 +189,10 @@ struct LicensesView: View {
             Section("On-device analysis & sound") {
                 Text("Implemented in TonePilotCore (this project) from published methods: Ellis 2007 beat tracking, Krumhansl–Kessler key profiles, Foote 2000 novelty segmentation, Salamon & Gómez 2012-style predominant melody, Freeverb (public domain) reverb.")
             }
+            Section("Separation & recording") {
+                Text("Stem separation on this iPhone: Demucs v4 htdemucs / htdemucs_6s (MIT, Meta AI) via demucs.cpp (MIT, Sevag Hanssian) and Eigen (MPL-2.0); models are downloaded in the app.")
+                Text("MP3 export (Record): LAME 3.100 (GNU LGPL 2.0, lame.sourceforge.io). TonePilot's full source, including how LAME is built, is public, so it can be rebuilt with a modified LAME.")
+            }
             Section("Optional analysis server") {
                 Text("Demucs (MIT, github.com/adefossez/demucs) for stem separation and Spotify Basic Pitch (Apache-2.0, github.com/spotify/basic-pitch) for vocal transcription run on your own Mac/server — not bundled in the app.")
             }

@@ -88,11 +88,31 @@ final class TonePilotUITests: XCTestCase {
                 app.swipeUp(); app.swipeDown()
                 assertAlive("scroll Song Studio")
                 tap(element("transport.play"), "pause (round \(round))")
+                tap(app.tabBars.buttons["Record"], thenExpect: element("record.button"), "Record tab")
                 tap(app.tabBars.buttons["Settings"], "Settings tab")
                 tap(app.tabBars.buttons["Songs"], "Songs tab")
                 tap(app.tabBars.buttons["Play"], thenExpect: element("transport.play"), "back to Play")
             }
         }
+    }
+
+    /// Record tab: record 2 s while the song plays, save as MP3, play it back.
+    func testRecordAndSaveMP3() {
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15))
+        openDemoSong()
+        tap(element("transport.play"), "play the song")
+        tap(app.tabBars.buttons["Record"], thenExpect: element("record.button"), "Record tab")
+        let before = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Play '")).count
+        tap(element("record.button"), "start recording")
+        sleep(2)
+        tap(element("record.button"), "stop recording")
+        let saved = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Play '"))
+        let deadline = Date().addingTimeInterval(30)
+        while saved.count <= before, Date() < deadline { _ = element("record.status").waitForExistence(timeout: 1) }
+        XCTAssertGreaterThan(saved.count, before, "the MP3 appears in the list")
+        tap(saved.firstMatch, "play the recording")
+        assertAlive("recording playback")
     }
 
     /// Scrolling Song Studio while the song plays must stay smooth (hitch ratio reported).

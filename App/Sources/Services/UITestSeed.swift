@@ -15,6 +15,8 @@ enum UITestSeed {
         UserDefaults.standard.set(true, forKey: "hasCompletedSetup")
         UserDefaults.standard.set(true, forKey: "studioIntroDismissed")
         UserDefaults.standard.set(false, forKey: "autoSeparate")
+        // The simulator has no keyboard attached: record immediately.
+        UserDefaults.standard.set(false, forKey: "recordWaitForKey")
     }
 
     @MainActor static func seed(_ model: AppModel) {

@@ -6,7 +6,7 @@ import TonePilotCore
 
 /// Bottom tabs. Playing, mixing and song-specific tone editing all live in the Song Studio.
 enum AppTab: Hashable {
-    case library, analyse, studio, settings
+    case library, analyse, studio, record, settings
 }
 
 enum EngineKind: String, CaseIterable, Identifiable {
@@ -61,6 +61,19 @@ final class AppModel: ObservableObject {
     // Stem separation (on this iPhone)
     @Published var separationProgress: [UUID: Double] = [:]
     @Published var separationError: [UUID: String] = [:]
+    /// Record tab.
+    let recorder = Recorder()
+    let recordWaiting = OSAllocatedUnfairLock(initialState: false)
+    @Published var recordState: Recorder.State = .idle
+    @Published var recordings: [Recording] = []
+    @Published var recordError: String?
+    var recordTimer: Timer?
+    @Published var recordIncludeSong: Bool = UserDefaults.standard.object(forKey: "recordIncludeSong") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(recordIncludeSong, forKey: "recordIncludeSong") }
+    }
+    @Published var recordWaitForKey: Bool = UserDefaults.standard.object(forKey: "recordWaitForKey") as? Bool ?? true {
+        didSet { UserDefaults.standard.set(recordWaitForKey, forKey: "recordWaitForKey") }
+    }
     /// Separation models, downloaded inside the app when first needed.
     let models = ModelStore()
     /// Model download progress (0...1), by pack.
@@ -200,10 +213,17 @@ final class AppModel: ObservableObject {
         let router = self.router
         let box = outputBox
         let liveFlag = arpeggioLiveFlag
+        let recorder = self.recorder, recordWaiting = self.recordWaiting
         midi.onEvents = { [weak self] events in
             // CoreMIDI thread: route and play immediately, nothing else.
             let out = box.value
             for e in events { out.perform(router.handle(e)) }
+            // Record: the first key press starts a waiting recording (right here, so it's on time).
+            if recordWaiting.withLock({ $0 }), events.contains(where: { if case let .noteOn(_, _, v) = $0 { return v > 0 }; return false }) {
+                recordWaiting.withLock { $0 = false }
+                recorder.keyPressed()
+                DispatchQueue.main.async { if self?.recordState == .waitingForKey { self?.recordState = .recording } }
+            }
             // Song Arpeggio live fill-in: hand note-ons (with their arrival time) to the main thread.
             guard liveFlag.withLock({ $0 }) else { return }
             let now = CACurrentMediaTime()

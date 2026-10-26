@@ -46,7 +46,22 @@ jobs:
         run: |
           # Sources only: the models are downloaded inside the app (models-v1 release), not bundled.
           Native/fetch-demucs.sh
+          Native/fetch-lame.sh
+          mkdir -p App/Resources/Models
           curl -fsSL -o App/Resources/Models/DEMUCS-LICENSE.txt https://raw.githubusercontent.com/facebookresearch/demucs/main/LICENSE || true
+
+      - name: MP3 export check (LAME + the app's encoder, macOS)
+        run: |
+          set -euo pipefail
+          mkdir -p build-mp3 && cd build-mp3
+          for f in ../Native/lame/libmp3lame/*.c; do
+            clang -O2 -DHAVE_CONFIG_H -I../Native/CLame -I../Native/lame/include -I../Native/lame/libmp3lame -w -c "$f" -o "$(basename "$f").o"
+          done
+          printf '#include "lame.h"\n' > lame-bridge.h
+          swiftc -O -I ../Native/lame/include -import-objc-header lame-bridge.h ../Native/tools/mp3_check/main.swift \
+            ../App/Sources/Audio/Mp3Encoder.swift *.o -o mp3_check
+          ./mp3_check | tee mp3.log
+          grep "^RESULT" mp3.log | while IFS= read -r l; do echo "::notice title=MP3 export::$l"; done
 
       - name: In-app model download is published
         run: |

@@ -7,6 +7,9 @@ final class LiveState: ObservableObject {
     @Published private(set) var position: Double?
     @Published var peak: Float = 0
     @Published var clipped = false
+    /// Recording timer and level (Record tab), updated ~10× a second while recording.
+    @Published var recordSeconds: Double = 0
+    @Published var recordLevel: Float = 0
 
     /// Updates the position at most ~10× a second (and immediately when it starts or stops).
     func setPosition(_ p: Double?) {

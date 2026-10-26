@@ -10,6 +10,8 @@ protocol ToneOutput: AnyObject {
     var onMeter: ((Float, Bool) -> Void)? { get set }
     var routeDescription: String { get }
     var supportsAccompaniment: Bool { get }
+    /// Your instruments only (no song audio), for recording just your playing.
+    var instrumentNode: AVAudioNode? { get }
     func start() throws
     func stop()
     /// Called on the CoreMIDI thread.
@@ -54,6 +56,7 @@ final class ToneEngineHost: ToneOutput, @unchecked Sendable {
 
     var songPlayerNode: AVAudioPlayerNode { songPlayer }
     var supportsAccompaniment: Bool { true }
+    var instrumentNode: AVAudioNode? { sourceNode }
     var routeDescription: String { AudioSessionSetup.routeDescription + " · \(core.activeVoiceCount) voices" }
 
     init() {
@@ -114,4 +117,5 @@ extension SoundEngine: ToneOutput {
     var avEngine: AVAudioEngine { engine }
     var songPlayerNode: AVAudioPlayerNode { songPlayer }
     var supportsAccompaniment: Bool { false }
+    var instrumentNode: AVAudioNode? { nil }
 }

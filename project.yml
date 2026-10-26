@@ -29,6 +29,20 @@ targets:
         GCC_PREPROCESSOR_DEFINITIONS: ["$(inherited)", "NDEBUG=1", "EIGEN_NO_DEBUG=1", "EIGEN_USE_BLAS=1"]
         GCC_WARN_INHIBIT_ALL_WARNINGS: YES
         SKIP_INSTALL: YES
+  # MP3 export for Record: LAME 3.100 (LGPL-2.0), fetched by Native/fetch-lame.sh.
+  CLame:
+    type: library.static
+    platform: iOS
+    sources:
+      - path: Native/lame/libmp3lame
+        excludes: ["vector/**", "i386/**", "*.rc", "*.ico", "Makefile*", "depcomp"]
+    settings:
+      base:
+        GCC_OPTIMIZATION_LEVEL: "3"
+        HEADER_SEARCH_PATHS: ["$(SRCROOT)/Native/CLame", "$(SRCROOT)/Native/lame/include", "$(SRCROOT)/Native/lame/libmp3lame"]
+        GCC_PREPROCESSOR_DEFINITIONS: ["$(inherited)", "HAVE_CONFIG_H=1", "NDEBUG=1"]
+        GCC_WARN_INHIBIT_ALL_WARNINGS: YES
+        SKIP_INSTALL: YES
   TonePilot:
     type: application
     platform: iOS
@@ -45,6 +59,7 @@ targets:
     dependencies:
       - package: TonePilotCore
       - target: CDemucs
+      - target: CLame
     info:
       path: App/Info.plist
       properties:
@@ -63,7 +78,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.yourname.tonepilot
         SWIFT_OBJC_BRIDGING_HEADER: App/Sources/TonePilot-Bridging-Header.h
-        HEADER_SEARCH_PATHS: ["$(SRCROOT)/Native/CDemucs"]
+        HEADER_SEARCH_PATHS: ["$(SRCROOT)/Native/CDemucs", "$(SRCROOT)/Native/lame/include"]
         OTHER_LDFLAGS: ["$(inherited)", "-lc++", "-framework", "Accelerate"]
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

@@ -37,6 +37,8 @@ struct RootView: View {
                 .tabItem { Label("Songs", systemImage: "music.note.list") }.tag(AppTab.library)
             StudioTab()
                 .tabItem { Label("Play", systemImage: "pianokeys") }.tag(AppTab.studio)
+            NavigationStack { RecordView() }
+                .tabItem { Label("Record", systemImage: "record.circle") }.tag(AppTab.record)
             NavigationStack { SettingsView() }
                 .tabItem { Label("Settings", systemImage: "gearshape") }.tag(AppTab.settings)
         }
