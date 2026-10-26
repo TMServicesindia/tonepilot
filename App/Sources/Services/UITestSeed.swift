@@ -51,13 +51,17 @@ enum UITestSeed {
             let t = Double(i) / sr, tb = t.truncatingRemainder(dividingBy: beat)
             let chord = progression[Int(t / bar) % 4], root = roots[chord]!
             let third = chord == "Am" ? 3.0 : 4.0
-            drums[i] = Float(0.5 * sin(2 * .pi * 55 * tb) * exp(-tb * 25))
-            bass[i] = Float(0.25 * sin(2 * .pi * f(root - 12) * t))
-            music[i] = Float(0.12 * (sin(2 * .pi * f(root + 12) * t) + sin(2 * .pi * f(root + 12 + third) * t) + sin(2 * .pi * f(root + 19) * t)) * exp(-tb * 4))
-            vocals[i] = Float(0.15 * sin(2 * .pi * f(72 + Double(Int(t) % 5)) * t) * (t.truncatingRemainder(dividingBy: 4) < 3 ? 1 : 0))
+            drums[i] = Float(0.5 * sin(2 * Double.pi * 55 * tb) * exp(-tb * 25))
+            bass[i] = Float(0.25 * sin(2 * Double.pi * f(root - 12) * t))
+            let twoPiT: Double = 2 * Double.pi * t
+            let triad: Double = sin(twoPiT * f(root + 12)) + sin(twoPiT * f(root + 12 + third)) + sin(twoPiT * f(root + 19))
+            music[i] = Float(0.12 * triad * exp(-tb * 4))
+            let sung: Double = t.truncatingRemainder(dividingBy: 4) < 3 ? 1 : 0
+            vocals[i] = Float(0.15 * sin(2 * Double.pi * f(72 + Double(Int(t) % 5)) * t) * sung)
         }
         let parts: [StemInfo.Kind: [Float]] = [.drums: drums, .bass: bass, .other: music, .vocals: vocals]
-        let mix = (0..<n).map { i in (drums[i] + bass[i] + music[i] + vocals[i]) * 0.8 }
+        var mix = [Float](repeating: 0, count: n)
+        for i in 0..<n { mix[i] = 0.8 * (drums[i] + bass[i] + music[i] + vocals[i]) }
         do {
             try write(mix, sr: sr, to: model.store.audioDirectory.appendingPathComponent("uitest-demo.wav"))
             let dir = model.store.stemDirectory(for: song.id)
