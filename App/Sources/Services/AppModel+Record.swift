@@ -22,7 +22,8 @@ extension AppModel {
             recordError = "Recording couldn't start: \(error.localizedDescription)"
             return
         }
-        recordWaiting.withLock { $0 = recordWaitForKey }
+        let wait = recordWaitForKey
+        recordWaiting.withLock { $0 = wait }
         recordState = recordWaitForKey ? .waitingForKey : .recording
         live.recordSeconds = 0
         recordTimer?.invalidate()
