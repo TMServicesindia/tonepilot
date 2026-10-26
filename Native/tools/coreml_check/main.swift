@@ -8,7 +8,16 @@ import TonePilotCore
 let args = CommandLine.arguments
 guard args.count >= 4 else { print("usage: coreml_check <model.bin> <HTDemucs.mlmodelc> <workdir> [seconds]"); exit(1) }
 StemSeparator.modelOverride = URL(fileURLWithPath: args[1])
-CoreMLNetwork.modelOverride = URL(fileURLWithPath: args[2])
+// The model as the app downloads it: a .aar archive, unpacked exactly as the app does.
+let modelArg = URL(fileURLWithPath: args[2])
+if modelArg.pathExtension == "aar" {
+    let unpacked = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("unpacked-\(UUID().uuidString).mlmodelc")
+    try ModelArchive.extract(modelArg, to: unpacked)
+    CoreMLNetwork.modelOverride = unpacked
+    print("RESULT unpacked \(modelArg.lastPathComponent) like the app does")
+} else {
+    CoreMLNetwork.modelOverride = modelArg
+}
 let work = URL(fileURLWithPath: args[3], isDirectory: true)
 try? FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
 let sr = 44_100.0, seconds = args.count > 4 ? Double(args[4]) ?? 30 : 30.0, n = Int(sr * seconds)
@@ -57,7 +66,7 @@ print(String(format: "RESULT %.0f s of audio: CPU engine %.1f s, Core ML %.1f s 
 
 // The first block's input and both outputs, for the comparison with PyTorch Demucs.
 if let a = cpu[0], let b = ml[0] {
-    let len = a.count / 8
+    let len = a.count / (2 * StemSeparator.lastSources)
     let (l, r) = try StemSeparator.decodeStereo(input)
     func save(_ name: String, _ v: [Float]) { v.withUnsafeBufferPointer { try? Data(buffer: $0).write(to: work.appendingPathComponent(name)) } }
     save("block0_input.f32", Array(l[0..<len]) + Array(r[0..<len]))
@@ -66,7 +75,7 @@ if let a = cpu[0], let b = ml[0] {
 }
 
 // Per part: how far the Core ML output is from the CPU engine's (signal-to-difference ratio).
-let names = StemSeparator.order.map(\.rawValue)
+let names = StemSeparator.order(for: StemSeparator.lastSources).map(\.rawValue)
 var worst = Double.infinity
 for (s, name) in names.enumerated() {
     var sig = 0.0, err = 0.0

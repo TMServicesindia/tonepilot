@@ -545,28 +545,47 @@ struct SeparationCard: View {
             }
             .padding(14)
             .background(Theme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
-        } else if !separated, model.audioURL(for: song) != nil {
-            HStack(alignment: .center, spacing: 12) {
-                Image(systemName: "scissors").font(.title3.weight(.semibold))
-                    .frame(width: 44, height: 44)
-                    .background(Theme.accent.opacity(0.2), in: RoundedRectangle(cornerRadius: 12))
-                    .foregroundStyle(Theme.accent)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Separate the parts").font(.subheadline.weight(.semibold))
-                    if let e = model.separationError[song.id] {
-                        Text(e).font(.caption).foregroundStyle(Theme.bad).lineLimit(3)
-                    } else if !model.canSeparate {
-                        Text("The separation model isn't included in this build.").font(.caption).foregroundStyle(Theme.warn)
-                    } else {
-                        Text(song.analysisStatus == .running ? "Starts after the analysis." : "Vocals, drums, bass and music — on this iPhone.")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
+        } else if let d = model.modelDownloadProgress[model.separationPack] {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 10) {
+                    ProgressView().controlSize(.small)
+                    Text("Downloading the separation model (one time)…").font(.subheadline.weight(.semibold))
+                    Spacer()
+                    Text("\(Int(d * 100))%").font(.caption.monospacedDigit())
                 }
-                Spacer(minLength: 4)
-                if model.canSeparate {
+                ProgressView(value: d).tint(Theme.accent)
+                Text("Separation starts automatically when it's done. Wi-Fi recommended.").font(.caption2).foregroundStyle(.secondary)
+            }
+            .padding(14)
+            .background(Theme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+        } else if !separated, model.audioURL(for: song) != nil {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .center, spacing: 12) {
+                    Image(systemName: "scissors").font(.title3.weight(.semibold))
+                        .frame(width: 44, height: 44)
+                        .background(Theme.accent.opacity(0.2), in: RoundedRectangle(cornerRadius: 12))
+                        .foregroundStyle(Theme.accent)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Separate the parts").font(.subheadline.weight(.semibold))
+                        if let e = model.separationError[song.id] ?? model.modelDownloadError {
+                            Text(e).font(.caption).foregroundStyle(Theme.bad).lineLimit(3)
+                        } else {
+                            Text(song.analysisStatus == .running ? "Starts after the analysis." : model.separationPack.detail)
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                    Spacer(minLength: 4)
                     Button(model.separationError[song.id] == nil ? "Start" : "Retry") { model.separateStems(song.id) }
                         .buttonStyle(.borderedProminent)
                         .disabled(song.analysisStatus == .running)
+                        .accessibilityIdentifier("separate.start")
+                }
+                Picker("Parts", selection: $model.separationPack) {
+                    ForEach(SeparationPack.allCases) { Text($0 == .four ? "4 parts" : "6 parts · + Piano & Guitar").tag($0) }
+                }
+                .pickerStyle(.segmented)
+                if !model.models.isInstalled(model.separationPack) {
+                    Text("The first time, the separation model is downloaded (Wi-Fi recommended).").font(.caption2).foregroundStyle(.secondary)
                 }
             }
             .padding(14)
@@ -745,6 +764,8 @@ struct StemTile: View {
         case SongStudio.stem(.drums): return .orange
         case SongStudio.stem(.bass): return .purple
         case SongStudio.stem(.lead): return .yellow
+        case SongStudio.stem(.piano): return .mint
+        case SongStudio.stem(.guitar): return .brown
         case SongStudio.stem(.backing): return .indigo
         default: return .teal
         }

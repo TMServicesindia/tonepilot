@@ -8,6 +8,7 @@ import torch
 
 sys.path.insert(0, os.path.dirname(__file__))
 from convert_htdemucs import Core, m, snr  # noqa: E402
+S = len(m.sources)
 
 d, pkg = sys.argv[1], sys.argv[2]
 F, T, L = 2048, 336, 343980
@@ -20,8 +21,8 @@ print(f"RESULT Core ML left its input unchanged: max change {np.abs(after - mx).
 
 with torch.no_grad():
     rx, rxt = (t.numpy() for t in Core(m).eval()(torch.from_numpy(x), torch.from_numpy(xt)))
-cx, cxt = load("cpu_x_out.f32", (1, 16, F, T)), load("cpu_xt_out.f32", (1, 8, L))
-ax, axt = load("ml_x_out.f32", (1, 16, F, T)), load("ml_xt_out.f32", (1, 8, L))
+cx, cxt = load("cpu_x_out.f32", (1, 4 * S, F, T)), load("cpu_xt_out.f32", (1, 2 * S, L))
+ax, axt = load("ml_x_out.f32", (1, 4 * S, F, T)), load("ml_xt_out.f32", (1, 2 * S, L))
 print(f"RESULT network vs PyTorch — CPU engine: spec {snr(rx, cx):.1f} dB, wave {snr(rxt, cxt):.1f} dB")
 # The engines may hand over different first segments, so the app's Core ML output is judged
 # against PyTorch on its own inputs.

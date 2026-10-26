@@ -44,18 +44,16 @@ jobs:
 
       - name: Stem separator sources and weights (demucs.cpp MIT, Eigen MPL-2.0, htdemucs MIT)
         run: |
-          Native/fetch-demucs.sh --weights
+          # Sources only: the models are downloaded inside the app (models-v1 release), not bundled.
+          Native/fetch-demucs.sh
           curl -fsSL -o App/Resources/Models/DEMUCS-LICENSE.txt https://raw.githubusercontent.com/facebookresearch/demucs/main/LICENSE || true
 
-      - name: Separation model for the GPU / Neural Engine (Core ML, checked by coreml-convert.yml)
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: In-app model download is published
         run: |
-          if gh release download coreml-models -p HTDemucs.mlmodelc.zip -D /tmp/coreml --clobber; then
-            ditto -x -k /tmp/coreml/HTDemucs.mlmodelc.zip App/Resources/Models/
-            echo "::notice title=Core ML::bundled HTDemucs.mlmodelc ($(du -sh App/Resources/Models/HTDemucs.mlmodelc | cut -f1)) — fast separation"
+          if curl -fsSL "https://github.com/${GITHUB_REPOSITORY}/releases/download/models-v1/manifest.json" -o manifest.json; then
+            python3 -c "import json; m=json.load(open('manifest.json'))['files']; [print(f'::notice title=Downloadable model::{k} {v[\"size\"]/1048576:.0f} MB') for k,v in m.items()]"
           else
-            echo "::warning title=Core ML::model not published yet — this build separates on the CPU only"
+            echo "::warning title=Models::models-v1/manifest.json isn't published yet — separation will fail to download until coreml-convert.yml publishes it"
           fi
 
       - name: Generate Xcode project
@@ -83,9 +81,10 @@ jobs:
           if [ "$(nm "$APP/TonePilot" 2>/dev/null | grep -c tp_demucs_separate)" = "0" ]; then
             echo "::error title=Separator::tp_demucs symbols not found in the app binary"; exit 1
           fi
-          if [ -z "$(find "$APP" -name 'ggml-model-htdemucs-4s-f16.bin' -size +10M)" ]; then
-            echo "::error title=Separator::model file missing from the app"; ls -la "$APP" | head -40; exit 1
+          if [ -n "$(find "$APP" -name '*.mlmodelc' -o -name 'ggml-model-*.bin')" ]; then
+            echo "::error title=Size::a separation model is bundled in the app (they are downloaded in the app now)"; exit 1
           fi
+          echo "::notice title=App size::$(du -sh "$APP" | cut -f1)"
 
       # Logs need a login to download; annotations are public, so surface errors there.
       # Speed & crash gate: the app is driven through every screen on an iPhone simulator. A crash,

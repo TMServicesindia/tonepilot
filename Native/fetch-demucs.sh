@@ -21,9 +21,15 @@ if [ ! -d eigen/Eigen ]; then
   git -C eigen fetch -q --depth 1 https://gitlab.com/libeigen/eigen.git "$EIGEN_COMMIT"
   git -C eigen checkout -q FETCH_HEAD
 fi
-if [ "${1:-}" = "--weights" ]; then
+# --weights: 4-part weights; --weights6: 6-part (htdemucs_6s); --all-weights: both.
+fetch_weights() {
   mkdir -p ../App/Resources/Models
-  W=../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin
-  [ -s "$W" ] || curl -fsSL -o "$W" https://huggingface.co/datasets/Retrobear/demucs.cpp/resolve/main/ggml-model-htdemucs-4s-f16.bin
+  W=../App/Resources/Models/ggml-model-htdemucs-$1s-f16.bin
+  [ -s "$W" ] || curl -fsSL -o "$W" "https://huggingface.co/datasets/Retrobear/demucs.cpp/resolve/main/ggml-model-htdemucs-$1s-f16.bin"
   ls -la "$W"
-fi
+}
+case "${1:-}" in
+  --weights) fetch_weights 4 ;;
+  --weights6) fetch_weights 6 ;;
+  --all-weights) fetch_weights 4; fetch_weights 6 ;;
+esac

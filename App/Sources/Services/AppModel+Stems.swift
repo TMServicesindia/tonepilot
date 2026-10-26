@@ -25,7 +25,8 @@ final class CancelFlags: @unchecked Sendable {
 
 /// Moises-style separation on this iPhone: vocals, drums, bass and music as separate parts.
 extension AppModel {
-    var canSeparate: Bool { StemSeparator.isAvailable }
+    /// The separator is part of the app; its model is downloaded when first needed.
+    var canSeparate: Bool { true }
 
     func isSeparating(_ songId: UUID) -> Bool { separationProgress[songId] != nil }
 
@@ -36,8 +37,49 @@ extension AppModel {
         return max(0, elapsed / p - elapsed)
     }
 
+    /// Separates with the chosen pack (4 or 6 parts), downloading its model first if needed.
     func separateStems(_ songId: UUID) {
-        guard canSeparate, !isSeparating(songId), let song = song(songId), let url = audioURL(for: song) else { return }
+        let pack = separationPack
+        guard !isSeparating(songId), modelDownloadProgress[pack] == nil else { return }
+        if models.isInstalled(pack) { runSeparation(songId, pack: pack); return }
+        downloadModel(pack) { [weak self] ok in if ok { self?.runSeparation(songId, pack: pack) } }
+    }
+
+    /// Downloads a separation model (progress in `modelDownloadProgress`).
+    func downloadModel(_ pack: SeparationPack, then: ((Bool) -> Void)? = nil) {
+        guard modelDownloadProgress[pack] == nil else { return }
+        modelDownloadError = nil
+        modelDownloadProgress[pack] = 0
+        let store = models
+        let throttle = ProgressThrottle()
+        Task.detached(priority: .userInitiated) { [weak self] in
+            var failure: String?
+            do {
+                try await store.install(pack) { p in
+                    if throttle.shouldSend(p) { Task { @MainActor in if self?.modelDownloadProgress[pack] != nil { self?.modelDownloadProgress[pack] = p } } }
+                }
+            } catch {
+                failure = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            }
+            let failureText = failure
+            await MainActor.run {
+                self?.modelDownloadProgress[pack] = nil
+                self?.modelDownloadError = failureText
+                then?(failureText == nil)
+            }
+        }
+    }
+
+    func deleteModel(_ pack: SeparationPack) {
+        guard modelDownloadProgress[pack] == nil else { return }
+        models.delete(pack)
+        objectWillChange.send()
+    }
+
+    private func runSeparation(_ songId: UUID, pack: SeparationPack) {
+        guard !isSeparating(songId), let song = song(songId), let url = audioURL(for: song) else { return }
+        StemSeparator.current = models.weightsURL(pack)
+        CoreMLNetwork.current = models.coreMLURL(pack)
         separationError[songId] = nil
         separationProgress[songId] = 0
         separationStart[songId] = Date()

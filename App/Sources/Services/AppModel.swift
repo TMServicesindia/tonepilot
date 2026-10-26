@@ -61,6 +61,15 @@ final class AppModel: ObservableObject {
     // Stem separation (on this iPhone)
     @Published var separationProgress: [UUID: Double] = [:]
     @Published var separationError: [UUID: String] = [:]
+    /// Separation models, downloaded inside the app when first needed.
+    let models = ModelStore()
+    /// Model download progress (0...1), by pack.
+    @Published var modelDownloadProgress: [SeparationPack: Double] = [:]
+    @Published var modelDownloadError: String?
+    /// 4 or 6 parts for the next separation.
+    @Published var separationPack: SeparationPack = SeparationPack(rawValue: UserDefaults.standard.string(forKey: "separationParts") ?? "") ?? .four {
+        didSet { UserDefaults.standard.set(separationPack.rawValue, forKey: "separationParts") }
+    }
     /// Splitting the Music part into Lead instruments and Backing (0...1 while running).
     @Published var musicSplitProgress: [UUID: Double] = [:]
     var separationStart: [UUID: Date] = [:]

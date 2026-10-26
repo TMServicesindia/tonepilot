@@ -29,6 +29,7 @@ struct SettingsView: View {
             } header: { Text("Sounds") } footer: {
                 Text("The TonePilot engine supports per-layer envelope, filter, EQ, chorus, glide/vibrato, and the generated accompaniment. The Apple sampler is a simpler fallback.")
             }
+            SeparationModelsSection()
             Section("AI analysis") {
                 NavigationLink { AnalysisServerSettingsView() } label: {
                     Label("Analysis server (vocal separation)", systemImage: "server.rack")
@@ -274,5 +275,42 @@ struct AnalysisServerSettingsView: View {
         .navigationTitle("Analysis server")
         .onAppear { token = model.serverToken ?? "" }
         .onDisappear { model.serverToken = token }
+    }
+}
+
+
+/// Separation models: downloaded inside the app when first needed; size and delete here.
+struct SeparationModelsSection: View {
+    @EnvironmentObject var model: AppModel
+
+    var body: some View {
+        Section {
+            ForEach(SeparationPack.allCases) { pack in
+                let installed = model.models.isInstalled(pack)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(pack.title).font(.subheadline.weight(.semibold))
+                        if model.separationPack == pack { StatusPill(text: "Used", color: Theme.accent) }
+                        Spacer()
+                        if let p = model.modelDownloadProgress[pack] {
+                            ProgressView(value: p).frame(width: 80)
+                        } else if installed {
+                            Text(ByteCountFormatter.string(fromByteCount: model.models.installedSize(pack), countStyle: .file))
+                                .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                            Button(role: .destructive) { model.deleteModel(pack) } label: { Image(systemName: "trash") }
+                                .buttonStyle(.borderless).accessibilityLabel("Delete \(pack.title) model")
+                        } else {
+                            Button("Download") { model.downloadModel(pack) }.buttonStyle(.bordered)
+                        }
+                    }
+                    Text(pack.detail).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            if let e = model.modelDownloadError { Text(e).font(.caption).foregroundStyle(Theme.bad) }
+        } header: {
+            Text("Separation models")
+        } footer: {
+            Text("Downloaded the first time you separate a song (Wi-Fi recommended) and kept on this iPhone. Deleting one frees space; it downloads again when needed.")
+        }
     }
 }

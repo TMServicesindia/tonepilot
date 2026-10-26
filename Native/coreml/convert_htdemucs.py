@@ -10,7 +10,7 @@ de-normalisation — exactly what demucs.cpp's model_inference computes between
 
 Checks the converted model against PyTorch on the same input and writes HTDemucs.mlpackage.
 """
-import sys, time
+import os, sys, time
 import numpy as np
 import torch
 from torch import nn
@@ -20,7 +20,9 @@ torch.backends.mha.set_fastpath_enabled(False)  # plain ops that Core ML underst
 
 from demucs.pretrained import get_model
 
-bag = get_model("htdemucs")
+# htdemucs (4 parts) or htdemucs_6s (6 parts: + guitar, piano).
+MODEL = os.environ.get("TP_DEMUCS_MODEL", "htdemucs")
+bag = get_model(MODEL)
 m = bag.models[0] if hasattr(bag, "models") else bag
 m.eval()
 SEG = int(m.segment * m.samplerate)  # 343980 samples (7.8 s at 44.1 kHz)

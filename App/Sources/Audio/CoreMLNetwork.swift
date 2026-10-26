@@ -17,12 +17,16 @@ final class CoreMLNetwork: @unchecked Sendable {
     /// Why the model couldn't be loaded (diagnostics).
     nonisolated(unsafe) static var loadError: String?
 
+    /// The model to use for the next separation (set by `StemSeparator` from the chosen pack).
+    nonisolated(unsafe) static var current: URL?
+
     static var modelURL: URL? {
-        modelOverride ?? Bundle.main.url(forResource: modelName, withExtension: "mlmodelc", subdirectory: "Models")
-            ?? Bundle.main.url(forResource: modelName, withExtension: "mlmodelc")
+        modelOverride ?? current ?? Bundle.main.url(forResource: modelName, withExtension: "mlmodelc", subdirectory: "Models")
     }
 
     private let model: MLModel
+    /// Parts the model produces (4 = htdemucs, 6 = htdemucs_6s), read from its output shape.
+    let sources: Int
     private let lock = NSLock()
     private var failed = false
     private(set) var segments = 0
@@ -32,14 +36,18 @@ final class CoreMLNetwork: @unchecked Sendable {
         guard !Self.disabled, let url = Self.modelURL else { return nil }
         let config = MLModelConfiguration()
         config.computeUnits = computeUnits
-        do { model = try MLModel(contentsOf: url, configuration: config) } catch {
+        let loaded: MLModel
+        do { loaded = try MLModel(contentsOf: url, configuration: config) } catch {
             Self.loadError = error.localizedDescription
             return nil
         }
+        let shape = loaded.modelDescription.outputDescriptionsByName["xt_out"]?.multiArrayConstraint?.shape.map(\.intValue) ?? [1, 8, Self.samples]
+        model = loaded
+        sources = shape.count == 3 ? shape[1] / 2 : 4
     }
 
-    /// One segment: x (1,4,bins,frames) and xt (1,2,samples) in, x_out (1,16,bins,frames) and
-    /// xt_out (1,8,samples) out, all row-major float32. Returns 0 on success.
+    /// One segment: x (1,4,bins,frames) and xt (1,2,samples) in, x_out (1,4S,bins,frames) and
+    /// xt_out (1,2S,samples) out (S parts), all row-major float32. Returns 0 on success.
     func run(x: UnsafePointer<Float>, xt: UnsafePointer<Float>, xOut: UnsafeMutablePointer<Float>,
              xtOut: UnsafeMutablePointer<Float>, bins: Int, frames: Int, samples: Int) -> Int32 {
         guard bins == Self.bins, frames == Self.frames, samples == Self.samples else { return 2 }
@@ -61,8 +69,8 @@ final class CoreMLNetwork: @unchecked Sendable {
             }
             guard let xo = out.featureValue(for: "x_out")?.multiArrayValue,
                   let xto = out.featureValue(for: "xt_out")?.multiArrayValue,
-                  Self.copy(xo, to: xOut, shape: [1, 16, bins, frames]),
-                  Self.copy(xto, to: xtOut, shape: [1, 8, samples]) else { failed = true; return 1 }
+                  Self.copy(xo, to: xOut, shape: [1, 4 * sources, bins, frames]),
+                  Self.copy(xto, to: xtOut, shape: [1, 2 * sources, samples]) else { failed = true; return 1 }
         } catch {
             failed = true
             return 1

@@ -1,13 +1,16 @@
 name: Convert Demucs to Core ML
 
-# Converts the htdemucs network to Core ML (GPU / Neural Engine) and checks it against PyTorch,
-# then runs the app's own separator with it and compares against the CPU engine. When everything
-# matches, the compiled model is published as a release asset that the iPhone build bundles:
-#   https://github.com/<owner>/<repo>/releases/download/coreml-models/HTDemucs.mlmodelc.zip
+# Converts the Demucs networks (htdemucs: 4 parts; htdemucs_6s: 6 parts with guitar and piano)
+# to Core ML, checks each against PyTorch, runs the app's own separator with it (from the exact
+# archive the app downloads) and compares against the CPU engine and the original Demucs. Only
+# when every check passes are the models published for in-app download:
+#   https://github.com/<owner>/<repo>/releases/download/models-v1/manifest.json
 on:
   push:
     branches: [main]
-    paths: ["Native/coreml/**", "Native/CDemucs/**", "Native/patch-demucs.py", "Native/tools/coreml_check/**", "App/Sources/Audio/CoreMLNetwork.swift", ".github/workflows/coreml-convert.yml"]
+    paths: ["Native/coreml/**", "Native/CDemucs/**", "Native/patch-demucs.py", "Native/tools/coreml_check/**",
+            "App/Sources/Audio/CoreMLNetwork.swift", "App/Sources/Audio/ModelArchive.swift", "App/Sources/Audio/StemSeparator.swift",
+            ".github/workflows/coreml-convert.yml"]
   workflow_dispatch:
 
 permissions:
@@ -16,6 +19,14 @@ permissions:
 jobs:
   convert:
     runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { model: htdemucs, parts: "4", name: HTDemucs }
+          - { model: htdemucs_6s, parts: "6", name: HTDemucs6 }
+    env:
+      TP_DEMUCS_MODEL: ${{ matrix.model }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,20 +36,20 @@ jobs:
         run: |
           python -m pip install --quiet "torch==2.4.1" "torchaudio==2.4.1" "coremltools==8.1" "numpy<2" einops
           python -m pip install --quiet "demucs==4.0.1"
-      - name: Convert and verify against PyTorch
+      - name: Convert and verify against PyTorch (${{ matrix.model }})
         run: |
           set -o pipefail
-          python Native/coreml/convert_htdemucs.py HTDemucs.mlpackage 2>&1 | tee convert.log | grep -vE "^\s*$" | tail -20
-          grep -E "^RESULT|^saved" convert.log | while IFS= read -r l; do echo "::notice title=Core ML::$l"; done
-      - name: Compile
+          python Native/coreml/convert_htdemucs.py ${{ matrix.name }}.mlpackage 2>&1 | tee convert.log | grep -vE "^\s*$" | tail -20
+          grep -E "^RESULT|^saved" convert.log | while IFS= read -r l; do echo "::notice title=Core ML ${{ matrix.parts }} parts::$l"; done
+      - name: Compile and pack for download
         run: |
           set -euo pipefail
-          xcrun coremlcompiler compile HTDemucs.mlpackage .
-          test -d HTDemucs.mlmodelc
-          ditto -c -k --keepParent HTDemucs.mlmodelc HTDemucs.mlmodelc.zip
-          echo "::notice title=Core ML size::$(du -sh HTDemucs.mlmodelc | cut -f1) compiled, $(du -sh HTDemucs.mlmodelc.zip | cut -f1) zipped"
+          xcrun coremlcompiler compile ${{ matrix.name }}.mlpackage .
+          test -d ${{ matrix.name }}.mlmodelc
+          aa archive -d ${{ matrix.name }}.mlmodelc -o ${{ matrix.name }}.mlmodelc.aar -a lzfse
+          echo "::notice title=Core ML ${{ matrix.parts }} parts size::$(du -sh ${{ matrix.name }}.mlmodelc | cut -f1) compiled, $(du -sh ${{ matrix.name }}.mlmodelc.aar | cut -f1) packed"
       - name: Fetch demucs.cpp, Eigen and weights
-        run: Native/fetch-demucs.sh --weights
+        run: Native/fetch-demucs.sh --weights${{ matrix.parts == '6' && '6' || '' }}
       - name: The app's separator with Core ML vs the CPU engine
         working-directory: Native
         run: |
@@ -55,37 +66,73 @@ jobs:
             $(find ../../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') -o libTonePilotCore.a > core.log 2>&1
           swiftc -O -I . -L . -lTonePilotCore -import-objc-header ../CDemucs/tp_demucs.h \
             ../tools/coreml_check/main.swift ../../App/Sources/Audio/StemSeparator.swift ../../App/Sources/Audio/CoreMLNetwork.swift \
+            ../../App/Sources/Audio/ModelArchive.swift \
             obj/*.o -lc++ -framework Accelerate -framework CoreML -o coreml_check > cli.log 2>&1
           set +e
-          mkdir -p /tmp/netdump && TP_DUMP_NET=/tmp/netdump ./coreml_check ../../App/Resources/Models/ggml-model-htdemucs-4s-f16.bin ../../HTDemucs.mlmodelc /tmp/mlcheck 30 > check.log 2>&1
+          mkdir -p /tmp/netdump && TP_DUMP_NET=/tmp/netdump ./coreml_check ../../App/Resources/Models/ggml-model-htdemucs-${{ matrix.parts }}s-f16.bin \
+            ../../${{ matrix.name }}.mlmodelc.aar /tmp/mlcheck 30 > check.log 2>&1
           code=$?
           set -e
-          grep -E "^RESULT|^ERROR" check.log | while IFS= read -r l; do echo "::notice title=App separator::$l"; done
+          grep -E "^RESULT|^ERROR" check.log | while IFS= read -r l; do echo "::notice title=App separator ${{ matrix.parts }} parts::$l"; done
           [ $code = 0 ] || grep -vE "Loading tensor|^\[|MB$" check.log | tail -8 | while IFS= read -r l; do echo "::error title=Check (exit $code)::$l"; done
           exit $code
       - name: Network-level check (same inputs, each engine vs PyTorch)
         run: |
           code=0
-          python Native/coreml/compare_network.py /tmp/netdump HTDemucs.mlpackage > net.log 2>&1 || code=$?
+          python Native/coreml/compare_network.py /tmp/netdump ${{ matrix.name }}.mlpackage > net.log 2>&1 || code=$?
           tail -6 net.log
-          grep "^RESULT" net.log | while IFS= read -r l; do echo "::notice title=Network::$l"; done
+          grep "^RESULT" net.log | while IFS= read -r l; do echo "::notice title=Network ${{ matrix.parts }} parts::$l"; done
           [ $code = 0 ] || tail -5 net.log | while IFS= read -r l; do echo "::error title=Network check::$l"; done
       - name: Referee — both engines vs the original PyTorch Demucs
         run: |
           code=0
           python Native/coreml/compare_pytorch.py /tmp/mlcheck > ref.log 2>&1 || code=$?
           tail -8 ref.log
-          grep "^RESULT" ref.log | while IFS= read -r l; do echo "::notice title=vs PyTorch::$l"; done
+          grep "^RESULT" ref.log | while IFS= read -r l; do echo "::notice title=vs PyTorch ${{ matrix.parts }} parts::$l"; done
           exit $code
+      - name: Collect the downloadable files
+        run: |
+          mkdir -p pack
+          mv ${{ matrix.name }}.mlmodelc.aar pack/
+          cp App/Resources/Models/ggml-model-htdemucs-${{ matrix.parts }}s-f16.bin pack/
+          ls -la pack
       - uses: actions/upload-artifact@v4
         with:
-          name: HTDemucs-mlmodelc
-          path: HTDemucs.mlmodelc.zip
-      - name: Publish the model for the iPhone build
-        if: github.ref == 'refs/heads/main'
+          name: models-${{ matrix.parts }}
+          path: pack/*
+
+  publish:
+    needs: convert
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: models-*
+          path: pack
+          merge-multiple: true
+      - name: Manifest (sizes and SHA-256 the app checks)
+        run: |
+          cd pack
+          python3 - <<'PY'
+          import hashlib, json, os
+          files = {}
+          for name in sorted(os.listdir(".")):
+              h = hashlib.sha256()
+              with open(name, "rb") as f:
+                  for chunk in iter(lambda: f.read(1 << 22), b""): h.update(chunk)
+              files[name] = {"size": os.path.getsize(name), "sha256": h.hexdigest()}
+          json.dump({"version": 1, "files": files}, open("manifest.json", "w"), indent=1)
+          for n, v in files.items(): print(f"::notice title=Model file::{n} {v['size'] / 1048576:.0f} MB")
+          PY
+          ls -la
+      - name: Publish for in-app download
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          gh release view coreml-models > /dev/null 2>&1 || gh release create coreml-models --title "Separation model (Core ML)" \
-            --notes "htdemucs (Demucs v4, Meta AI, MIT licence) converted to Core ML at full 32-bit precision. Bundled into the iPhone app by the build." --latest=false
-          gh release upload coreml-models HTDemucs.mlmodelc.zip --clobber
+          gh release view models-v1 > /dev/null 2>&1 || gh release create models-v1 --title "Separation models (in-app download)" \
+            --notes "Downloaded by the TonePilot app when first needed. htdemucs and htdemucs_6s (Demucs v4, Meta AI, MIT licence): demucs.cpp weights (16-bit) and Core ML networks (32-bit, checked against PyTorch). Do not delete." --latest=false
+          # The manifest goes last, so the app never sees a manifest for files not yet uploaded.
+          gh release upload models-v1 pack/*.bin pack/*.aar --clobber
+          gh release upload models-v1 pack/manifest.json --clobber

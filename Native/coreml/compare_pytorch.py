@@ -3,7 +3,7 @@ how close TonePilot's CPU engine (demucs.cpp) and its Core ML engine are to it.
 Exits 1 unless, for every part, the Core ML engine is at least as close to PyTorch as the CPU
 engine the app used before (measured: both share demucs.cpp's spectrogram/segmenting, which is
 where most of their common difference from PyTorch comes from)."""
-import sys
+import os, sys
 import numpy as np
 import torch
 from demucs.apply import apply_model
@@ -12,10 +12,11 @@ from demucs.pretrained import get_model
 work = sys.argv[1]
 mix = np.fromfile(f"{work}/block0_input.f32", dtype=np.float32).reshape(2, -1)
 n = mix.shape[1]
-cpu = np.fromfile(f"{work}/block0_cpu.f32", dtype=np.float32).reshape(4, 2, n)
-ml = np.fromfile(f"{work}/block0_coreml.f32", dtype=np.float32).reshape(4, 2, n)
+bag = get_model(os.environ.get("TP_DEMUCS_MODEL", "htdemucs"))
+S = len(bag.sources)
+cpu = np.fromfile(f"{work}/block0_cpu.f32", dtype=np.float32).reshape(S, 2, n)
+ml = np.fromfile(f"{work}/block0_coreml.f32", dtype=np.float32).reshape(S, 2, n)
 
-bag = get_model("htdemucs")
 print("sources", bag.sources)
 with torch.no_grad():
     ref = apply_model(bag, torch.from_numpy(mix)[None], shifts=0, split=True, overlap=0.25, progress=False)[0].numpy()

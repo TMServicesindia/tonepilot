@@ -135,7 +135,8 @@ public enum SongStudio {
         case .vocals: return "music.mic"
         case .drums: return "metronome.fill"
         case .bass: return "waveform.path"
-        case .other, .piano, .guitar: return "guitars"
+        case .other, .guitar: return "guitars"
+        case .piano: return "pianokeys"
         case .lead: return "music.quarternote.3"
         case .backing: return "music.note.list"
         }

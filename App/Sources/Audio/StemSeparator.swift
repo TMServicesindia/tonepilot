@@ -27,14 +27,19 @@ enum StemSeparator {
     static let modelName = "ggml-model-htdemucs-4s-f16"
     /// demucs.cpp output order for the 4-source model.
     static let order: [StemInfo.Kind] = [.drums, .bass, .other, .vocals]
+    /// Output order for a model with `sources` parts (htdemucs_6s adds guitar and piano).
+    static func order(for sources: Int) -> [StemInfo.Kind] { sources == 6 ? order + [.guitar, .piano] : order }
+    /// The model files for the next separation (set from the chosen, downloaded pack).
+    nonisolated(unsafe) static var current: URL?
+    /// Parts the last separation produced (4 or 6).
+    nonisolated(unsafe) static var lastSources = 4
     static let sampleRate = 44_100.0
 
     /// Tests point this at the weights file.
     nonisolated(unsafe) static var modelOverride: URL?
 
     static var modelURL: URL? {
-        modelOverride ?? Bundle.main.url(forResource: modelName, withExtension: "bin", subdirectory: "Models")
-            ?? Bundle.main.url(forResource: modelName, withExtension: "bin")
+        modelOverride ?? current ?? Bundle.main.url(forResource: modelName, withExtension: "bin", subdirectory: "Models")
     }
 
     static var isAvailable: Bool { modelURL != nil }
@@ -76,10 +81,13 @@ enum StemSeparator {
         guard let model = tp_demucs_load(modelURL.path) else { throw Failure.modelLoad }
         defer { tp_demucs_free(model) }
         let sources = Int(tp_demucs_source_count(model))
-        guard sources == order.count else { throw Failure.modelLoad }
+        guard sources == 4 || sources == 6 else { throw Failure.modelLoad }
+        let order = Self.order(for: sources)
+        lastSources = sources
         // The neural network runs on the GPU / Neural Engine when the Core ML model is in the app
         // (several times faster, same output); otherwise everything runs on the CPU.
-        let network = CoreMLNetwork()
+        // (Only a Core ML model with the same parts can stand in for the CPU network.)
+        let network = CoreMLNetwork().flatMap { $0.sources == sources ? $0 : nil }
         network?.install()
         defer {
             network?.uninstall()
@@ -142,7 +150,8 @@ enum StemSeparator {
                 blockDone?(c.index)
             } }
         }
-        return files.map { StemInfo(kind: $0.0, fileName: $0.1.lastPathComponent, model: "htdemucs (on this iPhone)") }
+        let modelName = sources == 6 ? "htdemucs_6s (on this iPhone)" : "htdemucs (on this iPhone)"
+        return files.map { StemInfo(kind: $0.0, fileName: $0.1.lastPathComponent, model: modelName) }
     }
 
     /// Writes a stereo part as AAC (same format as the separated parts).
