@@ -5,6 +5,7 @@ name: Build iPhone app
 on:
   push:
     branches: [main]
+    paths-ignore: ["docs/**", "android/**", "server/**", "**/*.md", ".github/workflows/android-build.yml", ".github/workflows/stems-bench.yml"]
     tags: ["v*"]
   pull_request:
   workflow_dispatch:

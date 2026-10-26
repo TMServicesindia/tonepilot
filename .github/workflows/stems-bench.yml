@@ -3,9 +3,7 @@ name: Stem separation benchmark
 # Measures the on-device separator (demucs.cpp, htdemucs 4-source) on an Apple Silicon runner
 # and checks that each part of a synthetic song lands in the right stem.
 on:
-  push:
-    branches: [main]
-    paths: ["Native/**", "App/Sources/Audio/StemSeparator.swift", "Packages/TonePilotCore/Sources/**", ".github/workflows/stems-bench.yml"]
+  # Run on demand only (Mac minutes are limited).
   workflow_dispatch:
 
 jobs:

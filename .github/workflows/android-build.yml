@@ -9,7 +9,9 @@ name: Build Android app
 on:
   push:
     branches: [main]
+    paths: ["android/**", "Packages/TonePilotCore/**", ".github/workflows/android-build.yml"]
   pull_request:
+    paths: ["android/**", "Packages/TonePilotCore/**"]
   workflow_dispatch:
 
 concurrency:
