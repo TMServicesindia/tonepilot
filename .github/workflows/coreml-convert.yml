@@ -65,9 +65,9 @@ jobs:
           exit $code
       - name: Referee — both engines vs the original PyTorch Demucs
         run: |
-          set -o pipefail
-          python Native/coreml/compare_pytorch.py /tmp/mlcheck 2>&1 | tee ref.log | grep -v "^\s*$" | tail -8
-          code=${PIPESTATUS[0]}
+          code=0
+          python Native/coreml/compare_pytorch.py /tmp/mlcheck > ref.log 2>&1 || code=$?
+          tail -8 ref.log
           grep "^RESULT" ref.log | while IFS= read -r l; do echo "::notice title=vs PyTorch::$l"; done
           exit $code
       - uses: actions/upload-artifact@v4
