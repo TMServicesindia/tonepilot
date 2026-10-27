@@ -148,5 +148,9 @@ final class ToneQualityTests: XCTestCase {
         XCTAssertNil(InstrumentEvidence.family(forLabel: "dog_bark"))
         XCTAssertNil(InstrumentEvidence.family(forLabel: "bass_guitar"))
         XCTAssertEqual(InstrumentEvidence.family(forLabel: "electric_piano"), "piano")
+        XCTAssertEqual(InstrumentEvidence.weight(forLabel: "keyboard_(musical)"), 0.5)
+        XCTAssertEqual(InstrumentEvidence.weight(forLabel: "guitar"), 0.5)
+        XCTAssertEqual(InstrumentEvidence.weight(forLabel: "electric_guitar"), 1)
+        XCTAssertEqual(InstrumentEvidence.weight(forLabel: "trumpet"), 1)
     }
 }

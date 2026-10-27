@@ -51,7 +51,7 @@ enum InstrumentRecognizer {
             var window: [String: Double] = [:]
             for c in r.classifications where c.confidence > 0.05 {
                 if let family = InstrumentEvidence.family(forLabel: c.identifier) {
-                    window[family] = max(window[family] ?? 0, c.confidence)
+                    window[family] = max(window[family] ?? 0, c.confidence * InstrumentEvidence.weight(forLabel: c.identifier))
                 }
             }
             lock.withLock {

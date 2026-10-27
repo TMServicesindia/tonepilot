@@ -28,6 +28,15 @@ public enum InstrumentEvidence {
     public static let families = ["brass", "strings", "flute", "reed", "synth", "electricGuitar", "acousticGuitar",
                                   "piano", "organ", "plucked", "bells", "choir", "voice"]
 
+    /// How much a label says about the family: broad labels the classifier gives to many sounds
+    /// ("keyboard (musical)" for synths and organs, "plucked string instrument" and plain "guitar"
+    /// for every guitar) count half, so the specific labels decide.
+    public static func weight(forLabel label: String) -> Double {
+        let l = label.lowercased()
+        let broad = ["keyboard", "plucked_string", "bowed_string", "musical_instrument", "wind_instrument"]
+        return l == "guitar" || broad.contains(where: { l.contains($0) }) ? 0.5 : 1
+    }
+
     /// Family for a classifier label (identifiers like "trumpet", "violin_fiddle", "synthesizer").
     public static func family(forLabel label: String) -> String? {
         let l = label.lowercased()

@@ -86,6 +86,7 @@ struct ArrangementEditorView: View {
     let arrangementId: UUID
     /// Shown as a sheet: a Done button closes it.
     var onDone: (() -> Void)?
+    @Environment(\.dismiss) private var dismiss
     @State private var expandedLayer: UUID?
     @State private var pickingPatchForLayer: UUID?
     @State private var addingLayer = false
@@ -177,7 +178,9 @@ struct ArrangementEditorView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }
                 if let onDone {
-                    ToolbarItem(placement: .confirmationAction) { Button("Done", action: onDone).accessibilityIdentifier("tone.done") }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") { onDone(); dismiss() }.accessibilityIdentifier("tone.done")
+                    }
                 }
             }
             .onAppear { model.activate(arrangement, songId: songId == model.activeSongId ? songId : nil) }
