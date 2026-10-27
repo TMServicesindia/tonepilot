@@ -278,10 +278,13 @@ public final class ToneEngineController: @unchecked Sendable {
 
     private var patternBuffers: [(Int, UnsafeMutableBufferPointer<SequencerEvent>)] = []
     private var patternGeneration = 0
+    /// The pattern player is also driven from the MIDI thread (Song Arpeggio live fill-in).
+    private let patternLock = NSLock()
 
     /// Installs a looping pattern (`events` frames relative to the loop start, < `loopSeconds`).
     /// The current loop position is kept, so a new chord or pattern takes over without a restart.
     public func setPattern(_ events: [SequencerEvent], loopSeconds: Double) {
+        patternLock.lock(); defer { patternLock.unlock() }
         patternGeneration += 1
         let sorted = events.sorted { ($0.frame, $0.velocity == 0 ? 0 : 1) < ($1.frame, $1.velocity == 0 ? 0 : 1) }
         let buf = UnsafeMutableBufferPointer<SequencerEvent>.allocate(capacity: max(1, sorted.count))

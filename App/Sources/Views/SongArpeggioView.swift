@@ -81,8 +81,9 @@ struct SongArpeggioCard: View {
                 Stepper(value: Binding(get: { arp.effectiveSplit }, set: { model.setArpeggioSplit($0, songId: song.id) }), in: 40...84) {
                     Text("Chord hand: below \(NoteName.name(for: arp.effectiveSplit))").font(.subheadline)
                 }
-                Text("Works with the song paused (it uses the song's tempo) or playing. Your octave note counts as chord hand too.")
+                Text("Start with R · 5 — TonePilot continues the song's pattern, softer and above your hand, in the song's rhythm (locked to its beat while it plays). It never plays the notes you play, follows your chord changes at once, and stays silent when you play a full chord.")
                     .font(.caption2).foregroundStyle(.secondary)
+                chordMemory(arp)
             }
         }
         .padding(12)
@@ -135,7 +136,7 @@ struct SongArpeggioCard: View {
             }
             .accessibilityIdentifier("arpeggio.style")
         }
-        PatternGrid(pattern: pattern, yours: live ? model.arpeggioFollower?.yourNotes ?? 3 : 0)
+        PatternGrid(pattern: pattern, yours: live ? 2 : 0)
 
         // 4. Preview and sound
         HStack(spacing: 12) {
@@ -177,6 +178,22 @@ struct SongArpeggioCard: View {
         }
     }
 
+    /// The chords you taught TonePilot by playing their 3rd (or a full chord): they beat the analysis.
+    @ViewBuilder private func chordMemory(_ arp: SongArpeggio) -> some View {
+        let learned = arp.memory.sorted { $0.key < $1.key }
+        HStack(spacing: 6) {
+            Text("Your chords:").font(.caption.weight(.semibold))
+            if learned.isEmpty {
+                Text("play a 3rd or a full chord once and TonePilot remembers it").font(.caption2).foregroundStyle(.secondary)
+            } else {
+                ForEach(learned, id: \.key) { pc, q in StatusPill(text: NoteName.sharpNames[pc] + (q == .minor ? "m" : ""), color: Theme.accent) }
+                Spacer(minLength: 4)
+                Button("Reset") { model.resetChordMemory(songId: song.id) }.font(.caption.weight(.semibold))
+                    .accessibilityIdentifier("arpeggio.resetChords")
+            }
+        }
+    }
+
     private func styleButton(_ s: ArpeggioStyle, current: ArpeggioStyle, section: UUID) -> some View {
         Button { model.setArpeggioStyle(s.id, songId: song.id, sectionId: section) } label: {
             if s.id == current.id { Label("\(s.name)  \(s.shape)", systemImage: "checkmark") } else { Text("\(s.name)  \(s.shape)") }
@@ -186,7 +203,7 @@ struct SongArpeggioCard: View {
     /// "You: R · 5 · 8 → TonePilot: 10 · 12 · 10 · 8 · 5"
     private func yourPart(_ p: ArpeggioPattern) -> some View {
         let hits = p.hits.sorted { $0.step < $1.step }
-        let k = min(hits.count, model.arpeggioFollower?.yourNotes ?? 3)
+        let k = min(hits.count, 2)
         let you = hits.prefix(k).map { ArpeggioStyle.number($0.degree) }.joined(separator: "·")
         let ai = hits.dropFirst(k).map { ArpeggioStyle.number($0.degree) }.joined(separator: "·")
         return Text("You **\(you)** → TonePilot **\(ai.isEmpty ? "—" : ai)**").font(.caption.monospaced())

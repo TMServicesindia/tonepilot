@@ -127,6 +127,12 @@ public struct SongArpeggio: Codable, Hashable, Sendable {
     public var split: Int?
     /// Live fill-in on.
     public var liveFill: Bool?
+    /// Major/minor you played per root (pitch class → "m" or ""), learned while you play.
+    public var chordMemory: [String: String]?
+
+    public var memory: [Int: ChordSymbol.Quality] {
+        Dictionary(uniqueKeysWithValues: (chordMemory ?? [:]).compactMap { k, v in Int(k).map { ($0, v == "m" ? ChordSymbol.Quality.minor : .major) } })
+    }
 
     public static let currentVersion = 1
     /// Sounds that suit broken chords, offered first.

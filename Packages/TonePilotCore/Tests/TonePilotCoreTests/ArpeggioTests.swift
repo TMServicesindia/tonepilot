@@ -172,49 +172,11 @@ final class ArpeggioStyleTests: XCTestCase {
         XCTAssertTrue((48...57).contains(p.centerNote))
     }
 
-    func follower(_ styleId: String, bpm: Double = 120, minorRoots: Set<Int> = [9]) -> ArpeggioFollower {
-        ArpeggioFollower(pattern: ArpeggioStyles.pattern(ArpeggioStyles.style(id: styleId)!, adjustedTo: nil), bpm: bpm) { minorRoots.contains($0) ? .minor : .major }
-    }
-
-    func testFillsTheRestOfTheBarAfterRootFifthOctave() throws {
-        var f = follower("tisra6", bpm: 60)   // 6/8 in two: a step is 1/3 s, a bar 2 s
-        XCTAssertNil(f.noteOn(48, at: 10.0), "root alone: wait for the second note")
-        let fill = try XCTUnwrap(f.noteOn(55, at: 10.33), "decides on the second note")
-        XCTAssertEqual(fill.chord, ChordSymbol("C"))
-        XCTAssertEqual(fill.notes.map(\.note), [64, 60, 55], "10 · 8 · 5 after your R · 5 · 8")
-        XCTAssertEqual(fill.notes[0].time, 1.0, accuracy: 1e-9, "starts on the 4th step")
-        XCTAssertEqual(fill.barStart, 10.0)
-        XCTAssertNil(f.noteOn(60, at: 10.66), "your third note: nothing more to decide")
-        XCTAssertTrue(fill.notes.allSatisfy { $0.time + $0.length <= fill.barSeconds })
-    }
-
-    func testMinorFromTheSongOrFromYourThird() throws {
-        var f = follower("tisra6", bpm: 60)
-        _ = f.noteOn(45, at: 0)                          // A, song uses Am
-        XCTAssertEqual(try XCTUnwrap(f.noteOn(52, at: 0.3)).chord, ChordSymbol("Am"))
-        var g = follower("tisra6", bpm: 60)
-        _ = g.noteOn(48, at: 0)
-        XCTAssertEqual(try XCTUnwrap(g.noteOn(51, at: 0.3)).chord, ChordSymbol("Cm"), "you played the minor 3rd")
-    }
-
-    func testEachNewRootStartsANewBarAndLearnsYourPart() throws {
-        var f = follower("rolling8", bpm: 120)   // bar = 2 s, step = 0.25 s
-        _ = f.noteOn(48, at: 0); _ = f.noteOn(55, at: 0.25); _ = f.noteOn(60, at: 0.5)
-        // Next bar: G. You now play only two notes before the fill.
-        XCTAssertNil(f.noteOn(43, at: 2.0))
-        let fill = try XCTUnwrap(f.noteOn(50, at: 2.25))
-        XCTAssertEqual(fill.chord, ChordSymbol("G"))
-        XCTAssertEqual(fill.barStart, 2.0)
-        XCTAssertEqual(fill.notes.count, 5, "R·5·8 were yours last bar: the fill plays the other five steps")
-        XCTAssertNil(f.noteOn(72, at: 2.3), "right-hand notes (above the split and the octave) are ignored")
-        XCTAssertEqual(f.yourNotes, 3, "your octave note counted as chord hand")
-    }
-
     func testSongQualityUsesTheSongsChordsThenTheKey() {
-        let q = ArpeggioFollower.songQuality(chords: [ChordEvent(time: 0, duration: 8, symbol: "D", confidence: 0.9)],
-                                             key: MusicalKey(tonic: 0, mode: .major))
-        XCTAssertEqual(q(2), .major, "the song plays D major, not the key's Dm")
-        XCTAssertEqual(q(9), .minor, "A in C major → Am")
-        XCTAssertEqual(q(7), .major, "G in C major → G")
+        let q = LiveArpeggiator.songQuality(chords: [ChordEvent(time: 0, duration: 8, symbol: "D", confidence: 0.9)],
+                                            key: MusicalKey(tonic: 0, mode: .major))
+        XCTAssertEqual(q(2, 20), .major, "the song plays D major, not the key's Dm")
+        XCTAssertEqual(q(9, 20), .minor, "A in C major → Am")
+        XCTAssertEqual(q(7, 20), .major, "G in C major → G")
     }
 }

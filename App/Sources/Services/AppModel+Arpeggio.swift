@@ -47,43 +47,63 @@ extension AppModel {
         refreshArpeggioLive()
     }
 
-    /// Arms or disarms live fill-in for the open song (call when the song, tone or settings change).
+    /// Arms or disarms live fill-in for the open song (call when the song, section, tone or
+    /// settings change). The fill itself runs on the MIDI thread (`LiveFill`).
     func refreshArpeggioLive() {
-        guard let song = song(activeSongId), let arp = song.arpeggio, arp.liveFill == true, let section = arpeggioSection(song),
-              let pattern = arp.playable(for: section.id) else {
+        guard let host, let song = song(activeSongId), let arp = song.arpeggio, arp.liveFill == true,
+              let section = arpeggioSection(song), let pattern = arp.playable(for: section.id) else {
             arpeggioLiveFlag.withLock { $0 = false }
-            arpeggioFollower = nil
+            liveFill.install(nil, handle: 0, sampleRate: 48_000, controller: host?.controller, beats: [], stepsPerBeat: 3)
             arpeggioLiveChord = nil
             return
         }
         loadArpeggioSound(arp)
-        arpeggioFollower = ArpeggioFollower(pattern: pattern, bpm: arp.effectiveBPM, split: arp.effectiveSplit,
-                                            quality: ArpeggioFollower.songQuality(chords: song.chordEvents, key: song.key?.value))
+        // Timing from the song: its tempo and feel (steps per beat), locked to its beat while it plays.
+        let stepSeconds = 60 / max(30, arp.effectiveBPM) / Double(pattern.stepsPerBeat)
+        let chords = song.chordEvents
+        let typical = LiveArpeggiator.typicalChordLength(chords, from: section.startTime, to: section.endTime)
+        let quality = LiveArpeggiator.songQuality(chords: chords, key: song.key?.value)
+        let fill = liveFill
+        let arpeggiator = LiveArpeggiator(
+            pattern: pattern, stepSeconds: stepSeconds, split: arp.effectiveSplit, memory: arp.memory,
+            // Playing: until the song's next chord change; paused: the section's usual chord length.
+            chordLength: { [weak fill] t in
+                guard let now = fill?.songTime(at: t), let next = chords.first(where: { $0.time > now + 0.1 }) else { return typical }
+                return max(0.3, min(4, next.time - now))
+            },
+            // The song's chord counts only while it plays (paused: its chords overall, then the key).
+            songQuality: { [weak fill] pc, t in quality(pc, fill?.songTime(at: t) ?? -1) },
+            snap: { [weak fill] t in fill?.snapToSong(t) ?? t })
+        let songId = song.id
+        liveFill.onChange = { [weak self] chord, memory in
+            guard let self else { return }
+            self.arpeggioLiveChord = chord.map { "\(NoteName.sharpNames[$0.root]) \($0.quality == .minor ? "minor" : "major")" }
+            self.saveChordMemory(memory, songId: songId)
+        }
+        liveFill.install(arpeggiator, handle: host.controller.accompanimentHandle(.arpeggio), sampleRate: host.core.sampleRate,
+                         controller: host.controller, beats: song.beatTimes, stepsPerBeat: pattern.stepsPerBeat)
         arpeggioFollowerSection = section.id
         arpeggioLiveFlag.withLock { $0 = true }
     }
 
-    /// A note from the Casio (main thread, with the time it arrived on the MIDI thread).
-    func arpeggioNote(_ note: Int, at time: Double) {
-        guard let host, let song = song(activeSongId) else { return }
-        // Follow the section the song is in (or the one chosen while paused).
-        if let section = arpeggioSection(song), section.id != arpeggioFollowerSection { refreshArpeggioLive() }
-        guard var follower = arpeggioFollower else { return }
-        let fill = follower.noteOn(note, at: time)
-        arpeggioFollower = follower
-        guard let fill else { return }
-        let sr = host.core.sampleRate, h = host.controller.accompanimentHandle(.arpeggio)
-        let last = Int64(fill.barSeconds * sr) - 1
-        var events: [SequencerEvent] = []
-        for n in fill.notes where (0...127).contains(n.note) {
-            let on = Int64(n.time * sr), off = min(last, Int64((n.time + max(0.05, n.length)) * sr))
-            guard off > on else { continue }
-            events.append(SequencerEvent(frame: on, handle: h, note: UInt8(n.note), velocity: UInt8(max(1, min(127, 30 + 90 * n.velocity)))))
-            events.append(SequencerEvent(frame: off, handle: h, note: UInt8(n.note), velocity: 0))
-        }
-        host.controller.setPattern(events, loopSeconds: fill.barSeconds)
-        host.controller.playPatternOnce(elapsed: CACurrentMediaTime() - fill.barStart)
-        arpeggioLiveChord = "\(NoteName.sharpNames[fill.chord.root]) \(fill.chord.quality == .minor ? "minor" : "major")"
+    /// Keeps what you play (major/minor per root) with the song.
+    private func saveChordMemory(_ memory: [Int: ChordSymbol.Quality], songId: UUID) {
+        guard var song = song(songId), var arp = song.arpeggio else { return }
+        let stored = Dictionary(uniqueKeysWithValues: memory.map { (String($0.key), $0.value == .minor ? "m" : "") })
+        guard stored != (arp.chordMemory ?? [:]) else { return }
+        arp.chordMemory = stored
+        song.arpeggio = arp
+        update(song)
+    }
+
+    /// Forgets the chords you taught TonePilot for this song.
+    func resetChordMemory(songId: UUID) {
+        guard var song = song(songId), var arp = song.arpeggio else { return }
+        arp.chordMemory = nil
+        song.arpeggio = arp
+        update(song)
+        liveFill.resetMemory()
+        refreshArpeggioLive()
     }
 
     // MARK: Preview

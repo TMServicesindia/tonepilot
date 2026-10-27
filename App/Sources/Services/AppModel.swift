@@ -54,7 +54,8 @@ final class AppModel: ObservableObject {
     @Published var arpeggioLiveChord: String?
     /// Section whose pattern live fill-in uses while the song is paused.
     @Published var arpeggioSectionId: UUID?
-    var arpeggioFollower: ArpeggioFollower?
+    /// Live fill-in, driven from the MIDI thread.
+    let liveFill = LiveFill()
     var arpeggioFollowerSection: UUID?
     /// Read on the MIDI thread: forward chord-hand notes to live fill-in.
     let arpeggioLiveFlag = OSAllocatedUnfairLock(initialState: false)
@@ -212,7 +213,7 @@ final class AppModel: ObservableObject {
     private func wireMIDI() {
         let router = self.router
         let box = outputBox
-        let liveFlag = arpeggioLiveFlag
+        let liveFlag = arpeggioLiveFlag, fill = liveFill
         let recorder = self.recorder, recordWaiting = self.recordWaiting
         midi.onEvents = { [weak self] events in
             // CoreMIDI thread: route and play immediately, nothing else.
@@ -228,7 +229,7 @@ final class AppModel: ObservableObject {
             guard liveFlag.withLock({ $0 }) else { return }
             let now = CACurrentMediaTime()
             for case let .noteOn(_, note, velocity) in events where velocity > 0 {
-                DispatchQueue.main.async { self?.arpeggioNote(Int(note), at: now) }
+                fill.noteOn(Int(note), velocity: Int(velocity), at: now)
             }
         }
         midi.onSourcesChanged = { [weak self] removed in
@@ -335,7 +336,7 @@ final class AppModel: ObservableObject {
         if pendingSuggestion == sectionId { pendingSuggestion = nil }
         applyActiveArrangement()
         // Song Arpeggio fills in your tone: follow tone changes.
-        if arpeggioFollower != nil { refreshArpeggioLive() }
+        if liveFill.isArmed { refreshArpeggioLive() }
         // The AI melody plays with the section's lead sound unless another one was chosen.
         if let song = song(activeSongId), song.accompaniment?.melodyGuide == true, song.accompaniment?.guidePatchId == nil {
             applyMix(song)
@@ -451,6 +452,10 @@ final class AppModel: ObservableObject {
             time = nil
         }
         songPosition = time
+        liveFill.updateClock(songTime: time, rate: Double(sectionPlayer.rate))
+        if liveFill.isArmed, let t = time, let section = arpeggioSection(song), section.id != arpeggioFollowerSection, t > 0 {
+            refreshArpeggioLive()
+        }
         // Parts that play only in chosen sections ("AI plays difficult parts" from the recording).
         if let t = time ?? (isSectionPlaying ? nil : cursor) {
             let current = song.orderedSections.last { $0.startTime <= t + 0.02 }?.id
