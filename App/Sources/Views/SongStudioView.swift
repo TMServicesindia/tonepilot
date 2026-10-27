@@ -96,7 +96,7 @@ struct SongStudioView: View {
                 TonePickerSheet(songId: songId, sectionId: ref.id).environmentObject(model)
             }
             .sheet(item: $editingTone) { target in
-                NavigationStack { ArrangementEditorView(songId: songId, arrangementId: target.id) }
+                NavigationStack { ArrangementEditorView(songId: songId, arrangementId: target.id, onDone: { editingTone = nil }) }
                     .environmentObject(model)
                     .presentationDetents([.medium, .large])
             }
@@ -643,6 +643,7 @@ struct MyKeyboardCard: View {
                 if usingMain, let main = model.mainTone(of: song) {
                     Button { onEditTone(main.id) } label: { Label("Edit main tone", systemImage: "slider.horizontal.3") }
                         .buttonStyle(.borderedProminent)
+                        .accessibilityIdentifier("tone.editMain")
                 } else if let sectionId {
                     Button { onChangeSound(sectionId) } label: { Label("Change sound", systemImage: "music.note.list") }
                         .buttonStyle(.borderedProminent)

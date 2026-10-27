@@ -41,6 +41,8 @@ public struct EngineLayerConfig: @unchecked Sendable {
     public var velocitySensitivity: Float = 1
     /// Accompaniment/guide layers are driven by the sequencer and silenced on transport stop.
     public var isAccompaniment = false
+    /// 0...1 saturation amount (0 = clean, bypassed).
+    public var drive: Float = 0
 
     public init() {}
 
@@ -81,6 +83,7 @@ public struct EngineLayerConfig: @unchecked Sendable {
         c.sendReverb = Float(fx.reverbMix / 100)
         c.sendChorus = Float(fx.chorusMix / 100)
         c.sendDelay = Float(fx.delayMix / 100)
+        c.drive = Float(max(0, min(100, fx.drive)) / 100)
         let ex = layer.expressionOverride ?? patch.expression ?? .poly
         c.mono = ex.mono
         c.glideTime = Float(ex.glideTime)
@@ -450,6 +453,7 @@ public final class ToneEngine: @unchecked Sendable {
             let bl = busL + s * maxFrames, br = busR + s * maxFrames
             slots[s].eq.process(bl, br, n)
             let c = slots[s].config
+            if c.drive > 0 { Self.saturate(bl, br, n, amount: c.drive) }
             let level: Float = Self.accompanimentSlotRange.contains(s) ? master.accompanimentGain : master.liveGain
             let rv = c.sendReverb * level, ch = c.sendChorus * level, dl = c.sendDelay * level
             anyReverb = anyReverb || rv > 0; anyChorus = anyChorus || ch > 0; anyDelay = anyDelay || dl > 0
@@ -668,6 +672,18 @@ public final class ToneEngine: @unchecked Sendable {
         case let .killRegions(ptr):
             for v in 0..<Self.maxVoices where voices[v].active && voices[v].regions == ptr { voices[v].active = false }
             for s in 0..<Self.slotCount where slots[s].config.regions == ptr { slots[s].active = false }
+        }
+    }
+
+    /// Controlled saturation: tanh soft clip with makeup so quiet notes keep their level and loud
+    /// ones get warm grit instead of hard clipping.
+    static func saturate(_ l: UnsafeMutablePointer<Float>, _ r: UnsafeMutablePointer<Float>, _ n: Int, amount: Float) {
+        let k = 1 + 7 * amount
+        let makeup = 1 / tanhf(k)
+        let wet = min(1, amount * 1.5)
+        for i in 0..<n {
+            l[i] = (1 - wet) * l[i] + wet * tanhf(k * l[i]) * makeup / k * (1 + 0.6 * amount)
+            r[i] = (1 - wet) * r[i] + wet * tanhf(k * r[i]) * makeup / k * (1 + 0.6 * amount)
         }
     }
 

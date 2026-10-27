@@ -73,6 +73,24 @@ final class TonePilotUITests: XCTestCase {
                 page("keyboard")
                 tap(element("tonemode.sections"), "tone per section")
                 tap(element("tonemode.main"), "main tone")
+                if round == 1 {
+                    // Tone editor: open the main tone, a layer and its effects, move Drive.
+                    let edit = element("tone.editMain")
+                    if edit.waitForExistence(timeout: 3) {
+                        tap(edit, thenExpect: element("layer.header"), limit: 5, "open the main tone editor")
+                        tap(element("layer.header"), "expand a layer")
+                        let effects = app.buttons["Effects & EQ"].firstMatch
+                        if effects.waitForExistence(timeout: 3) {
+                            tap(effects, thenExpect: element("layer.drive"), "open effects")
+                            let drive = app.sliders["layer.drive"].firstMatch
+                            if drive.waitForExistence(timeout: 2) { drive.adjust(toNormalizedSliderPosition: 0.3); assertAlive("drive") }
+                        }
+                        tap(element("tone.done"), "close the tone editor")
+                        let closed = NSPredicate(format: "exists == false")
+                        let wait = XCTNSPredicateExpectation(predicate: closed, object: element("tone.done"))
+                        XCTAssertEqual(XCTWaiter().wait(for: [wait], timeout: 5), .completed, "tone editor didn't close in 5 s")
+                    }
+                }
                 page("arpeggio")
                 let live = element("arpeggio.live")
                 if live.waitForExistence(timeout: 3) {

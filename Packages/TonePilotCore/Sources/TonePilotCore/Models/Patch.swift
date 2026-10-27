@@ -143,18 +143,21 @@ public struct EffectSettings: Codable, Hashable, Sendable {
     /// 0...100 chorus send.
     public var chorusMix: Double
     public var eq: EQSettings
+    /// 0...100: controlled saturation for powerful tones (brass stabs, driven leads). 0 = clean.
+    public var drive: Double
 
     public init(reverbMix: Double = 15, delayMix: Double = 0, delayTime: Double = 0.35, delayFeedback: Double = 25,
-                chorusMix: Double = 0, eq: EQSettings = EQSettings()) {
+                chorusMix: Double = 0, eq: EQSettings = EQSettings(), drive: Double = 0) {
         self.reverbMix = reverbMix
         self.delayMix = delayMix
         self.delayTime = delayTime
         self.delayFeedback = delayFeedback
         self.chorusMix = chorusMix
         self.eq = eq
+        self.drive = drive
     }
 
-    enum CodingKeys: String, CodingKey { case reverbMix, delayMix, delayTime, delayFeedback, chorusMix, eq }
+    enum CodingKeys: String, CodingKey { case reverbMix, delayMix, delayTime, delayFeedback, chorusMix, eq, drive }
 
     /// Fields added in schema v3 decode with defaults so older libraries still load.
     public init(from decoder: Decoder) throws {
@@ -165,6 +168,7 @@ public struct EffectSettings: Codable, Hashable, Sendable {
         delayFeedback = try c.decode(Double.self, forKey: .delayFeedback)
         chorusMix = try c.decodeIfPresent(Double.self, forKey: .chorusMix) ?? 0
         eq = try c.decodeIfPresent(EQSettings.self, forKey: .eq) ?? EQSettings()
+        drive = try c.decodeIfPresent(Double.self, forKey: .drive) ?? 0
     }
 }
 

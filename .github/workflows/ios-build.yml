@@ -67,6 +67,21 @@ jobs:
           [ $code = 0 ] || tail -12 mp3.log | while IFS= read -r l; do echo "::error title=MP3 export (exit $code)::$l"; done
           exit $code
 
+      - name: Instrument recognition check (Apple sound classifier, macOS)
+        run: |
+          set -euo pipefail
+          mkdir -p build-instruments && cd build-instruments
+          # The app's recogniser compiled together with the core (one module, so no import needed).
+          sed '/^import TonePilotCore$/d' ../App/Sources/Audio/InstrumentRecognizer.swift > InstrumentRecognizer.swift
+          swiftc -O $(find ../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') InstrumentRecognizer.swift \
+            ../Native/tools/instrument_check/main.swift -o instrument_check
+          code=0
+          ./instrument_check ../App/Resources/SoundFonts/GeneralUser-GS.sf2 > instruments.log 2>&1 || code=$?
+          cat instruments.log
+          grep -E "^RESULT" instruments.log | while IFS= read -r l; do echo "::notice title=Instrument recognition::$l"; done
+          grep -E "^MISS" instruments.log | while IFS= read -r l; do echo "::warning title=Instrument recognition::$l"; done
+          [ $code = 0 ] || echo "::warning title=Instrument recognition::check exited $code"
+
       - name: In-app model download is published
         run: |
           if curl -fsSL "https://github.com/${GITHUB_REPOSITORY}/releases/download/models-v1/manifest.json" -o manifest.json; then

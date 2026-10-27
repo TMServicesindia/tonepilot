@@ -84,6 +84,8 @@ struct ArrangementEditorView: View {
     @EnvironmentObject var model: AppModel
     let songId: UUID?
     let arrangementId: UUID
+    /// Shown as a sheet: a Done button closes it.
+    var onDone: (() -> Void)?
     @State private var expandedLayer: UUID?
     @State private var pickingPatchForLayer: UUID?
     @State private var addingLayer = false
@@ -172,7 +174,12 @@ struct ArrangementEditorView: View {
             }
             .disabled(arrangement.origin == .aiOriginal)
             .navigationTitle(arrangement.name)
-            .toolbar { EditButton() }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) { EditButton() }
+                if let onDone {
+                    ToolbarItem(placement: .confirmationAction) { Button("Done", action: onDone).accessibilityIdentifier("tone.done") }
+                }
+            }
             .onAppear { model.activate(arrangement, songId: songId == model.activeSongId ? songId : nil) }
             .sheet(isPresented: $addingLayer) {
                 PatchPicker { patch in
@@ -259,6 +266,7 @@ struct LayerEditor: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("layer.header")
                 Spacer()
                 Toggle("M", isOn: $layer.muted).toggleStyle(.button).controlSize(.small).tint(Theme.warn)
                     .accessibilityLabel("Mute")
@@ -319,6 +327,8 @@ struct LayerEditor: View {
             HStack { Text("Reverb"); Slider(value: effects.reverbMix, in: 0...100) }
             HStack { Text("Chorus"); Slider(value: effects.chorusMix, in: 0...100) }.disabled(!fullControls)
             HStack { Text("Delay"); Slider(value: effects.delayMix, in: 0...100) }
+            // Warm saturation for powerful leads, brass and synths (0 = clean).
+            HStack { Text("Drive"); Slider(value: effects.drive, in: 0...100).accessibilityIdentifier("layer.drive") }
             if !fullControls, effects.wrappedValue.delayMix > 0 {
                 HStack { Text("Delay time"); Slider(value: effects.delayTime, in: 0.05...1.5) }
                 HStack { Text("Feedback"); Slider(value: effects.delayFeedback, in: 0...90) }

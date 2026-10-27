@@ -247,16 +247,18 @@ extension AppModel {
     /// The song's own tone that isn't tied to a section (e.g. "Main tone").
     func mainTone(of song: Song) -> Arrangement? {
         let used = Set(song.sections.compactMap(\.arrangementId))
-        return song.arrangements.first { !used.contains($0.id) && $0.origin != .aiOriginal }
+        let own = song.arrangements.filter { !used.contains($0.id) && $0.origin != .aiOriginal }
+        return own.first { $0.name == "Main tone" } ?? own.first
     }
 
     /// Plays the main tone for the whole song (section changes stop switching the tone). Saved per song.
+    /// The main tone is made from the song (its chorus/most intense part) unless you edited it yourself.
     func useMainTone(_ songId: UUID) {
         guard var song = song(songId) else { return }
-        if mainTone(of: song) == nil {
-            song.arrangements.append(.starterFilmStack(name: "Main tone"))
-            update(song)
-        }
+        let before = song.arrangements
+        AutoArranger.refreshMainTone(&song)
+        if mainTone(of: song) == nil { song.arrangements.append(.starterFilmStack(name: "Main tone")) }
+        if song.arrangements != before { update(song) }
         guard let tone = mainTone(of: song) else { return }
         var sw = song.switching ?? SwitchingSettings()
         sw.mode = .manual

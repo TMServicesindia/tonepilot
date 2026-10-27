@@ -234,6 +234,7 @@ public enum SongAnalyzer {
             let l = s.duration > 0 ? min(1, covered / s.duration) * leadPlausibility(notes, seconds: s.duration) : 0
             lead[s.id] = l
             guard let t = s.timbre ?? r.timbres[s.id] else { continue }
+            r.sections[i].timbre = t
             let meanPitch = notes.isEmpty ? nil : Double(notes.map(\.midi).reduce(0, +)) / Double(notes.count)
             var levels: [StemInfo.Kind: Double] = [:]
             for a in s.activity ?? [] where a.source == .stems {
@@ -276,6 +277,19 @@ public enum SongAnalyzer {
                 sections[i].type = .verse
             } else if i == 0, l < 0.2, sections[i].type == .intro {
                 sections[i].type = .instrumentalIntro
+            }
+        }
+        // No repeat was found to call a chorus (common in mass songs where every part has new
+        // music): the clearly loudest sung parts are the chorus, so they get chorus tones.
+        if !sections.contains(where: { $0.type == .chorus }) {
+            let verses = sections.indices.filter { sections[$0].type == .verse && sections[$0].timbre != nil }
+            let loud = verses.map { sections[$0].timbre!.loudness }
+            if verses.count >= 2, let top = loud.max() {
+                let median = loud.sorted()[(loud.count - 1) / 2]
+                let picked = verses.filter { sections[$0].timbre!.loudness >= max(0.85 * top, 1.15 * median) }
+                if picked.count < verses.count {
+                    for i in picked { sections[i].type = .chorus; sections[i].confidence = min(sections[i].confidence, 0.3) }
+                }
             }
         }
         var counts: [SectionType: Int] = [:]

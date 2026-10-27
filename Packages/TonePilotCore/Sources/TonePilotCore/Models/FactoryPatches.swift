@@ -33,6 +33,9 @@ public enum FactoryPatches {
         (21, "Accordion", .reed),
         (24, "Nylon Guitar", .guitar),
         (25, "Steel Guitar", .guitar),
+        (27, "Clean Electric Guitar", .guitar),
+        (29, "Overdrive Guitar", .guitar),
+        (30, "Distortion Guitar", .guitar),
         (32, "Acoustic Bass", .bass),
         (33, "Finger Bass", .bass),
         (38, "Synth Bass", .bass),
@@ -45,7 +48,10 @@ public enum FactoryPatches {
         (50, "Synth Strings", .synthStrings),
         (52, "Choir Aahs", .choir),
         (56, "Trumpet", .brass),
+        (57, "Trombone", .brass),
         (61, "Brass Section", .brass),
+        (62, "Synth Brass", .brass),
+        (65, "Alto Sax", .reed),
         (68, "Oboe", .reed),
         (71, "Clarinet", .reed),
         (73, "Flute", .flute),
@@ -106,6 +112,13 @@ public enum FactoryPatches {
     public static let warmSynthLeadId = variantId(26)
     public static let singingSynthLeadId = variantId(27)
     public static let bansuriLowId = variantId(28)
+    // Powerful tones (mass / high-intensity film songs).
+    public static let powerBrassId = variantId(30)
+    public static let brassStabsId = variantId(31)
+    public static let powerSawLeadId = variantId(32)
+    public static let subBassId = variantId(33)
+    public static let powerStringsId = variantId(34)
+    public static let drivenSynthBrassId = variantId(35)
 
     static func sf(_ id: UUID, _ name: String, _ family: InstrumentFamily, program: UInt8, bankMSB: UInt8 = SoundFontReference.melodicBankMSB,
                    effects: EffectSettings = EffectSettings(), expression: ExpressionSettings? = nil, filter: FilterSettings = FilterSettings(),
@@ -168,6 +181,31 @@ public enum FactoryPatches {
            expression: ExpressionSettings(mono: true, glideTime: 0.1, bendRange: 2, vibratoDepth: 20, vibratoRate: 5, vibratoDelay: 0.35),
            tags: ["breathy", "ornamented", "lead", "indian", "warm"],
            notes: "GM shakuhachi shaped towards a low bansuri (breathy, mono, glide). Not a sampled bansuri."),
+        sf(powerBrassId, "Power Brass", .brass, program: 61,
+           effects: EffectSettings(reverbMix: 14, eq: EQSettings(lowDB: 1, midDB: 2.5, midFrequency: 1400, highDB: 3), drive: 18),
+           tags: ["powerful", "lead", "bright", "mass"],
+           notes: "GM brass section, brightened with a little drive for mass-song leads."),
+        sf(brassStabsId, "Brass Stabs", .brass, program: 61,
+           effects: EffectSettings(reverbMix: 10, eq: EQSettings(lowDB: 2, midDB: 2, midFrequency: 1200, highDB: 2.5), drive: 22),
+           tags: ["powerful", "accompaniment", "stab", "mass"],
+           notes: "Short, punchy brass chords for the left hand in high-energy sections."),
+        sf(drivenSynthBrassId, "Driven Synth Brass", .brass, program: 62,
+           effects: EffectSettings(reverbMix: 12, chorusMix: 10, eq: EQSettings(lowDB: 1, midDB: 2, midFrequency: 1600, highDB: 2), drive: 28),
+           tags: ["powerful", "lead", "electronic", "mass"]),
+        sf(powerStringsId, "Power Strings", .strings, program: 48,
+           effects: EffectSettings(reverbMix: 16, eq: EQSettings(lowDB: 2, midDB: 1.5, midFrequency: 900, highDB: 2)),
+           tags: ["powerful", "accompaniment", "orchestral"]),
+        synth(powerSawLeadId, "Power Saw Lead", .synthLead, SynthSettings(waveform: .saw, detuneCents: 14, subLevel: 0.25),
+              envelope: Envelope(attack: 0.004, decay: 0.25, sustain: 0.9, release: 0.18),
+              filter: FilterSettings(enabled: true, cutoff: 5200, resonance: 3),
+              effects: EffectSettings(reverbMix: 12, delayMix: 12, chorusMix: 12, eq: EQSettings(lowDB: 0, midDB: 2.5, midFrequency: 1800, highDB: 1.5), drive: 35),
+              expression: ExpressionSettings(mono: true, glideTime: 0.03, bendRange: 2, vibratoDepth: 8, vibratoRate: 5.8, vibratoDelay: 0.35),
+              tags: ["powerful", "lead", "electronic", "aggressive"]),
+        synth(subBassId, "Sub Synth Bass", .bass, SynthSettings(waveform: .square, detuneCents: 0, subLevel: 0.6),
+              envelope: Envelope(attack: 0.003, decay: 0.3, sustain: 0.8, release: 0.12),
+              filter: FilterSettings(enabled: true, cutoff: 700, resonance: 2),
+              effects: EffectSettings(reverbMix: 0, eq: EQSettings(lowDB: 3, midDB: -1, midFrequency: 800, highDB: -4), drive: 15),
+              tags: ["powerful", "bass", "electronic"]),
         synth(warmSynthLeadId, "Warm Synth Lead", .synthLead, SynthSettings(waveform: .square, detuneCents: 5, subLevel: 0.15),
               envelope: Envelope(attack: 0.02, decay: 0.3, sustain: 0.85, release: 0.3),
               filter: FilterSettings(enabled: true, cutoff: 2600, resonance: 2),

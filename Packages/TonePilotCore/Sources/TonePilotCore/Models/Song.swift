@@ -45,6 +45,9 @@ public struct SongSection: Codable, Hashable, Identifiable, Sendable {
     public var timbre: SectionTimbre?
     /// The song's peak section (loudest, late, clearly above the rest).
     public var isClimax: Bool?
+    /// Instrument families heard in this section (family → 0...1), from on-device recognition
+    /// of its separated Lead / Music parts. Keys: `InstrumentEvidence` families.
+    public var instruments: [String: Double]?
 
     public init(id: UUID = UUID(), type: SectionType, label: String? = nil, startTime: Double, endTime: Double,
                 startBar: Int? = nil, endBar: Int? = nil, confidence: Double = 1,

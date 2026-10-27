@@ -858,7 +858,11 @@ final class AppModel: ObservableObject {
                 }
                 // Parts separated on this iPhone: analyse from them (beat from drums, chords from
                 // the instruments, melody from the vocals).
-                if stems.isEmpty, let local = await MainActor.run(body: { self?.audioTracks(for: snapshot) }) {
+                let local = await MainActor.run(body: { self?.audioTracks(for: snapshot) }) ?? []
+                // Instruments are recognised on the separated instrument parts (no singer on top), else the mix.
+                let instrumentKinds: Set<StemInfo.Kind> = [.lead, .backing, .other, .piano, .guitar]
+                let instrumentFiles = local.compactMap { t in SongStudio.stemKind(t.id).flatMap { instrumentKinds.contains($0) ? t.url : nil } }
+                if stems.isEmpty {
                     let parts = local.compactMap { t in SongStudio.stemKind(t.id).map { ($0, t.url) } }
                     if !parts.isEmpty { await stage("Reading the separated parts…", 0.02) }
                     for (kind, file) in parts { stems[kind] = try AudioFileDecoder.decodeMono(url: file) }
@@ -869,12 +873,14 @@ final class AppModel: ObservableObject {
                 let current = await MainActor.run { self?.library.song(id: songId) } ?? snapshot
                 let base = progressBase + 0.05
                 let throttle = ProgressThrottle()
-                let output = try SongPipeline.run(song: current, audio: audio, stems: stems, melodyOverride: serverMelody, patches: patches) { p in
+                let output = try SongPipeline.run(song: current, audio: audio, stems: stems, melodyOverride: serverMelody, patches: patches, progress: { p in
                     if Task.isCancelled { return false }
                     let value = base + (0.95 - base) * p
                     if throttle.shouldSend(value) { Task { @MainActor in self?.analysisProgress[songId] = value } }
                     return true
-                }
+                }, instruments: { sections in
+                    InstrumentRecognizer.recognize(files: instrumentFiles.isEmpty ? [url] : instrumentFiles, sections: sections)
+                })
                 await MainActor.run {
                     guard let self else { return }
                     var s = output.song

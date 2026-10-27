@@ -32,6 +32,10 @@ public enum AutoArranger {
         let register: ClosedRange<Double>
         let vocalAffinity: Double
         let reason: String
+        /// Instrument families this tone stands in for (`InstrumentEvidence`).
+        var families: [String] = []
+        /// Section intensity range it suits (0 calm ... 1 mass).
+        var energy: ClosedRange<Double> = 0...0.7
     }
 
     static let leadCandidates: [Candidate] = [
@@ -70,6 +74,49 @@ public enum AutoArranger {
                   register: 60...88, vocalAffinity: 0.5, reason: "a reedy, highly ornamented sustained line"),
     ]
 
+    /// Families and intensity for the original candidates, plus the powerful ones.
+    static let candidates: [Candidate] = {
+        var list = leadCandidates.map { c -> Candidate in
+            var c = c
+            switch c.patchId {
+            case FactoryPatches.bansuriId, FactoryPatches.bansuriLowId, FactoryPatches.id(forProgram: 75):
+                c.families = ["flute"]; c.energy = 0...0.55
+            case FactoryPatches.id(forProgram: 73): c.families = ["flute"]; c.energy = 0...0.65
+            case FactoryPatches.expressiveViolinId: c.families = ["strings"]; c.energy = 0.1...0.8
+            case FactoryPatches.harmoniumId: c.families = ["organ", "reed"]; c.energy = 0...0.6
+            case FactoryPatches.singingSynthLeadId: c.families = ["synth"]; c.energy = 0.2...0.6
+            case FactoryPatches.warmSynthLeadId, FactoryPatches.softSynthLeadId: c.families = ["synth"]; c.energy = 0.3...0.75
+            case FactoryPatches.id(forProgram: 16): c.families = ["organ"]; c.energy = 0.2...0.7
+            case FactoryPatches.id(forProgram: 0): c.families = ["piano"]; c.energy = 0...0.7
+            case FactoryPatches.id(forProgram: 8): c.families = ["bells"]; c.energy = 0...0.5
+            case FactoryPatches.santoorId, FactoryPatches.veenaId: c.families = ["plucked"]; c.energy = 0...0.65
+            case FactoryPatches.expressiveShehnaiId: c.families = ["reed"]; c.energy = 0.2...0.85
+            case FactoryPatches.vocalLeadId: c.families = ["voice"]; c.energy = 0...0.5
+            default: break
+            }
+            return c
+        }
+        list += [
+            Candidate(patchId: FactoryPatches.powerBrassId, name: "Power Brass", centroid: 900...4000, sustain: 0.3...1, ornament: 0.1,
+                      register: 55...90, vocalAffinity: 0.3, reason: "a loud, punchy line — a mass song's brass lead", families: ["brass"], energy: 0.55...1),
+            Candidate(patchId: FactoryPatches.drivenSynthBrassId, name: "Driven Synth Brass", centroid: 1200...5000, sustain: 0.3...1, ornament: 0.1,
+                      register: 52...90, vocalAffinity: 0.3, reason: "a powerful electronic brass line", families: ["brass", "synth"], energy: 0.6...1),
+            Candidate(patchId: FactoryPatches.powerSawLeadId, name: "Power Saw Lead", centroid: 1500...6000, sustain: 0.3...1, ornament: 0.2,
+                      register: 55...96, vocalAffinity: 0.3, reason: "an aggressive, bright synth lead for high-energy sections", families: ["synth"], energy: 0.6...1),
+            Candidate(patchId: FactoryPatches.id(forProgram: 30), name: "Distortion Guitar", centroid: 1200...5000, sustain: 0.4...1, ornament: 0.3,
+                      register: 45...84, vocalAffinity: 0.2, reason: "a distorted electric-guitar line", families: ["electricGuitar"], energy: 0.6...1),
+            Candidate(patchId: FactoryPatches.id(forProgram: 27), name: "Clean Electric Guitar", centroid: 900...3500, sustain: 0.1...0.6, ornament: 0.3,
+                      register: 45...84, vocalAffinity: 0.2, reason: "a clean electric-guitar line", families: ["electricGuitar", "acousticGuitar"], energy: 0.2...0.75),
+            Candidate(patchId: FactoryPatches.id(forProgram: 56), name: "Trumpet", centroid: 900...3600, sustain: 0.3...1, ornament: 0.3,
+                      register: 55...86, vocalAffinity: 0.4, reason: "a bright brass melody", families: ["brass"], energy: 0.35...0.9),
+            Candidate(patchId: FactoryPatches.id(forProgram: 65), name: "Alto Sax", centroid: 700...3000, sustain: 0.35...1, ornament: 0.5,
+                      register: 52...84, vocalAffinity: 0.5, reason: "a smooth, reedy saxophone melody", families: ["reed"], energy: 0.25...0.8),
+            Candidate(patchId: FactoryPatches.id(forProgram: 52), name: "Choir", centroid: 400...2500, sustain: 0.6...1, ornament: 0.2,
+                      register: 48...84, vocalAffinity: 0.6, reason: "chant-like held voices", families: ["choir"], energy: 0.3...1),
+        ]
+        return list
+    }()
+
     static func closeness(_ x: Double, _ r: ClosedRange<Double>, scale: Double) -> Double {
         if r.contains(x) { return 1 }
         let d = x < r.lowerBound ? r.lowerBound - x : x - r.upperBound
@@ -82,17 +129,37 @@ public enum AutoArranger {
         public var ornamentRatio: Double
         public var medianPitch: Double?
         public var fromVocals: Bool
+        /// 0 calm ... 1 mass (`ToneIntensity`).
+        public var intensity: Double = 0.4
+        /// Instrument families heard (family → 0...1); empty when not recognised.
+        public var instruments: [String: Double] = [:]
     }
 
     /// Ranks lead patches for the evidence; returns (candidate, score 0...1) best first.
+    /// Order of importance: the instruments actually heard, the section's intensity, then the
+    /// timbre (brightness, sustain, ornaments, register).
     static func rankLeads(_ e: LeadEvidence) -> [(Candidate, Double)] {
-        leadCandidates.map { c in
-            var s = 0.3 * closeness(e.centroid, c.centroid, scale: 800)
-            s += 0.2 * closeness(e.sustain, c.sustain, scale: 0.2)
-            s += 0.25 * (1 - abs(e.ornamentRatio * 1.6 - c.ornament).clamped(to: 0...1))
-            if let p = e.medianPitch { s += 0.15 * closeness(p, c.register, scale: 6) } else { s += 0.075 }
-            s += 0.1 * (e.fromVocals ? c.vocalAffinity : 0.5)
-            if c.patchId == FactoryPatches.vocalLeadId { s *= 0.7 }
+        // Instrument evidence, relative to the strongest family heard (the singer's voice doesn't count:
+        // a sung melody gets the instrument that suits the song, not a voice imitation).
+        let heard = e.instruments.filter { $0.key != "voice" && $0.value > 0.05 }
+        let top = heard.values.max() ?? 0
+        return candidates.map { c in
+            var timbre = 0.3 * closeness(e.centroid, c.centroid, scale: 800)
+            timbre += 0.2 * closeness(e.sustain, c.sustain, scale: 0.2)
+            timbre += 0.25 * (1 - abs(e.ornamentRatio * 1.6 - c.ornament).clamped(to: 0...1))
+            if let p = e.medianPitch { timbre += 0.15 * closeness(p, c.register, scale: 6) } else { timbre += 0.075 }
+            timbre += 0.1 * (e.fromVocals ? min(c.vocalAffinity, 0.6) : 0.5)
+            let energy = closeness(e.intensity, c.energy, scale: 0.12)
+            var s: Double
+            if top > 0 {
+                let family = (c.families.compactMap { heard[$0] }.max() ?? 0) / top
+                s = 0.45 * family + 0.3 * energy + 0.25 * timbre
+            } else {
+                s = 0.45 * energy + 0.55 * timbre
+            }
+            // Voice imitations only when nothing else fits.
+            if c.patchId == FactoryPatches.vocalLeadId { s *= 0.6 }
+            if c.patchId == FactoryPatches.singingSynthLeadId, (heard["synth"] ?? 0) < 0.5 * max(top, 0.01) { s *= 0.8 }
             return (c, s)
         }.sorted { $0.1 > $1.1 }
     }
@@ -114,6 +181,18 @@ public enum AutoArranger {
         var built: [String: (ai: Arrangement, mine: Arrangement)] = [:]
         var arranged: [UUID] = []
         var newSuggestions = song.toneSuggestions
+        func timbre(_ section: SongSection) -> SectionTimbre {
+            timbres[section.id] ?? section.timbre ?? SectionTimbre(centroid: 1500, onsetRate: 2, lowEnergyShare: 0.2, highEnergyShare: 0.05, sustain: 0.5, loudness: 0.1)
+        }
+        // The song's lead: the tone that wins the most song time. Sections only differ from it when
+        // their own best is clearly better (avoids Bansuri → Synth → Bansuri across similar verses).
+        var votes: [UUID: Double] = [:]
+        for section in sections {
+            if let best = rankLeads(leadEvidence(for: section, song: song, timbre: timbre(section))).first(where: { available[$0.0.patchId] != nil }) {
+                votes[best.0.patchId, default: 0] += best.1 * max(1, section.duration)
+            }
+        }
+        let preferredLead = votes.max { $0.value < $1.value }?.key
 
         for section in sections {
             if let only = onlySection, section.id != only { continue }
@@ -128,8 +207,8 @@ public enum AutoArranger {
             if let existing = built[groupKey] {
                 pair = existing
             } else {
-                let timbre = timbres[section.id] ?? section.timbre ?? SectionTimbre(centroid: 1500, onsetRate: 2, lowEnergyShare: 0.2, highEnergyShare: 0.05, sustain: 0.5, loudness: 0.1)
-                let (ai, suggestions) = buildArrangement(for: section, song: song, timbre: timbre, available: available, options: options)
+                let (ai, suggestions) = buildArrangement(for: section, song: song, timbre: timbre(section), available: available,
+                                                         options: options, preferredLead: preferredLead)
                 newSuggestions.removeAll { $0.sectionId == section.id && $0.method == .featureHeuristic }
                 newSuggestions += suggestions
                 pair = (ai, ai.makeMyVersion())
@@ -148,12 +227,75 @@ public enum AutoArranger {
             arranged.append(section.id)
         }
         song.toneSuggestions = newSuggestions
+        if onlySection == nil { refreshMainTone(&song) }
         song.updatedAt = Date()
         return Result(song: song, arranged: arranged)
     }
 
+    static let aiMainTonePrefix = "AI main tone"
+
+    /// The song's main tone (one tone for the whole song), made from the song: the arrangement of
+    /// its most representative section — the lead that covers the most song time (the chorus and
+    /// loud parts count more), taken from its most intense section.
+    public static func aiMainTone(for song: Song) -> Arrangement? {
+        let withTone = song.sections.compactMap { s -> (SongSection, Arrangement)? in song.arrangement(for: s).map { (s, $0) } }
+        guard !withTone.isEmpty else { return nil }
+        func lead(_ a: Arrangement) -> UUID? { a.layers.first { [.lead, .vocalMelody, .motif].contains($0.role) }?.patchId ?? a.layers.first?.patchId }
+        // A section's weight: its length, more for the chorus / climax / loud parts (the song's hook).
+        func weight(_ s: SongSection) -> Double {
+            (s.type == .chorus ? 2 : 1) * (s.isClimax == true ? 1.3 : 1) * (s.timbre.map { 0.5 + $0.loudness * 10 } ?? 1) * max(1, s.duration)
+        }
+        var time: [UUID: Double] = [:]
+        for (s, a) in withTone { if let l = lead(a) { time[l, default: 0] += weight(s) } }
+        guard let mainLead = time.max(by: { $0.value < $1.value })?.key else { return nil }
+        let pick = withTone.filter { lead($0.1) == mainLead }.max { weight($0.0) < weight($1.0) }
+        guard let (section, source) = pick else { return nil }
+        var tone = Arrangement(name: "Main tone", layers: source.layers, masterGain: source.masterGain, master: source.master)
+        tone.rationale = "\(aiMainTonePrefix) from \(section.label): " + (source.rationale ?? "")
+        return tone
+    }
+
+    /// Adds the AI main tone, or refreshes it when the current one is the old generic stack or an
+    /// earlier AI main tone. A main tone you edited yourself is kept.
+    public static func refreshMainTone(_ song: inout Song) {
+        guard let fresh = aiMainTone(for: song) else { return }
+        let used = Set(song.sections.compactMap(\.arrangementId))
+        let generic = Set(Arrangement.starterFilmStack().layers.map(\.patchId))
+        if let i = song.arrangements.firstIndex(where: { !used.contains($0.id) && $0.origin != .aiOriginal && $0.name == "Main tone" }) {
+            let current = song.arrangements[i]
+            let isGeneric = Set(current.layers.map(\.patchId)) == generic && current.layers.count == 3
+            // An AI main tone you saved in the editor is yours from then on.
+            let isAI = current.rationale?.hasPrefix(aiMainTonePrefix) == true && current.updatedAt.timeIntervalSince(current.createdAt) <= 1
+            guard isGeneric || isAI else { return }
+            var replaced = fresh
+            replaced.id = current.id
+            song.arrangements[i] = replaced
+        } else {
+            song.arrangements.append(fresh)
+        }
+    }
+
+    /// Section intensity (0...1) against the rest of the song.
+    static func intensity(of section: SongSection, in song: Song, timbre t: SectionTimbre) -> Double {
+        let all = song.sections.compactMap(\.timbre)
+        let percussion = section.activity?.first { $0.role == .percussion }?.level ?? 0
+        return ToneIntensity.value(t, song: all.isEmpty ? [t] : all, percussion: percussion)
+    }
+
+    static func leadEvidence(for section: SongSection, song: Song, timbre t: SectionTimbre) -> LeadEvidence {
+        let activity = Dictionary((section.activity ?? []).map { ($0.role, $0) }, uniquingKeysWith: { a, b in a.level >= b.level ? a : b })
+        let notes = song.melody?.notes(in: section.startTime, section.endTime) ?? []
+        let ornamentRatio = notes.isEmpty ? 0 : Double(notes.filter(\.isOrnamented).count) / Double(notes.count)
+        let median = notes.isEmpty ? nil : Double(notes.map(\.midi).sorted()[notes.count / 2])
+        let fromVocals = song.melody?.source == .vocalStem || (activity[.vocalMelody]?.level ?? 0) > 0.4
+        var e = LeadEvidence(centroid: t.centroid, sustain: t.sustain, ornamentRatio: ornamentRatio, medianPitch: median, fromVocals: fromVocals)
+        e.intensity = intensity(of: section, in: song, timbre: t)
+        e.instruments = section.instruments ?? [:]
+        return e
+    }
+
     static func buildArrangement(for section: SongSection, song: Song, timbre t: SectionTimbre, available: [UUID: InstrumentPatch],
-                                 options: Options) -> (Arrangement, [ToneSuggestion]) {
+                                 options: Options, preferredLead: UUID? = nil) -> (Arrangement, [ToneSuggestion]) {
         let activity = Dictionary((section.activity ?? []).map { ($0.role, $0) }, uniquingKeysWith: { a, b in a.level >= b.level ? a : b })
         func level(_ r: MusicalRole) -> Double { activity[r]?.level ?? 0 }
         let notes = song.melody?.notes(in: section.startTime, section.endTime) ?? []
@@ -181,26 +323,36 @@ public enum AutoArranger {
         var suggestions: [ToneSuggestion] = []
 
         // 1. Right hand: lead (sung melody or instrumental motif).
-        let evidence = LeadEvidence(centroid: t.centroid, sustain: t.sustain, ornamentRatio: ornamentRatio, medianPitch: median, fromVocals: fromVocals)
+        var evidence = LeadEvidence(centroid: t.centroid, sustain: t.sustain, ornamentRatio: ornamentRatio, medianPitch: median, fromVocals: fromVocals)
+        let power = intensity(of: section, in: song, timbre: t)
+        evidence.intensity = power
+        evidence.instruments = section.instruments ?? [:]
+        let level3 = ToneIntensity.level(power)
         let ranked = rankLeads(evidence).filter { available[$0.0.patchId] != nil }
-        if let (best, score) = ranked.first {
+        // One lead for the whole song unless this section clearly calls for another.
+        let chosen = ranked.first.map { best in
+            ranked.first { $0.0.patchId == preferredLead && $0.1 >= best.1 - 0.1 } ?? best
+        }
+        if let (best, _) = chosen {
             let isInstrumental = !hasLead
             let quiet = best.patchId == FactoryPatches.vocalLeadId
-            let lead = Layer(patchId: best.patchId, volume: quiet ? 0.45 : (section.type == .chorus ? 0.85 : 0.75), octave: leadOctave,
+            let volume = quiet ? 0.45 : (level3 == .powerful ? 0.85 : section.type == .chorus ? 0.8 : 0.72)
+            let lead = Layer(patchId: best.patchId, volume: volume, octave: leadOctave,
                              keyRange: rightRange, role: isInstrumental ? .motif : (fromVocals ? .vocalMelody : .lead))
             layers.append(lead)
-            why.append("Right hand: \(best.name) — \(best.reason)\(isInstrumental ? " (instrumental motif)" : "").")
+            let heard = evidence.instruments.filter { $0.key != "voice" }.max { $0.value < $1.value }
+            why.append("Right hand: \(best.name) — \(best.reason)\(isInstrumental ? " (instrumental motif)" : "")"
+                       + "\(heard.map { "; heard: \($0.key) \(Int($0.value * 100))%" } ?? ""); intensity \(level3.rawValue).")
             for (c, s) in ranked.prefix(3) {
                 suggestions.append(ToneSuggestion(sectionId: section.id, family: available[c.patchId]?.family ?? .other, patchId: c.patchId,
-                                                  reason: "Lead option: \(c.reason).", confidence: 0.6 * s, method: .featureHeuristic))
+                                                  reason: "Lead option: \(c.reason).", confidence: min(1, s), method: .featureHeuristic))
             }
-            _ = score
         }
 
         // 2. Left hand: accompaniment for Root–Fifth–Root.
         let padLevel = level(.pad), keysLevel = level(.keys)
-        let leftPatch: UUID
-        let leftWhy: String
+        var leftPatch: UUID
+        var leftWhy: String
         if padLevel > keysLevel + 0.1 {
             leftPatch = t.centroid < 1200 && available[FactoryPatches.warmAnalogPadId] != nil && section.type != .chorus
                 ? FactoryPatches.warmAnalogPadId : FactoryPatches.id(forProgram: 49)
@@ -208,6 +360,12 @@ public enum AutoArranger {
         } else {
             leftPatch = section.type == .chorus ? FactoryPatches.id(forProgram: 0) : (available[FactoryPatches.softPianoId] != nil ? FactoryPatches.softPianoId : FactoryPatches.id(forProgram: 0))
             leftWhy = "articulated accompaniment — piano keeps Root–Fifth–Root patterns clear"
+        }
+        if level3 == .powerful {
+            let brass = (evidence.instruments["brass"] ?? 0) >= 0.25
+            leftPatch = brass || power >= 0.78 ? FactoryPatches.brassStabsId : FactoryPatches.powerStringsId
+            leftWhy = brass ? "powerful section with brass — the left hand plays brass stabs" : "powerful section — the left hand plays punchy strings"
+            if available[leftPatch] == nil { leftPatch = FactoryPatches.id(forProgram: 61) }
         }
         layers.append(Layer(patchId: leftPatch, volume: 0.6, pan: -0.1, keyRange: leftRange, role: padLevel > keysLevel + 0.1 ? .pad : .harmony))
         why.append("Left hand: \(leftWhy).")
@@ -223,16 +381,26 @@ public enum AutoArranger {
                                 keyRange: KeyRange(low: UInt8(max(split, 64)), high: 127), role: .accent))
             why.append("Subtle celesta an octave up: bright bell-like accents detected.")
         }
-        if level(.bass) > 0.55 {
-            layers.append(Layer(patchId: FactoryPatches.id(forProgram: 33), volume: 0.45, octave: -1, keyRange: leftRange, role: .bass))
-            why.append("Bass doubles your left-hand root an octave down: strong low end in this section.")
+        if level(.bass) > 0.55 || (level3 == .powerful && level(.bass) > 0.4) {
+            let sub = level3 == .powerful && available[FactoryPatches.subBassId] != nil
+            layers.append(Layer(patchId: sub ? FactoryPatches.subBassId : FactoryPatches.id(forProgram: 33), volume: sub ? 0.5 : 0.45,
+                                octave: -1, keyRange: leftRange, role: .bass))
+            why.append(sub ? "Sub synth bass under your left-hand root: heavy low end in a powerful section."
+                           : "Bass doubles your left-hand root an octave down: strong low end in this section.")
+        }
+        // Clean gain staging: layers that sound together never add up past the engine's headroom
+        // (the limiter stays a safety net, not part of the sound).
+        for probe: UInt8 in [48, 72] {
+            let together = layers.filter { $0.keyRange.contains(probe) }.reduce(0) { $0 + $1.volume }
+            if together > 1.1 { let k = 1.1 / together; for i in layers.indices where layers[i].keyRange.contains(probe) { layers[i].volume *= k } }
         }
 
         // Effects by section character.
         var master = MasterEffects()
-        switch section.type {
+        switch level3 == .powerful ? .chorus : section.type {
         case .intro, .instrumentalIntro, .outro: master.reverbLevel = 1.0; master.reverbSize = 0.75
         case .interlude, .instrumentalBreak: master.reverbLevel = 0.95; master.delayLevel = 0.7
+        case .chorus where level3 == .powerful: master.reverbLevel = 0.55; master.eq = EQSettings(lowDB: 1, midDB: 1, midFrequency: 2000, highDB: 2)
         case .chorus: master.reverbLevel = 0.8; master.eq = EQSettings(highDB: 1.5)
         default: master.reverbLevel = 0.75
         }
