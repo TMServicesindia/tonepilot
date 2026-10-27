@@ -2,7 +2,6 @@
 // on-device sound classifier) on macOS: plays a short phrase on each GeneralUser GS instrument,
 // recognises it, and checks the family the AI tones are chosen from.
 // Usage: instrument_check <GeneralUser-GS.sf2>
-import AudioToolbox
 import AVFoundation
 import Foundation
 
@@ -43,7 +42,7 @@ func render(_ c: Case) throws -> URL {
     let format = AVAudioFormat(standardFormatWithSampleRate: 44_100, channels: 2)!
     try engine.enableManualRenderingMode(.offline, format: format, maximumFrameCount: 4096)
     try engine.start()
-    try sampler.loadSoundBankInstrument(at: bank, program: c.program, bankMSB: UInt8(kAUSampleBankMSBDefaultMelodic), bankLSB: 0)
+    try sampler.loadSoundBankInstrument(at: bank, program: c.program, bankMSB: 0x79 /* kAUSampleBankMSBDefaultMelodic */, bankLSB: 0)
     let steps = [0, 2, 4, 5, 7, 5, 4, 2, 0, 4, 7, 9, 7, 5, 4, 0]
     let noteLength = 0.45, seconds = 8.0
     let url = dir.appendingPathComponent("\(c.program).caf")

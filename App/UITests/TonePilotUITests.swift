@@ -89,7 +89,12 @@ final class TonePilotUITests: XCTestCase {
                             if drive.waitForExistence(timeout: 2), drive.isHittable { drive.adjust(toNormalizedSliderPosition: 0.3) }
                             assertAlive("drive")
                         }
-                        tap(element("tone.done"), "close the tone editor")
+                        // Tapped by position: XCUITest can't "scroll to" a toolbar button in a sheet.
+                        let done = element("tone.done")
+                        XCTAssertTrue(done.waitForExistence(timeout: 3), "tone editor has a Done button")
+                        done.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+                        if done.waitForExistence(timeout: 1) { app.swipeDown(velocity: .fast) }
+                        assertAlive("close the tone editor")
                         let closed = NSPredicate(format: "exists == false")
                         let wait = XCTNSPredicateExpectation(predicate: closed, object: element("tone.done"))
                         XCTAssertEqual(XCTWaiter().wait(for: [wait], timeout: 5), .completed, "tone editor didn't close in 5 s")
