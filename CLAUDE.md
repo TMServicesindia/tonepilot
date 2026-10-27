@@ -23,6 +23,11 @@ A change is not done until all of these hold:
 
 Report the measured numbers (the "App speed" and "Speed budget" annotations) with each build.
 
+**The full build is mandatory.** `ios-quick.yml` (build + publish, no tests) and the
+`[publish-anyway]` commit tag are temporary, one-off tools, used only when the owner explicitly
+asks to try features before the gate finishes. Every change must still go through the full build
+(`ios-build.yml`), and anything its tests find is fixed in the next full build.
+
 ## Quality
 - Separation quality must never go below the current engine: `coreml-convert.yml` checks the
   app's separator against PyTorch Demucs per part before the model is published.
