@@ -81,9 +81,13 @@ final class TonePilotUITests: XCTestCase {
                         tap(element("layer.header"), "expand a layer")
                         let effects = app.buttons["Effects & EQ"].firstMatch
                         if effects.waitForExistence(timeout: 3) {
-                            tap(effects, thenExpect: element("layer.drive"), "open effects")
+                            tap(effects, "open effects")
+                            // Drive sits below the fold in the layer's list: scroll to it.
                             let drive = app.sliders["layer.drive"].firstMatch
-                            if drive.waitForExistence(timeout: 2) { drive.adjust(toNormalizedSliderPosition: 0.3); assertAlive("drive") }
+                            var tries = 0
+                            while !(drive.exists && drive.isHittable) && tries < 3 { app.swipeUp(); tries += 1 }
+                            if drive.waitForExistence(timeout: 2), drive.isHittable { drive.adjust(toNormalizedSliderPosition: 0.3) }
+                            assertAlive("drive")
                         }
                         tap(element("tone.done"), "close the tone editor")
                         let closed = NSPredicate(format: "exists == false")

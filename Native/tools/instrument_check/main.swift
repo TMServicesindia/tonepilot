@@ -2,6 +2,7 @@
 // on-device sound classifier) on macOS: plays a short phrase on each GeneralUser GS instrument,
 // recognises it, and checks the family the AI tones are chosen from.
 // Usage: instrument_check <GeneralUser-GS.sf2>
+import AudioToolbox
 import AVFoundation
 import Foundation
 
