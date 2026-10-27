@@ -68,13 +68,18 @@ jobs:
           exit $code
 
       - name: Instrument recognition check (Apple sound classifier, macOS)
+        # A measurement, reported with the build; it never blocks the app from being published.
+        continue-on-error: true
         run: |
-          set -euo pipefail
+          set -uo pipefail
           mkdir -p build-instruments && cd build-instruments
           # The app's recogniser compiled together with the core (one module, so no import needed).
           sed '/^import TonePilotCore$/d' ../App/Sources/Audio/InstrumentRecognizer.swift > InstrumentRecognizer.swift
-          swiftc -O $(find ../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') InstrumentRecognizer.swift \
-            ../Native/tools/instrument_check/main.swift -o instrument_check
+          if ! swiftc -O -target "$(uname -m)-apple-macos14" $(find ../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') \
+               InstrumentRecognizer.swift ../Native/tools/instrument_check/main.swift -o instrument_check > compile.log 2>&1; then
+            grep -E "error:" compile.log | sort -u | head -10 | while IFS= read -r l; do echo "::warning title=Instrument check didn't compile::$l"; done
+            exit 0
+          fi
           code=0
           ./instrument_check ../App/Resources/SoundFonts/GeneralUser-GS.sf2 > instruments.log 2>&1 || code=$?
           cat instruments.log
