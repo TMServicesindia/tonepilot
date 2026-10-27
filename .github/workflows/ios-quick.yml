@@ -43,7 +43,7 @@ jobs:
             -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             build > xcodebuild.log 2>&1 || true
-          grep -E "error:" xcodebuild.log | sort -u | head -20 | while IFS= read -r l; do echo "::error title=Build::$l"; done
+          { grep -E "error:" xcodebuild.log || true; } | sort -u | head -20 | while IFS= read -r l; do echo "::error title=Build::$l"; done
           grep -q "BUILD SUCCEEDED" xcodebuild.log
           file build/Build/Products/Release-iphoneos/TonePilot.app/TonePilot | grep -q arm64
 
