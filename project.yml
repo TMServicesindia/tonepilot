@@ -64,7 +64,7 @@ targets:
       path: App/Info.plist
       properties:
         CFBundleDisplayName: TonePilot
-        CFBundleShortVersionString: "0.7.0"
+        CFBundleShortVersionString: "0.8.0"
         CFBundleVersion: "1"
         UILaunchScreen: {}
         UIBackgroundModes: [audio]

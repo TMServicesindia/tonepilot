@@ -52,6 +52,37 @@ final class SpeedBudgetTests: XCTestCase {
     }
 
     /// Learning Song Arpeggio patterns for a 4-minute song must take seconds, not minutes.
+    /// A mass-song main tone at its heaviest: supersaw lead + supersaw chords (7 oscillators per
+    /// note, filter envelopes, drive) and a sub bass, all held.
+    func testSupersawToneRendersFasterThanRealTime() throws {
+        try budgetsApply()
+        let sr = 48_000.0
+        let e = ToneEngine(sampleRate: sr)
+        var m = EngineMasterConfig(); m.gain = 0.5
+        e.send(.setMaster(m))
+        let layers: [(UUID, [UInt8])] = [(FactoryPatches.anthemSupersawId, [72, 76, 79, 84]),
+                                         (FactoryPatches.supersawChordsId, [48, 52, 55, 60, 64, 67]),
+                                         (FactoryPatches.reeseBassId, [36])]
+        for (slot, (id, notes)) in layers.enumerated() {
+            let patch = try XCTUnwrap(FactoryPatches.all.first { $0.id == id })
+            let inst = LoadedInstrument(name: patch.name, synth: try XCTUnwrap(patch.synth))
+            let cfg = EngineLayerConfig.make(layer: Layer(patchId: id, volume: 0.6), patch: patch, instrument: inst,
+                                             handle: UInt32(100 + slot), headroomGain: 0.4)
+            e.send(.setSlot(index: slot, config: cfg))
+            for n in notes { e.send(.noteOn(handle: UInt32(100 + slot), note: n, velocity: 110)) }
+        }
+        let audioSeconds = 10.0, block = 256
+        var l = [Float](repeating: 0, count: block), r = l
+        let took = seconds {
+            for _ in 0..<Int(audioSeconds * sr) / block {
+                l.withUnsafeMutableBufferPointer { lp in r.withUnsafeMutableBufferPointer { rp in e.render(frames: block, left: lp.baseAddress!, right: rp.baseAddress!) } }
+            }
+        }
+        let load = took / audioSeconds
+        print("SPEED supersaw tone: \(String(format: "%.1f", load * 100))% of real time (\(e.activeVoiceCount) voices)")
+        XCTAssertLessThan(load, 0.25, "supersaw tone uses \(Int(load * 100))% of real time")
+    }
+
     func testPatternLearningIsQuick() throws {
         try budgetsApply()
         let pattern: [(Int, ArpeggioPattern.Degree)] = [(0, .root), (3, .fifth), (6, .octave), (8, .third), (11, .fifth), (14, .octave)]

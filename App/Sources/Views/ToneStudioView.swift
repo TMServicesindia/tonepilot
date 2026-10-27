@@ -361,6 +361,16 @@ struct LayerEditor: View {
                         Slider(value: Binding(get: { log10(filter.wrappedValue.cutoff) }, set: { filter.wrappedValue.cutoff = pow(10, $0) }), in: log10(80)...log10(18_000))
                     }
                     HStack { Text("Resonance \(Int(filter.wrappedValue.resonance)) dB").frame(width: 130, alignment: .leading); Slider(value: filter.resonance, in: 0...18) }
+                    // Filter envelope: the tone opens on each attack (synth brass, plucks).
+                    HStack {
+                        Text("Attack sweep \(filter.wrappedValue.envAmount, specifier: "%.1f") oct").frame(width: 130, alignment: .leading)
+                        Slider(value: filter.envAmount, in: 0...5).accessibilityIdentifier("layer.filterEnv")
+                    }
+                    if filter.wrappedValue.envAmount > 0 { timeSlider("Sweep time", filter.envDecay, 0.02...2) }
+                    HStack {
+                        Text("Hit brightness \(filter.wrappedValue.velocityBrightness, specifier: "%.1f")").frame(width: 130, alignment: .leading)
+                        Slider(value: filter.velocityBrightness, in: 0...3)
+                    }
                 }
             }
             DisclosureGroup("Expression (mono · glide · vibrato · bend)") {
@@ -398,15 +408,32 @@ struct PatchPicker: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
+    /// Film Tone Library era/style filter (nil = everything).
+    @State private var era: String?
     let onPick: (InstrumentPatch) -> Void
+
+    private func matches(_ p: InstrumentPatch) -> Bool {
+        let tags = p.tags ?? []
+        if let era, !tags.contains(era) { return false }
+        return query.isEmpty || p.name.localizedCaseInsensitiveContains(query) || tags.contains { $0.localizedCaseInsensitiveContains(query) }
+    }
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(InstrumentFamily.allCases, id: \.self) { family in
-                    let patches = model.library.patches.filter {
-                        $0.family == family && (query.isEmpty || $0.name.localizedCaseInsensitiveContains(query))
+                Section {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            eraChip(nil, "All")
+                            ForEach(FactoryPatches.libraryEras, id: \.tag) { eraChip($0.tag, $0.name) }
+                        }
+                        .padding(.vertical, 2)
                     }
+                } footer: {
+                    Text("Film Tone Library: sounds for Indian film music from the 90s keyboard era to today's mass and EDM songs. Every sound can be edited.")
+                }
+                ForEach(InstrumentFamily.allCases, id: \.self) { family in
+                    let patches = model.library.patches.filter { $0.family == family && matches($0) }
                     if !patches.isEmpty {
                         Section(family.displayName) {
                             ForEach(patches) { p in
@@ -427,5 +454,16 @@ struct PatchPicker: View {
             .navigationTitle("Choose sound")
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
         }
+    }
+
+    private func eraChip(_ tag: String?, _ name: String) -> some View {
+        Button { era = tag } label: {
+            Text(name).font(.subheadline.weight(.semibold))
+                .padding(.horizontal, 12).padding(.vertical, 6)
+                .background(Capsule().fill(era == tag ? Color.accentColor : Color.secondary.opacity(0.18)))
+                .foregroundStyle(era == tag ? Color.white : Color.primary)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("sound.era.\(tag ?? "all")")
     }
 }

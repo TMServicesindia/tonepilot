@@ -123,10 +123,34 @@ public struct FilterSettings: Codable, Hashable, Sendable {
     /// dB.
     public var resonance: Double
 
-    public init(enabled: Bool = false, cutoff: Double = 20_000, resonance: Double = 0) {
+    /// Filter envelope: how far the filter opens on each note's attack, in octaves above
+    /// `cutoff` (0 = static filter). Classic synth brass and plucks.
+    public var envAmount: Double
+    /// Seconds for the filter envelope to fall back to `cutoff`.
+    public var envDecay: Double
+    /// Octaves the filter opens for a hard hit vs a soft one (soft notes sound darker, like real brass).
+    public var velocityBrightness: Double
+
+    public init(enabled: Bool = false, cutoff: Double = 20_000, resonance: Double = 0,
+                envAmount: Double = 0, envDecay: Double = 0.3, velocityBrightness: Double = 0) {
         self.enabled = enabled
         self.cutoff = cutoff
         self.resonance = resonance
+        self.envAmount = envAmount
+        self.envDecay = envDecay
+        self.velocityBrightness = velocityBrightness
+    }
+
+    enum CodingKeys: String, CodingKey { case enabled, cutoff, resonance, envAmount, envDecay, velocityBrightness }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        enabled = try c.decode(Bool.self, forKey: .enabled)
+        cutoff = try c.decode(Double.self, forKey: .cutoff)
+        resonance = try c.decode(Double.self, forKey: .resonance)
+        envAmount = try c.decodeIfPresent(Double.self, forKey: .envAmount) ?? 0
+        envDecay = try c.decodeIfPresent(Double.self, forKey: .envDecay) ?? 0.3
+        velocityBrightness = try c.decodeIfPresent(Double.self, forKey: .velocityBrightness) ?? 0
     }
 }
 

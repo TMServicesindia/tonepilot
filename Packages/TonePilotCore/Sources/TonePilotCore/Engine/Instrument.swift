@@ -10,12 +10,29 @@ public struct SynthSettings: Codable, Hashable, Sendable {
     public var subLevel: Double
     /// Breath/noise amount 0...1 (makes flute-like or vocal-like leads airier).
     public var noise: Double
+    /// Oscillators per note, 1...7. Above 2 they spread evenly across ±`detuneCents`
+    /// (a "supersaw" at 7): the wide, thick sound of modern film and EDM leads and chords.
+    public var unison: Int
 
-    public init(waveform: Waveform = .saw, detuneCents: Double = 7, subLevel: Double = 0, noise: Double = 0) {
+    public static let maxUnison = 7
+
+    public init(waveform: Waveform = .saw, detuneCents: Double = 7, subLevel: Double = 0, noise: Double = 0, unison: Int = 2) {
         self.waveform = waveform
         self.detuneCents = detuneCents
         self.subLevel = subLevel
         self.noise = noise
+        self.unison = max(1, min(Self.maxUnison, unison))
+    }
+
+    enum CodingKeys: String, CodingKey { case waveform, detuneCents, subLevel, noise, unison }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        waveform = try c.decode(Waveform.self, forKey: .waveform)
+        detuneCents = try c.decode(Double.self, forKey: .detuneCents)
+        subLevel = try c.decode(Double.self, forKey: .subLevel)
+        noise = try c.decodeIfPresent(Double.self, forKey: .noise) ?? 0
+        unison = max(1, min(Self.maxUnison, try c.decodeIfPresent(Int.self, forKey: .unison) ?? 2))
     }
 }
 

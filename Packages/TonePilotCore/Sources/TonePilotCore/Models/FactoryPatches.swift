@@ -47,8 +47,10 @@ public enum FactoryPatches {
         (49, "Slow Strings", .strings),
         (50, "Synth Strings", .synthStrings),
         (52, "Choir Aahs", .choir),
+        (54, "Synth Voice", .choir),
         (56, "Trumpet", .brass),
         (57, "Trombone", .brass),
+        (60, "French Horn", .brass),
         (61, "Brass Section", .brass),
         (62, "Synth Brass", .brass),
         (65, "Alto Sax", .reed),
@@ -119,6 +121,33 @@ public enum FactoryPatches {
     public static let subBassId = variantId(33)
     public static let powerStringsId = variantId(34)
     public static let drivenSynthBrassId = variantId(35)
+    // Film Tone Library (90s → 2026).
+    public static let filmStrings90sId = variantId(40)
+    public static let fmBellKeysId = variantId(41)
+    public static let panFluteLeadId = variantId(42)
+    public static let melodicAccordionId = variantId(43)
+    public static let synthChoirPadId = variantId(44)
+    public static let classicSynthBrassId = variantId(45)
+    public static let supersawLeadId = variantId(46)
+    public static let trancePluckId = variantId(47)
+    public static let danceSynthBassId = variantId(48)
+    public static let electricSitarId = variantId(49)
+    public static let rockOrganId = variantId(50)
+    public static let anthemSupersawId = variantId(51)
+    public static let supersawChordsId = variantId(52)
+    public static let reeseBassId = variantId(53)
+    public static let sub808Id = variantId(54)
+    public static let trapBellId = variantId(55)
+    public static let massBrassHitsId = variantId(56)
+    public static let epicHornsId = variantId(57)
+    public static let cinematicLowStringsId = variantId(58)
+    public static let nadaswaramLeadId = variantId(59)
+    public static let distortedGuitarLeadId = variantId(60)
+    public static let retroLeadId = variantId(61)
+    public static let wideSynthPadId = variantId(62)
+    public static let lofiKeysId = variantId(63)
+    public static let heroWhistleLeadId = variantId(64)
+    public static let melodySaxId = variantId(65)
 
     static func sf(_ id: UUID, _ name: String, _ family: InstrumentFamily, program: UInt8, bankMSB: UInt8 = SoundFontReference.melodicBankMSB,
                    effects: EffectSettings = EffectSettings(), expression: ExpressionSettings? = nil, filter: FilterSettings = FilterSettings(),
@@ -239,8 +268,135 @@ public enum FactoryPatches {
               filter: FilterSettings(), effects: EffectSettings(reverbMix: 0), tags: ["accompaniment"]),
     ]
 
+    /// Eras and styles of the Film Tone Library (tags on its tones), in picker order.
+    public static let libraryEras: [(tag: String, name: String)] = [
+        ("90s", "90s"), ("2000s", "2000s"), ("2010s", "2010s"), ("2020s", "2020s"), ("indian", "Indian"), ("mass", "Mass"),
+    ]
+
+    /// Curated tones for Indian film music from the 90s keyboard era to today's mass/EDM
+    /// productions. Named by sound, not by composer; every one is editable in the tone editor.
+    public static let filmLibrary: [InstrumentPatch] = [
+        // 90s: the synth-keyboard era (string machines, FM keys, pan flute, accordion, choirs).
+        sf(filmStrings90sId, "90s Film Strings", .synthStrings, program: 50,
+           effects: EffectSettings(reverbMix: 35, chorusMix: 30, eq: EQSettings(lowDB: -1, midDB: 1, midFrequency: 1200, highDB: 1)),
+           tags: ["library", "90s", "strings", "pad", "accompaniment"]),
+        sf(fmBellKeysId, "90s FM Bell Keys", .electricPiano, program: 5,
+           effects: EffectSettings(reverbMix: 25, chorusMix: 25, eq: EQSettings(highDB: 1.5)),
+           tags: ["library", "90s", "keys", "bright", "accompaniment"]),
+        sf(panFluteLeadId, "90s Pan Flute Lead", .flute, program: 75,
+           effects: EffectSettings(reverbMix: 32, chorusMix: 8),
+           expression: ExpressionSettings(mono: true, glideTime: 0.06, bendRange: 2, vibratoDepth: 18, vibratoRate: 5.4, vibratoDelay: 0.3),
+           tags: ["library", "90s", "lead", "flute", "ornamented"]),
+        sf(melodicAccordionId, "Melodic Accordion", .reed, program: 21,
+           effects: EffectSettings(reverbMix: 20, eq: EQSettings(midDB: 1, midFrequency: 900, highDB: -1)),
+           expression: ExpressionSettings(mono: false, bendRange: 2, vibratoDepth: 8, vibratoRate: 5.5),
+           tags: ["library", "90s", "reed", "lead", "indian"]),
+        sf(synthChoirPadId, "Synth Choir Pad", .choir, program: 54,
+           effects: EffectSettings(reverbMix: 45, chorusMix: 20),
+           tags: ["library", "90s", "choir", "pad", "accompaniment"]),
+        synth(classicSynthBrassId, "Classic Synth Brass", .brass, SynthSettings(waveform: .saw, detuneCents: 10, subLevel: 0.15, unison: 3),
+              envelope: Envelope(attack: 0.02, decay: 0.4, sustain: 0.8, release: 0.25),
+              filter: FilterSettings(enabled: true, cutoff: 900, resonance: 2, envAmount: 2.5, envDecay: 0.35, velocityBrightness: 1.2),
+              effects: EffectSettings(reverbMix: 18, chorusMix: 15, eq: EQSettings(midDB: 1.5, midFrequency: 1500, highDB: 1), drive: 10),
+              tags: ["library", "90s", "brass", "synth", "powerful"]),
+        // 2000s: trance/dance leads and plucks, electric sitar, rock organ.
+        synth(supersawLeadId, "Supersaw Lead", .synthLead, SynthSettings(waveform: .saw, detuneCents: 22, subLevel: 0.1, unison: 7),
+              envelope: Envelope(attack: 0.005, decay: 0.3, sustain: 0.9, release: 0.25),
+              filter: FilterSettings(enabled: true, cutoff: 7000, resonance: 2, envAmount: 0.8, envDecay: 0.4, velocityBrightness: 0.6),
+              effects: EffectSettings(reverbMix: 20, delayMix: 15, chorusMix: 10, eq: EQSettings(midDB: 1.5, midFrequency: 2000, highDB: 1), drive: 12),
+              expression: ExpressionSettings(mono: true, glideTime: 0.03, bendRange: 2, vibratoDepth: 8, vibratoRate: 5.8, vibratoDelay: 0.35),
+              tags: ["library", "2000s", "lead", "synth", "bright", "powerful"]),
+        synth(trancePluckId, "Trance Pluck", .pluck, SynthSettings(waveform: .saw, detuneCents: 16, unison: 5),
+              envelope: Envelope(attack: 0.001, decay: 0.35, sustain: 0, release: 0.25),
+              filter: FilterSettings(enabled: true, cutoff: 1200, resonance: 4, envAmount: 3.5, envDecay: 0.18, velocityBrightness: 1),
+              effects: EffectSettings(reverbMix: 25, delayMix: 25),
+              tags: ["library", "2000s", "pluck", "synth", "motif", "accompaniment"]),
+        synth(danceSynthBassId, "Dance Synth Bass", .bass, SynthSettings(waveform: .saw, detuneCents: 0, subLevel: 0.4, unison: 1),
+              envelope: Envelope(attack: 0.002, decay: 0.3, sustain: 0.7, release: 0.1),
+              filter: FilterSettings(enabled: true, cutoff: 500, resonance: 6, envAmount: 2.5, envDecay: 0.15, velocityBrightness: 1),
+              effects: EffectSettings(reverbMix: 0, drive: 20),
+              tags: ["library", "2000s", "bass", "synth"]),
+        sf(electricSitarId, "Electric Sitar", .ethnic, program: 104,
+           effects: EffectSettings(reverbMix: 22, delayMix: 18, chorusMix: 10, eq: EQSettings(highDB: 1.5)),
+           tags: ["library", "2000s", "plucked", "indian", "motif"]),
+        sf(rockOrganId, "Rock Organ", .organ, program: 16,
+           effects: EffectSettings(reverbMix: 15, chorusMix: 25, eq: EQSettings(midDB: 1.5, midFrequency: 1000), drive: 25),
+           tags: ["library", "2000s", "organ", "powerful"]),
+        // 2010s–2026: mass anthems, EDM chords, 808s, cinematic brass and strings.
+        synth(anthemSupersawId, "Anthem Supersaw", .synthLead, SynthSettings(waveform: .saw, detuneCents: 28, subLevel: 0.3, unison: 7),
+              envelope: Envelope(attack: 0.004, decay: 0.3, sustain: 0.9, release: 0.22),
+              filter: FilterSettings(enabled: true, cutoff: 6000, resonance: 2, envAmount: 1, envDecay: 0.5, velocityBrightness: 1),
+              effects: EffectSettings(reverbMix: 20, delayMix: 12, chorusMix: 10, eq: EQSettings(lowDB: 1, midDB: 2.5, midFrequency: 1800, highDB: 1.5), drive: 30),
+              expression: ExpressionSettings(mono: false, bendRange: 2, vibratoDepth: 6, vibratoRate: 5.8, vibratoDelay: 0.4),
+              tags: ["library", "2020s", "lead", "synth", "powerful", "mass"]),
+        synth(supersawChordsId, "EDM Supersaw Chords", .synthStrings, SynthSettings(waveform: .saw, detuneCents: 30, unison: 7),
+              envelope: Envelope(attack: 0.01, decay: 0.5, sustain: 0.9, release: 0.4),
+              filter: FilterSettings(enabled: true, cutoff: 4500, resonance: 1, velocityBrightness: 0.8),
+              effects: EffectSettings(reverbMix: 35, chorusMix: 30, eq: EQSettings(lowDB: -2, midDB: 1, midFrequency: 1500, highDB: 1)),
+              tags: ["library", "2010s", "chords", "synth", "accompaniment", "powerful"]),
+        synth(reeseBassId, "Reese Bass", .bass, SynthSettings(waveform: .saw, detuneCents: 18, subLevel: 0.3, unison: 3),
+              envelope: Envelope(attack: 0.003, decay: 0.4, sustain: 0.85, release: 0.15),
+              filter: FilterSettings(enabled: true, cutoff: 800, resonance: 3),
+              effects: EffectSettings(reverbMix: 0, eq: EQSettings(lowDB: 2, highDB: -3), drive: 35),
+              tags: ["library", "2020s", "bass", "synth", "powerful", "mass"]),
+        synth(sub808Id, "808 Sub Bass", .bass, SynthSettings(waveform: .sine, detuneCents: 0, unison: 1),
+              envelope: Envelope(attack: 0.002, decay: 1.5, sustain: 0.4, release: 0.3),
+              filter: FilterSettings(),
+              effects: EffectSettings(reverbMix: 0, eq: EQSettings(lowDB: 2), drive: 25),
+              tags: ["library", "2020s", "bass", "808", "powerful"]),
+        synth(trapBellId, "Trap Bell Lead", .bell, SynthSettings(waveform: .triangle, detuneCents: 0, unison: 1),
+              envelope: Envelope(attack: 0.001, decay: 0.6, sustain: 0, release: 0.4),
+              filter: FilterSettings(enabled: true, cutoff: 6000, resonance: 0),
+              effects: EffectSettings(reverbMix: 30, delayMix: 30),
+              tags: ["library", "2020s", "bells", "motif", "bright"]),
+        sf(massBrassHitsId, "Mass Brass Hits", .brass, program: 61,
+           effects: EffectSettings(reverbMix: 12, eq: EQSettings(lowDB: 2, midDB: 2.5, midFrequency: 1300, highDB: 3), drive: 30),
+           filter: FilterSettings(enabled: true, cutoff: 9000, resonance: 0, velocityBrightness: 1.5),
+           tags: ["library", "2020s", "brass", "powerful", "stab", "mass"]),
+        sf(epicHornsId, "Epic French Horns", .brass, program: 60,
+           effects: EffectSettings(reverbMix: 35, eq: EQSettings(lowDB: 2, midDB: 1, midFrequency: 700)),
+           tags: ["library", "2010s", "brass", "cinematic", "powerful"]),
+        sf(cinematicLowStringsId, "Cinematic Low Strings", .strings, program: 48,
+           effects: EffectSettings(reverbMix: 30, eq: EQSettings(lowDB: 3, midDB: 0.5, midFrequency: 400, highDB: -1)),
+           tags: ["library", "2010s", "strings", "cinematic", "powerful", "accompaniment"]),
+        sf(nadaswaramLeadId, "Nadaswaram-like Lead", .ethnic, program: 111,
+           effects: EffectSettings(reverbMix: 22, eq: EQSettings(midDB: 3, midFrequency: 1500, highDB: 2), drive: 10),
+           expression: ExpressionSettings(mono: true, glideTime: 0.05, bendRange: 2, vibratoDepth: 12, vibratoRate: 6),
+           tags: ["library", "indian", "reed", "lead", "ornamented", "powerful", "mass"],
+           notes: "GM shehnai, brightened and pushed towards a nadaswaram. Not a sampled nadaswaram."),
+        sf(distortedGuitarLeadId, "Distorted Guitar Lead", .guitar, program: 30,
+           effects: EffectSettings(reverbMix: 18, delayMix: 15, eq: EQSettings(midDB: 1.5, midFrequency: 1600), drive: 20),
+           expression: ExpressionSettings(mono: true, glideTime: 0.02, bendRange: 2, vibratoDepth: 10, vibratoRate: 5.5, vibratoDelay: 0.3),
+           tags: ["library", "2010s", "electricGuitar", "lead", "powerful", "mass"]),
+        synth(retroLeadId, "Retro 80s Lead", .synthLead, SynthSettings(waveform: .square, detuneCents: 6, subLevel: 0.1),
+              envelope: Envelope(attack: 0.005, decay: 0.3, sustain: 0.85, release: 0.2),
+              filter: FilterSettings(enabled: true, cutoff: 2500, resonance: 3, envAmount: 1.5, envDecay: 0.25, velocityBrightness: 0.8),
+              effects: EffectSettings(reverbMix: 22, delayMix: 20, chorusMix: 15),
+              expression: ExpressionSettings(mono: true, glideTime: 0.04, bendRange: 2, vibratoDepth: 10, vibratoRate: 5.5, vibratoDelay: 0.3),
+              tags: ["library", "2020s", "retro", "lead", "synth"]),
+        synth(wideSynthPadId, "Wide Synth Pad", .pad, SynthSettings(waveform: .saw, detuneCents: 20, subLevel: 0.2, unison: 7),
+              envelope: Envelope(attack: 0.8, decay: 1.0, sustain: 0.85, release: 1.5),
+              filter: FilterSettings(enabled: true, cutoff: 2200, resonance: 1),
+              effects: EffectSettings(reverbMix: 50, chorusMix: 40),
+              tags: ["library", "2010s", "pad", "synth", "accompaniment"]),
+        sf(lofiKeysId, "Lo-fi Keys", .electricPiano, program: 4,
+           effects: EffectSettings(reverbMix: 30, chorusMix: 20, eq: EQSettings(lowDB: 1, highDB: -4)),
+           filter: FilterSettings(enabled: true, cutoff: 3500, resonance: 0),
+           tags: ["library", "2020s", "keys", "lofi", "warm", "accompaniment"]),
+        synth(heroWhistleLeadId, "Whistle Lead", .synthLead, SynthSettings(waveform: .sine, detuneCents: 0, noise: 0.06, unison: 1),
+              envelope: Envelope(attack: 0.03, decay: 0.2, sustain: 0.9, release: 0.2),
+              filter: FilterSettings(),
+              effects: EffectSettings(reverbMix: 30, delayMix: 15),
+              expression: ExpressionSettings(mono: true, glideTime: 0.07, bendRange: 2, vibratoDepth: 15, vibratoRate: 5.8, vibratoDelay: 0.2),
+              tags: ["library", "indian", "lead", "whistle", "ornamented"]),
+        sf(melodySaxId, "Melody Sax", .reed, program: 65,
+           effects: EffectSettings(reverbMix: 25, eq: EQSettings(midDB: 1, midFrequency: 1200)),
+           expression: ExpressionSettings(mono: true, glideTime: 0.04, bendRange: 2, vibratoDepth: 12, vibratoRate: 5.2, vibratoDelay: 0.35),
+           tags: ["library", "90s", "reed", "lead", "ornamented"]),
+    ]
+
     /// Everything shipped with the app.
-    public static let all: [InstrumentPatch] = generalMIDI + extended
+    public static let all: [InstrumentPatch] = generalMIDI + extended + filmLibrary
 
     /// Default patch for each family, used by tone suggestions.
     public static func defaultPatch(for family: InstrumentFamily) -> InstrumentPatch {

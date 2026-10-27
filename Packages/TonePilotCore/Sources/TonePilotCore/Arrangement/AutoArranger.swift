@@ -113,6 +113,23 @@ public enum AutoArranger {
                       register: 52...84, vocalAffinity: 0.5, reason: "a smooth, reedy saxophone melody", families: ["reed"], energy: 0.25...0.8),
             Candidate(patchId: FactoryPatches.id(forProgram: 52), name: "Choir", centroid: 400...2500, sustain: 0.6...1, ornament: 0.2,
                       register: 48...84, vocalAffinity: 0.6, reason: "chant-like held voices", families: ["choir"], energy: 0.3...1),
+            // Film Tone Library.
+            Candidate(patchId: FactoryPatches.anthemSupersawId, name: "Anthem Supersaw", centroid: 1800...7000, sustain: 0.3...1, ornament: 0.15,
+                      register: 52...96, vocalAffinity: 0.3, reason: "a huge, wide synth hook for a mass anthem", families: ["synth"], energy: 0.7...1),
+            Candidate(patchId: FactoryPatches.supersawLeadId, name: "Supersaw Lead", centroid: 1500...6000, sustain: 0.3...1, ornament: 0.25,
+                      register: 55...96, vocalAffinity: 0.35, reason: "a bright, wide dance lead", families: ["synth"], energy: 0.5...0.9),
+            Candidate(patchId: FactoryPatches.classicSynthBrassId, name: "Classic Synth Brass", centroid: 1000...4500, sustain: 0.3...1, ornament: 0.1,
+                      register: 52...90, vocalAffinity: 0.3, reason: "punchy synth-brass phrases", families: ["brass", "synth"], energy: 0.45...0.9),
+            Candidate(patchId: FactoryPatches.nadaswaramLeadId, name: "Nadaswaram-like Lead", centroid: 1200...4000, sustain: 0.5...1, ornament: 0.85,
+                      register: 60...90, vocalAffinity: 0.5, reason: "a loud, ornamented reed line — temple and mass-song colour", families: ["reed"], energy: 0.55...1),
+            Candidate(patchId: FactoryPatches.epicHornsId, name: "Epic French Horns", centroid: 500...2500, sustain: 0.5...1, ornament: 0.1,
+                      register: 48...80, vocalAffinity: 0.3, reason: "a broad, cinematic horn melody", families: ["brass"], energy: 0.5...1),
+            Candidate(patchId: FactoryPatches.distortedGuitarLeadId, name: "Distorted Guitar Lead", centroid: 1200...5000, sustain: 0.4...1, ornament: 0.4,
+                      register: 48...88, vocalAffinity: 0.25, reason: "a singing, distorted guitar solo line", families: ["electricGuitar"], energy: 0.6...1),
+            Candidate(patchId: FactoryPatches.melodySaxId, name: "Melody Sax", centroid: 700...3000, sustain: 0.35...1, ornament: 0.6,
+                      register: 52...84, vocalAffinity: 0.5, reason: "an expressive sax melody with slides", families: ["reed"], energy: 0.2...0.7),
+            Candidate(patchId: FactoryPatches.heroWhistleLeadId, name: "Whistle Lead", centroid: 1500...5000, sustain: 0.4...1, ornament: 0.6,
+                      register: 67...96, vocalAffinity: 0.4, reason: "a pure, whistled high melody", families: ["flute"], energy: 0.2...0.7),
         ]
         return list
     }()
@@ -363,8 +380,14 @@ public enum AutoArranger {
         }
         if level3 == .powerful {
             let brass = (evidence.instruments["brass"] ?? 0) >= 0.25
-            leftPatch = brass || power >= 0.78 ? FactoryPatches.brassStabsId : FactoryPatches.powerStringsId
-            leftWhy = brass ? "powerful section with brass — the left hand plays brass stabs" : "powerful section — the left hand plays punchy strings"
+            let synth = (evidence.instruments["synth"] ?? 0) >= 0.4 && !brass
+            if synth {
+                leftPatch = FactoryPatches.supersawChordsId
+                leftWhy = "powerful electronic section — the left hand plays wide supersaw chords"
+            } else {
+                leftPatch = brass || power >= 0.78 ? FactoryPatches.brassStabsId : FactoryPatches.powerStringsId
+                leftWhy = brass ? "powerful section with brass — the left hand plays brass stabs" : "powerful section — the left hand plays punchy strings"
+            }
             if available[leftPatch] == nil { leftPatch = FactoryPatches.id(forProgram: 61) }
         }
         layers.append(Layer(patchId: leftPatch, volume: 0.6, pan: -0.1, keyRange: leftRange, role: padLevel > keysLevel + 0.1 ? .pad : .harmony))

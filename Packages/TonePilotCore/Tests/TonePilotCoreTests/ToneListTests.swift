@@ -28,7 +28,7 @@ final class ToneListTests: XCTestCase {
         let names = list.instruments.flatMap { $0.entries.map(\.tone.name) }
         XCTAssertTrue(names.contains("Grand Piano") && names.contains("Orchestral Strings") && names.contains("Bansuri-like Flute"))
         XCTAssertFalse(names.contains("Metronome Click"), "accompaniment-only sounds hidden")
-        XCTAssertEqual(lib.toneList(search: "flute").instruments.flatMap(\.entries).count, 4) // Flute, Pan Flute, Bansuri-like, Low Bansuri-like
+        XCTAssertEqual(lib.toneList(search: "flute").instruments.flatMap(\.entries).count, 5) // Flute, Pan Flute, Bansuri-like, Low Bansuri-like, 90s Pan Flute Lead
         // Saving a song tone makes an independent copy.
         let saved = list.songTones[0].tone.savedAsMyTone(name: "Hukum Chorus")
         XCTAssertNotEqual(saved.id, list.songTones[0].tone.id)

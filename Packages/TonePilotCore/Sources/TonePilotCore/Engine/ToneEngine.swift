@@ -20,6 +20,8 @@ public struct EngineLayerConfig: @unchecked Sendable {
     public var synthDetune: Float = 0
     public var synthSub: Float = 0
     public var synthNoise: Float = 0
+    /// Oscillators per note (1...7; 2 = the classic detuned pair).
+    public var synthUnison: UInt8 = 2
     public var gain: Float = 0.8
     public var pan: Float = 0
     public var fineTuneCents: Float = 0
@@ -28,6 +30,11 @@ public struct EngineLayerConfig: @unchecked Sendable {
     public var filterOverride = false
     public var cutoff: Float = 20_000
     public var resonanceDB: Float = 0
+    /// Filter envelope: octaves the filter opens on the attack, and its decay in seconds.
+    public var filterEnvAmount: Float = 0
+    public var filterEnvDecay: Float = 0.3
+    /// Octaves brighter for a hard hit than a soft one.
+    public var velocityBrightness: Float = 0
     public var eq = EQSettings()
     public var sendReverb: Float = 0.15
     public var sendChorus: Float = 0
@@ -57,6 +64,7 @@ public struct EngineLayerConfig: @unchecked Sendable {
             c.synthDetune = Float(synth.detuneCents)
             c.synthSub = Float(synth.subLevel)
             c.synthNoise = Float(synth.noise)
+            c.synthUnison = UInt8(max(1, min(SynthSettings.maxUnison, synth.unison)))
         } else {
             c.regions = UnsafePointer(instrument.regions.baseAddress)
             c.regionCount = instrument.regionCount
@@ -77,6 +85,9 @@ public struct EngineLayerConfig: @unchecked Sendable {
             c.filterOverride = true
             c.cutoff = Float(filter.cutoff)
             c.resonanceDB = Float(filter.resonance)
+            c.filterEnvAmount = Float(max(0, min(6, filter.envAmount)))
+            c.filterEnvDecay = Float(max(0.01, min(5, filter.envDecay)))
+            c.velocityBrightness = Float(max(0, min(4, filter.velocityBrightness)))
         }
         let fx = layer.effectsOverride ?? patch.effects
         c.eq = fx.eq
@@ -268,6 +279,13 @@ public final class ToneEngine: @unchecked Sendable {
         var phase1: Double = 0, phase2: Double = 0, phaseSub: Double = 0
         var detune: Float = 0, sub: Float = 0, noise: Float = 0
         var noiseState: UInt32 = 22_222
+        // Unison (supersaw): oscillator phases and pitch ratios; used when uniCount > 2.
+        var uniCount = 0
+        var uniPhase = SIMD8<Double>(repeating: 0)
+        var uniRatio = SIMD8<Double>(repeating: 1)
+        var uniNorm: Double = 0.5
+        // Filter envelope: current extra octaves above fBase, decaying.
+        var fBase: Float = 20_000, fRes: Float = 0, fEnv: Float = 0, fEnvDecay: Float = 0.3
         // Shaping
         var env = AmpEnvelope()
         var filter = SVFLowPass()
@@ -510,6 +528,11 @@ public final class ToneEngine: @unchecked Sendable {
             for i in 0..<len {
                 let e = v.env.next()
                 if v.env.stage == .done { v.active = false; break }
+                if v.fEnv > 0, i & 63 == 0 {
+                    v.fEnv *= expf(-64 / max(1, v.fEnvDecay * sr))
+                    if v.fEnv < 0.01 { v.fEnv = 0 }
+                    v.filter.set(cutoff: min(sr * 0.45, v.fBase * exp2f(v.fEnv)), resonanceDB: v.fRes, sampleRate: sr)
+                }
                 var s: Float
                 if v.isSynth {
                     s = synthSample(&v, inc: inc)
@@ -577,8 +600,22 @@ public final class ToneEngine: @unchecked Sendable {
     private func synthSample(_ v: inout Voice, inc: Double) -> Float {
         // For synth voices baseInc holds frequency/sampleRate.
         let dt1 = inc, dt2 = inc * exp2(Double(v.detune) / 1200)
-        var s = osc(v.wave, v.phase1, dt1)
-        if v.detune != 0 { s = 0.5 * (s + osc(v.wave, v.phase2, dt2)) }
+        var s: Double
+        if v.uniCount > 2 {
+            // Supersaw: oscillators spread across ±detune, the centre one a little louder.
+            var sum = 0.0
+            let mid = v.uniCount / 2
+            for k in 0..<v.uniCount {
+                let dt = inc * v.uniRatio[k]
+                sum += osc(v.wave, v.uniPhase[k], dt) * (k == mid ? 1 : 0.8)
+                v.uniPhase[k] += dt
+                if v.uniPhase[k] >= 1 { v.uniPhase[k] -= 1 }
+            }
+            s = sum * v.uniNorm
+        } else {
+            s = osc(v.wave, v.phase1, dt1)
+            if v.detune != 0 { s = 0.5 * (s + osc(v.wave, v.phase2, dt2)) }
+        }
         if v.sub > 0 { s += Double(v.sub) * (v.phaseSub < 0.5 ? 0.6 : -0.6) }
         v.phase1 += dt1; if v.phase1 >= 1 { v.phase1 -= 1 }
         v.phase2 += dt2; if v.phase2 >= 1 { v.phase2 -= 1 }
@@ -794,13 +831,13 @@ public final class ToneEngine: @unchecked Sendable {
 
         let velGain = (1 - c.velocitySensitivity) + c.velocitySensitivity * powf(Float(velocity) / 127, 1.6)
         if c.isSynth {
-            startVoice(slot: s, config: c, region: nil, note: note, velGain: velGain, sequencer: sequencer, pattern: pattern)
+            startVoice(slot: s, config: c, region: nil, note: note, velocity: velocity, velGain: velGain, sequencer: sequencer, pattern: pattern)
             return
         }
         guard let regions = c.regions else { return }
         var started = 0
         for r in 0..<c.regionCount where regions[r].matches(note: note, velocity: velocity) {
-            startVoice(slot: s, config: c, region: r, note: note, velGain: velGain, sequencer: sequencer, pattern: pattern)
+            startVoice(slot: s, config: c, region: r, note: note, velocity: velocity, velGain: velGain, sequencer: sequencer, pattern: pattern)
             started += 1
             if started == 4 { break }
         }
@@ -830,8 +867,8 @@ public final class ToneEngine: @unchecked Sendable {
         return r.sampleRate / sampleRate * exp2(cents / 1200)
     }
 
-    private func startVoice(slot s: Int, config c: EngineLayerConfig, region ri: Int?, note: UInt8, velGain: Float, sequencer: Bool,
-                            pattern: Bool = false) {
+    private func startVoice(slot s: Int, config c: EngineLayerConfig, region ri: Int?, note: UInt8, velocity: UInt8 = 100, velGain: Float,
+                            sequencer: Bool, pattern: Bool = false) {
         let vi = allocateVoice()
         var v = Voice()
         v.active = true
@@ -883,6 +920,30 @@ public final class ToneEngine: @unchecked Sendable {
             v.noiseState = UInt32(truncatingIfNeeded: ageCounter &* 2_654_435_761)
             v.baseInc = 440 * exp2((Double(note) - 69) / 12) / sampleRate
             gain *= 0.6
+            let n = Int(c.synthUnison)
+            if n > 2 {
+                v.uniCount = n
+                var sumSq = 0.0
+                for k in 0..<n {
+                    let spread = Double(k) / Double(n - 1) * 2 - 1
+                    v.uniRatio[k] = exp2(Double(c.synthDetune) * spread / 1200)
+                    // Free-running phases so the oscillators don't start in step (no click, no comb).
+                    v.noiseState = v.noiseState &* 1_664_525 &+ 1_013_904_223
+                    v.uniPhase[k] = Double(v.noiseState >> 8) / 16_777_216
+                    let w = k == n / 2 ? 1.0 : 0.8
+                    sumSq += w * w
+                }
+                v.uniNorm = 0.707 / sumSq.squareRoot()
+            }
+        }
+        if cutoff < 19_000 {
+            // Hard hits brighter, soft ones darker (real brass and plucks do this).
+            if c.velocityBrightness > 0 { cutoff *= exp2f(c.velocityBrightness * (Float(velocity) / 127 - 0.8)) }
+            v.fBase = cutoff
+            v.fRes = resonance
+            v.fEnv = c.filterEnvAmount
+            v.fEnvDecay = c.filterEnvDecay
+            if v.fEnv > 0 { cutoff = min(sr * 0.45, cutoff * exp2f(v.fEnv)) }
         }
         v.filter.set(cutoff: cutoff, resonanceDB: resonance, sampleRate: sr)
         // Equal-power pan.
