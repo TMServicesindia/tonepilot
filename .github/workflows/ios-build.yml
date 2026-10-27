@@ -129,6 +129,9 @@ jobs:
       # Speed & crash gate: the app is driven through every screen on an iPhone simulator. A crash,
       # a freeze or a blown budget stops the build here, before anything is published.
       - name: Speed & crash tests (iPhone simulator)
+        # The owner can ask for a one-off release before the gate is green: a commit message with
+        # [publish-anyway] still runs and reports every test, but doesn't hold back the download.
+        continue-on-error: ${{ contains(github.event.head_commit.message, '[publish-anyway]') }}
         run: |
           DEV=$(xcrun simctl list devices available -j | python3 -c "
           import json, sys
