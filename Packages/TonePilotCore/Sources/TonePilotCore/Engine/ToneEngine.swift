@@ -656,7 +656,9 @@ public final class ToneEngine: @unchecked Sendable {
             slots[index].config = config
             slots[index].active = true
             slots[index].eq.set(config.eq, sampleRate: sampleRate)
-            _ = ensureHandle(config.handle)
+            // A tone change starts with a clean held-key list (mono legato never returns to a key
+            // pressed under the previous tone).
+            handles[ensureHandle(config.handle)].stackCount = 0
         case let .clearSlot(index):
             guard index >= 0, index < Self.slotCount else { return }
             slots[index].active = false
@@ -671,6 +673,7 @@ public final class ToneEngine: @unchecked Sendable {
             }
             for h in 0..<Self.handleCapacity { handles[h].sustain = false; handles[h].bendCents = 0; handles[h].stackCount = 0 }
         case let .releaseHandle(h):
+            if let i = handleIndex(h) { handles[i].stackCount = 0; handles[i].sustain = false }
             for v in 0..<Self.maxVoices where voices[v].active && voices[v].handle == h {
                 voices[v].released = true
                 voices[v].heldBySustain = false
@@ -820,12 +823,20 @@ public final class ToneEngine: @unchecked Sendable {
         let hi = ensureHandle(h)
 
         if c.mono {
+            let sounding = soundingVoices(h, note: nil)
+            // Nothing sounding: nothing can be held either (a lost release can't leave a stale key).
+            if !sounding { handles[hi].stackCount = 0 }
+            let heldBefore = handles[hi].stackCount
             pushStack(hi, note)
-            // Legato: retarget the sounding voice and glide instead of re-attacking.
-            if let vi = (0..<Self.maxVoices).first(where: { voices[$0].active && voices[$0].handle == h && !voices[$0].released }) {
-                if retarget(vi, to: note, config: c) { return }
-                voices[vi].released = true
-                voices[vi].env.kill(sampleRate: sr)
+            // Legato (glide) only for a single line: one key held, the next one pressed. Two or
+            // more keys already down is a chord — it plays as a chord (new voice per key).
+            if sounding, heldBefore == 1 {
+                // Every voice of the key moves together (stereo/layered samples have 2+ voices).
+                if retargetVoices(h, from: nil, to: note, config: c) { return }
+                for vi in 0..<Self.maxVoices where voices[vi].active && voices[vi].handle == h && !voices[vi].released {
+                    voices[vi].released = true
+                    voices[vi].env.kill(sampleRate: sr)
+                }
             }
         }
 
@@ -843,17 +854,45 @@ public final class ToneEngine: @unchecked Sendable {
         }
     }
 
+    /// A held voice of handle `h` (playing `note`, or any note when nil) exists. Allocation-free.
+    private func soundingVoices(_ h: UInt32, note: UInt8?) -> Bool {
+        for vi in 0..<Self.maxVoices where voices[vi].active && voices[vi].handle == h && !voices[vi].released {
+            if note == nil || voices[vi].note == note! { return true }
+        }
+        return false
+    }
+
+    /// Moves every held voice of `h` (playing `from`, or all when nil) to `note` — all of them or
+    /// none, so the voices of one key (stereo/layered samples) never split. Allocation-free.
+    private func retargetVoices(_ h: UInt32, from: UInt8?, to note: UInt8, config c: EngineLayerConfig) -> Bool {
+        var any = false
+        for vi in 0..<Self.maxVoices where voices[vi].active && voices[vi].handle == h && !voices[vi].released && (from == nil || voices[vi].note == from!) {
+            guard retargetIncrement(voices[vi], to: note, config: c) != nil else { return false }
+            any = true
+        }
+        guard any else { return false }
+        for vi in 0..<Self.maxVoices where voices[vi].active && voices[vi].handle == h && !voices[vi].released && (from == nil || voices[vi].note == from!) {
+            _ = retarget(vi, to: note, config: c)
+        }
+        return true
+    }
+
+    /// The new sample increment for moving a voice to `note`, or nil when it can't glide there
+    /// (the note uses a different sample).
+    private func retargetIncrement(_ v: Voice, to note: UInt8, config c: EngineLayerConfig) -> Double? {
+        if v.isSynth { return 440 * exp2((Double(note) - 69) / 12) / sampleRate }
+        guard let regions = c.regions else { return nil }
+        for r in 0..<c.regionCount where regions[r].matches(note: note, velocity: 100) {
+            return regions[r].start == v.start ? Self.increment(note: note, region: regions[r], sampleRate: sampleRate) : nil
+        }
+        return nil
+    }
+
     private func retarget(_ vi: Int, to note: UInt8, config c: EngineLayerConfig) -> Bool {
         var v = voices[vi]
         let oldNote = v.note
-        if v.isSynth {
-            v.baseInc = 440 * exp2((Double(note) - 69) / 12) / sampleRate
-        } else {
-            guard let regions = c.regions,
-                  let r = (0..<c.regionCount).first(where: { regions[$0].matches(note: note, velocity: 100) }),
-                  regions[r].start == v.start else { return false }
-            v.baseInc = Self.increment(note: note, region: regions[r], sampleRate: sampleRate)
-        }
+        guard let inc = retargetIncrement(v, to: note, config: c) else { return false }
+        v.baseInc = inc
         v.glideCents += Float(Int(oldNote) - Int(note)) * 100
         v.glideCoef = c.glideTime > 0 ? expf(-6.9078 / max(1, c.glideTime * sr)) : 0
         if c.glideTime <= 0 { v.glideCents = 0 }
@@ -970,9 +1009,10 @@ public final class ToneEngine: @unchecked Sendable {
         let sustained = handles[hi].sustain
         if let s = slotIndex(forHandle: h), slots[s].config.mono {
             let back = popStack(hi, note)
-            // Return to the previous held key (trill / gamaka-style alternation) instead of stopping.
-            if let back, let vi = (0..<Self.maxVoices).first(where: { voices[$0].active && voices[$0].handle == h && !voices[$0].released && voices[$0].note == note }) {
-                if retarget(vi, to: back, config: slots[s].config) { return }
+            // Return to the previous held key (trill / gamaka-style alternation) instead of stopping,
+            // when that key isn't already sounding (in a chord it is: then just release this one).
+            if let back, !sustained, soundingVoices(h, note: note), !soundingVoices(h, note: back) {
+                if retargetVoices(h, from: note, to: back, config: slots[s].config) { return }
             }
         }
         for v in 0..<Self.maxVoices where voices[v].active && voices[v].handle == h && voices[v].note == note && !voices[v].released {

@@ -42,7 +42,7 @@ public struct LiveArpeggiator: Sendable {
     public var pattern: ArpeggioPattern
     /// Seconds per pattern step (the song's beat / steps per beat).
     public var stepSeconds: Double
-    /// Notes below this are the chord hand (and anything up to the chord's octave + 5th).
+    /// Notes below this are the chord hand; above it only the chord's root/5th (up to octave + 5th) count.
     public var split: Int
     /// How long a chord lasts from a time (song's next change, or the section's usual length).
     public var chordLength: @Sendable (Double) -> Double
@@ -83,7 +83,14 @@ public struct LiveArpeggiator: Sendable {
     /// A note-on from your keyboard at `time` (seconds), velocity 1...127.
     public mutating func noteOn(_ note: Int, velocity v: Int, at time: Double) -> Action? {
         let inChord = chord != nil && time < end
-        guard note < split || (inChord && note >= rootNote && note <= rootNote + 19) else { return nil }
+        let pc = ((note % 12) + 12) % 12
+        if note >= split {
+            // Above the split is your melody hand. Only your chord's own root or fifth reaching over
+            // the split (R · 5 · R') belongs to the chord; any other note is melody and is ignored —
+            // it never changes the chord or the fill.
+            guard inChord, decided || count >= 1, let c = chord, note > rootNote, note <= rootNote + 19,
+                  pc == c.root || pc == c.fifth else { return nil }
+        }
 
         // Full chord: 3+ notes within 40 ms → silent (and learn its quality).
         recent = recent.filter { time - $0.time < 0.04 } + [(note, time)]
@@ -104,7 +111,6 @@ public struct LiveArpeggiator: Sendable {
         }
 
         // A new chord: no chord yet, the chord's time is over, or a note that isn't one of its tones.
-        let pc = ((note % 12) + 12) % 12
         let tones: Set<Int> = chord.map { c in decided ? [c.root, c.third, c.fifth] : [c.root, (c.root + 3) % 12, (c.root + 4) % 12, c.fifth] } ?? []
         if !inChord || !tones.contains(pc) {
             rootNote = note

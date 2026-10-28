@@ -873,6 +873,14 @@ final class AppModel: ObservableObject {
                 let current = await MainActor.run { self?.library.song(id: songId) } ?? snapshot
                 let base = progressBase + 0.05
                 let throttle = ProgressThrottle()
+                // Sounds for reverse-engineering each part's tone: the loaded GM bank (or read it here, off the main thread).
+                let soundFont = FactoryPatches.defaultSoundFontFile
+                var bank = await MainActor.run { self?.cache.loadedBank(named: soundFont) }
+                if bank == nil, !stems.isEmpty, let dir = await MainActor.run(body: { self?.store.soundFontDirectory }) {
+                    bank = try? SoundFontBank(url: dir.appendingPathComponent(soundFont))
+                }
+                let toneLoader = PartMatcher.loader(bank: bank)
+                if !stems.isEmpty { await stage("Analysing, then matching each part's instrument…", base) }
                 let output = try SongPipeline.run(song: current, audio: audio, stems: stems, melodyOverride: serverMelody, patches: patches, progress: { p in
                     if Task.isCancelled { return false }
                     let value = base + (0.95 - base) * p
@@ -880,7 +888,7 @@ final class AppModel: ObservableObject {
                     return true
                 }, instruments: { sections in
                     InstrumentRecognizer.recognize(files: instrumentFiles.isEmpty ? [url] : instrumentFiles, sections: sections)
-                })
+                }, toneInstrument: toneLoader)
                 await MainActor.run {
                     guard let self else { return }
                     var s = output.song

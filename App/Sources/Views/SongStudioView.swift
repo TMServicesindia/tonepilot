@@ -796,6 +796,11 @@ struct StemTile: View {
                     Text(track.name).font(.headline).lineLimit(1)
                     Text(on ? (gated ? "Fills in chosen parts" : "Playing") : "Muted — you play")
                         .font(.caption).foregroundStyle(on ? Color.secondary : Theme.accent).lineLimit(1)
+                    // The nearest TonePilot tone for this part, measured (always laid out: no jumps).
+                    let match = SongStudio.stemKind(track.id).flatMap { model.song(songId)?.partMatches?[$0.rawValue] }
+                    Text(match.map { "Sounds like \($0.name) · \(Int(($0.similarity * 100).rounded()))%" } ?? " ")
+                        .font(.caption2.weight(.semibold)).foregroundStyle(Theme.accent).lineLimit(1)
+                        .opacity(match == nil ? 0 : 1)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

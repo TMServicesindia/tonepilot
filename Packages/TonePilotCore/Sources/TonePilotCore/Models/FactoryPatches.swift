@@ -20,6 +20,7 @@ public enum FactoryPatches {
         (1, "Bright Piano", .piano),
         (4, "Electric Piano", .electricPiano),
         (5, "FM Electric Piano", .electricPiano),
+        (7, "Clavinet", .electricPiano),
         (8, "Celesta", .bell),
         (9, "Glockenspiel", .bell),
         (10, "Music Box", .bell),
@@ -31,16 +32,20 @@ public enum FactoryPatches {
         (19, "Church Organ", .organ),
         (20, "Reed Organ", .organ),
         (21, "Accordion", .reed),
+        (22, "Harmonica", .reed),
         (24, "Nylon Guitar", .guitar),
         (25, "Steel Guitar", .guitar),
         (27, "Clean Electric Guitar", .guitar),
+        (28, "Muted Guitar", .guitar),
         (29, "Overdrive Guitar", .guitar),
         (30, "Distortion Guitar", .guitar),
         (32, "Acoustic Bass", .bass),
         (33, "Finger Bass", .bass),
+        (36, "Slap Bass", .bass),
         (38, "Synth Bass", .bass),
         (40, "Violin", .strings),
         (42, "Cello", .strings),
+        (44, "Tremolo Strings", .strings),
         (45, "Pizzicato Strings", .pluck),
         (46, "Harp", .pluck),
         (48, "Orchestral Strings", .strings),
@@ -48,13 +53,17 @@ public enum FactoryPatches {
         (50, "Synth Strings", .synthStrings),
         (52, "Choir Aahs", .choir),
         (54, "Synth Voice", .choir),
+        (55, "Orchestra Hit", .brass),
         (56, "Trumpet", .brass),
         (57, "Trombone", .brass),
+        (58, "Tuba", .brass),
         (60, "French Horn", .brass),
         (61, "Brass Section", .brass),
         (62, "Synth Brass", .brass),
+        (63, "Synth Brass 2", .brass),
         (65, "Alto Sax", .reed),
         (68, "Oboe", .reed),
+        (72, "Piccolo", .flute),
         (71, "Clarinet", .reed),
         (73, "Flute", .flute),
         (75, "Pan Flute", .flute),
@@ -67,6 +76,7 @@ public enum FactoryPatches {
         (94, "Halo Pad", .pad),
         (104, "Sitar", .ethnic),
         (107, "Koto", .ethnic),
+        (110, "Fiddle", .strings),
         (108, "Kalimba", .mallet),
         (111, "Shehnai", .ethnic),
         (112, "Tinkle Bell", .bell),
@@ -148,6 +158,27 @@ public enum FactoryPatches {
     public static let lofiKeysId = variantId(63)
     public static let heroWhistleLeadId = variantId(64)
     public static let melodySaxId = variantId(65)
+    // Indian film instruments (composer-style research).
+    public static let mandolinId = variantId(70)
+    public static let sarangiId = variantId(71)
+    public static let kuzhalId = variantId(72)
+    public static let tanpuraId = variantId(73)
+    public static let kombuId = variantId(74)
+    public static let dudukId = variantId(75)
+    public static let shakuhachiLeadId = variantId(76)
+    public static let rhodesId = variantId(77)
+    public static let mutedRiffId = variantId(78)
+    public static let steelStrumId = variantId(79)
+    public static let lushViolinsId = variantId(80)
+    public static let vocalChopId = variantId(81)
+    public static let indiePluckId = variantId(82)
+    public static let orchestraHitId = variantId(83)
+    public static let retroSynthBrassId = variantId(84)
+    public static let polySynth80sId = variantId(85)
+    public static let cleanLeadGuitarId = variantId(86)
+    public static let tremoloStringsId = variantId(87)
+    public static let moogBassId = variantId(88)
+    public static let folkHarmonicaId = variantId(89)
 
     static func sf(_ id: UUID, _ name: String, _ family: InstrumentFamily, program: UInt8, bankMSB: UInt8 = SoundFontReference.melodicBankMSB,
                    effects: EffectSettings = EffectSettings(), expression: ExpressionSettings? = nil, filter: FilterSettings = FilterSettings(),
@@ -270,7 +301,7 @@ public enum FactoryPatches {
 
     /// Eras and styles of the Film Tone Library (tags on its tones), in picker order.
     public static let libraryEras: [(tag: String, name: String)] = [
-        ("90s", "90s"), ("2000s", "2000s"), ("2010s", "2010s"), ("2020s", "2020s"), ("indian", "Indian"), ("mass", "Mass"),
+        ("90s", "90s"), ("2000s", "2000s"), ("2010s", "2010s"), ("2020s", "2020s"), ("indian", "Indian"), ("folk", "Folk"), ("classic", "Melody"), ("mass", "Mass"),
     ]
 
     /// Curated tones for Indian film music from the 90s keyboard era to today's mass/EDM
@@ -393,6 +424,87 @@ public enum FactoryPatches {
            effects: EffectSettings(reverbMix: 25, eq: EQSettings(midDB: 1, midFrequency: 1200)),
            expression: ExpressionSettings(mono: true, glideTime: 0.04, bendRange: 2, vibratoDepth: 12, vibratoRate: 5.2, vibratoDelay: 0.35),
            tags: ["library", "90s", "reed", "lead", "ornamented"]),
+        // Melody / classic film sounds and folk instruments.
+        sf(mandolinId, "Mandolin-like Pluck", .ethnic, program: 25,
+           effects: EffectSettings(reverbMix: 22, delayMix: 10, eq: EQSettings(lowDB: -3, midDB: 2, midFrequency: 2200, highDB: 3)),
+           expression: ExpressionSettings(mono: false, bendRange: 2),
+           tags: ["library", "classic", "plucked", "lead", "indian", "motif"],
+           notes: "Steel guitar made short and bright towards a Carnatic-style mandolin. Not a sampled mandolin."),
+        sf(sarangiId, "Sarangi-like Folk Fiddle", .strings, program: 110,
+           effects: EffectSettings(reverbMix: 28, eq: EQSettings(lowDB: -2, midDB: 2.5, midFrequency: 1300, highDB: -1)),
+           expression: ExpressionSettings(mono: true, glideTime: 0.09, bendRange: 2, vibratoDepth: 20, vibratoRate: 5.5, vibratoDelay: 0.25),
+           tags: ["library", "folk", "strings", "lead", "ornamented", "indian"],
+           notes: "GM fiddle with glide and vibrato towards a sarangi. Not a sampled sarangi."),
+        sf(kuzhalId, "Kuzhal-like Folk Reed", .reed, program: 68,
+           effects: EffectSettings(reverbMix: 20, eq: EQSettings(lowDB: -2, midDB: 3, midFrequency: 1600, highDB: 1.5), drive: 8),
+           expression: ExpressionSettings(mono: true, glideTime: 0.05, bendRange: 2, vibratoDepth: 14, vibratoRate: 6),
+           tags: ["library", "folk", "reed", "lead", "ornamented", "indian", "mass"],
+           notes: "GM oboe pushed bright and nasal towards a folk kuzhal. Not a sampled kuzhal."),
+        sf(tanpuraId, "Tanpura-like Drone", .ethnic, program: 104,
+           effects: EffectSettings(reverbMix: 40, chorusMix: 15, eq: EQSettings(lowDB: 2, midDB: 1, midFrequency: 600, highDB: -2)),
+           tags: ["library", "classic", "plucked", "indian", "accompaniment"]),
+        sf(kombuId, "Kombu-like Folk Horn", .brass, program: 60,
+           effects: EffectSettings(reverbMix: 18, eq: EQSettings(lowDB: 1, midDB: 3, midFrequency: 1200, highDB: 2), drive: 22),
+           expression: ExpressionSettings(mono: true, glideTime: 0.06, bendRange: 3, vibratoDepth: 6, vibratoRate: 5),
+           tags: ["library", "folk", "brass", "powerful", "mass", "indian"],
+           notes: "French horn driven and brightened towards a temple/folk kombu blast. Not a sampled kombu."),
+        sf(dudukId, "Duduk-like Reed", .reed, program: 68,
+           effects: EffectSettings(reverbMix: 35, eq: EQSettings(lowDB: 1.5, midDB: 1, midFrequency: 700, highDB: -4)),
+           expression: ExpressionSettings(mono: true, glideTime: 0.1, bendRange: 2, vibratoDepth: 12, vibratoRate: 5, vibratoDelay: 0.4),
+           tags: ["library", "classic", "reed", "lead", "ornamented"],
+           notes: "Oboe darkened and slowed towards a duduk. Not a sampled duduk."),
+        sf(shakuhachiLeadId, "Breathy Shakuhachi Lead", .flute, program: 77,
+           effects: EffectSettings(reverbMix: 38, delayMix: 10, eq: EQSettings(midDB: 1, midFrequency: 1100, highDB: 1)),
+           expression: ExpressionSettings(mono: true, glideTime: 0.08, bendRange: 2, vibratoDepth: 16, vibratoRate: 5, vibratoDelay: 0.35),
+           tags: ["library", "90s", "flute", "lead", "ornamented", "breathy"]),
+        sf(rhodesId, "Classic Rhodes Keys", .electricPiano, program: 4,
+           effects: EffectSettings(reverbMix: 25, chorusMix: 30, eq: EQSettings(lowDB: 1, midDB: 1, midFrequency: 900, highDB: -1)),
+           tags: ["library", "90s", "keys", "warm", "accompaniment"]),
+        sf(mutedRiffId, "Muted Guitar Riff", .guitar, program: 28,
+           effects: EffectSettings(reverbMix: 12, delayMix: 12, eq: EQSettings(midDB: 2, midFrequency: 1800, highDB: 1)),
+           tags: ["library", "2000s", "electricGuitar", "motif", "accompaniment"]),
+        sf(steelStrumId, "Bright Steel Strum", .guitar, program: 25,
+           effects: EffectSettings(reverbMix: 25, chorusMix: 25, eq: EQSettings(lowDB: -2, highDB: 2.5)),
+           tags: ["library", "classic", "acousticGuitar", "accompaniment"]),
+        sf(lushViolinsId, "Lush Film Violins", .strings, program: 48,
+           effects: EffectSettings(reverbMix: 45, eq: EQSettings(lowDB: -2, midDB: 1, midFrequency: 2000, highDB: 2)),
+           expression: ExpressionSettings(mono: false, bendRange: 2, vibratoDepth: 10, vibratoRate: 5.6, vibratoDelay: 0.3),
+           tags: ["library", "classic", "strings", "lead", "accompaniment"]),
+        sf(tremoloStringsId, "Tremolo Tension Strings", .strings, program: 44,
+           effects: EffectSettings(reverbMix: 35, eq: EQSettings(lowDB: 1, highDB: 1)),
+           tags: ["library", "folk", "strings", "cinematic", "powerful", "accompaniment"]),
+        sf(orchestraHitId, "90s Orchestra Hit", .brass, program: 55,
+           effects: EffectSettings(reverbMix: 20, eq: EQSettings(lowDB: 2, highDB: 1)),
+           tags: ["library", "90s", "brass", "stab", "powerful", "mass"]),
+        sf(retroSynthBrassId, "Retro Synth Brass", .brass, program: 63,
+           effects: EffectSettings(reverbMix: 15, chorusMix: 15, eq: EQSettings(midDB: 1.5, midFrequency: 1400, highDB: 1), drive: 15),
+           tags: ["library", "90s", "brass", "synth", "powerful", "mass"]),
+        sf(folkHarmonicaId, "Folk Harmonica", .reed, program: 22,
+           effects: EffectSettings(reverbMix: 22, eq: EQSettings(midDB: 1, midFrequency: 1500)),
+           expression: ExpressionSettings(mono: true, glideTime: 0.03, bendRange: 2, vibratoDepth: 10, vibratoRate: 6),
+           tags: ["library", "classic", "reed", "lead"]),
+        sf(cleanLeadGuitarId, "Clean Lead Guitar", .guitar, program: 27,
+           effects: EffectSettings(reverbMix: 22, delayMix: 22, chorusMix: 15, eq: EQSettings(midDB: 1.5, midFrequency: 1500, highDB: 1)),
+           expression: ExpressionSettings(mono: true, glideTime: 0.02, bendRange: 2, vibratoDepth: 8, vibratoRate: 5.5, vibratoDelay: 0.3),
+           tags: ["library", "2000s", "electricGuitar", "lead"]),
+        sf(vocalChopId, "Vocal Chop Lead", .choir, program: 54,
+           effects: EffectSettings(reverbMix: 20, delayMix: 25, eq: EQSettings(lowDB: -3, midDB: 2, midFrequency: 1800, highDB: 2)),
+           tags: ["library", "2020s", "choir", "motif", "lead"]),
+        synth(indiePluckId, "Indie Pop Pluck", .pluck, SynthSettings(waveform: .triangle, detuneCents: 8, unison: 3),
+              envelope: Envelope(attack: 0.001, decay: 0.45, sustain: 0, release: 0.3),
+              filter: FilterSettings(enabled: true, cutoff: 1800, resonance: 2, envAmount: 2.5, envDecay: 0.2, velocityBrightness: 1),
+              effects: EffectSettings(reverbMix: 30, delayMix: 25, chorusMix: 10),
+              tags: ["library", "2020s", "pluck", "synth", "motif", "accompaniment"]),
+        synth(polySynth80sId, "80s Poly Synth", .pad, SynthSettings(waveform: .saw, detuneCents: 12, unison: 3),
+              envelope: Envelope(attack: 0.05, decay: 0.6, sustain: 0.8, release: 0.6),
+              filter: FilterSettings(enabled: true, cutoff: 2600, resonance: 2, envAmount: 1, envDecay: 0.4),
+              effects: EffectSettings(reverbMix: 35, chorusMix: 35),
+              tags: ["library", "90s", "pad", "synth", "accompaniment"]),
+        synth(moogBassId, "Analog Moog Bass", .bass, SynthSettings(waveform: .saw, detuneCents: 0, subLevel: 0.3, unison: 1),
+              envelope: Envelope(attack: 0.003, decay: 0.35, sustain: 0.75, release: 0.12),
+              filter: FilterSettings(enabled: true, cutoff: 700, resonance: 5, envAmount: 1.8, envDecay: 0.2, velocityBrightness: 1),
+              effects: EffectSettings(reverbMix: 0, drive: 12),
+              tags: ["library", "classic", "bass", "synth"]),
     ]
 
     /// Everything shipped with the app.

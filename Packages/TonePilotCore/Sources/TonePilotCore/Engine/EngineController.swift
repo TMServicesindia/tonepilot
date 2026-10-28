@@ -47,6 +47,8 @@ public final class InstrumentCache {
     }
 
     public func register(bank: SoundFontBank, as file: String) { banks[file] = bank }
+    /// A bank that is already loaded (never reads the disk).
+    public func loadedBank(named file: String) -> SoundFontBank? { banks[file] }
 
     static func key(for patch: InstrumentPatch) -> String {
         var h = Hasher()

@@ -128,6 +128,18 @@ public enum AutoArranger {
                       register: 48...88, vocalAffinity: 0.25, reason: "a singing, distorted guitar solo line", families: ["electricGuitar"], energy: 0.6...1),
             Candidate(patchId: FactoryPatches.melodySaxId, name: "Melody Sax", centroid: 700...3000, sustain: 0.35...1, ornament: 0.6,
                       register: 52...84, vocalAffinity: 0.5, reason: "an expressive sax melody with slides", families: ["reed"], energy: 0.2...0.7),
+            Candidate(patchId: FactoryPatches.sarangiId, name: "Sarangi-like Folk Fiddle", centroid: 900...3200, sustain: 0.5...1, ornament: 0.9,
+                      register: 55...88, vocalAffinity: 0.8, reason: "a sliding, ornamented bowed folk line", families: ["strings"], energy: 0.2...0.8),
+            Candidate(patchId: FactoryPatches.mandolinId, name: "Mandolin-like Pluck", centroid: 1800...5000, sustain: 0...0.4, ornament: 0.6,
+                      register: 60...92, vocalAffinity: 0.2, reason: "a bright, fast plucked melody", families: ["plucked", "acousticGuitar"], energy: 0.2...0.8),
+            Candidate(patchId: FactoryPatches.kuzhalId, name: "Kuzhal-like Folk Reed", centroid: 1200...4200, sustain: 0.5...1, ornament: 0.85,
+                      register: 60...90, vocalAffinity: 0.5, reason: "a loud, nasal folk pipe melody", families: ["reed"], energy: 0.5...1),
+            Candidate(patchId: FactoryPatches.dudukId, name: "Duduk-like Reed", centroid: 500...2200, sustain: 0.55...1, ornament: 0.7,
+                      register: 52...80, vocalAffinity: 0.7, reason: "a dark, soulful reed melody", families: ["reed"], energy: 0...0.5),
+            Candidate(patchId: FactoryPatches.lushViolinsId, name: "Lush Film Violins", centroid: 1200...4000, sustain: 0.55...1, ornament: 0.5,
+                      register: 60...96, vocalAffinity: 0.6, reason: "a sweeping string-section melody", families: ["strings"], energy: 0.2...0.85),
+            Candidate(patchId: FactoryPatches.cleanLeadGuitarId, name: "Clean Lead Guitar", centroid: 1000...4000, sustain: 0.2...0.7, ornament: 0.4,
+                      register: 52...88, vocalAffinity: 0.3, reason: "a clean, delayed guitar melody", families: ["electricGuitar"], energy: 0.3...0.85),
             Candidate(patchId: FactoryPatches.heroWhistleLeadId, name: "Whistle Lead", centroid: 1500...5000, sustain: 0.4...1, ornament: 0.6,
                       register: 67...96, vocalAffinity: 0.4, reason: "a pure, whistled high melody", families: ["flute"], energy: 0.2...0.7),
         ]
@@ -354,12 +366,20 @@ public enum AutoArranger {
             let isInstrumental = !hasLead
             let quiet = best.patchId == FactoryPatches.vocalLeadId
             let volume = quiet ? 0.45 : (level3 == .powerful ? 0.85 : section.type == .chorus ? 0.8 : 0.72)
-            let lead = Layer(patchId: best.patchId, volume: volume, octave: leadOctave,
+            var lead = Layer(patchId: best.patchId, volume: volume, octave: leadOctave,
                              keyRange: rightRange, role: isInstrumental ? .motif : (fromVocals ? .vocalMelody : .lead))
-            layers.append(lead)
             let heard = evidence.instruments.filter { $0.key != "voice" }.max { $0.value < $1.value }
-            why.append("Right hand: \(best.name) — \(best.reason)\(isInstrumental ? " (instrumental motif)" : "")"
-                       + "\(heard.map { "; heard: \($0.key) \(Int($0.value * 100))%" } ?? ""); intensity \(level3.rawValue).")
+            // The song's own lead instrument, measured (Tone match), wins over the rules.
+            if let m = song.partMatches?["lead"] ?? song.partMatches?["other"], m.similarity >= PartMatcher.trusted, let patch = available[m.patchId] {
+                lead.patchId = m.patchId
+                lead.effectsOverride = m.effects(base: patch.effects)
+                why.append("Right hand: \(m.name) — matched to the song's lead instruments (\(Int((m.similarity * 100).rounded()))% tone match, "
+                           + "EQ and reverb fitted); intensity \(level3.rawValue).")
+            } else {
+                why.append("Right hand: \(best.name) — \(best.reason)\(isInstrumental ? " (instrumental motif)" : "")"
+                           + "\(heard.map { "; heard: \($0.key) \(Int($0.value * 100))%" } ?? ""); intensity \(level3.rawValue).")
+            }
+            layers.append(lead)
             for (c, s) in ranked.prefix(3) {
                 suggestions.append(ToneSuggestion(sectionId: section.id, family: available[c.patchId]?.family ?? .other, patchId: c.patchId,
                                                   reason: "Lead option: \(c.reason).", confidence: min(1, s), method: .featureHeuristic))
@@ -390,7 +410,15 @@ public enum AutoArranger {
             }
             if available[leftPatch] == nil { leftPatch = FactoryPatches.id(forProgram: 61) }
         }
-        layers.append(Layer(patchId: leftPatch, volume: 0.6, pan: -0.1, keyRange: leftRange, role: padLevel > keysLevel + 0.1 ? .pad : .harmony))
+        var left = Layer(patchId: leftPatch, volume: 0.6, pan: -0.1, keyRange: leftRange, role: padLevel > keysLevel + 0.1 ? .pad : .harmony)
+        // The song's own accompaniment instrument (backing / piano / guitar part), measured.
+        let accompaniment = ["backing", "piano", "guitar"].compactMap { song.partMatches?[$0] }.filter { $0.similarity >= PartMatcher.trusted }
+        if let m = accompaniment.max(by: { $0.similarity < $1.similarity }), let patch = available[m.patchId] {
+            left.patchId = m.patchId
+            left.effectsOverride = m.effects(base: patch.effects)
+            leftWhy = "\(m.name), matched to the song's \(m.part) part (\(Int((m.similarity * 100).rounded()))% tone match)"
+        }
+        layers.append(left)
         why.append("Left hand: \(leftWhy).")
 
         // 3. Support layers only when heard.

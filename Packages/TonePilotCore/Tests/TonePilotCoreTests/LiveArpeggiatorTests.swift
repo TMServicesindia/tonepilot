@@ -91,4 +91,19 @@ final class LiveArpeggiatorTests: XCTestCase {
         let chords = ["Em", "D", "C", "D", "Em", "D"].enumerated().map { ChordEvent(time: Double($0.offset) * 1.35, duration: 1.35, symbol: $0.element, confidence: 0.8) }
         XCTAssertEqual(LiveArpeggiator.typicalChordLength(chords, from: 0, to: 8), 1.35, accuracy: 1e-9)
     }
+
+    func testMelodyAboveTheSplitNeverChangesTheChordOrFill() {
+        var a = arp(songSays: [0: .major])
+        XCTAssertEqual(a.noteOn(48, velocity: 90, at: 0), .stop)                 // C3 root
+        guard case .play(let fill)? = a.noteOn(55, velocity: 90, at: 0.3) else { return XCTFail("fill after R · 5") }
+        XCTAssertEqual(fill.chord.root, 0)
+        // Right-hand melody: D4, E4, F4 — none of them is the chord hand.
+        XCTAssertNil(a.noteOn(62, velocity: 90, at: 0.5))
+        XCTAssertNil(a.noteOn(64, velocity: 90, at: 0.6))
+        XCTAssertNil(a.noteOn(65, velocity: 90, at: 0.75))
+        XCTAssertEqual(a.currentChord?.root, 0, "still C")
+        // Your R' over the split (C4) still counts as the chord hand.
+        XCTAssertNotNil(a.noteOn(60, velocity: 90, at: 0.9))
+        XCTAssertEqual(a.currentChord?.root, 0)
+    }
 }

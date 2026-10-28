@@ -83,6 +83,21 @@ final class SpeedBudgetTests: XCTestCase {
         XCTAssertLessThan(load, 0.25, "supersaw tone uses \(Int(load * 100))% of real time")
     }
 
+    /// Tone matching one part: 12 candidate tones on a 10-second phrase (the app matches a few
+    /// parts per song in the background after analysis).
+    func testToneMatchingIsQuick() throws {
+        try budgetsApply()
+        let notes: [MelodyNote] = (0..<20).map { MelodyNote(start: 0.2 + Double($0) * 0.48, duration: 0.4, midi: 64 + ($0 * 5) % 12, confidence: 0.9) }
+        let synths = FactoryPatches.all.filter { $0.synth != nil && $0.family != .percussion }.prefix(12)
+        func inst(_ p: InstrumentPatch) -> LoadedInstrument? { p.synth.map { LoadedInstrument(name: p.name, synth: $0) } }
+        let target = ToneMatcher.render(synths.first!, instrument: inst(synths.first!)!, notes: notes, seconds: 10.2, sampleRate: 44_100)
+        var matches: [ToneMatcher.Match] = []
+        let took = seconds { matches = ToneMatcher.bestMatches(target: target, notes: notes, candidates: Array(synths), instrument: inst) }
+        print("SPEED tone matching: \(String(format: "%.2f", took)) s for \(synths.count) tones on a 10 s phrase")
+        XCTAssertFalse(matches.isEmpty)
+        XCTAssertLessThan(took, 8, "tone matching took \(took) s")
+    }
+
     func testPatternLearningIsQuick() throws {
         try budgetsApply()
         let pattern: [(Int, ArpeggioPattern.Degree)] = [(0, .root), (3, .fifth), (6, .octave), (8, .third), (11, .fifth), (14, .octave)]

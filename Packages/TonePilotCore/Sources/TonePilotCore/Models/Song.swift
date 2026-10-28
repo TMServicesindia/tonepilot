@@ -152,6 +152,9 @@ public struct Song: Codable, Hashable, Identifiable, Sendable {
     public var album: String?
     /// Song Arpeggio: broken-chord patterns learned per section.
     public var arpeggio: SongArpeggio?
+    /// Nearest TonePilot tone for each separated instrument part (part → match), measured by
+    /// playing the part's notes on candidate tones (`PartMatcher`).
+    public var partMatches: [String: PartMatch]?
 
     public init(id: UUID = UUID(), title: String, artist: String? = nil, film: String? = nil,
                 composer: String? = nil, language: String? = nil, tags: [String] = [],
