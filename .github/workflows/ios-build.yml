@@ -146,6 +146,10 @@ jobs:
           grep -E "Test Case .*(passed|failed)|error:|crashed|measured \[" uitest.log | sed -E 's/^.*Test Case .-\[TonePilotUITests\.//' | head -60
           grep -E "measured \[" uitest.log | sed -E "s/.*measured \[([^]]+)\] average: ([0-9.]+).*/\1: \2/" | sort -u | while IFS= read -r l; do echo "::notice title=App speed::$l"; done
           grep -E "error:|crashed" uitest.log | sort -u | head -15 | while IFS= read -r l; do echo "::error title=Speed & crash tests::$l"; done
+          # A failure without an "error:" line (app crash at launch, simulator or runner trouble): show the end of the log.
+          if [ $code != 0 ] && ! grep -qE "error:" uitest.log; then
+            grep -vE "^\s*$|^    (cd|export|builtin|/Applications)" uitest.log | tail -40 | while IFS= read -r l; do echo "::error title=Speed & crash tests (log tail)::$l"; done
+          fi
           # Budgets on the simulator: launch under 4 s, peak memory under 1.5 GB.
           budgets=0
           python3 - <<'PY' || budgets=$?
