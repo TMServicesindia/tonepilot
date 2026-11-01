@@ -429,6 +429,46 @@
    "instrument": "duduk",
    "family": "Other winds",
    "source": "imitation"
+  },
+  "syn_bansuri_like": {
+   "instrument": "bansuri",
+   "family": "Indian winds",
+   "source": "imitation"
+  },
+  "syn_violin_like": {
+   "instrument": "violin",
+   "family": "Strings",
+   "source": "imitation"
+  },
+  "syn_cello_like": {
+   "instrument": "cello",
+   "family": "Strings",
+   "source": "imitation"
+  },
+  "syn_nadaswaram_like": {
+   "instrument": "nadaswaram",
+   "family": "Indian winds",
+   "source": "imitation"
+  },
+  "syn_shehnai_like": {
+   "instrument": "shehnai",
+   "family": "Indian winds",
+   "source": "imitation"
+  },
+  "syn_sitar_like": {
+   "instrument": "sitar",
+   "family": "Indian plucked",
+   "source": "imitation"
+  },
+  "syn_veena_like": {
+   "instrument": "veena",
+   "family": "Indian plucked",
+   "source": "imitation"
+  },
+  "syn_santoor_like": {
+   "instrument": "santoor",
+   "family": "Bells",
+   "source": "imitation"
   }
  },
  "tone_map": {

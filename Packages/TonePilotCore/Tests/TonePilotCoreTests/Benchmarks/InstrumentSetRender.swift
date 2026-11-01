@@ -30,11 +30,38 @@ final class InstrumentSetRender: XCTestCase {
         return out
     }
 
+    /// Truly SYNTHESISED imitations of traditional instruments (oscillators + noise + filter + vibrato;
+    /// research only). Two parameter sets: 0 for the train bank, 1 for the test bank, so a head is never
+    /// tested on the imitation patch it learned from.
+    static func imitationSynths(_ set: Int) -> [(key: String, patch: InstrumentPatch)] {
+        func p(_ name: String, _ w: SynthSettings.Waveform, noise: Double, cutoff: Double, res: Double, a: Double, d: Double, s: Double, r: Double,
+               vib: Double, rate: Double, detune: Double = 4, unison: Int = 1) -> InstrumentPatch {
+            InstrumentPatch(id: UUID(), name: name, family: .synthLead, sourceType: .synthesized,
+                            envelope: Envelope(attack: a, decay: d, sustain: s, release: r),
+                            filter: FilterSettings(enabled: true, cutoff: cutoff, resonance: res), effects: EffectSettings(),
+                            license: LicenseInfo(name: "TonePilot benchmark synth", redistributable: true), notes: "benchmark imitation",
+                            synth: SynthSettings(waveform: w, detuneCents: detune, subLevel: 0, noise: noise, unison: unison),
+                            expression: ExpressionSettings(mono: true, glideTime: 0.04, bendRange: 2, vibratoDepth: vib, vibratoRate: rate, vibratoDelay: 0.2),
+                            tags: [])
+        }
+        let v = set == 0
+        return [
+            ("syn_bansuri_like", p("syn bansuri", v ? .triangle : .sine, noise: v ? 0.22 : 0.3, cutoff: v ? 3200 : 2600, res: 1, a: 0.07, d: 0.2, s: 0.9, r: 0.2, vib: v ? 18 : 26, rate: v ? 5.0 : 5.8)),
+            ("syn_violin_like", p("syn violin", .saw, noise: 0.03, cutoff: v ? 3600 : 4200, res: v ? 3 : 5, a: 0.09, d: 0.3, s: 0.9, r: 0.25, vib: v ? 28 : 35, rate: v ? 5.5 : 6.2, detune: v ? 6 : 9, unison: 2)),
+            ("syn_cello_like", p("syn cello", .saw, noise: 0.02, cutoff: v ? 1800 : 1500, res: 3, a: 0.12, d: 0.3, s: 0.9, r: 0.3, vib: v ? 22 : 30, rate: v ? 5.0 : 5.4)),
+            ("syn_nadaswaram_like", p("syn nadaswaram", .square, noise: 0.05, cutoff: v ? 4800 : 4000, res: v ? 2 : 4, a: 0.03, d: 0.2, s: 0.95, r: 0.15, vib: v ? 30 : 40, rate: v ? 6.0 : 6.5)),
+            ("syn_shehnai_like", p("syn shehnai", .square, noise: 0.04, cutoff: v ? 3000 : 3400, res: v ? 6 : 8, a: 0.04, d: 0.2, s: 0.9, r: 0.15, vib: v ? 25 : 32, rate: v ? 5.5 : 6.0)),
+            ("syn_sitar_like", p("syn sitar", .saw, noise: 0.01, cutoff: v ? 5000 : 4200, res: v ? 8 : 10, a: 0.002, d: v ? 0.9 : 1.2, s: 0.08, r: 0.4, vib: 0, rate: 5)),
+            ("syn_veena_like", p("syn veena", .triangle, noise: 0.01, cutoff: v ? 3000 : 2500, res: v ? 4 : 6, a: 0.003, d: v ? 1.3 : 1.6, s: 0.12, r: 0.5, vib: v ? 10 : 15, rate: 4.5)),
+            ("syn_santoor_like", p("syn santoor", .triangle, noise: 0, cutoff: v ? 6000 : 5200, res: 2, a: 0.001, d: v ? 0.5 : 0.7, s: 0.0, r: 0.3, vib: 0, rate: 5, detune: v ? 12 : 16, unison: 3)),
+        ]
+    }
+
     /// Register per key (MIDI of the phrase's lowest note).
     static func base(_ key: String) -> Int {
         switch key {
         case "gm32", "gm33", "gm38", "gm42": return 36
-        case "gm57", "gm60", "tp_kombu_like", "tp_bansuri_low_like", "tp_tanpura_like": return 48
+        case "gm57", "gm60", "tp_kombu_like", "tp_bansuri_low_like", "tp_tanpura_like", "syn_cello_like": return 48
         case "gm72", "gm9", "gm8", "gm10", "gm108": return 72
         default: return 60
         }
@@ -80,7 +107,8 @@ final class InstrumentSetRender: XCTestCase {
         var clips: [[String: Any]] = []
         for (split, path) in banks {
             let loader = PartMatcher.loader(bank: try SoundFontBank(url: URL(fileURLWithPath: path)))
-            for (key, patch) in Self.patches() {
+            let bankPatches = Self.patches() + Self.imitationSynths(split == "train" ? 0 : 1)
+            for (key, patch) in bankPatches {
                 guard let inst = loader(patch) else { print("RENDER skip \(key) (\(split))"); continue }
                 for (pi, notes) in Self.phrases(key).enumerated() {
                     let audio = ToneMatcher.render(patch, instrument: inst, notes: notes, seconds: 3.5, sampleRate: Self.sr)
@@ -90,7 +118,7 @@ final class InstrumentSetRender: XCTestCase {
                 }
             }
             // Layered tracks per bank (different random draws): 2–4 instruments with known entry and exit times.
-            let all = Self.patches().filter { $0.key != "drums" }
+            let all = bankPatches.filter { $0.key != "drums" }
             var rng: UInt64 = split == "test" ? 0xA11CE : 0xB0B
             func rand(_ n: Int) -> Int { rng = rng &* 6364136223846793005 &+ 1442695040888963407; return Int((rng >> 33) % UInt64(n)) }
             // More layered training mixtures on request (TP_LAYERED_TRAIN); the test bank stays at 24.
