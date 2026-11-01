@@ -1,0 +1,116 @@
+name: Instrument recognition proxy benchmark (research only, no app build)
+
+# Approach A (each model's own labels) and C (frozen embeddings + small TonePilot head) on
+# licence-clean PROXY data: TonePilot renders from GeneralUser GS (test) and FluidR3 GM (MIT, train),
+# incl. timed layered tracks and reverb/compressed/short variants. NOT real film-music accuracy.
+# Results go to branch ci/instrument-bench. Free GitHub runners only (zero budget).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    container: swift:6.0-noble
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sound banks (GeneralUser GS = test; FluidR3 GM, MIT = train)
+        run: |
+          apt-get update -qq && apt-get install -y -qq curl fluid-soundfont-gm python3 python3-numpy > /dev/null
+          curl -fsSL -o /tmp/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+          grep -i "MIT license" /usr/share/doc/fluid-soundfont-gm/copyright
+      - name: Render clips
+        working-directory: Packages/TonePilotCore
+        env:
+          TP_SF2: /tmp/GeneralUser-GS.sf2
+          TP_SF2_TRAIN: /usr/share/sounds/sf2/FluidR3_GM.sf2
+          TP_RENDER_SET: /tmp/iset
+        run: swift test -c release --filter InstrumentSetRender 2>&1 | grep -E "RENDER|error:|Executed" | tail -5
+      - name: Variants (reverb, compressed, short)
+        run: python3 Native/tools/instruments/variants.py /tmp/iset
+      - uses: actions/upload-artifact@v4
+        with: { name: iset, path: /tmp/iset, retention-days: 3 }
+
+  model:
+    needs: render
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [yamnet, efficientat, panns, clap]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: iset, path: /tmp/iset }
+      - name: Install
+        run: |
+          set -e
+          pip install -q "numpy<2" scipy
+          case "${{ matrix.model }}" in
+            yamnet) pip install -q "tensorflow-cpu==2.16.1" "tensorflow-hub==0.16.1" ;;
+            efficientat) pip install -q --index-url https://download.pytorch.org/whl/cpu "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2"
+                         git clone -q --depth 1 https://github.com/fschmid56/EfficientAT /tmp/eat ;;
+            panns) pip install -q --index-url https://download.pytorch.org/whl/cpu "torch==2.2.2" "torchaudio==2.2.2"; pip install -q panns-inference==0.1.1 librosa ;;
+            clap) pip install -q --index-url https://download.pytorch.org/whl/cpu "torch==2.2.2" "torchaudio==2.2.2"; pip install -q "transformers==4.44.2" librosa ;;
+          esac
+      - name: Run model
+        run: |
+          set -o pipefail
+          S=$GITHUB_WORKSPACE/Native/tools/instruments
+          if [ "${{ matrix.model }}" = efficientat ]; then cd /tmp/eat && python $S/embed.py /tmp/iset efficientat /tmp/out --eat /tmp/eat
+          else python $S/embed.py /tmp/iset ${{ matrix.model }} /tmp/out; fi 2>&1 | tee /tmp/embed.log | grep -E "EMBED|Error|error" | tail -20
+          grep "EMBED done" /tmp/embed.log | while IFS= read -r l; do echo "::notice title=${{ matrix.model }}::$l"; done
+      - uses: actions/upload-artifact@v4
+        with: { name: "out-${{ matrix.model }}", path: /tmp/out, retention-days: 3 }
+
+  apple:
+    needs: render
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: iset, path: /tmp/iset }
+      - name: Apple SoundAnalysis (the app's current recogniser)
+        run: |
+          set -e
+          swiftc -O Native/tools/apple_windows/main.swift -o /tmp/apple_windows
+          /tmp/apple_windows /tmp/iset /tmp/apple.json | tail -3
+          pip3 install -q --break-system-packages "numpy<2" 2>/dev/null || pip3 install -q "numpy<2"
+          python3 Native/tools/instruments/apple_to_npz.py /tmp/apple.json /tmp/out
+      - uses: actions/upload-artifact@v4
+        with: { name: out-apple, path: /tmp/out, retention-days: 3 }
+
+  evaluate:
+    needs: [model, apple]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: iset, path: /tmp/iset }
+      - uses: actions/download-artifact@v4
+        with: { pattern: "out-*", path: /tmp/out, merge-multiple: true }
+      - name: Evaluate A and C
+        run: |
+          pip install -q "numpy<2" scipy scikit-learn
+          ls /tmp/out
+          python Native/tools/instruments/evaluate.py /tmp/iset /tmp/out /tmp/report.md | tee /tmp/eval.log | tail -60
+      - name: Push results to branch ci/instrument-bench
+        if: always()
+        run: |
+          [ -f /tmp/report.md ] || exit 0
+          mkdir -p /tmp/pub && cp /tmp/report.md /tmp/report.json /tmp/pub/ && cp /tmp/out/*.json /tmp/pub/ 2>/dev/null || true
+          echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID} · $(date -u +%FT%TZ)" > /tmp/pub/SOURCE.txt
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/instrument-bench && git rm -rqf . && mkdir -p bench && cp /tmp/pub/* bench/
+          git add bench && git commit -qm "Instrument proxy benchmark for ${GITHUB_SHA}" && git push -qf origin ci/instrument-bench
