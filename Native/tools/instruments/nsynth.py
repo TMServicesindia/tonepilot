@@ -7,6 +7,7 @@ from collections import defaultdict
 import numpy as np
 
 root, per = sys.argv[1], int(sys.argv[2])
+train_per = int(sys.argv[3]) if len(sys.argv) > 3 else 0
 FAM = {"bass": "Bass", "brass": "Other", "flute": "Western winds", "guitar": "Other plucked", "keyboard": "Keys",
        "mallet": "Bells", "organ": "Keys", "reed": "Western winds", "string": "Strings", "synth_lead": "Electronic", "vocal": "Other"}
 URL = "http://download.magenta.tensorflow.org/datasets/nsynth/nsynth-{}.jsonwav.tar.gz"
@@ -42,4 +43,26 @@ for part, split in (("valid", "dev_nsynth"), ("test", "test_nsynth")):
                                   "nsynth": {"family": fam, "source": v["instrument_source_str"], "instrument": v["instrument_str"]}})
             n += 1
     print(f"NSYNTH {part}: {n} notes from {len(by)} families")
+
+# TRAIN (optional): stream nsynth-train (~22 GB, too big for runner disk) and keep a stratified sample
+# chosen from file names: <family>_<source>_<nnn>-<pitch>-<velocity>.wav. Separate instruments from valid/test.
+if train_per:
+    import re
+    quota = defaultdict(int); per_inst = defaultdict(int); n = 0
+    with urllib.request.urlopen(URL.format("train")) as resp, tarfile.open(fileobj=resp, mode="r|gz") as tf:
+        for m in tf:
+            g = re.search(r"audio/(([a-z_]+?)_(acoustic|electronic|synthetic)_(\d+))-(\d+)-(\d+)\.wav$", m.name)
+            if not g: continue
+            inst, fam, src, pitch = g.group(1), g.group(2), g.group(3), int(g.group(5))
+            if fam not in FAM or not 36 <= pitch <= 96 or quota[fam] >= train_per or per_inst[inst] >= 4: continue
+            data = tf.extractfile(m).read()
+            rel = f"nsynth/train/{os.path.basename(m.name)}"; os.makedirs(os.path.join(root, "nsynth/train"), exist_ok=True)
+            open(os.path.join(root, rel), "wb").write(data)
+            meta["clips"].append({"file": rel, "split": "train_nsynth", "kind": "solo", "variant": "original",
+                                  "events": [{"key": f"nsynth:{FAM[fam]}", "start": 0.0, "end": 4.0}],
+                                  "nsynth": {"family": fam, "source": src, "instrument": inst}})
+            quota[fam] += 1; per_inst[inst] += 1; n += 1
+            if all(quota[f] >= train_per for f in FAM if f != "synth_lead") and quota["synth_lead"] >= min(train_per, 50):
+                break
+    print(f"NSYNTH train (streamed): {n} notes, per family {dict(quota)}")
 json.dump(meta, open(os.path.join(root, "clips.json"), "w"), indent=1)

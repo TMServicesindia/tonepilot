@@ -24,6 +24,8 @@ def role(c):
         return c["split"]
     if c["split"] == "dev_nsynth":
         return "dev"
+    if c["split"] == "train_nsynth":
+        return "train"
     m = re.search(r"_(\d+)\.wav$", c["file"]) if c["kind"] == "solo" else re.search(r"track_(\d+)\.wav$", c["file"])
     idx = int(m.group(1)) if m else 0
     cut = int(0.8 * LAYERED_TRAIN_COUNT[0])
@@ -146,7 +148,7 @@ def main(root, outdir, report_path):
                 for w, s in enumerate(d["starts"]):
                     tk = truth_window(c, s, win)
                     rows.append((d["emb"][w], {KEYS[k]["instrument"] for k in tk}, {KEYS[k]["family"] for k in tk},
-                                 KEYS[tk[0]]["source"] if c["kind"] == "solo" and tk else None))
+                                 (KEYS[tk[0]]["source"] if KEYS[tk[0]]["source"] != "unknown" else None) if c["kind"] == "solo" and tk else None))
             sc, heads = train_heads(rows); cache = {}
             def sfc(f, d=data, sc=sc, heads=heads, cache=cache):
                 if f not in cache:

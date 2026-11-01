@@ -33,7 +33,7 @@ jobs:
       - name: Variants (reverb, compressed, short)
         run: python3 Native/tools/instruments/variants.py /tmp/iset
       - name: NSynth (CC BY 4.0) — cross-domain DEV (valid) and extra TEST (test)
-        run: python3 Native/tools/instruments/nsynth.py /tmp/iset 60
+        run: python3 Native/tools/instruments/nsynth.py /tmp/iset 60 200
       - uses: actions/upload-artifact@v4
         with: { name: iset, path: /tmp/iset, retention-days: 3 }
 
@@ -74,7 +74,7 @@ jobs:
 
   apple:
     needs: render
-    runs-on: macos-15
+    runs-on: macos-26   # macos-15 arm64 capacity was exhausted on 1 Nov; macos-14 is being retired
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

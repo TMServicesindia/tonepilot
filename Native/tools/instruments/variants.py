@@ -38,7 +38,8 @@ def main(root):
         if c["kind"] != "solo" or c["variant"] != "original":
             continue
         x, sr = read_wav(os.path.join(root, c["file"]))
-        kinds = ["reverb", "compressed", "short"] if c["split"] == "test" else ["reverb", "compressed"]
+        # Short (1 s) variants for TEST and for the DEV phrase (_2) of the train bank, so calibration covers short inputs.
+        kinds = ["reverb", "compressed", "short"] if c["split"] == "test" or c["file"].endswith("_2.wav") else ["reverb", "compressed"]
         for v in kinds:
             y = reverb(x, sr) if v == "reverb" else compress(x, sr) if v == "compressed" else x[: int(1.0 * sr)]
             f = c["file"].replace("/solo/", f"/solo_{v}/")
