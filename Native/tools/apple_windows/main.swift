@@ -15,8 +15,9 @@ final class Collect: NSObject, SNResultsObserving {
     func request(_ request: SNRequest, didProduce result: SNResult) {
         guard let r = result as? SNClassificationResult else { return }
         var d: [String: Double] = [:]
-        for c in r.classifications where c.confidence > 0.005 { d[c.identifier] = c.confidence }
-        rows.append((r.timeRange.start.seconds, d))
+        for c in r.classifications where c.confidence > 0.005 && c.confidence.isFinite { d[c.identifier] = c.confidence }
+        let start = r.timeRange.start.seconds
+        rows.append((start.isFinite ? start : 0, d))
     }
 }
 
@@ -35,7 +36,7 @@ for (k, c) in clips.enumerated() {
         let obs = Collect()
         try analyzer.add(request, withObserver: obs)
         analyzer.analyze()
-        if let f = try? AVAudioFile(forReading: url) { audioSeconds += Double(f.length) / f.fileFormat.sampleRate }
+        if let f = try? AVAudioFile(forReading: url), f.fileFormat.sampleRate > 0 { audioSeconds += Double(f.length) / f.fileFormat.sampleRate }
         for (_, d) in obs.rows { labelSet.formUnion(d.keys) }
         out[file] = ["starts": obs.rows.map { $0.0 }, "scores": obs.rows.map { $0.1 }]
     } catch {
@@ -53,7 +54,12 @@ for (f, v) in out {
     cl[f] = ["starts": v["starts"]!, "scores": scores]
 }
 packed["clips"] = cl
-packed["info"] = ["model": "apple", "params": 0, "infer_s": elapsed, "audio_s": audioSeconds,
-                  "s_per_audio_min": elapsed / max(1e-6, audioSeconds) * 60, "source_classes": ["acoustic", "electronic"]]
-try JSONSerialization.data(withJSONObject: packed).write(to: URL(fileURLWithPath: CommandLine.arguments[2]))
+let audioS = audioSeconds.isFinite ? audioSeconds : 0
+packed["info"] = ["model": "apple", "params": 0, "infer_s": elapsed, "audio_s": audioS,
+                  "s_per_audio_min": elapsed / max(1e-6, audioS) * 60, "source_classes": ["acoustic", "electronic"]]
+do {
+    try JSONSerialization.data(withJSONObject: packed).write(to: URL(fileURLWithPath: CommandLine.arguments[2]))
+} catch {
+    print("APPLE write failed: \(error)"); exit(1)
+}
 print(String(format: "APPLE done: %d clips, %d labels seen, %.1f s for %.0f s of audio", out.count, labels.count, elapsed, audioSeconds))
