@@ -131,6 +131,15 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - First deliverable (8 parts): **`docs/TONEPILOT_INDIAN_FILM_STRATEGY.md`**. Awaiting approval; no large training, no production change.
 - Tooling committed (not wired): `Native/tools/instruments/taxonomy.json` v2 (families incl. Indian percussion; sources acoustic/electronic/imitation/unknown), `Benchmarks/InstrumentSetRender.swift` (FluidR3 GM MIT train bank vs GeneralUser test bank; solo + timed layered). FluidR3 licence verified MIT (Debian copyright).
 
+
+## 6g. Zero-budget consolidated strategy (owner's final instruction, 1 Nov ~20:00 IST) — governing
+
+- **`docs/TONEPILOT_ZERO_BUDGET_STRATEGY.md`** supersedes the Indian-film strategy where they differ. Zero budget (no paid APIs/datasets/GPUs/commissioned recordings); as many real songs as legitimately accessible; verified ground truth before any accuracy claim; status buckets in every report.
+- **`docs/TODO.md`**: the master to-do list (owner asked for it). Keep it updated.
+- Annotation schema `docs/benchmark/annotation.schema.json` + `Native/tools/dataset/annotations.py` (validator + coverage report).
+- Outreach drafts (not sent): `docs/outreach/`.
+- Instrument proxy benchmark pipeline: `.github/workflows/instrument-bench.yml` (render → variants → YAMNet/EfficientAT/PANNs/CLAP + Apple → evaluate A/C) → branch ci/instrument-bench. First run 41312723399.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
