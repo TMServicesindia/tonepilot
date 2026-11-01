@@ -1,0 +1,26 @@
+name: Dataset survey (research only, no app build)
+
+# Lists candidate Tamil / Indian music datasets on Hugging Face and Zenodo with their real
+# contents (audio file counts), licences and access rules. Downloads no audio.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  survey:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Survey public dataset pages
+        run: python3 Native/tools/research/dataset_survey.py
+      - name: Publish results to research/dataset-survey
+        run: |
+          git config user.name "tonepilot-research"
+          git config user.email "research@users.noreply.github.com"
+          git checkout -B research/dataset-survey
+          git add -f docs/research/dataset_survey.json docs/research/dataset_survey.md
+          git commit -m "Dataset survey [skip ci]"
+          git push -f origin research/dataset-survey
