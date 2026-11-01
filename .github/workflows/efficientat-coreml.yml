@@ -1,0 +1,36 @@
+name: EfficientAT → Core ML (research only, no app build)
+
+# iPhone deployment evidence for the instrument-recognition candidate: converts EfficientAT mn10_as
+# (MIT) to Core ML, checks it against PyTorch, measures size and Core ML speed on the Mac runner.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: |
+          pip install -q "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2" "numpy<2" "coremltools==8.2"
+          git clone -q --depth 1 https://github.com/fschmid56/EfficientAT /tmp/eat
+      - name: Convert and measure
+        run: |
+          set -o pipefail
+          python Native/tools/instruments/convert_efficientat.py /tmp/eat /tmp/eat-coreml 2>&1 | tee convert.log | tail -30
+          grep "^RESULT" convert.log | while IFS= read -r l; do echo "::notice title=EfficientAT Core ML::$l"; done
+      - name: Push report to branch ci/efficientat-coreml
+        if: always()
+        run: |
+          [ -f /tmp/eat-coreml/efficientat_coreml.json ] || exit 0
+          cp /tmp/eat-coreml/efficientat_coreml.json /tmp/r.json; cp convert.log /tmp/convert.log
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/efficientat-coreml && git rm -rqf . && mkdir -p report && cp /tmp/r.json /tmp/convert.log report/
+          echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID}" > report/SOURCE.txt
+          git add report && git commit -qm "EfficientAT Core ML report" && git push -qf origin ci/efficientat-coreml
