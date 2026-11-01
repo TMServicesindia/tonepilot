@@ -94,7 +94,7 @@ Rules that apply to every item:
 | 3.1 | Audit of current recognition (Apple, iOS only, 13 families) vs tone matching | ✅ |
 | 3.2 | Taxonomy v2 (+ acoustic / electronic / imitation / unknown) | ✅ |
 | 3.3 | Proxy clip generator (FluidR3 train bank vs GeneralUser test bank, timed layered tracks, variants) | ✅ tested locally |
-| 3.4 | Proxy benchmark A (Apple, YAMNet, EfficientAT, PANNs, CLAP) and C (embeddings + head), run 41312723399 | 🔨 running in CI |
+| 3.4 | Proxy benchmark A (Apple, YAMNet, EfficientAT, PANNs, CLAP) and C (embeddings + head): run 41315008400 | 🔨 running in CI |
 | 3.5 | Add NSynth real-sample set (families, acoustic/electronic/synthetic) to the benchmark | ⏳ |
 | 3.6 | Add licensed real recordings (GuitarSet, Saraga, CC clips) | ⏳ (needs 2.6) |
 | 3.7 | Fine-tuning experiment (B), only if C leaves a measured gap; resumable on free Colab/Kaggle | ⏳ (approval for large training: 👤) |
@@ -152,7 +152,8 @@ Rules that apply to every item:
 
 | # | Item | Status |
 |---|---|---|
-| 7.1 | x86_64 build of the shared core for the emulator; LiteRT Kotlin back-end; JNI hook; emulator contract tests | ⏳ |
+| 7.1a | x86_64 core build + JNI `pipelineCheck` + instrumented `CoreParityTest` (shared mix-only fixture) + emulator CI job | 🔨 first CI run 41314957089 |
+| 7.1b | LiteRT Kotlin back-end behind `tp_set_inference_callback`; Basic Pitch contract on the emulator | ⏳ |
 | 7.2 | Android instrument recognition (none today) via the same LiteRT model | ⏳ (after 3.8) |
 | 7.3 | Android separation and Song Arpeggio | ⏳ |
 
