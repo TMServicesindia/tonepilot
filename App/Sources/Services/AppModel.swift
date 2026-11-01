@@ -890,7 +890,11 @@ final class AppModel: ObservableObject {
                     return true
                 }
                 let instruments: ([SongSection]) -> [UUID: [String: Double]] = { sections in
-                    InstrumentRecognizer.recognize(files: instrumentFiles.isEmpty ? [url] : instrumentFiles, sections: sections)
+                    let files = instrumentFiles.isEmpty ? [url] : instrumentFiles
+                    let result = InstrumentRecognizer.recognize(files: files, sections: sections)
+                    // Developer-only comparison (off unless the developer adds its files); it never changes `result`.
+                    DeveloperShadowMode.compareIfEnabled(files: files, sections: sections, production: result)
+                    return result
                 }
                 let output: SongPipeline.Output
                 if ImportPipelineFlags.useSharedPipeline {

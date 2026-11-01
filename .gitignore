@@ -5,6 +5,7 @@ DerivedData/
 .build/
 .swiftpm/
 Packages/TonePilotCore/.build/
+Packages/TonePilotCore/.build-docker*/
 App/Resources/SoundFonts/*.sf2
 App/Resources/SoundFonts/*.dls
 docs/demo/*.wav

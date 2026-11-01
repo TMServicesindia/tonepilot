@@ -65,6 +65,26 @@ def agree(pi, pf):
     return pi, pf
 
 
+OFFICIAL_HEAD = {}
+
+
+def export_head(rows, thresholds, out_path, source):
+    """The official candidate (EfficientAT + head C, DEV thresholds) as plain JSON for the app's
+    developer-only shadow mode: scaler, per-label logistic weights, family map, thresholds."""
+    sc, heads = train_heads(rows, 0.5, True)
+    def lin(hs, labels):
+        D = len(sc.mean_)
+        return {"labels": labels,
+                "weights": [[round(float(v), 6) for v in h.coef_[0]] if h is not None else [] for h in hs],
+                "bias": [round(float(h.intercept_[0]), 6) if h is not None else 0.0 for h in hs], "dim": D}
+    json.dump({"version": 1, "source": source, "model": "EfficientAT mn10_as (embedding output)", "embeddingDim": int(len(sc.mean_)),
+               "mean": [round(float(v), 6) for v in sc.mean_], "scale": [round(float(v), 6) for v in sc.scale_],
+               "inst": lin(heads["inst"], INSTRUMENTS), "fam": lin(heads["fam"], FAMILIES), "familyOf": FAM_OF,
+               "thresholds": [round(float(t), 4) for t in thresholds],
+               "note": "SYNTHETIC-proxy-trained research head. Developer shadow mode only; never shown to users."},
+              open(out_path, "w"))
+
+
 def calibrate(dev_items):
     grid = np.concatenate([np.linspace(0.05, 0.95, 46), [0.97, 0.98, 0.99, 0.995, 0.999]])
     best, fallback = None, None
@@ -164,6 +184,8 @@ def main(root, outdir, report_path):
                     return cache[f]
                 return sfc
             sf_c = make_sf(0.5, True)
+            if name == "efficientat":
+                OFFICIAL_HEAD.update(rows=rows)
             systems.append(("C", sf_c))
             # Variants aimed at confidently-wrong answers (short clips, other sound banks). Chosen on DEV only.
             systems.append(("Creg", make_sf(0.02, False)))      # stronger regularisation, unweighted
@@ -181,6 +203,9 @@ def main(root, outdir, report_path):
                 results.append({"system": f"A-argmax · {name}", "thresholds": [0, 0], "dev": solo_stats(items("dev"), 0, 0), "target_reached_on_dev": None,
                                 "test": {v: solo_stats(items("test", v), 0, 0) for v in ("original", "reverb", "compressed", "short", "imitation")},
                                 "test_nsynth": solo_stats(items("test_nsynth"), 0, 0), "coverage_curve_test": coverage_curve(items("test", "original"))})
+            if name == "efficientat" and kind == "C" and "rows" in OFFICIAL_HEAD:
+                export_head(OFFICIAL_HEAD["rows"], (ti, tf), os.path.join(os.path.dirname(report_path), "efficientat_head.json"),
+                            f"calibration {os.environ.get('GITHUB_RUN_ID', 'local')} · DEV thresholds")
             rep = {"system": label, "thresholds": [round(float(ti), 3), round(float(tf), 3)], "dev": dev_st, "target_reached_on_dev": reached,
                    "test": {v: solo_stats(items("test", v), *((ts_i, ts_f) if v == "short" else (ti, tf))) for v in ("original", "reverb", "compressed", "short", "imitation")},
                    "short_thresholds": [round(float(ts_i), 3), round(float(ts_f), 3)], "short_target_reached_on_dev": short_reached,
