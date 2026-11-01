@@ -152,7 +152,7 @@ Rules that apply to every item:
 
 | # | Item | Status |
 |---|---|---|
-| 7.1a | x86_64 core build + JNI `pipelineCheck` + instrumented `CoreParityTest` (shared mix-only fixture) + emulator CI job | 🔨 first CI run 41314957089 |
+| 7.1a | x86_64 core build + JNI `pipelineCheck` + instrumented `CoreParityTest` (shared mix-only fixture) + emulator CI job | ✅ **passes** on the API 30 x86_64 emulator (run 41314957089: 1 test, 0 failures); APK unchanged |
 | 7.1b | LiteRT Kotlin back-end behind `tp_set_inference_callback`; Basic Pitch contract on the emulator | ⏳ |
 | 7.2 | Android instrument recognition (none today) via the same LiteRT model | ⏳ (after 3.8) |
 | 7.3 | Android separation and Song Arpeggio | ⏳ |
