@@ -99,14 +99,15 @@ Rules that apply to every item:
 | 3.3 | Proxy clip generator (FluidR3 train bank vs GeneralUser test bank, timed layered tracks, variants) | ✅ tested locally |
 | 3.4 | Proxy benchmark A vs C (run 41315008400): off-the-shelf labels unusable (Apple 94% unknown); **C · EfficientAT + head leads: 59% exact, 75% family, layered window F1 0.37**; ~25% confident wrong family. See `docs/benchmark/INSTRUMENT_PROXY_RESULTS.md` | 🧪 |
 | 3.4b | **Gate 1 calibration v1** (run 41321228828): ≤5% met on DEV but **not on TEST** (C·EfficientAT: coverage 99%, wrong family 26%). Cause: DEV came from the same sound bank as TRAIN, so the heads were over-confident. Coverage curve on TEST: 88% family accuracy at 70% coverage, 94% at 50%. Source type: imitation tones mostly read as acoustic (8/36) | 🧪 (finding) |
-| 3.4c | **Gate 1 v2** (run 41321917030): NSynth (CC BY 4.0, real notes) as cross-domain DEV and extra TEST; 96 layered training mixtures; CLAP on 10 s windows + argmax; calibration in the pipeline | 🔨 running |
+| 3.4c | **Gate 1 v2**: with NSynth as cross-domain DEV, **≤5% wrong family met on TEST** (EfficientAT + head: 41% coverage, 3% wrong, 94% selective) for clean/reverb/compressed; **fails on 1 s clips** (25% wrong); **poor on NSynth-test (real notes)** → GM-only training does not transfer | 🧪 |
+| 3.4e | Gate 1 v3: NSynth-train in TRAIN, short-clip DEV, source-type head | ⏳ next |
 | 3.4d | Source-type head improvement (imitation vs acoustic) and hybrid sounds | ⏳ |
 | 3.5 | Add NSynth real-sample set (families, acoustic/electronic/synthetic) to the benchmark | ⏳ |
 | 3.6 | Add licensed real recordings (GuitarSet, Saraga, CC clips) | ⏳ (needs 2.6) |
 | 3.7 | Fine-tuning experiment (B), only if C leaves a measured gap; resumable on free Colab/Kaggle | ⏳ (approval for large training: 👤) |
 | 3.8 | Five-stage analyser prototype (content → family → instrument → time aggregation → tone mapping), Core ML, shadow mode | ⏳ (approval: 👤) |
-| G2.1 | **Gate 2 Core ML**: fp32 / fp16 / int8 / 6-bit × CPU / CPU+NE / all × batch 1/8/16; numerics vs PyTorch on benchmark windows; latency p50/p90/p95; Mac full-song estimates (run 41322117074) | 🔨 queued (Mac runner) |
-| G2.2 | Swift EfficientAT mel front-end (`Instruments/EfficientATFrontEnd.swift`) + fixture test | 🔨 written; test waits for the Gate 2 fixture |
+| G2.1 | **Gate 2 Core ML** (run 41323484719, macos-26): fp16 9.9 MB, 99.5% family-decision agreement, ~4 ms/window (Mac); int8 5.1 MB 97.2%; 6-bit rejected (87.2%). `docs/benchmark/COREML_DEPLOYMENT_REPORT.md` | 🧪 Mac measured |
+| G2.2 | Swift EfficientAT mel front-end: **matches PyTorch (2.2e-5)**; 2.6 s per 4-min song (Linux CPU), now costlier than inference → Accelerate FFT next | ✅ tested |
 | G2.3 | **TonePilot Lab**: separate iPhone benchmark app (main app untouched); device latency per compute unit, full-song time, footprint, thermal, battery, on-device numerics → JSON report | 🔨 written; build after G2.1 (`lab-build.yml`) |
 | G2.4 | **Physical iPhone run** of TonePilot Lab (sideload, press Full run, share the JSON) | 👤 (one session) |
 | G2.5 | Developer-only shadow mode in the main app (off by default; production recognizer stays authoritative) | ⏳ after G2.4 |

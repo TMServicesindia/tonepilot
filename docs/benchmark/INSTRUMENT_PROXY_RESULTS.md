@@ -82,3 +82,33 @@ TonePilot's imitation tones (bansuri-like etc.), family accuracy: 53% (Efficient
    licence check), especially the Indian instruments.
 6. Mel front-end in Swift + Core ML model behind `InferenceBackend`, for **shadow-mode** measurements
    on iPhone. This needs owner approval before anything appears in the app.
+
+
+---
+
+## Gate 1 v2 — calibrated abstention with a cross-domain DEV (run 41321917030, calibration run 41324196558)
+
+DEV = FluidR3 held-out phrase 2 + layered 77–95 **+ NSynth-valid** (real notes, a different source).
+TEST = GeneralUser GS (untouched) and NSynth-test (separate). Heads trained on FluidR3 TRAIN only.
+96 layered training mixtures.
+
+**EfficientAT + head on TEST** (coverage / wrong family / selective family accuracy):
+
+| Condition | Coverage | Wrong family | Selective family acc. |
+|---|---|---|---|
+| Clean | 41% | 3% | 94% (selective exact 82%) |
+| Reverb | 43% | 3% | 94% |
+| Compressed | 27% | 3% | 90% |
+| Short 1 s | 81% | **25%** | 69% |
+| Imitation tones | 27% | 14% | 49% |
+
+- **Target ≤ 5% wrong family is now met on untouched TEST** for clean, reverb and compressed clips.
+  This is the trade-off: 41% coverage. **It fails on short clips**: DEV had none, so thresholds don't cover them.
+- PANNs + head: 41% / 5% / 87%. YAMNet + head: 63% / 12% / 81%.
+- **NSynth-test (real notes): every head generalises poorly.** EfficientAT + head answers 11% of clips at 33%
+  selective accuracy. **Training only on General MIDI renders does not transfer to real instruments.**
+  Next: add NSynth-*train* (CC BY 4.0, separate instruments) to TRAIN.
+- Layered (EfficientAT + head): window instrument F1 0.39, family F1 0.58, events detected 57/75,
+  onset error median 0.5 s / p90 7.7 s. Little change from 4× more mixtures.
+- Source type: imitation tones still mostly classified as acoustic (9/36 right).
+- CLAP with 10 s windows: still poor (head 0% coverage on clean). It stays optional, as decided.
