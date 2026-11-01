@@ -184,6 +184,25 @@ Recommendations awaiting the owner:
 
 **Wait for explicit approval before implementing any of it.**
 
+## 6j. Launch investigation (2 Nov ~01:30 IST) — every timing kept
+
+Five launches per build; medians; same runner image throughout (macos15 20261028.0489.1, M1 virtual, Xcode 16.4, iPhone 16 iOS 18.5).
+
+| Run | Build A median (values) | Build B median (values) |
+|---|---|---|
+| 41340066348 | v0.3.71 **2.19 s** (2.74, 2.28, 1.83, 2.19, 1.89) | main **3.50 s** (3.81, 3.50, 3.14, 3.50, 3.66) |
+| 41342418353 | v0.3.71 **2.12 s** (2.39, 2.02, 2.49, 2.12, 1.94) | main **3.51 s** (5.35, 3.39, 2.93, 3.79, 3.51) |
+| 41342424229 | (control failed: short SHA) | main **3.74 s** (4.30, 3.74, 3.42, 4.01, 3.67) |
+| 41342430415 | (control failed: short SHA) | main **2.67 s** (4.69, 2.57, 2.77, 2.67, 2.61) |
+| 41343134530 | 007f6b2 **3.52 s** (5.00, 3.48, 3.14, 3.52, 4.10) | main **2.44 s** (2.40, 2.44, 2.51, 2.61, 2.01) |
+| 41343140345 | 9f9ad63 **3.36 s** (3.73, 3.32, 3.36, 3.75, 3.02) | main **2.65 s** (2.56, 2.65, 2.86, 1.75, **19.17**) |
+
+Reading:
+- Medians fall into two clusters, about 2.1–2.7 s and about 3.4–3.7 s, whatever the code.
+- Main was measured in both clusters, and both older commits were measured slow.
+- This fits two kinds of host machine behind the same runner label, not a code regression. One 19.17 s single launch shows why the gate uses the median.
+- It doesn't rule out a small regression. The next step is a same-machine A/B: both builds in one job, launches interleaved.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
