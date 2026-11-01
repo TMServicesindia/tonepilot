@@ -125,7 +125,8 @@ Rules that apply to every item:
 | 4.6 | **Chain test:** original section → isolated instrument → TonePilot tone → comparison, **inside the full arrangement** | ⏳ |
 | 4.7 | Layered-tone tests (e.g. strings + choir pad) | ⏳ |
 | 4.8 | **CT-X870IN listening validation** (played through the Casio) | 👤 |
-| 4.3 | Indian tones from licensed samples or synthesis (bansuri, nadaswaram, veena, santoor, …) to replace or improve the "-like" GM variants | ⏳ |
+| 4.1b | **Stage-5 tone map** (`taxonomy.json` → `tone_map`): 53 instruments → candidate TonePilot tones, validated against the tone library (`InstrumentToneMapTests`) | ✅ tested |
+| 4.3 | Indian tones from licensed samples or synthesis (bansuri, nadaswaram, veena, santoor, …) to replace or improve the "-like" GM variants. **No tone at all yet for tabla, mridangam, dholak, ghatam, kanjira, thavil, dhol, electronic percussion, frame drums, ambient/hybrid textures** | ⏳ |
 | 4.4 | Layer editing, EQ/reverb shaping driven by recognition | ⏳ |
 | 4.5 | Listening A/B protocol and runs | ⏳ + 👤 |
 

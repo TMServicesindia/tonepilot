@@ -430,5 +430,211 @@
    "family": "Other winds",
    "source": "imitation"
   }
- }
+ },
+ "tone_map": {
+  "violin": [
+   "Expressive Violin Lead",
+   "Violin",
+   "Lush Film Violins"
+  ],
+  "viola": [
+   "Violin",
+   "Orchestral Strings"
+  ],
+  "cello": [
+   "Cello",
+   "Cinematic Low Strings"
+  ],
+  "double bass": [
+   "Acoustic Bass"
+  ],
+  "string ensemble": [
+   "Orchestral Strings",
+   "Lush Film Violins",
+   "Slow Strings",
+   "Tremolo Strings"
+  ],
+  "sarangi": [
+   "Sarangi-like Folk Fiddle",
+   "Violin"
+  ],
+  "bansuri": [
+   "Bansuri-like Flute",
+   "Low Bansuri-like Flute",
+   "Flute"
+  ],
+  "nadaswaram": [
+   "Nadaswaram-like Lead",
+   "Shehnai Lead"
+  ],
+  "shehnai": [
+   "Shehnai Lead",
+   "Shehnai"
+  ],
+  "kuzhal": [
+   "Kuzhal-like Folk Reed",
+   "Oboe"
+  ],
+  "flute": [
+   "Flute",
+   "Pan Flute"
+  ],
+  "piccolo": [
+   "Piccolo",
+   "Flute"
+  ],
+  "oboe": [
+   "Oboe"
+  ],
+  "clarinet": [
+   "Clarinet"
+  ],
+  "saxophone": [
+   "Melody Sax",
+   "Alto Sax"
+  ],
+  "pan flute": [
+   "90s Pan Flute Lead",
+   "Pan Flute"
+  ],
+  "shakuhachi": [
+   "Breathy Shakuhachi Lead",
+   "Shakuhachi"
+  ],
+  "duduk": [
+   "Duduk-like Reed"
+  ],
+  "veena": [
+   "Veena-like Pluck",
+   "Sitar"
+  ],
+  "sitar": [
+   "Sitar",
+   "Electric Sitar"
+  ],
+  "tanpura": [
+   "Tanpura-like Drone"
+  ],
+  "guitar": [
+   "Nylon Guitar",
+   "Steel Guitar",
+   "Bright Steel Strum"
+  ],
+  "electric guitar": [
+   "Clean Lead Guitar",
+   "Clean Electric Guitar",
+   "Distorted Guitar Lead"
+  ],
+  "mandolin": [
+   "Mandolin-like Pluck"
+  ],
+  "harp": [
+   "Harp"
+  ],
+  "koto": [
+   "Koto"
+  ],
+  "piano": [
+   "Grand Piano",
+   "Soft Piano",
+   "Bright Piano"
+  ],
+  "electric piano": [
+   "Classic Rhodes Keys",
+   "Electric Piano",
+   "FM Electric Piano"
+  ],
+  "organ": [
+   "Drawbar Organ",
+   "Rock Organ",
+   "Church Organ"
+  ],
+  "accordion": [
+   "Melodic Accordion",
+   "Accordion"
+  ],
+  "harmonium": [
+   "Harmonium-like Reed",
+   "Reed Organ"
+  ],
+  "celesta": [
+   "Celesta"
+  ],
+  "glockenspiel": [
+   "Glockenspiel"
+  ],
+  "music box": [
+   "Music Box"
+  ],
+  "vibraphone": [
+   "Vibraphone"
+  ],
+  "marimba": [
+   "Marimba"
+  ],
+  "tubular bells": [
+   "Tubular Bells"
+  ],
+  "kalimba": [
+   "Kalimba"
+  ],
+  "santoor": [
+   "Santoor-like Dulcimer"
+  ],
+  "drums": [
+   "Standard Drum Kit"
+  ],
+  "synth lead": [
+   "Saw Lead",
+   "Square Lead"
+  ],
+  "synth pad": [
+   "Warm Pad",
+   "Polysynth Pad",
+   "Halo Pad",
+   "New Age Pad"
+  ],
+  "orchestral synth": [
+   "Synth Strings"
+  ],
+  "bass synth": [
+   "Synth Bass"
+  ],
+  "synth brass": [
+   "Driven Synth Brass",
+   "Retro Synth Brass",
+   "Synth Brass"
+  ],
+  "bass guitar": [
+   "Finger Bass",
+   "Slap Bass"
+  ],
+  "trumpet": [
+   "Trumpet"
+  ],
+  "trombone": [
+   "Trombone"
+  ],
+  "french horn": [
+   "Epic French Horns",
+   "French Horn"
+  ],
+  "brass section": [
+   "Power Brass",
+   "Brass Section",
+   "Brass Stabs"
+  ],
+  "kombu": [
+   "Kombu-like Folk Horn"
+  ],
+  "choir": [
+   "Choir Aahs",
+   "Synth Choir Pad"
+  ],
+  "vocal-like synth": [
+   "Synth Voice",
+   "Vocal Chop Lead"
+  ]
+ },
+ "tone_map_note": "Candidate tones per recognised instrument (Instrument Maker input). A family-only result uses the family's tones; unknown uses none. Tabla, mridangam, dholak, ghatam, kanjira, thavil, dhol, electronic percussion, frame drums, ambient/hybrid textures: no dedicated tone yet (gap)."
 }
