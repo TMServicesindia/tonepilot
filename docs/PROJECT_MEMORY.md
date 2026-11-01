@@ -138,6 +138,7 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - **`docs/TODO.md`**: the master to-do list (owner asked for it). Keep it updated.
 - Annotation schema `docs/benchmark/annotation.schema.json` + `Native/tools/dataset/annotations.py` (validator + coverage report).
 - Outreach drafts (not sent): `docs/outreach/`.
+- **No-fill-unless-sure** `Analysis/AccompanimentClassifier.swift` (not wired): evidence = activity, density, bar repeatability, chord-tone share, simultaneity; benchmark gated learner: false arpeggios 0/7 (dev, held-out 88 BPM, held-out-2 112 BPM), unwanted fills 0/4; arpeggios kept 1/2, 2/2, 1/2. maxSimultaneity 2.7 = midpoint of dev classes; otherwise initial thresholds.
 - Instrument proxy benchmark pipeline: `.github/workflows/instrument-bench.yml` (render → variants → YAMNet/EfficientAT/PANNs/CLAP + Apple → evaluate A/C) → branch ci/instrument-bench. First run 41312723399.
 
 ## 7. Open owner decisions

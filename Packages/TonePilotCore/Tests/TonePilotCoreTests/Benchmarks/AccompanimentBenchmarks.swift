@@ -105,6 +105,23 @@ final class AccompanimentBenchmarks: XCTestCase {
         ArpeggioLearner.learn(.init(music: music, beats: beats, beatsPerBar: 4, chords: chords, sections: sections))?.patterns ?? [:]
     }
 
+    /// Phase 4 investigation: the learner's pattern survives only when AccompanimentClassifier allows it.
+    /// Sustained/sparse sections may keep a held chord; everything else gets no fill.
+    static let gatedLearner: Decider = { music, beats, chords, sections in
+        let learned = currentLearner(music, beats, chords, sections)
+        let ctx = AccompanimentClassifier.SongContext(music: music)
+        var out: [String: ArpeggioPattern] = [:]
+        for s in sections {
+            let v = AccompanimentClassifier.classify(ctx, beats: beats, chords: chords, section: s)
+            let ev = v.evidence.sorted { $0.key < $1.key }.map { String(format: "%@ %.2f", $0.key, $0.value) }.joined(separator: ", ")
+            print("ACCOMP-EVIDENCE \(s.label ?? "?"): \(v.kind.rawValue) conf \(String(format: "%.2f", v.confidence)) · \(ev)")
+            guard let p = learned[s.id.uuidString] else { continue }
+            if v.allowsArpeggio { out[s.id.uuidString] = p }
+            else if v.kind == .sustained || v.kind == .sparse { var held = p; held.sustained = true; out[s.id.uuidString] = held }
+        }
+        return out
+    }
+
     struct Tally {
         var falseArpeggio = 0, nonArpeggioSections = 0, unwantedFill = 0, noFillSections = 0
         var arpeggioFound = 0, arpeggioSections = 0, stepF = 0.0, degreeRight = 0, degreeTotal = 0
@@ -151,8 +168,15 @@ final class AccompanimentBenchmarks: XCTestCase {
     /// Held-out order and tempo (different neighbours, seed and BPM; never tuned on).
     static let orderB: [Kind] = [.solo, .arpeggioTriplet, .none, .strum, .hook, .arpeggio, .sparse, .bassOnly, .sustained]
 
+    /// Second held-out order (added with the classifier; never tuned on).
+    static let orderC: [Kind] = [.hook, .sustained, .arpeggio, .bassOnly, .strum, .none, .arpeggioTriplet, .solo, .sparse]
+
     func testCurrentLearner() {
-        print(evaluate("current", Self.currentLearner, order: Self.orderA).line("current learner"))
-        print(evaluate("current held-out", Self.currentLearner, order: Self.orderB, bpm: 88, seed: 7).line("held-out (88 BPM, other order) current learner"))
+        print(evaluate("current", Self.currentLearner, order: Self.orderA).line("dev (100 BPM) current learner"))
+        print(evaluate("gated", Self.gatedLearner, order: Self.orderA).line("dev (100 BPM) gated learner"))
+        print(evaluate("current held-out", Self.currentLearner, order: Self.orderB, bpm: 88, seed: 7).line("held-out (88 BPM) current learner"))
+        print(evaluate("gated held-out", Self.gatedLearner, order: Self.orderB, bpm: 88, seed: 7).line("held-out (88 BPM) gated learner"))
+        print(evaluate("current held-out-2", Self.currentLearner, order: Self.orderC, bpm: 112, seed: 11).line("held-out 2 (112 BPM) current learner"))
+        print(evaluate("gated held-out-2", Self.gatedLearner, order: Self.orderC, bpm: 112, seed: 11).line("held-out 2 (112 BPM) gated learner"))
     }
 }

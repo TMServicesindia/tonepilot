@@ -133,7 +133,7 @@ Rules that apply to every item:
 | # | Item | Status |
 |---|---|---|
 | 6.1 | Accompaniment benchmark: current learner gives **7/7 false arpeggios** | 🧪 ✅ |
-| 6.2 | **No-fill-unless-sure classifier** (non-production investigation; must reach 0 false arpeggios) | ⏳ next after the instrument benchmark |
+| 6.2 | **No-fill-unless-sure classifier** (`AccompanimentClassifier`, NOT wired into the app): false arpeggios **7/7 → 0/7** and unwanted fills **4/4 → 0/4** on dev and both held-out sets; real arpeggios kept 1/2, 2/2, 1/2 (triplet on guitar sometimes blocked: safe side) | 🧪 (synthetic); real-section validation 📝 + listening 👤; activation 👤 |
 | 6.3 | Pattern fidelity with estimated (not true) beats and chords | ⏳ |
 | 6.4 | Owner listening on 10 real sections | 👤 |
 | 6.5 | Live Song Arpeggio: no-third-when-unsure, stop modes, Casio test | ⏳ + 👤 |
