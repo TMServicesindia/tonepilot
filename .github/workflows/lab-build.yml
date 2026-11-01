@@ -23,7 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+        run: |
+          # Prefer Xcode 16.4 (same as the main app build); newer images ship only newer Xcode.
+          sudo xcode-select -s /Applications/Xcode_16.4.app 2>/dev/null || true
+          xcodebuild -version
       - uses: actions/download-artifact@v4
         with: { name: coreml-models, path: /tmp/models, run-id: "${{ inputs.gate2_run_id }}", github-token: "${{ github.token }}" }
       - name: Models (compiled) and fixtures
