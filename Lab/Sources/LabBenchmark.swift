@@ -11,15 +11,20 @@ final class LabBenchmark: ObservableObject {
     @Published var running = false
     @Published var reportURL: URL?
 
-    private func say(_ s: String) { log.append(s) }
-
     func run(sustainedSeconds: Int) async {
         running = true; log = []; reportURL = nil
         defer { running = false }
         UIDevice.current.isBatteryMonitoringEnabled = true
+        let sink: @Sendable (String) -> Void = { line in Task { @MainActor [weak self] in self?.log.append(line) } }
+        let report = await Task.detached(priority: .userInitiated) { LabBenchmark.measure(sustainedSeconds: sustainedSeconds, say: sink) }.value
+        save(report)
+    }
+
+    /// All measurement work, synchronous and off the main thread (UIKit state is read on main).
+    nonisolated static func measure(sustainedSeconds: Int, say: @Sendable (String) -> Void) -> [String: Any] {
         var report: [String: Any] = ["label": "MEASURED on a physical device by TonePilot Lab", "date": ISO8601DateFormatter().string(from: Date()),
-                                     "device": Self.deviceInfo(), "sustained_seconds": sustainedSeconds]
-        say("Device \(Self.machine()), iOS \(UIDevice.current.systemVersion)")
+                                     "device": onMain { Self.deviceInfo() }, "sustained_seconds": sustainedSeconds]
+        say("Device \(Self.machine()), iOS \(onMain { UIDevice.current.systemVersion })")
 
         // 1. Front-end parity on device (Swift mel vs the PyTorch fixture).
         let audio = Self.floats("audio") ?? Self.synthetic(seconds: 2.5)
@@ -29,7 +34,7 @@ final class LabBenchmark: ObservableObject {
             fe["max_abs_diff_vs_pytorch"] = zip(ref, mel.values).map { abs($0 - $1) }.max() ?? 0
         } else { fe["max_abs_diff_vs_pytorch"] = "fixture not bundled" }
         report["front_end"] = fe; say("Front-end: \(fe)")
-        guard mel.frames >= 101 else { say("Too few frames"); return }
+        guard mel.frames >= 101 else { say("Too few frames"); return report }
         let input = try! MLMultiArray(shape: [1, 1, 128, 101], dataType: .float32)
         for m in 0..<128 { for t in 0..<101 { input[m * 101 + t] = NSNumber(value: mel.values[m * mel.frames + t]) } }
         let provider = try! MLDictionaryFeatureProvider(dictionary: ["mel": MLFeatureValue(multiArray: input)])
@@ -63,7 +68,7 @@ final class LabBenchmark: ObservableObject {
             models[name] = per
         }
         report["models"] = models
-        guard let best, let url = Bundle.main.url(forResource: best.name, withExtension: "mlmodelc") else { save(report); return }
+        guard let best, let url = Bundle.main.url(forResource: best.name, withExtension: "mlmodelc") else { return report }
         let cfg = MLModelConfiguration(); cfg.computeUnits = best.units
         let model = try! MLModel(contentsOf: url, configuration: cfg)
         report["best"] = ["model": best.name, "units": "\(best.units.rawValue)", "warm_ms_median": best.ms]
@@ -89,7 +94,7 @@ final class LabBenchmark: ObservableObject {
         report["full_song"] = songs
 
         // 4. Sustained load: thermal state, footprint and battery.
-        let battery0 = UIDevice.current.batteryLevel, state0 = UIDevice.current.batteryState.rawValue
+        let (battery0, state0) = onMain { (UIDevice.current.batteryLevel, UIDevice.current.batteryState.rawValue) }
         var samples: [[String: Any]] = []; let s0 = Date(); var n = 0; var lastSample = -1
         while Date().timeIntervalSince(s0) < Double(sustainedSeconds) {
             _ = try? model.prediction(from: provider); n += 1
@@ -97,16 +102,17 @@ final class LabBenchmark: ObservableObject {
             if sec != lastSample && sec % 5 == 0 {
                 lastSample = sec
                 samples.append(["t": sec, "thermal": Self.thermal(), "footprint_mb": Self.footprintMB(), "windows": n])
-                if sec % 30 == 0 { say("sustained \(sec)s thermal \(Self.thermal())") ; await Task.yield() }
+                if sec % 30 == 0 { say("sustained \(sec)s thermal \(Self.thermal())") }
             }
         }
+        let (batteryAfter, stateAfter) = onMain { (UIDevice.current.batteryLevel, UIDevice.current.batteryState.rawValue) }
         report["sustained"] = ["windows": n, "windows_per_s": Double(n) / Double(sustainedSeconds), "samples": samples,
                                "battery_level_before": battery0 < 0 ? "unavailable" : battery0 as Any,
-                               "battery_level_after": UIDevice.current.batteryLevel < 0 ? "unavailable" : UIDevice.current.batteryLevel as Any,
-                               "battery_state_before": state0, "battery_state_after": UIDevice.current.batteryState.rawValue,
+                               "battery_level_after": batteryAfter < 0 ? "unavailable" : batteryAfter as Any,
+                               "battery_state_before": state0, "battery_state_after": stateAfter,
                                "note": "Battery level has 1% (or 5%) granularity on iOS; precise energy is not exposed to apps."]
         report["peak_footprint_mb"] = Self.footprintMB()
-        save(report)
+        return report
     }
 
     private func save(_ report: [String: Any]) {
@@ -117,7 +123,11 @@ final class LabBenchmark: ObservableObject {
     }
 
     // MARK: Helpers
-    static func machine() -> String {
+    nonisolated static func onMain<T>(_ f: @MainActor () -> T) -> T {
+        if Thread.isMainThread { return MainActor.assumeIsolated(f) }
+        return DispatchQueue.main.sync { MainActor.assumeIsolated(f) }
+    }
+    nonisolated static func machine() -> String {
         var s = utsname(); uname(&s)
         return withUnsafeBytes(of: &s.machine) { String(decoding: $0.prefix { $0 != 0 }, as: UTF8.self) }
     }
@@ -125,25 +135,25 @@ final class LabBenchmark: ObservableObject {
         ["machine": machine(), "ios": UIDevice.current.systemVersion, "cores": ProcessInfo.processInfo.activeProcessorCount,
          "memory_gb": Double(ProcessInfo.processInfo.physicalMemory) / 1e9, "low_power_mode": ProcessInfo.processInfo.isLowPowerModeEnabled]
     }
-    static func thermal() -> String {
+    nonisolated static func thermal() -> String {
         switch ProcessInfo.processInfo.thermalState { case .nominal: return "nominal"; case .fair: return "fair"; case .serious: return "serious"; case .critical: return "critical"; @unknown default: return "unknown" }
     }
-    static func footprintMB() -> Double {
+    nonisolated static func footprintMB() -> Double {
         var info = task_vm_info_data_t(); var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
         let kr = withUnsafeMutablePointer(to: &info) { $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count) } }
         return kr == KERN_SUCCESS ? Double(info.phys_footprint) / 1_048_576 : -1
     }
-    static func sizeMB(_ url: URL) -> Double {
+    nonisolated static func sizeMB(_ url: URL) -> Double {
         let e = FileManager.default.enumerator(at: url, includingPropertiesForKeys: [.fileSizeKey])
         var total = 0
         while let f = e?.nextObject() as? URL { total += (try? f.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0 }
         return Double(total) / 1e6
     }
-    static func floats(_ name: String) -> [Float]? {
+    nonisolated static func floats(_ name: String) -> [Float]? {
         guard let url = Bundle.main.url(forResource: name, withExtension: "f32"), let d = try? Data(contentsOf: url) else { return nil }
         return d.withUnsafeBytes { Array($0.bindMemory(to: Float.self)) }
     }
-    static func synthetic(seconds: Double) -> [Float] {
+    nonisolated static func synthetic(seconds: Double) -> [Float] {
         let sr = 32_000.0, n = Int(seconds * sr)
         var x = [Float](repeating: 0, count: n); var r: UInt64 = 7
         for i in 0..<n {
