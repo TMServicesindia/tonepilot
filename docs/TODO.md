@@ -101,7 +101,7 @@ Rules that apply to every item:
 | 3.4b | **Gate 1 calibration v1** (run 41321228828): ≤5% met on DEV but **not on TEST** (C·EfficientAT: coverage 99%, wrong family 26%). Cause: DEV came from the same sound bank as TRAIN, so the heads were over-confident. Coverage curve on TEST: 88% family accuracy at 70% coverage, 94% at 50%. Source type: imitation tones mostly read as acoustic (8/36) | 🧪 (finding) |
 | 3.4c | **Gate 1 v2**: with NSynth as cross-domain DEV, **≤5% wrong family met on TEST** (EfficientAT + head: 41% coverage, 3% wrong, 94% selective) for clean/reverb/compressed; **fails on 1 s clips** (25% wrong); **poor on NSynth-test (real notes)** → GM-only training does not transfer | 🧪 |
 | 3.4e | **Gate 1 v3** (+ NSynth-train): real-note generalisation 33% → **87%** selective (NSynth-test, 47% coverage, 6% wrong); synthetic set now 17% wrong (one threshold can't fit two domains) | 🧪 |
-| 3.4f | **Gate 1 v4** (run 41328362434): synthesised imitations (source type), duration-aware thresholds, Apple job fixed | 🔨 running |
+| 3.4f | **Gate 1 v4** (run 41328362434): synthesised imitations help family accuracy (imitation wrong-family 49%→22%, clean 17%→10%); source head never says "imitation"; short-clip thresholds fail on DEV; Apple job still crashes (fix committed) | ✅ measured (synthetic) — v4b variants running |
 | 3.4d | Source-type head improvement (imitation vs acoustic) and hybrid sounds | ⏳ |
 | 3.5 | Add NSynth real-sample set (families, acoustic/electronic/synthetic) to the benchmark | ⏳ |
 | 3.6 | Add licensed real recordings (GuitarSet, Saraga, CC clips) | ⏳ (needs 2.6) |

@@ -138,3 +138,43 @@ Findings:
 3. Calibration must therefore come from DEV audio that resembles the target (real film music); until
    that exists, per-condition thresholds (duration-aware, added in v4) are the principled interim step.
 4. Layered (v3): window instrument F1 0.37, family F1 0.55, onset error median 0.5 s / p90 6.4 s.
+
+---
+
+## Gate 1 v4 — synthesised Indian imitations + duration-aware thresholds (bench run 41328362434, calibration run 41331398996)
+
+All SYNTHETIC proxy (GM sound banks and in-house imitation synths). Not film-music accuracy.
+
+What changed:
+- Synthesised "imitation" tones (bansuri, violin, cello, nadaswaram, shehnai, sitar, veena, santoor) were added to every split.
+- Clips of 1 s and under got their own DEV-calibrated thresholds.
+- PANNs was included; CLAP finished too late for this calibration.
+
+EfficientAT + head (coverage / wrong family / selective family accuracy), measured on TEST (GeneralUser GS, untouched):
+
+| TEST set | v3 | **v4** |
+|---|---|---|
+| GeneralUser, clean | 78% / 17% / 78% | **72% / 10% / 86%** |
+| GeneralUser, 1 s clips | 96% / 36% / 62% | 95% / 25% / 73% |
+| Imitation tones | 74% / 49% / 33% | **78% / 22% / 72%** |
+| NSynth-test (real notes) | 47% / 6% / 87% | 50% / 7% / 87% |
+
+Other heads on GeneralUser, clean:
+- PANNs + head: 85% / 26% / 70%
+- YAMNet + head: 55% / 11% / 80%
+
+The EfficientAT lead holds (on NSynth: EfficientAT 87% selective at 50% coverage; PANNs 79% at 25%; YAMNet 82% at 25%).
+
+Findings:
+1. **Imitation tones in training help the family decision a lot**: imitation wrong-family went from 49% to 22%, and the clean set's wrong-family went from 17% to 10%.
+2. **The source-type head still never says "imitation"** on TEST:
+   - EfficientAT: imitation → acoustic 28/28.
+   - Electronic is mostly right (26/33).
+   - So "synth imitating an Indian instrument" cannot yet be told apart from the real instrument. This needs real recordings of both (licensed), not more synthesis.
+3. **Short-clip thresholds did not reach the target on DEV.** The head is confidently wrong on single 1 s windows: even at a 0.99 threshold, DEV wrong-family stays above 5%. Thresholds alone cannot fix this. The v4b calibration run tests a stronger-regularised head and a "heads must agree" rule, selected on DEV only.
+4. Layered mixtures (EfficientAT + head):
+   - window instrument F1 0.34, family F1 0.50;
+   - 46/70 events detected;
+   - onset error median 0.5 s, p90 7.0 s.
+   - Little change from v3.
+5. The Apple SoundAnalysis job crashed again near the end of NSynth (about 4,200 of 4,356 clips). A per-clip autorelease-pool fix is committed and will be checked on the next bench run.
