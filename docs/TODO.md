@@ -148,7 +148,7 @@ Rules that apply to every item:
 | F.1 | Checkpoint and resume for every long job (embeddings cached per model version; training checkpoints) | ⏳ (benchmark caches outputs per model ✅) |
 | F.2 | Training time estimates before any run; experiment registry so the same experiment never runs twice | ⏳ |
 | F.3 | Free GPU quota tracking (Colab/Kaggle) with CPU fallback (GitHub Actions) | ⏳ |
-| F.4 | Model size, memory, inference speed and battery benchmarks (CI + iPhone/Android) | ⏳ (CPU speed and parameters ✅ in benchmark) |
+| F.4 | Model size, memory, inference speed and battery benchmarks (CI + iPhone/Android) | 🔨 CPU speed + parameters in the benchmark; **EfficientAT Core ML** (run 41317441310): fp32 19.6 MB / 7.2 ms per 1 s window, fp16 9.9 MB / 4.5 ms (Mac runner, all units), matches PyTorch (3e-7 fp32, 4e-4 fp16). On-iPhone timing and battery ⏳ |
 | F.5 | No paid compute or recurring services | ✅ rule |
 
 ## 7. Android parity (project requirement)
