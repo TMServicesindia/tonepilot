@@ -221,7 +221,7 @@ public enum AutoArranger {
                 votes[best.0.patchId, default: 0] += best.1 * max(1, section.duration)
             }
         }
-        let preferredLead = votes.max { $0.value < $1.value }?.key
+        let preferredLead = votes.max { ($0.value, $1.key.uuidString) < ($1.value, $0.key.uuidString) }?.key   // exact ties: fixed order
 
         for section in sections {
             if let only = onlySection, section.id != only { continue }
@@ -276,7 +276,7 @@ public enum AutoArranger {
         }
         var time: [UUID: Double] = [:]
         for (s, a) in withTone { if let l = lead(a) { time[l, default: 0] += weight(s) } }
-        guard let mainLead = time.max(by: { $0.value < $1.value })?.key else { return nil }
+        guard let mainLead = time.max(by: { ($0.value, $1.key.uuidString) < ($1.value, $0.key.uuidString) })?.key else { return nil }
         let pick = withTone.filter { lead($0.1) == mainLead }.max { weight($0.0) < weight($1.0) }
         guard let (section, source) = pick else { return nil }
         var tone = Arrangement(name: "Main tone", layers: source.layers, masterGain: source.masterGain, master: source.master)
@@ -368,7 +368,7 @@ public enum AutoArranger {
             let volume = quiet ? 0.45 : (level3 == .powerful ? 0.85 : section.type == .chorus ? 0.8 : 0.72)
             var lead = Layer(patchId: best.patchId, volume: volume, octave: leadOctave,
                              keyRange: rightRange, role: isInstrumental ? .motif : (fromVocals ? .vocalMelody : .lead))
-            let heard = evidence.instruments.filter { $0.key != "voice" }.max { $0.value < $1.value }
+            let heard = evidence.instruments.filter { $0.key != "voice" }.max { ($0.value, $1.key) < ($1.value, $0.key) }
             // The song's own lead instrument, measured (Tone match), wins over the rules.
             if let m = song.partMatches?["lead"] ?? song.partMatches?["other"], m.similarity >= PartMatcher.trusted, let patch = available[m.patchId] {
                 lead.patchId = m.patchId

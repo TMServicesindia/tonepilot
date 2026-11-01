@@ -165,7 +165,9 @@ public enum ArpeggioLearner {
             let v = votes[s]
             let total = v.values.reduce(0, +)
             let degree: ArpeggioPattern.Degree
-            if let best = v.max(by: { $0.value < $1.value }), total > 0 {
+            // Ties broken by a fixed degree order (a Dictionary's order changes per run).
+            let order = ArpeggioPattern.Degree.allCases
+            if let best = v.max(by: { ($0.value, order.firstIndex(of: $1.key)!) < ($1.value, order.firstIndex(of: $0.key)!) }), total > 0 {
                 degree = best.key
                 shareSum += Double(best.value) / Double(total) * Double(total)
                 shareCount += Double(total)

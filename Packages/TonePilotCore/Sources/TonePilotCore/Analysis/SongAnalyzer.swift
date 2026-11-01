@@ -217,7 +217,10 @@ public enum SongAnalyzer {
         let present = weights.filter { stems[$0.key] != nil }
         guard !present.isEmpty, let rate = stems[present.keys.first!]?.sampleRate else { return nil }
         var out = [Float](repeating: 0, count: length)
-        for (kind, w) in present {
+        // Fixed order: a Dictionary's order changes per run, and summing in a different order
+        // changed borderline results (e.g. a learned arpeggio degree) from run to run.
+        for kind in StemInfo.Kind.allCases {
+            guard let w = present[kind] else { continue }
             let x = stems[kind]!.samples
             for i in 0..<min(length, x.count) { out[i] += x[i] * w }
         }

@@ -1,0 +1,1873 @@
+{
+  "accompaniment" : {
+    "backingTrack" : false,
+    "backingTrackLevel" : 0.8,
+    "bass" : false,
+    "bassLevel" : 0.7,
+    "drumLevel" : 0.6,
+    "drums" : false,
+    "drumStyle" : "basic",
+    "guideLevel" : 0.6,
+    "melodyGuide" : false,
+    "metronome" : false,
+    "metronomeLevel" : 0.5
+  },
+  "analysisStatus" : "completed",
+  "arpeggio" : {
+    "bpm" : 117.5,
+    "patterns" : {
+      "uuid:1" : {
+        "bars" : 12,
+        "beatsPerBar" : 4,
+        "centerNote" : 67,
+        "hits" : [
+          {
+            "degree" : "third",
+            "length" : 4,
+            "step" : 0,
+            "velocity" : 1
+          },
+          {
+            "degree" : "fifth",
+            "length" : 4,
+            "step" : 4,
+            "velocity" : 0.86
+          },
+          {
+            "degree" : "fifth",
+            "length" : 4,
+            "step" : 8,
+            "velocity" : 0.86
+          },
+          {
+            "degree" : "fifth",
+            "length" : 4,
+            "step" : 12,
+            "velocity" : 0.85
+          }
+        ],
+        "positionMatch" : 0.59,
+        "stepsPerBeat" : 4,
+        "sustained" : false,
+        "timingMatch" : 0.85,
+        "userEdited" : false
+      },
+      "uuid:2" : {
+        "bars" : 4,
+        "beatsPerBar" : 4,
+        "centerNote" : 65,
+        "hits" : [
+          {
+            "degree" : "third",
+            "length" : 1,
+            "step" : 0,
+            "velocity" : 1
+          },
+          {
+            "degree" : "third",
+            "length" : 1,
+            "step" : 1,
+            "velocity" : 0.8
+          },
+          {
+            "degree" : "highThird",
+            "length" : 1,
+            "step" : 2,
+            "velocity" : 0.85
+          },
+          {
+            "degree" : "fifth",
+            "length" : 1,
+            "step" : 3,
+            "velocity" : 0.77
+          },
+          {
+            "degree" : "third",
+            "length" : 1,
+            "step" : 4,
+            "velocity" : 0.79
+          },
+          {
+            "degree" : "fifth",
+            "length" : 1,
+            "step" : 5,
+            "velocity" : 0.89
+          },
+          {
+            "degree" : "octave",
+            "length" : 1,
+            "step" : 6,
+            "velocity" : 0.8
+          },
+          {
+            "degree" : "fifth",
+            "length" : 1,
+            "step" : 7,
+            "velocity" : 0.8
+          },
+          {
+            "degree" : "root",
+            "length" : 1,
+            "step" : 8,
+            "velocity" : 0.87
+          },
+          {
+            "degree" : "highThird",
+            "length" : 1,
+            "step" : 9,
+            "velocity" : 0.78
+          },
+          {
+            "degree" : "third",
+            "length" : 1,
+            "step" : 10,
+            "velocity" : 0.82
+          },
+          {
+            "degree" : "third",
+            "length" : 1,
+            "step" : 11,
+            "velocity" : 0.87
+          },
+          {
+            "degree" : "root",
+            "length" : 1,
+            "step" : 12,
+            "velocity" : 0.81
+          },
+          {
+            "degree" : "fifth",
+            "length" : 1,
+            "step" : 13,
+            "velocity" : 0.86
+          },
+          {
+            "degree" : "fifth",
+            "length" : 1,
+            "step" : 14,
+            "velocity" : 0.92
+          },
+          {
+            "degree" : "root",
+            "length" : 1,
+            "step" : 15,
+            "velocity" : 0.85
+          }
+        ],
+        "positionMatch" : 0.69,
+        "stepsPerBeat" : 4,
+        "sustained" : false,
+        "timingMatch" : 0.73,
+        "userEdited" : false
+      }
+    },
+    "version" : 1
+  },
+  "arrangements" : [
+    {
+      "id" : "uuid:3",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:4",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "vocalMelody",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.72
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:5",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:6",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0.15,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.35
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:7",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "bass",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.45
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 0,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 1,
+        "reverbSize" : 0.75
+      },
+      "masterGain" : 0.8,
+      "name" : "Main tone",
+      "rationale" : "AI main tone from Intro: Right hand: Trumpet — a bright brass melody; heard: brass 60%; intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (90%). Bass doubles your left-hand root an octave down: strong low end in this section. Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "id" : "uuid:8",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:4",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "vocalMelody",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.72
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:5",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:6",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0.15,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.35
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:7",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "bass",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.45
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 0,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 1,
+        "reverbSize" : 0.75
+      },
+      "masterGain" : 0.8,
+      "name" : "Intro (AI)",
+      "origin" : "aiOriginal",
+      "rationale" : "Right hand: Trumpet — a bright brass melody; heard: brass 60%; intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (90%). Bass doubles your left-hand root an octave down: strong low end in this section. Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "derivedFrom" : "uuid:8",
+      "id" : "uuid:9",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:4",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "vocalMelody",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.72
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:5",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:6",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0.15,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.35
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:7",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "bass",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.45
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 0,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 1,
+        "reverbSize" : 0.75
+      },
+      "masterGain" : 0.8,
+      "name" : "Intro (My Version)",
+      "origin" : "myVersion",
+      "rationale" : "Right hand: Trumpet — a bright brass melody; heard: brass 60%; intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (90%). Bass doubles your left-hand root an octave down: strong low end in this section. Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "id" : "uuid:10",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:11",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "vocalMelody",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.7791666666666667
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:12",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:13",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0.15,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.32083333333333336
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:14",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "bass",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.5
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 2,
+          "lowDB" : 1,
+          "midDB" : 1,
+          "midFrequency" : 2000
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 0.55,
+        "reverbSize" : 0.6
+      },
+      "masterGain" : 0.8,
+      "name" : "Interlude (AI)",
+      "origin" : "aiOriginal",
+      "rationale" : "Right hand: Trumpet — a bright brass melody; heard: brass 60%; intensity powerful. Left hand: powerful section with brass — the left hand plays brass stabs. Strings under the right hand: a sustained bed is present (91%). Sub synth bass under your left-hand root: heavy low end in a powerful section. Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "derivedFrom" : "uuid:10",
+      "id" : "uuid:15",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:11",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "vocalMelody",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.7791666666666667
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:12",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:13",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 65
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0.15,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.32083333333333336
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:14",
+          "keyRange" : {
+            "high" : 64,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "bass",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.5
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 2,
+          "lowDB" : 1,
+          "midDB" : 1,
+          "midFrequency" : 2000
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 0.55,
+        "reverbSize" : 0.6
+      },
+      "masterGain" : 0.8,
+      "name" : "Interlude (My Version)",
+      "origin" : "myVersion",
+      "rationale" : "Right hand: Trumpet — a bright brass melody; heard: brass 60%; intensity powerful. Left hand: powerful section with brass — the left hand plays brass stabs. Strings under the right hand: a sustained bed is present (91%). Sub synth bass under your left-hand root: heavy low end in a powerful section. Closest available sounds — approximations, not the original studio instruments."
+    }
+  ],
+  "beatTimes" : [
+    0,
+    0.46439909297052157,
+    0.9752380952380952,
+    1.486077097505669,
+    1.9736961451247166,
+    2.48453514739229,
+    2.972154195011338,
+    3.4829931972789114,
+    3.9706122448979593,
+    4.481451247165533,
+    4.96907029478458,
+    5.479909297052155,
+    5.9675283446712015,
+    6.478367346938776,
+    6.965986394557823,
+    7.476825396825397,
+    7.964444444444444,
+    8.475283446712018,
+    8.986122448979591,
+    9.47374149659864,
+    9.984580498866213,
+    10.47219954648526,
+    10.983038548752834,
+    11.470657596371883,
+    11.981496598639456,
+    12.469115646258503,
+    12.979954648526077,
+    13.467573696145125,
+    13.978412698412699,
+    14.466031746031746,
+    14.97687074829932,
+    15.464489795918368,
+    15.975328798185942,
+    16.486167800453515,
+    16.973786848072564,
+    17.484625850340137,
+    17.972244897959182,
+    18.483083900226756,
+    18.970702947845805,
+    19.481541950113378,
+    19.969160997732427,
+    20.48,
+    20.96761904761905,
+    21.478458049886623,
+    21.966077097505668,
+    22.47691609977324,
+    22.96453514739229,
+    23.475374149659864,
+    23.986213151927437,
+    24.473832199546486,
+    24.98467120181406,
+    25.472290249433108,
+    25.98312925170068,
+    26.470748299319727,
+    26.9815873015873,
+    27.46920634920635,
+    27.980045351473922,
+    28.46766439909297,
+    28.978503401360545,
+    29.466122448979593,
+    29.976961451247167,
+    30.464580498866212,
+    30.975419501133786,
+    31.48625850340136,
+    31.997097505668933
+  ],
+  "bpm" : {
+    "confidence" : 0.9023980759788807,
+    "provenance" : "algorithm",
+    "value" : 119.5
+  },
+  "chordEvents" : [
+    {
+      "alternatives" : [
+        "Em"
+      ],
+      "confidence" : 0.7952886819839478,
+      "duration" : 1.9736961451247166,
+      "symbol" : "C",
+      "time" : 0
+    },
+    {
+      "confidence" : 0.8634275197982788,
+      "duration" : 1.9969160997732427,
+      "symbol" : "F",
+      "time" : 1.9736961451247166
+    },
+    {
+      "confidence" : 0.9224111437797546,
+      "duration" : 1.9969160997732422,
+      "symbol" : "G",
+      "time" : 3.9706122448979593
+    },
+    {
+      "alternatives" : [
+        "Em"
+      ],
+      "confidence" : 0.7656574249267578,
+      "duration" : 4.017052154195012,
+      "symbol" : "C",
+      "time" : 5.9675283446712015
+    },
+    {
+      "alternatives" : [
+        "F"
+      ],
+      "confidence" : 0.8701252937316895,
+      "duration" : 1.9969160997732427,
+      "symbol" : "Dm",
+      "time" : 9.984580498866213
+    },
+    {
+      "alternatives" : [
+        "G"
+      ],
+      "confidence" : 0.713772177696228,
+      "duration" : 1.9969160997732427,
+      "symbol" : "Em",
+      "time" : 11.981496598639456
+    },
+    {
+      "alternatives" : [
+        "Em"
+      ],
+      "confidence" : 0.7716060876846313,
+      "duration" : 3.9938321995464836,
+      "symbol" : "C",
+      "time" : 13.978412698412699
+    },
+    {
+      "confidence" : 0.8617304563522339,
+      "duration" : 1.9969160997732445,
+      "symbol" : "F",
+      "time" : 17.972244897959182
+    },
+    {
+      "confidence" : 0.9226986765861511,
+      "duration" : 1.996916099773241,
+      "symbol" : "G",
+      "time" : 19.969160997732427
+    },
+    {
+      "alternatives" : [
+        "Em"
+      ],
+      "confidence" : 0.7634144425392151,
+      "duration" : 4.017052154195014,
+      "symbol" : "C",
+      "time" : 21.966077097505668
+    },
+    {
+      "alternatives" : [
+        "F"
+      ],
+      "confidence" : 0.8706691861152649,
+      "duration" : 1.996916099773241,
+      "symbol" : "Dm",
+      "time" : 25.98312925170068
+    },
+    {
+      "alternatives" : [
+        "G"
+      ],
+      "confidence" : 0.7144128084182739,
+      "duration" : 1.9969160997732445,
+      "symbol" : "Em",
+      "time" : 27.980045351473922
+    },
+    {
+      "alternatives" : [
+        "Am"
+      ],
+      "confidence" : 0.7410122752189636,
+      "duration" : 2.0201360544217657,
+      "symbol" : "C",
+      "time" : 29.976961451247167
+    },
+    {
+      "confidence" : 1,
+      "duration" : 0.0029024943310673734,
+      "symbol" : "N",
+      "time" : 31.997097505668933
+    }
+  ],
+  "chordGuide" : [
+    {
+      "alternatives" : [
+        "Em"
+      ],
+      "chord" : "C",
+      "confidence" : 0.7952886819839478,
+      "duration" : 1.9736961451247166,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 0,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "F",
+      "confidence" : 0.8634275197982788,
+      "duration" : 1.9969160997732427,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        41,
+        48,
+        53
+      ],
+      "time" : 1.9736961451247166,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "G",
+      "confidence" : 0.9224111437797546,
+      "duration" : 1.9969160997732422,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        43,
+        50,
+        55
+      ],
+      "time" : 3.9706122448979593,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+        "Em"
+      ],
+      "chord" : "C",
+      "confidence" : 0.7656574249267578,
+      "duration" : 4.017052154195012,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 5.9675283446712015,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+        "F"
+      ],
+      "chord" : "Dm",
+      "confidence" : 0.8701252937316895,
+      "duration" : 1.9969160997732427,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        38,
+        45,
+        50
+      ],
+      "time" : 9.984580498866213,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+        "G"
+      ],
+      "chord" : "Em",
+      "confidence" : 0.713772177696228,
+      "duration" : 1.9969160997732427,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        40,
+        47,
+        52
+      ],
+      "time" : 11.981496598639456,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+        "Em"
+      ],
+      "chord" : "C",
+      "confidence" : 0.7716060876846313,
+      "duration" : 3.9938321995464836,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 13.978412698412699,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "F",
+      "confidence" : 0.8617304563522339,
+      "duration" : 1.9969160997732445,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        41,
+        48,
+        53
+      ],
+      "time" : 17.972244897959182,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "G",
+      "confidence" : 0.9226986765861511,
+      "duration" : 1.996916099773241,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        43,
+        50,
+        55
+      ],
+      "time" : 19.969160997732427,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+        "Em"
+      ],
+      "chord" : "C",
+      "confidence" : 0.7634144425392151,
+      "duration" : 4.017052154195014,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 21.966077097505668,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+        "F"
+      ],
+      "chord" : "Dm",
+      "confidence" : 0.8706691861152649,
+      "duration" : 1.996916099773241,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        38,
+        45,
+        50
+      ],
+      "time" : 25.98312925170068,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+        "G"
+      ],
+      "chord" : "Em",
+      "confidence" : 0.7144128084182739,
+      "duration" : 1.9969160997732445,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        40,
+        47,
+        52
+      ],
+      "time" : 27.980045351473922,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+        "Am"
+      ],
+      "chord" : "C",
+      "confidence" : 0.7410122752189636,
+      "duration" : 2.0201360544217657,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 29.976961451247167,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "C drone (Sa–Pa)",
+      "confidence" : 1,
+      "duration" : 0.0029024943310673734,
+      "id" : "uuid:?",
+      "isDrone" : true,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 31.997097505668933,
+      "userEdited" : false
+    }
+  ],
+  "duration" : 32,
+  "id" : "uuid:0",
+  "insights" : {
+    "bassLine" : [
+      {
+        "confidence" : 0.9050887193803482,
+        "duration" : 1.9736961451247166,
+        "midi" : 35,
+        "time" : 0
+      },
+      {
+        "confidence" : 0.868332711529372,
+        "duration" : 1.9969160997732427,
+        "midi" : 40,
+        "time" : 1.9736961451247166
+      },
+      {
+        "confidence" : 0.9375714234428123,
+        "duration" : 1.9969160997732422,
+        "midi" : 43,
+        "time" : 3.9706122448979593
+      },
+      {
+        "confidence" : 0.905088715222483,
+        "duration" : 1.9969160997732427,
+        "midi" : 35,
+        "time" : 5.9675283446712015
+      },
+      {
+        "confidence" : 0.9004446120940831,
+        "duration" : 2.0201360544217692,
+        "midi" : 32,
+        "time" : 7.964444444444444
+      },
+      {
+        "confidence" : 0.8916303025081274,
+        "duration" : 1.9969160997732427,
+        "midi" : 37,
+        "time" : 9.984580498866213
+      },
+      {
+        "confidence" : 0.8710865539083326,
+        "duration" : 1.9969160997732427,
+        "midi" : 40,
+        "time" : 11.981496598639456
+      },
+      {
+        "confidence" : 0.9004446657527589,
+        "duration" : 1.9969160997732427,
+        "midi" : 32,
+        "time" : 13.978412698412699
+      },
+      {
+        "confidence" : 0.9050886722086224,
+        "duration" : 1.996916099773241,
+        "midi" : 35,
+        "time" : 15.975328798185942
+      },
+      {
+        "confidence" : 0.8683332977328043,
+        "duration" : 1.9969160997732445,
+        "midi" : 40,
+        "time" : 17.972244897959182
+      },
+      {
+        "confidence" : 0.9375714150199868,
+        "duration" : 1.996916099773241,
+        "midi" : 43,
+        "time" : 19.969160997732427
+      },
+      {
+        "confidence" : 0.9050886301725818,
+        "duration" : 2.0201360544217692,
+        "midi" : 35,
+        "time" : 21.966077097505668
+      },
+      {
+        "confidence" : 0.900444532181567,
+        "duration" : 1.9969160997732445,
+        "midi" : 32,
+        "time" : 23.986213151927437
+      },
+      {
+        "confidence" : 0.8916304451662785,
+        "duration" : 1.996916099773241,
+        "midi" : 37,
+        "time" : 25.98312925170068
+      },
+      {
+        "confidence" : 0.8710866039194699,
+        "duration" : 1.9969160997732445,
+        "midi" : 40,
+        "time" : 27.980045351473922
+      },
+      {
+        "confidence" : 0.9004446451903784,
+        "duration" : 2.023038548752833,
+        "midi" : 32,
+        "time" : 29.976961451247167
+      }
+    ],
+    "gaps" : [
+
+    ],
+    "rhythmicFeel" : "Straight feel · sparse, on the beat",
+    "scaleNotes" : [
+      7,
+      4,
+      5
+    ],
+    "style" : [
+      "Up-tempo (120 BPM)",
+      "High-energy, percussion-driven (mass \/ dance feel)",
+      "Sustained strings\/pad bed",
+      "Strong lead melody",
+      "Heavy low end"
+    ]
+  },
+  "isFavorite" : false,
+  "key" : {
+    "confidence" : 0.3352853575801747,
+    "provenance" : "algorithm",
+    "value" : {
+      "mode" : "major",
+      "tonic" : 0
+    }
+  },
+  "melody" : {
+    "difficultPhrases" : [
+
+    ],
+    "notes" : [
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:16",
+        "isOrnamented" : false,
+        "midi" : 72,
+        "start" : 0,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:17",
+        "isOrnamented" : false,
+        "midi" : 79,
+        "start" : 1,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:18",
+        "isOrnamented" : false,
+        "midi" : 81,
+        "start" : 2,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:19",
+        "isOrnamented" : false,
+        "midi" : 77,
+        "start" : 3,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:20",
+        "isOrnamented" : false,
+        "midi" : 86,
+        "start" : 4,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:21",
+        "isOrnamented" : false,
+        "midi" : 83,
+        "start" : 5,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:22",
+        "isOrnamented" : false,
+        "midi" : 72,
+        "start" : 6,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:23",
+        "isOrnamented" : false,
+        "midi" : 79,
+        "start" : 7,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:24",
+        "isOrnamented" : false,
+        "midi" : 69,
+        "start" : 8,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:25",
+        "isOrnamented" : false,
+        "midi" : 76,
+        "start" : 9,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:26",
+        "isOrnamented" : false,
+        "midi" : 77,
+        "start" : 10,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:27",
+        "isOrnamented" : false,
+        "midi" : 74,
+        "start" : 11,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:28",
+        "isOrnamented" : false,
+        "midi" : 83,
+        "start" : 12,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:29",
+        "isOrnamented" : false,
+        "midi" : 79,
+        "start" : 13,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:30",
+        "isOrnamented" : false,
+        "midi" : 69,
+        "start" : 14,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:31",
+        "isOrnamented" : false,
+        "midi" : 76,
+        "start" : 15,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:32",
+        "isOrnamented" : false,
+        "midi" : 72,
+        "start" : 16,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:33",
+        "isOrnamented" : false,
+        "midi" : 79,
+        "start" : 17,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:34",
+        "isOrnamented" : false,
+        "midi" : 81,
+        "start" : 18,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:35",
+        "isOrnamented" : false,
+        "midi" : 77,
+        "start" : 19,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:36",
+        "isOrnamented" : false,
+        "midi" : 86,
+        "start" : 20,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:37",
+        "isOrnamented" : false,
+        "midi" : 83,
+        "start" : 21,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:38",
+        "isOrnamented" : false,
+        "midi" : 72,
+        "start" : 22,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:39",
+        "isOrnamented" : false,
+        "midi" : 79,
+        "start" : 23,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:40",
+        "isOrnamented" : false,
+        "midi" : 69,
+        "start" : 24,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:41",
+        "isOrnamented" : false,
+        "midi" : 76,
+        "start" : 25,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:42",
+        "isOrnamented" : false,
+        "midi" : 77,
+        "start" : 26,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:43",
+        "isOrnamented" : false,
+        "midi" : 74,
+        "start" : 27,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:44",
+        "isOrnamented" : false,
+        "midi" : 83,
+        "start" : 28,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:45",
+        "isOrnamented" : false,
+        "midi" : 79,
+        "start" : 29,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:46",
+        "isOrnamented" : false,
+        "midi" : 69,
+        "start" : 30,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.9,
+        "duration" : 0.9,
+        "id" : "uuid:47",
+        "isOrnamented" : false,
+        "midi" : 76,
+        "start" : 31,
+        "userEdited" : false
+      }
+    ],
+    "source" : "vocalStem",
+    "voicedRatio" : 0.8
+  },
+  "partMatches" : {
+    "other" : {
+      "eq" : {
+        "highDB" : 5,
+        "lowDB" : -9,
+        "midDB" : 9,
+        "midFrequency" : 252
+      },
+      "name" : "Classic Synth Brass",
+      "part" : "other",
+      "patchId" : "uuid:?",
+      "reverbMix" : 46.63146891019393,
+      "section" : "Intro",
+      "similarity" : 0.10063470363873392
+    }
+  },
+  "sections" : [
+    {
+      "activity" : [
+        {
+          "evidence" : "Vocal stem level 100% of its loudest section",
+          "level" : 1,
+          "role" : "vocalMelody",
+          "source" : "stems"
+        },
+        {
+          "evidence" : "A continuous lead line around F#5 is present 90% of the time",
+          "level" : 1,
+          "role" : "vocalMelody",
+          "source" : "stems"
+        },
+        {
+          "evidence" : "Bass stem level 100%",
+          "level" : 1,
+          "role" : "bass",
+          "source" : "stems"
+        },
+        {
+          "evidence" : "Drum stem level 100%",
+          "level" : 1,
+          "role" : "percussion",
+          "source" : "stems"
+        },
+        {
+          "evidence" : "Steady sustained energy (sustain 90%) — strings or pad bed",
+          "level" : 0.9040541051548886,
+          "role" : "pad",
+          "source" : "mixFeatures"
+        }
+      ],
+      "arrangementId" : "uuid:9",
+      "confidence" : 0.5,
+      "endTime" : 23.986213151927437,
+      "id" : "uuid:1",
+      "instruments" : {
+        "brass" : 0.6,
+        "strings" : 0.3,
+        "voice" : 0.8
+      },
+      "label" : "Intro",
+      "provenance" : "algorithm",
+      "repetitionGroup" : "A",
+      "startTime" : 0,
+      "timbre" : {
+        "centroid" : 445.8729553222656,
+        "highEnergyShare" : 0.016972295870665597,
+        "loudness" : 4.996546745300293,
+        "lowEnergyShare" : 0.4949781417193634,
+        "onsetRate" : 1.9594589484511133,
+        "sustain" : 0.8957917094230652
+      },
+      "type" : "intro"
+    },
+    {
+      "activity" : [
+        {
+          "evidence" : "A continuous lead line around D#5 is present 90% of the time",
+          "level" : 1,
+          "role" : "vocalMelody",
+          "source" : "stems"
+        },
+        {
+          "evidence" : "Vocal stem level 100% of its loudest section",
+          "level" : 0.9999148013459315,
+          "role" : "vocalMelody",
+          "source" : "stems"
+        },
+        {
+          "evidence" : "Bass stem level 100%",
+          "level" : 0.9997054597023232,
+          "role" : "bass",
+          "source" : "stems"
+        },
+        {
+          "evidence" : "Drum stem level 99%",
+          "level" : 0.9905969675112533,
+          "role" : "percussion",
+          "source" : "stems"
+        },
+        {
+          "evidence" : "Steady sustained energy (sustain 100%) — strings or pad bed",
+          "level" : 0.9127547554347826,
+          "role" : "pad",
+          "source" : "mixFeatures"
+        }
+      ],
+      "arrangementId" : "uuid:15",
+      "confidence" : 0.2031790018081665,
+      "endTime" : 32,
+      "id" : "uuid:2",
+      "instruments" : {
+        "brass" : 0.6,
+        "strings" : 0.3,
+        "voice" : 0.8
+      },
+      "label" : "Interlude",
+      "provenance" : "algorithm",
+      "repetitionGroup" : "B",
+      "startTime" : 23.986213151927437,
+      "timbre" : {
+        "centroid" : 401.8929748535156,
+        "highEnergyShare" : 0.015539509711282333,
+        "loudness" : 5.151968955993652,
+        "lowEnergyShare" : 0.4937454599236338,
+        "onsetRate" : 1.8724524456521738,
+        "sustain" : 0.9999430775642395
+      },
+      "type" : "interlude"
+    }
+  ],
+  "sourceType" : "importedFile",
+  "stems" : [
+    {
+      "fileName" : "vocals.m4a",
+      "kind" : "vocals",
+      "model" : "htdemucs"
+    },
+    {
+      "fileName" : "other.m4a",
+      "kind" : "other",
+      "model" : "htdemucs"
+    }
+  ],
+  "switching" : {
+    "leadTime" : 0.25,
+    "mode" : "assisted",
+    "reference" : "backingTrack"
+  },
+  "tags" : [
+
+  ],
+  "timeSignature" : {
+    "confidence" : 0.44073776058947006,
+    "provenance" : "algorithm",
+    "value" : 4
+  },
+  "title" : "Fixture",
+  "toneSuggestions" : [
+    {
+      "confidence" : 0.8965878263156616,
+      "family" : "brass",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a bright brass melody.",
+      "sectionId" : "uuid:1"
+    },
+    {
+      "confidence" : 0.7529911588237935,
+      "family" : "brass",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: punchy synth-brass phrases.",
+      "sectionId" : "uuid:1"
+    },
+    {
+      "confidence" : 0.7466437841352632,
+      "family" : "brass",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a broad, cinematic horn melody.",
+      "sectionId" : "uuid:1"
+    },
+    {
+      "confidence" : 0.9675940666727217,
+      "family" : "brass",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a broad, cinematic horn melody.",
+      "sectionId" : "uuid:2"
+    },
+    {
+      "confidence" : 0.9414897105270248,
+      "family" : "brass",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a loud, punchy line — a mass song's brass lead.",
+      "sectionId" : "uuid:2"
+    },
+    {
+      "confidence" : 0.9367614199010001,
+      "family" : "brass",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: punchy synth-brass phrases.",
+      "sectionId" : "uuid:2"
+    }
+  ],
+  "userConfirmedRights" : true
+}

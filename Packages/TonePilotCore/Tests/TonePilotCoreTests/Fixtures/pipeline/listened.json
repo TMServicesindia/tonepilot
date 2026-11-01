@@ -1,0 +1,2016 @@
+{
+  "accompaniment" : {
+    "backingTrack" : false,
+    "backingTrackLevel" : 0.8,
+    "bass" : false,
+    "bassLevel" : 0.7,
+    "drumLevel" : 0.6,
+    "drums" : false,
+    "drumStyle" : "basic",
+    "guideLevel" : 0.6,
+    "melodyGuide" : false,
+    "metronome" : false,
+    "metronomeLevel" : 0.5
+  },
+  "analysisStatus" : "completed",
+  "arrangements" : [
+    {
+      "id" : "uuid:5",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:6",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "motif",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.8
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:7",
+          "keyRange" : {
+            "high" : 55,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "harmony",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 1.5,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 0.8,
+        "reverbSize" : 0.6
+      },
+      "masterGain" : 0.85,
+      "name" : "Main tone",
+      "rationale" : "AI main tone from Chorus \/ Hook 2: Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: articulated accompaniment — piano keeps Root–Fifth–Root patterns clear. Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "id" : "uuid:8",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:6",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "motif",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.8
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:7",
+          "keyRange" : {
+            "high" : 55,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "harmony",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 1.5,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 0.8,
+        "reverbSize" : 0.6
+      },
+      "masterGain" : 0.85,
+      "name" : "Chorus \/ Hook 1 (AI)",
+      "origin" : "aiOriginal",
+      "rationale" : "Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: articulated accompaniment — piano keeps Root–Fifth–Root patterns clear. Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "derivedFrom" : "uuid:8",
+      "id" : "uuid:9",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:6",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "motif",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.8
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:7",
+          "keyRange" : {
+            "high" : 55,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "harmony",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 1.5,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 0.8,
+        "reverbSize" : 0.6
+      },
+      "masterGain" : 0.85,
+      "name" : "Chorus \/ Hook 1 (My Version)",
+      "origin" : "myVersion",
+      "rationale" : "Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: articulated accompaniment — piano keeps Root–Fifth–Root patterns clear. Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "id" : "uuid:10",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:11",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "motif",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.72
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:12",
+          "keyRange" : {
+            "high" : 55,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:13",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0.15,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.35
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.7,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 0,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 0.95,
+        "reverbSize" : 0.6
+      },
+      "masterGain" : 0.8,
+      "name" : "Interlude (AI)",
+      "origin" : "aiOriginal",
+      "rationale" : "Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (100%). Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "derivedFrom" : "uuid:10",
+      "id" : "uuid:14",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:11",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "motif",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.72
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:12",
+          "keyRange" : {
+            "high" : 55,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:13",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0.15,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.35
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.7,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 0,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 0.95,
+        "reverbSize" : 0.6
+      },
+      "masterGain" : 0.8,
+      "name" : "Interlude (My Version)",
+      "origin" : "myVersion",
+      "rationale" : "Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (100%). Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "id" : "uuid:15",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:16",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "motif",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.72
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:17",
+          "keyRange" : {
+            "high" : 55,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:18",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0.15,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.35
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 0,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 1,
+        "reverbSize" : 0.75
+      },
+      "masterGain" : 0.8,
+      "name" : "Outro (AI)",
+      "origin" : "aiOriginal",
+      "rationale" : "Right hand: Harmonium-like Reed — a sustained sung melody with a warm, reedy Indian colour (instrumental motif); intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (100%). Closest available sounds — approximations, not the original studio instruments."
+    },
+    {
+      "derivedFrom" : "uuid:15",
+      "id" : "uuid:19",
+      "isFavorite" : false,
+      "layers" : [
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:16",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : -1,
+          "pan" : 0,
+          "patchId" : "uuid:?",
+          "role" : "motif",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.72
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:17",
+          "keyRange" : {
+            "high" : 55,
+            "low" : 24
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : -0.1,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.6
+        },
+        {
+          "enabled" : true,
+          "fineTuneCents" : 0,
+          "id" : "uuid:18",
+          "keyRange" : {
+            "high" : 127,
+            "low" : 56
+          },
+          "muted" : false,
+          "octave" : 0,
+          "pan" : 0.15,
+          "patchId" : "uuid:?",
+          "role" : "pad",
+          "solo" : false,
+          "transpose" : 0,
+          "velocityRange" : {
+            "high" : 127,
+            "low" : 1
+          },
+          "volume" : 0.35
+        }
+      ],
+      "master" : {
+        "chorusLevel" : 0.7,
+        "delayFeedback" : 0.3,
+        "delayLevel" : 0.6,
+        "delayTime" : 0.35,
+        "eq" : {
+          "highDB" : 0,
+          "lowDB" : 0,
+          "midDB" : 0,
+          "midFrequency" : 1200
+        },
+        "reverbDamping" : 0.5,
+        "reverbLevel" : 1,
+        "reverbSize" : 0.75
+      },
+      "masterGain" : 0.8,
+      "name" : "Outro (My Version)",
+      "origin" : "myVersion",
+      "rationale" : "Right hand: Harmonium-like Reed — a sustained sung melody with a warm, reedy Indian colour (instrumental motif); intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (100%). Closest available sounds — approximations, not the original studio instruments."
+    }
+  ],
+  "beatTimes" : [
+    0,
+    0.4876190476190476,
+    0.9752380952380952,
+    1.486077097505669,
+    1.9736961451247166,
+    2.48453514739229,
+    2.972154195011338,
+    3.4829931972789114,
+    3.9706122448979593,
+    4.481451247165533,
+    4.96907029478458,
+    5.479909297052155,
+    5.9675283446712015,
+    6.478367346938776,
+    6.965986394557823,
+    7.476825396825397,
+    7.987664399092971,
+    8.475283446712018,
+    8.986122448979591,
+    9.47374149659864,
+    9.984580498866213,
+    10.47219954648526,
+    10.983038548752834,
+    11.470657596371883,
+    11.981496598639456,
+    12.469115646258503,
+    12.979954648526077,
+    13.467573696145125,
+    13.978412698412699,
+    14.466031746031746,
+    14.97687074829932,
+    15.487709750566893,
+    15.975328798185942,
+    16.486167800453515,
+    16.99700680272109,
+    17.507845804988662,
+    17.99546485260771,
+    18.506303854875284,
+    18.99392290249433,
+    19.481541950113378,
+    19.99238095238095,
+    20.503219954648525,
+    20.990839002267574,
+    21.478458049886623,
+    21.966077097505668,
+    22.47691609977324,
+    22.987755102040815,
+    23.475374149659864,
+    23.986213151927437,
+    24.473832199546486,
+    24.961451247165535,
+    25.44907029478458,
+    25.959909297052153,
+    26.470748299319727,
+    26.958367346938775,
+    27.46920634920635,
+    27.980045351473922,
+    28.46766439909297,
+    28.978503401360545,
+    29.466122448979593,
+    29.976961451247167,
+    30.464580498866212,
+    30.95219954648526,
+    31.463038548752834,
+    31.973877551020408,
+    32.48471655328798,
+    32.97233560090703,
+    33.483174603174604,
+    33.97079365079365,
+    34.481632653061226,
+    34.969251700680275,
+    35.48009070294785,
+    35.9677097505669,
+    36.47854875283447,
+    36.96616780045351,
+    37.477006802721085,
+    37.98784580498866,
+    38.47546485260771,
+    38.98630385487528,
+    39.47392290249433,
+    39.9847619047619,
+    40.47238095238095,
+    40.983219954648526,
+    41.470839002267574,
+    41.98167800453515,
+    42.4692970521542,
+    42.98013605442177,
+    43.46775510204082,
+    43.97859410430839,
+    44.46621315192744,
+    44.977052154195015,
+    45.48789115646259,
+    45.97551020408163,
+    46.4863492063492,
+    46.97396825396825,
+    47.484807256235825,
+    47.972426303854874,
+    48.48326530612245,
+    48.99410430839002,
+    49.48172335600907,
+    49.96934240362812,
+    50.48018140589569,
+    50.991020408163266,
+    51.478639455782314,
+    51.98947845804989,
+    52.47709750566894,
+    52.964716553287985,
+    53.47555555555556,
+    53.9631746031746,
+    54.474013605442174,
+    54.96163265306122,
+    55.472471655328796,
+    55.98331065759637,
+    56.47092970521542,
+    56.95854875283447,
+    57.446167800453516,
+    57.933786848072565,
+    58.44462585034014,
+    58.95546485260771,
+    59.466303854875285,
+    59.97714285714286,
+    60.46476190476191,
+    60.95238095238095,
+    61.46321995464853,
+    61.9740589569161,
+    62.48489795918368,
+    62.99573696145125,
+    63.48335600907029,
+    63.97097505668934
+  ],
+  "bpm" : {
+    "confidence" : 0.9052917855681626,
+    "provenance" : "algorithm",
+    "value" : 119.5
+  },
+  "chordEvents" : [
+    {
+      "confidence" : 0.9564067721366882,
+      "duration" : 3.9706122448979593,
+      "symbol" : "C",
+      "time" : 0
+    },
+    {
+      "confidence" : 0.9853317141532898,
+      "duration" : 4.017052154195012,
+      "symbol" : "F",
+      "time" : 3.9706122448979593
+    },
+    {
+      "confidence" : 0.9903460144996643,
+      "duration" : 3.9938321995464854,
+      "symbol" : "G",
+      "time" : 7.987664399092971
+    },
+    {
+      "confidence" : 0.9562212228775024,
+      "duration" : 3.9938321995464854,
+      "symbol" : "C",
+      "time" : 11.981496598639456
+    },
+    {
+      "confidence" : 0.920404314994812,
+      "duration" : 4.01705215419501,
+      "symbol" : "Am",
+      "time" : 15.975328798185942
+    },
+    {
+      "confidence" : 0.9742281436920166,
+      "duration" : 3.9938321995464854,
+      "symbol" : "Dm",
+      "time" : 19.99238095238095
+    },
+    {
+      "confidence" : 0.9804741144180298,
+      "duration" : 3.9938321995464854,
+      "symbol" : "Em",
+      "time" : 23.986213151927437
+    },
+    {
+      "confidence" : 0.9182718992233276,
+      "duration" : 3.9938321995464854,
+      "symbol" : "Am",
+      "time" : 27.980045351473922
+    },
+    {
+      "confidence" : 0.9570403099060059,
+      "duration" : 3.993832199546489,
+      "symbol" : "C",
+      "time" : 31.973877551020408
+    },
+    {
+      "confidence" : 0.9853062033653259,
+      "duration" : 4.017052154195007,
+      "symbol" : "F",
+      "time" : 35.9677097505669
+    },
+    {
+      "confidence" : 0.9903138279914856,
+      "duration" : 3.993832199546489,
+      "symbol" : "G",
+      "time" : 39.9847619047619
+    },
+    {
+      "confidence" : 0.9561830163002014,
+      "duration" : 3.993832199546482,
+      "symbol" : "C",
+      "time" : 43.97859410430839
+    },
+    {
+      "confidence" : 0.9203405976295471,
+      "duration" : 4.017052154195014,
+      "symbol" : "Am",
+      "time" : 47.972426303854874
+    },
+    {
+      "confidence" : 0.9742059111595154,
+      "duration" : 3.993832199546482,
+      "symbol" : "Dm",
+      "time" : 51.98947845804989
+    },
+    {
+      "confidence" : 0.9799364805221558,
+      "duration" : 3.993832199546489,
+      "symbol" : "Em",
+      "time" : 55.98331065759637
+    },
+    {
+      "confidence" : 0.9176211953163147,
+      "duration" : 4.022857142857141,
+      "symbol" : "Am",
+      "time" : 59.97714285714286
+    }
+  ],
+  "chordGuide" : [
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "C",
+      "confidence" : 0.9564067721366882,
+      "duration" : 3.9706122448979593,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 0,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "F",
+      "confidence" : 0.9853317141532898,
+      "duration" : 4.017052154195012,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        41,
+        48,
+        53
+      ],
+      "time" : 3.9706122448979593,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "G",
+      "confidence" : 0.9903460144996643,
+      "duration" : 3.9938321995464854,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        43,
+        50,
+        55
+      ],
+      "time" : 7.987664399092971,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "C",
+      "confidence" : 0.9562212228775024,
+      "duration" : 3.9938321995464854,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 11.981496598639456,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "Am",
+      "confidence" : 0.920404314994812,
+      "duration" : 4.01705215419501,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        45,
+        52,
+        57
+      ],
+      "time" : 15.975328798185942,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "Dm",
+      "confidence" : 0.9742281436920166,
+      "duration" : 3.9938321995464854,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        38,
+        45,
+        50
+      ],
+      "time" : 19.99238095238095,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "Em",
+      "confidence" : 0.9804741144180298,
+      "duration" : 3.9938321995464854,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        40,
+        47,
+        52
+      ],
+      "time" : 23.986213151927437,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "Am",
+      "confidence" : 0.9182718992233276,
+      "duration" : 3.9938321995464854,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        45,
+        52,
+        57
+      ],
+      "time" : 27.980045351473922,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "C",
+      "confidence" : 0.9570403099060059,
+      "duration" : 3.993832199546489,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 31.973877551020408,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "F",
+      "confidence" : 0.9853062033653259,
+      "duration" : 4.017052154195007,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        41,
+        48,
+        53
+      ],
+      "time" : 35.9677097505669,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "G",
+      "confidence" : 0.9903138279914856,
+      "duration" : 3.993832199546489,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        43,
+        50,
+        55
+      ],
+      "time" : 39.9847619047619,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "C",
+      "confidence" : 0.9561830163002014,
+      "duration" : 3.993832199546482,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        36,
+        43,
+        48
+      ],
+      "time" : 43.97859410430839,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "Am",
+      "confidence" : 0.9203405976295471,
+      "duration" : 4.017052154195014,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        45,
+        52,
+        57
+      ],
+      "time" : 47.972426303854874,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "Dm",
+      "confidence" : 0.9742059111595154,
+      "duration" : 3.993832199546482,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        38,
+        45,
+        50
+      ],
+      "time" : 51.98947845804989,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "Em",
+      "confidence" : 0.9799364805221558,
+      "duration" : 3.993832199546489,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        40,
+        47,
+        52
+      ],
+      "time" : 55.98331065759637,
+      "userEdited" : false
+    },
+    {
+      "alternatives" : [
+
+      ],
+      "chord" : "Am",
+      "confidence" : 0.9176211953163147,
+      "duration" : 4.022857142857141,
+      "id" : "uuid:?",
+      "isDrone" : false,
+      "pattern" : [
+        45,
+        52,
+        57
+      ],
+      "time" : 59.97714285714286,
+      "userEdited" : false
+    }
+  ],
+  "duration" : 64,
+  "id" : "uuid:0",
+  "insights" : {
+    "bassLine" : [
+      {
+        "confidence" : 0.8767151031171049,
+        "duration" : 3.9706122448979593,
+        "midi" : 48,
+        "time" : 0
+      },
+      {
+        "confidence" : 0.9042665799208712,
+        "duration" : 4.017052154195012,
+        "midi" : 53,
+        "time" : 3.9706122448979593
+      },
+      {
+        "confidence" : 0.9106199109984341,
+        "duration" : 0.48761904761904695,
+        "midi" : 55,
+        "time" : 7.987664399092971
+      },
+      {
+        "confidence" : 0.9106230497305771,
+        "duration" : 1.5092970521541957,
+        "midi" : 55,
+        "time" : 10.47219954648526
+      },
+      {
+        "confidence" : 0.8766396877224125,
+        "duration" : 3.9938321995464854,
+        "midi" : 48,
+        "time" : 11.981496598639456
+      },
+      {
+        "confidence" : 0.8825296004322926,
+        "duration" : 4.01705215419501,
+        "midi" : 57,
+        "time" : 15.975328798185942
+      },
+      {
+        "confidence" : 0.8828895207956428,
+        "duration" : 3.9938321995464854,
+        "midi" : 50,
+        "time" : 19.99238095238095
+      },
+      {
+        "confidence" : 0.8822439488326156,
+        "duration" : 3.9938321995464854,
+        "midi" : 52,
+        "time" : 23.986213151927437
+      },
+      {
+        "confidence" : 0.8825285911493962,
+        "duration" : 3.9938321995464854,
+        "midi" : 57,
+        "time" : 27.980045351473922
+      },
+      {
+        "confidence" : 0.876606586216689,
+        "duration" : 3.993832199546489,
+        "midi" : 48,
+        "time" : 31.973877551020408
+      },
+      {
+        "confidence" : 0.9042665576520105,
+        "duration" : 4.017052154195007,
+        "midi" : 53,
+        "time" : 35.9677097505669
+      },
+      {
+        "confidence" : 0.9106228409184541,
+        "duration" : 3.50621315192744,
+        "midi" : 55,
+        "time" : 40.47238095238095
+      },
+      {
+        "confidence" : 0.876641162372017,
+        "duration" : 3.993832199546482,
+        "midi" : 48,
+        "time" : 43.97859410430839
+      },
+      {
+        "confidence" : 0.8825286443740951,
+        "duration" : 4.017052154195014,
+        "midi" : 57,
+        "time" : 47.972426303854874
+      },
+      {
+        "confidence" : 0.8828887124405507,
+        "duration" : 3.993832199546482,
+        "midi" : 50,
+        "time" : 51.98947845804989
+      },
+      {
+        "confidence" : 0.8822455622348999,
+        "duration" : 3.993832199546489,
+        "midi" : 52,
+        "time" : 55.98331065759637
+      },
+      {
+        "confidence" : 0.8825308919461763,
+        "duration" : 4.022857142857141,
+        "midi" : 57,
+        "time" : 59.97714285714286
+      }
+    ],
+    "gaps" : [
+
+    ],
+    "rhythmicFeel" : "Straight feel · sparse, on the beat",
+    "scaleNotes" : [
+      4,
+      0,
+      7,
+      11,
+      9,
+      5
+    ],
+    "style" : [
+      "Up-tempo (120 BPM)"
+    ]
+  },
+  "isFavorite" : false,
+  "key" : {
+    "confidence" : 0.34568348197912663,
+    "provenance" : "algorithm",
+    "value" : {
+      "mode" : "major",
+      "tonic" : 0
+    }
+  },
+  "melody" : {
+    "difficultPhrases" : [
+
+    ],
+    "notes" : [
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.6146876037477733,
+        "duration" : 3.877732426303855,
+        "id" : "uuid:20",
+        "isOrnamented" : false,
+        "midi" : 48,
+        "start" : 0,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.6272839561981314,
+        "duration" : 3.947392290249433,
+        "id" : "uuid:21",
+        "isOrnamented" : false,
+        "midi" : 53,
+        "start" : 3.93578231292517,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.6317075672395089,
+        "duration" : 3.947392290249433,
+        "id" : "uuid:22",
+        "isOrnamented" : false,
+        "midi" : 55,
+        "start" : 7.9412244897959186,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.616743689687813,
+        "duration" : 3.947392290249433,
+        "id" : "uuid:23",
+        "isOrnamented" : false,
+        "midi" : 48,
+        "start" : 11.935056689342403,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.5024738340274147,
+        "duration" : 4.005442176870749,
+        "id" : "uuid:24",
+        "isOrnamented" : false,
+        "midi" : 45,
+        "start" : 15.952108843537415,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.5610347365050815,
+        "duration" : 3.9938321995464854,
+        "id" : "uuid:25",
+        "isOrnamented" : false,
+        "midi" : 50,
+        "start" : 19.957551020408165,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.562397184399511,
+        "duration" : 4.017052154195011,
+        "id" : "uuid:26",
+        "isOrnamented" : false,
+        "midi" : 52,
+        "start" : 23.95138321995465,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.5032997237660034,
+        "duration" : 3.9706122448979593,
+        "id" : "uuid:27",
+        "isOrnamented" : false,
+        "midi" : 45,
+        "start" : 27.96843537414966,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.6186891256009831,
+        "duration" : 3.947392290249433,
+        "id" : "uuid:28",
+        "isOrnamented" : false,
+        "midi" : 48,
+        "start" : 31.93904761904762,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.623149168577747,
+        "duration" : 4.005442176870749,
+        "id" : "uuid:29",
+        "isOrnamented" : false,
+        "midi" : 53,
+        "start" : 35.9328798185941,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.6319314560469459,
+        "duration" : 3.947392290249433,
+        "id" : "uuid:30",
+        "isOrnamented" : false,
+        "midi" : 55,
+        "start" : 39.938321995464854,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.6174607256696639,
+        "duration" : 3.93578231292517,
+        "id" : "uuid:31",
+        "isOrnamented" : false,
+        "midi" : 48,
+        "start" : 43.9437641723356,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+          -10,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          10,
+          70
+        ],
+        "confidence" : 0.5025964255782142,
+        "duration" : 4.005442176870749,
+        "id" : "uuid:32",
+        "isOrnamented" : true,
+        "midi" : 45,
+        "start" : 47.96081632653061,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.5610006539974102,
+        "duration" : 3.9938321995464854,
+        "id" : "uuid:33",
+        "isOrnamented" : false,
+        "midi" : 50,
+        "start" : 51.96625850340136,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.5625399169714554,
+        "duration" : 4.005442176870749,
+        "id" : "uuid:34",
+        "isOrnamented" : false,
+        "midi" : 52,
+        "start" : 55.960090702947845,
+        "userEdited" : false
+      },
+      {
+        "bendCents" : [
+
+        ],
+        "confidence" : 0.5032149036373712,
+        "duration" : 3.93578231292517,
+        "id" : "uuid:35",
+        "isOrnamented" : false,
+        "midi" : 45,
+        "start" : 59.965532879818596,
+        "userEdited" : false
+      }
+    ],
+    "source" : "fullMix",
+    "voicedRatio" : 0.9934593023255814
+  },
+  "sections" : [
+    {
+      "activity" : [
+        {
+          "evidence" : "Regular decaying attacks (1.9\/s) — piano\/keys-like accompaniment",
+          "level" : 0.5344975436352233,
+          "role" : "keys",
+          "source" : "mixFeatures"
+        }
+      ],
+      "arrangementId" : "uuid:9",
+      "confidence" : 0.4,
+      "endTime" : 15.975328798185942,
+      "id" : "uuid:1",
+      "label" : "Chorus \/ Hook 1",
+      "provenance" : "algorithm",
+      "repetitionGroup" : "A",
+      "startTime" : 0,
+      "timbre" : {
+        "centroid" : 531.4096069335938,
+        "highEnergyShare" : 0.0004207876306281587,
+        "loudness" : 1.4160271883010864,
+        "lowEnergyShare" : 0.02920337760379621,
+        "onsetRate" : 1.9404921420784884,
+        "sustain" : 0.3147481083869934
+      },
+      "type" : "chorus"
+    },
+    {
+      "activity" : [
+        {
+          "evidence" : "Steady sustained energy (sustain 100%) — strings or pad bed",
+          "level" : 1,
+          "role" : "pad",
+          "source" : "mixFeatures"
+        }
+      ],
+      "arrangementId" : "uuid:14",
+      "confidence" : 0.39999999999999997,
+      "endTime" : 31.973877551020408,
+      "id" : "uuid:2",
+      "key" : {
+        "confidence" : 0.6516943363775815,
+        "provenance" : "algorithm",
+        "value" : {
+          "mode" : "minor",
+          "tonic" : 9
+        }
+      },
+      "label" : "Interlude",
+      "provenance" : "algorithm",
+      "repetitionGroup" : "B",
+      "startTime" : 15.975328798185942,
+      "timbre" : {
+        "centroid" : 339.45867919921875,
+        "highEnergyShare" : 4.318187186185412e-06,
+        "loudness" : 1.282907485961914,
+        "lowEnergyShare" : 0.16899704094583295,
+        "onsetRate" : 0.18751700834542817,
+        "sustain" : 0.9997689723968506
+      },
+      "type" : "interlude"
+    },
+    {
+      "activity" : [
+        {
+          "evidence" : "Regular decaying attacks (1.9\/s) — piano\/keys-like accompaniment",
+          "level" : 0.5334882009032849,
+          "role" : "keys",
+          "source" : "mixFeatures"
+        },
+        {
+          "evidence" : "A continuous lead line around D3 is present 30% of the time",
+          "level" : 0.2663939833751156,
+          "role" : "lead",
+          "source" : "mixFeatures"
+        }
+      ],
+      "arrangementId" : "uuid:9",
+      "confidence" : 0.3851641654968262,
+      "endTime" : 47.972426303854874,
+      "id" : "uuid:3",
+      "label" : "Chorus \/ Hook 2",
+      "provenance" : "algorithm",
+      "repetitionGroup" : "A",
+      "startTime" : 31.973877551020408,
+      "timbre" : {
+        "centroid" : 531.3073120117188,
+        "highEnergyShare" : 0.00044828672405652936,
+        "loudness" : 1.4163318872451782,
+        "lowEnergyShare" : 0.029104902271086298,
+        "onsetRate" : 1.9376757529027577,
+        "sustain" : 0.31313690543174744
+      },
+      "type" : "chorus"
+    },
+    {
+      "activity" : [
+        {
+          "evidence" : "Steady sustained energy (sustain 100%) — strings or pad bed",
+          "level" : 1,
+          "role" : "pad",
+          "source" : "mixFeatures"
+        }
+      ],
+      "arrangementId" : "uuid:19",
+      "confidence" : 0.4482410877943039,
+      "endTime" : 64,
+      "id" : "uuid:4",
+      "key" : {
+        "confidence" : 0.654524248602199,
+        "provenance" : "algorithm",
+        "value" : {
+          "mode" : "minor",
+          "tonic" : 9
+        }
+      },
+      "label" : "Outro",
+      "provenance" : "algorithm",
+      "repetitionGroup" : "B",
+      "startTime" : 47.972426303854874,
+      "timbre" : {
+        "centroid" : 339.4017639160156,
+        "highEnergyShare" : 0.0000025795850092896166,
+        "loudness" : 1.282671570777893,
+        "lowEnergyShare" : 0.16920408401547782,
+        "onsetRate" : 0.18724524456521738,
+        "sustain" : 0.9997686147689819
+      },
+      "type" : "outro"
+    }
+  ],
+  "sourceType" : "listened",
+  "switching" : {
+    "leadTime" : 0.25,
+    "mode" : "assisted",
+    "reference" : "timer"
+  },
+  "tags" : [
+
+  ],
+  "timeSignature" : {
+    "confidence" : 0.6155777829509879,
+    "provenance" : "algorithm",
+    "value" : 4
+  },
+  "title" : "Listened",
+  "toneSuggestions" : [
+    {
+      "confidence" : 0.3727128828412578,
+      "family" : "piano",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Clear note attacks (1.9\/s) that decay between notes — piano-like articulation.",
+      "sectionId" : "uuid:3"
+    },
+    {
+      "confidence" : 0.1031162123548621,
+      "family" : "strings",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Sustained, smooth energy (sustain 31%) with few sharp attacks — typical of string sections.",
+      "sectionId" : "uuid:3"
+    },
+    {
+      "confidence" : 0.1,
+      "family" : "pad",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Very steady, warm background (centroid 531 Hz) — a soft pad can recreate this bed.",
+      "sectionId" : "uuid:3"
+    },
+    {
+      "confidence" : 0.9656250000000002,
+      "family" : "piano",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: clear, steady notes with decaying attacks.",
+      "sectionId" : "uuid:1"
+    },
+    {
+      "confidence" : 0.8703349593598064,
+      "family" : "guitar",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a clean electric-guitar line.",
+      "sectionId" : "uuid:1"
+    },
+    {
+      "confidence" : 0.8614226317911617,
+      "family" : "choir",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: chant-like held voices.",
+      "sectionId" : "uuid:1"
+    },
+    {
+      "confidence" : 0.8853863723255168,
+      "family" : "organ",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a sustained sung melody with a warm, reedy Indian colour.",
+      "sectionId" : "uuid:2"
+    },
+    {
+      "confidence" : 0.8326643884360956,
+      "family" : "piano",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: clear, steady notes with decaying attacks.",
+      "sectionId" : "uuid:2"
+    },
+    {
+      "confidence" : 0.8061061083248415,
+      "family" : "reed",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a dark, soulful reed melody.",
+      "sectionId" : "uuid:2"
+    },
+    {
+      "confidence" : 0.9128778967765496,
+      "family" : "organ",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a sustained sung melody with a warm, reedy Indian colour.",
+      "sectionId" : "uuid:4"
+    },
+    {
+      "confidence" : 0.8778534250717894,
+      "family" : "reed",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a dark, soulful reed melody.",
+      "sectionId" : "uuid:4"
+    },
+    {
+      "confidence" : 0.8329956802136993,
+      "family" : "flute",
+      "id" : "uuid:?",
+      "method" : "featureHeuristic",
+      "patchId" : "uuid:?",
+      "reason" : "Lead option: a sung melody in a low, breathy flute register.",
+      "sectionId" : "uuid:4"
+    }
+  ],
+  "userConfirmedRights" : true
+}

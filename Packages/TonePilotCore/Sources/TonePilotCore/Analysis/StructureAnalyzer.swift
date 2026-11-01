@@ -140,7 +140,7 @@ public enum StructureAnalyzer {
         for s in segments { groupCounts[s.group, default: 0] += 1; groupLoudness[s.group, default: []].append(s.loudness) }
         let medianLoud = Stats.median(segments.map(\.loudness))
         let repeated = groupCounts.filter { $0.value >= 2 }.map(\.key)
-        let chorusGroup = repeated.max { Stats.mean(groupLoudness[$0]!) < Stats.mean(groupLoudness[$1]!) }
+        let chorusGroup = repeated.max { (Stats.mean(groupLoudness[$0]!), -$0) < (Stats.mean(groupLoudness[$1]!), -$1) }
         let verseGroup = repeated.filter { $0 != chorusGroup }
             .max { (groupCounts[$0]!, -$0) < (groupCounts[$1]!, -$1) }
 
