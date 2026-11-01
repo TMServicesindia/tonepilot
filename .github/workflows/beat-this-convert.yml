@@ -1,0 +1,52 @@
+name: Beat This! conversion (Phase 2 evaluation, no app build)
+
+# Phase 2, step 1: convert the Beat This! small model (CPJKU, MIT code + weights) to Core ML,
+# gate it against PyTorch (CPU max |diff| <= 1e-3 and identical beat peaks), and write reference
+# fixtures for the Swift front-end. Results go to branch ci/beat-this. Not shipped in the app.
+on:
+  workflow_dispatch:
+    inputs:
+      checkpoint:
+        description: "Beat This! checkpoint"
+        default: "small0"
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Beat This! source and checkpoint
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/CPJKU/beat_this.git /tmp/beat_this
+          echo "BEAT_THIS_COMMIT=$(git -C /tmp/beat_this rev-parse HEAD)" >> $GITHUB_ENV
+          curl -fsSL -o /tmp/${{ inputs.checkpoint }}.ckpt "https://cloud.cp.jku.at/public.php/dav/files/7ik4RrBKTS273gp/${{ inputs.checkpoint }}.ckpt"
+          ls -la /tmp/*.ckpt; shasum -a 256 /tmp/*.ckpt
+      - name: Python packages
+        run: pip install -q "torch==2.5.1" "torchaudio==2.5.1" einops rotary-embedding-torch soxr "numpy<2" "coremltools==8.2"
+      - name: Convert and check
+        run: |
+          set -o pipefail
+          python Native/tools/beat_this/convert_beat_this.py /tmp/beat_this /tmp/${{ inputs.checkpoint }}.ckpt out 2>&1 | tee convert.log
+          code=${PIPESTATUS[0]}
+          grep "^RESULT" convert.log | while IFS= read -r l; do echo "::notice title=Beat This!::$l"; done
+          [ $code = 0 ] || echo "::error title=Beat This!::Core ML differs from PyTorch beyond tolerance (or conversion failed)"
+          exit $code
+      - name: Push results to branch ci/beat-this
+        if: always()
+        run: |
+          [ -d out ] || exit 0
+          cp convert.log out/
+          echo "beat_this ${BEAT_THIS_COMMIT} · checkpoint ${{ inputs.checkpoint }} · tonepilot ${GITHUB_SHA} · run ${GITHUB_RUN_ID}" > out/SOURCE.txt
+          (cd out && [ -d BeatThisSmall.mlpackage ] && zip -qr BeatThisSmall.mlpackage.zip BeatThisSmall.mlpackage && rm -rf BeatThisSmall.mlpackage || true)
+          mv out /tmp/out
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout --orphan ci/beat-this && git rm -rqf . && mv /tmp/out beat_this
+          git add beat_this && git commit -qm "Beat This! conversion results for ${GITHUB_SHA}" && git push -f origin ci/beat-this
