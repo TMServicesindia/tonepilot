@@ -73,11 +73,20 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 
 **Deliver before Phase 2:** updated docs; every file changed; iOS + Android build results; before/after pipeline equivalence report; backend contract-test results; benchmark baseline report; dataset manifest + licensing checklist; known issues and risks. **If a gate fails: stop and report, don't weaken it. Wait for explicit approval before Phase 2.**
 
-## 6. Phase 1 status (in progress)
+## 6. Phase 1 status (iPhone side delivered; Android parity pending; awaiting owner approval)
 
-- Checkpoint order: (1) fixtures of current behaviour → (2) `SongImportPipeline` + flag fallback → (3) equivalence report → (4) `InferenceBackend` (Core ML, LiteRT, Replay) + contract tests with Basic Pitch test model (reference outputs generated in CI) → (5) Android emulator instrumented fixture tests (needs x86_64 Swift core build) → (6) benchmark harness + reproducible baselines (`bench.yml`) → (7) Indian dataset manifest/schema/validator (clips + annotations need the owner) → (8) licence manifest + commercial gate.
-- Findings so far: `AppModel.analyze` (iOS) and `AppCore.analyze` (Android) both wrap `SongPipeline.run`; iOS adds stems decode, server melody, instrument recogniser, tone loader, stem-info replacement, auto-separate; Android adds the listened default + notice. Android has no test source set yet; the Swift core is built for arm64 only.
-- Audit benchmark code lives in the session scratchpad (`AuditBenchTests.swift`, `SongBenchTests.swift`); to be added to the repo as opt-in benchmarks in Phase 1.
+- Owner (1 Nov): **"The primary testing is right now on iPhone, so prioritise that."** iPhone items first; Android LiteRT/emulator after.
+- Delivery report: **`docs/TONEPILOT_PHASE1_REPORT.md`** (files changed, equivalence, contracts, builds, baselines, risks).
+- Done: fixtures (68d2e23) → `SongImportPipeline` + `ImportPipelineFlags.useSharedPipeline` fallback (iOS `TPLegacyImportPipeline` default) → equivalence exact (tol 0) vs legacy and pre-migration fixtures; Android bridge identical.
+- **Determinism fix** (owner-approved): `mixStems` Dictionary order + max tie-breaks (ArpeggioLearner, AutoArranger, StructureAnalyzer). Benchmarks unchanged vs audit.
+- `InferenceBackend` + `InferenceContract` (8 checks) in core; ReplayBackend; C-callback backend (`tp_set_inference_callback`, `tp_inference_contract`, `tp_pipeline_check`) for Android; `CoreMLBackend` in the app (unused by features). Basic Pitch fixtures from official `nmp.tflite` (`inference-fixtures.yml`, branch `ci/inference-fixtures`).
+- iPhone build (`ios-build.yml`) now also runs: Core ML contract (blocking, CPU 1e-3) — **PASS, max diff ~1e-6, 35.5 ms CPU / 16.9 ms all**; licence gate (personal) PASS; Indian-set validator.
+- `bench.yml` (manual + nightly 21:17 UTC): baselines, run twice, must be identical; results pushed to branch `ci/bench-results`. Baselines = audit numbers exactly.
+- Licence manifest `docs/LICENSES/manifest.json` + `Native/tools/licences/check_manifest.py` (commercial fails on Demucs by design).
+- Indian set: `docs/benchmark/indian-set/` + `Native/tools/dataset/validate_indian_set.py`; **0 clips** (needs owner recordings).
+- Build run 41291859865 (a4ab124): all tests/gates passed (launch 3.29 s, peak 157 MB, stress 843 s) but **release publish failed: 403 "Resource not accessible by integration"**; rerun requested (attempt 2).
+- Linux core: 195 tests, 0 failures, 8 skipped. Session note: job logs ARE readable via `gh api repos/.../actions/jobs/<id>/logs` once a job finishes.
+- **Pending:** Android x86_64 core build, LiteRT Kotlin back-end, JNI hook, androidTest + emulator job. Then wait for explicit Phase 2 approval.
 
 ## 7. Open owner decisions
 
@@ -87,4 +96,4 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 
 ## 8. Release history (latest first)
 
-v0.3.71 (live fill deadlock fix; all gates passed; launch 3.47 s) · v0.3.70 (stuck notes, arpeggio melody bug, ToneMatcher, 20 instruments; launch 3.86 s) · v0.3.67 (publish-anyway; Film Tone Library) · quick-2 · v0.3.61 (Record; owner's preferred older build) · earlier v0.3.x.
+(v0.3.72 attempted: Phase 1 iPhone foundation; publish 403) · v0.3.71 (live fill deadlock fix; all gates passed; launch 3.47 s) · v0.3.70 (stuck notes, arpeggio melody bug, ToneMatcher, 20 instruments; launch 3.86 s) · v0.3.67 (publish-anyway; Film Tone Library) · quick-2 · v0.3.61 (Record; owner's preferred older build) · earlier v0.3.x.
