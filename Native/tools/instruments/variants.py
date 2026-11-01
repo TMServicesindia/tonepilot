@@ -15,7 +15,8 @@ def reverb(x, sr, rt60=1.2, wet=0.35):
     ir = rng.standard_normal(n) * np.exp(-6.9 * t / rt60)
     ir[: int(0.02 * sr)] = 0                      # 20 ms pre-delay
     ir /= np.sqrt((ir ** 2).sum())
-    y = np.convolve(x, ir)[: len(x)]
+    m = len(x) + len(ir) - 1; nfft = 1 << (m - 1).bit_length()
+    y = np.fft.irfft(np.fft.rfft(x, nfft) * np.fft.rfft(ir, nfft), nfft)[: len(x)]   # FFT convolution (same result, fast)
     return (1 - wet) * x + wet * y / max(1e-6, np.abs(y).max()) * np.abs(x).max()
 
 
