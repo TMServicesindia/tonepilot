@@ -25,7 +25,7 @@ var out: [String: Any] = [:]
 var labelSet = Set<String>()
 let t0 = Date()
 var audioSeconds = 0.0
-for (k, c) in clips.enumerated() {
+for (k, c) in clips.enumerated() { autoreleasepool {
     let file = c["file"] as! String
     let url = root.appendingPathComponent(file)
     do {
@@ -42,8 +42,8 @@ for (k, c) in clips.enumerated() {
     } catch {
         print("APPLE fail \(file): \(error)")
     }
-    if k % 200 == 0 { print("APPLE \(k)/\(clips.count)") }
-}
+    if k % 200 == 0 { print("APPLE \(k)/\(clips.count)"); fflush(stdout) }
+} }
 let elapsed = Date().timeIntervalSince(t0)
 let labels = labelSet.sorted()
 var packed: [String: Any] = ["labels": labels, "clips": [:]]

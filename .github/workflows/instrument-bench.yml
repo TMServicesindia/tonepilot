@@ -84,7 +84,7 @@ jobs:
         run: |
           set -e
           swiftc -O Native/tools/apple_windows/main.swift -o /tmp/apple_windows
-          /tmp/apple_windows /tmp/iset /tmp/apple.json | tail -3
+          /tmp/apple_windows /tmp/iset /tmp/apple.json 2>&1 | tail -25
           pip3 install -q --break-system-packages "numpy<2" 2>/dev/null || pip3 install -q "numpy<2"
           python3 Native/tools/instruments/apple_to_npz.py /tmp/apple.json /tmp/out
       - uses: actions/upload-artifact@v4
