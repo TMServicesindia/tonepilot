@@ -96,8 +96,9 @@ def pick_window_thresholds(clips, scores_for):
 
 
 # ---------- approach C ----------
-def train_heads(train_rows):
-    """Multi-label logistic heads on embeddings: instruments, families; multi-class source (solo only)."""
+def train_heads(train_rows, C=0.5, balanced=True):
+    """Multi-label logistic heads on embeddings: instruments, families; multi-class source (solo only).
+    C / balanced: regularisation strength and class weighting (calibrate.py also tries a stronger-regularised head)."""
     from sklearn.linear_model import LogisticRegression
     from sklearn.preprocessing import StandardScaler
     X = np.stack([r[0] for r in train_rows]); sc = StandardScaler().fit(X); Xs = sc.transform(X)
@@ -108,10 +109,10 @@ def train_heads(train_rows):
         for j in range(len(labels)):
             if Y[:, j].sum() < 3:
                 hs.append(None); continue
-            hs.append(LogisticRegression(max_iter=2000, C=0.5, class_weight="balanced").fit(Xs, Y[:, j]))
+            hs.append(LogisticRegression(max_iter=2000, C=C, class_weight="balanced" if balanced else None).fit(Xs, Y[:, j]))
         heads[name] = hs
     solo = [r for r in train_rows if r[3] is not None]
-    heads["src"] = LogisticRegression(max_iter=2000, C=0.5).fit(sc.transform(np.stack([r[0] for r in solo])), [r[3] for r in solo])
+    heads["src"] = LogisticRegression(max_iter=2000, C=C).fit(sc.transform(np.stack([r[0] for r in solo])), [r[3] for r in solo])
     return sc, heads
 
 

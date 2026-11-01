@@ -58,8 +58,15 @@ def solo_stats(items, ti, tf):
             "exact_overall": s["exact_ok"] / n if n else 0, "instrument_level_share": s["inst_answered"] / n if n else 0}
 
 
+def agree(pi, pf):
+    """Abstain (all-zero scores) unless the instrument head's best guess is in the family head's best family."""
+    if FAM_OF[INSTRUMENTS[int(np.argmax(pi))]] != FAMILIES[int(np.argmax(pf))]:
+        return np.zeros_like(pi), np.zeros_like(pf)
+    return pi, pf
+
+
 def calibrate(dev_items):
-    grid = np.linspace(0.05, 0.99, 48)
+    grid = np.concatenate([np.linspace(0.05, 0.95, 46), [0.97, 0.98, 0.99, 0.995, 0.999]])
     best, fallback = None, None
     for ti in grid:
         for tf in grid:
@@ -149,15 +156,22 @@ def main(root, outdir, report_path):
                     tk = truth_window(c, s, win)
                     rows.append((d["emb"][w], {KEYS[k]["instrument"] for k in tk}, {KEYS[k]["family"] for k in tk},
                                  (KEYS[tk[0]]["source"] if KEYS[tk[0]]["source"] != "unknown" else None) if c["kind"] == "solo" and tk else None))
-            sc, heads = train_heads(rows); cache = {}
-            def sfc(f, d=data, sc=sc, heads=heads, cache=cache):
-                if f not in cache:
-                    inst, fam, src = head_scores(sc, heads, d[f]["emb"]); cache[f] = (d[f]["starts"], inst, fam, src)
-                return cache[f]
-            systems.append(("C", sfc))
+            def make_sf(C, balanced):
+                sc, heads = train_heads(rows, C, balanced); cache = {}
+                def sfc(f, d=data, sc=sc, heads=heads, cache=cache):
+                    if f not in cache:
+                        inst, fam, src = head_scores(sc, heads, d[f]["emb"]); cache[f] = (d[f]["starts"], inst, fam, src)
+                    return cache[f]
+                return sfc
+            sf_c = make_sf(0.5, True)
+            systems.append(("C", sf_c))
+            # Variants aimed at confidently-wrong answers (short clips, other sound banks). Chosen on DEV only.
+            systems.append(("Creg", make_sf(0.02, False)))      # stronger regularisation, unweighted
+            systems.append(("Cagree", sf_c))                    # answer only when instrument and family heads agree
         for kind, sf in systems:
-            label = f"{kind} · {name}" + (" + head" if kind == "C" else "")
-            items = lambda r, v=None: [(sf(c["file"])[1].mean(0), sf(c["file"])[2].mean(0), solo_truth(c)) for c in clips
+            label = {"C": f"C · {name} + head", "Creg": f"C-reg · {name} + head (C=0.02)", "Cagree": f"C-agree · {name} + head"}.get(kind, f"{kind} · {name}")
+            post = agree if kind == "Cagree" else (lambda a, b: (a, b))
+            items = lambda r, v=None, post=post: [(*post(sf(c["file"])[1].mean(0), sf(c["file"])[2].mean(0)), solo_truth(c)) for c in clips
                                         if c["kind"] == "solo" and role(c) == r and c["file"] in data and (v is None or c["variant"] == v or (v == "imitation" and solo_truth(c)[3] == "imitation"))]
             ti, tf, dev_st, reached = calibrate(items("dev"))
             # Short inputs (1 s clips) get their own DEV-calibrated thresholds.
@@ -171,14 +185,16 @@ def main(root, outdir, report_path):
                    "test": {v: solo_stats(items("test", v), *((ts_i, ts_f) if v == "short" else (ti, tf))) for v in ("original", "reverb", "compressed", "short", "imitation")},
                    "short_thresholds": [round(float(ts_i), 3), round(float(ts_f), 3)], "short_target_reached_on_dev": short_reached,
                    "coverage_curve_test": coverage_curve(items("test", "original")),
-                   "test_nsynth": solo_stats(items("test_nsynth"), ti, tf), "dev_nsynth_only": solo_stats([(sf(c["file"])[1].mean(0), sf(c["file"])[2].mean(0), solo_truth(c)) for c in clips if c["split"] == "dev_nsynth" and c["file"] in data], ti, tf)}
+                   "test_nsynth": solo_stats(items("test_nsynth"), ti, tf), "dev_nsynth_only": solo_stats([(*post(sf(c["file"])[1].mean(0), sf(c["file"])[2].mean(0)), solo_truth(c)) for c in clips if c["split"] == "dev_nsynth" and c["file"] in data], ti, tf)}
             # Source type (C only: A has no imitation class).
-            if kind == "C":
+            if kind in ("C", "Creg"):
                 conf = Counter()
                 for c in clips:
                     if c["kind"] == "solo" and role(c) == "test" and c["variant"] == "original":
                         pred = SOURCES[int(np.argmax(sf(c["file"])[3].mean(0)))]; conf[(solo_truth(c)[3], pred)] += 1
                 rep["source_confusion_test"] = {f"{a} -> {b}": n for (a, b), n in sorted(conf.items())}
+            if kind == "Cagree":   # window-level layered scores are identical to C
+                results.append(rep); print("CALIB", label, json.dumps({"dev": dev_st, "test_original": rep["test"]["original"]})); continue
             twi, twf = pick_window(clips, sf, win)
             rep["layered_test"] = layered_report(clips, sf, {"test"}, twi, twf, win); rep["window_thresholds"] = [round(float(twi), 2), round(float(twf), 2)]
             results.append(rep)
@@ -220,6 +236,19 @@ def write_md(results, path):
     for r in results:
         if "source_confusion_test" in r:
             L.append(f"- **{r['system']}**: " + "; ".join(f"{k}: {v}" for k, v in r["source_confusion_test"].items()))
+    # Selection uses DEV only (target met, then highest DEV coverage); TEST is shown for the chosen one, never used to choose.
+    L += ["", "## DEV-selected head variant per model (C, C-reg, C-agree; chosen on DEV only)", "",
+          "| Model | Chosen | DEV coverage / wrong | TEST original cov / wrong / sel. family | TEST short cov / wrong | NSynth TEST cov / wrong |", "|---|---|---|---|---|---|"]
+    by_model = defaultdict(list)
+    for r in results:
+        if r["system"].startswith("C"):
+            by_model[r["system"].split(" · ")[1].split(" ")[0]].append(r)
+    for m, rs in sorted(by_model.items()):
+        ok = [r for r in rs if r["target_reached_on_dev"]] or rs
+        b = max(ok, key=lambda r: (r["dev"]["coverage"], -r["dev"]["wrong_family"]))
+        t, sh, ns = b["test"]["original"], b["test"]["short"], b["test_nsynth"]
+        L.append(f"| {m} | {b['system'].split(' · ')[0]}{'' if b['target_reached_on_dev'] else ' (DEV target NOT met)'} | {p(b['dev']['coverage'])} / {p(b['dev']['wrong_family'])} | "
+                 f"{p(t['coverage'])} / {p(t['wrong_family'])} / {p(t['selective_family_acc'])} | {p(sh['coverage'])} / {p(sh['wrong_family'])} | {p(ns['coverage'])} / {p(ns['wrong_family'])} |")
     open(path, "w").write("\n".join(L) + "\n"); print("\n".join(L))
 
 
