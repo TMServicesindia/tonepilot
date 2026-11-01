@@ -61,7 +61,7 @@ Android shares TonePilotCore but **not** these iOS-only parts: separation (Core 
 
 | Dependency | Ships? | Code | Weights / data | Status under the owner's rules |
 |---|---|---|---|---|
-| Demucs `htdemucs` | Yes (in-app download) | MIT | The Demucs README says **"The license of the weights is not clear"**; part of its training data (MUSDB) is research-only ([source](https://github.com/adefossez/demucs)) | **FREE BUT UNVERIFIED — do not ship commercially** |
+| Demucs `htdemucs` | Yes (in-app download) | MIT | The Demucs README says **"The license of the weights is not clear"** ([source](https://github.com/adefossez/demucs)); its MUSDB18-HQ training data is licensed **"other-nc"** on Zenodo record 3338373 (confirmed by the CI scan, `docs/research/model_scan.md`) | **FREE BUT UNVERIFIED (non-commercial training data) — do not ship commercially** |
 | Demucs `htdemucs_6s` | Yes (in-app download) | MIT | Trained only on a Meta internal dataset; README: a CC-NC-BY licence **"likely"** applies ([source](https://github.com/adefossez/demucs)) | **FREE BUT RESTRICTED (likely non-commercial)** |
 | demucs.cpp, Eigen | Yes | MIT, MPL-2.0 | — | Safe |
 | GeneralUser GS | Yes | — | "use … without restriction for your own music creation, private or commercial"; "use it in your software projects"; silent on ML training; author cannot verify every sample's origin ([source](https://github.com/mrbumpy409/GeneralUser-GS/blob/main/documentation/LICENSE.txt)) | Safe for playback; **training use unaddressed** |

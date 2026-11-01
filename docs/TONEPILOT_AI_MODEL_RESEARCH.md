@@ -1,114 +1,117 @@
-# TonePilot — AI Model Research
+# TonePilot — AI Model Research (revision 2)
 
-**Date:** 1 November 2026 · **Rule applied:** a model is only recommended if (1) its code **and exact weights** have verified commercial-use and redistribution rights, (2) it beats the current TonePilot implementation on independent test data, and (3) the same gain can't be had more cheaply with existing models, DSP or music theory. Zero paid APIs; offline-first.
+**Date:** 1 November 2026 · **Revision 2** adds the Hugging Face and Zenodo licence scan (`docs/research/model_scan.md`, generated in CI by `Native/tools/research/hf_scan.py` from the hosts' public APIs) and the owner's Phase 0 review.
 
-**Bottom line:** only two new neural models are worth testing for production, and both are small:
+**Rule applied:** a model is recommended only if (1) its code **and exact weights** have verified commercial-use and redistribution rights, (2) it beats the current TonePilot implementation on independent test data, and (3) the same gain can't be had more cheaply with existing models, DSP or music theory. Zero paid APIs; offline-first; every model needs an Android path.
 
-1. **Beat This! (small, ~8.1 MB, MIT code and MIT weights)** for beats and downbeats — the measured weakest link for Song Arpeggio.
-2. **Spotify Basic Pitch (Apache-2.0)** for note events in the separated accompaniment, used for arpeggio extraction and (the same model) as a melody cross-check.
+**Bottom line (revised):**
 
-For instrument recognition and tone matching **no third-party checkpoint can be cleared today**: the strongest candidates (LAION-CLAP, Microsoft CLAP, PANNs, MERT) host their weights on sites whose licence pages could not be opened from this session, and MuQ is verified non-commercial. The recommended path is **one small TonePilot-trained timbre model** on commercially licensed data, with CLAP kept only as a research comparison in the benchmark until its weights licence is verified.
+- **Song Arpeggio inputs.** Test *Beat This! small* (MIT, ~8 MB) for beats and downbeats. Test *All-In-One* (MIT, 1.4 MB per fold, from the authors' own page) as a structure and downbeat comparison. Test the *BTC chord model* (MIT repository, 12 MB) against improved DSP chords.
+- **Accompaniment notes.** Test *Basic Pitch* (Apache-2.0, 0.84 MB LiteRT) against the existing learner, stem by stem. The heavy piano and multi-instrument transcribers (ByteDance piano 172 MB, YourMT3 2.7 GB) serve only as offline reference "upper bounds" in the benchmark, never on the phone.
+- **Instruments and tones.** *LAION-CLAP music* is now **verified Apache-2.0** (`laion/larger_clap_music`). It competes with a small TonePilot-trained model whose training data is now clearable: **NSynth (CC BY 4.0, real instrument samples)** and **Slakh2100 (CC BY 4.0)**. Both are research until the benchmark decides.
+- **Current separation.** Demucs's weights are **confirmed problematic**: MUSDB18-HQ, part of its training data, is licensed "other-nc" on Zenodo, and the Demucs README says the weight licence "is not clear".
 
 ## Classification key
 
 | Class | Meaning | Shippable? |
 |---|---|---|
-| **SAFE** | FREE & COMMERCIALLY SAFE: code and exact weights have verified commercial-use and redistribution rights | Yes |
-| **RESTRICTED** | FREE BUT RESTRICTED: non-commercial or research-only terms | No |
-| **UNVERIFIED** | FREE BUT UNVERIFIED: weights or data rights not established — DO NOT SHIP | No |
-| **PAID** | Needs payment or a commercial licence | No (zero budget) |
+| **SAFE** | FREE & COMMERCIALLY SAFE: code and exact weights carry a licence permitting commercial use and redistribution, stated by the original authors | Yes, after benchmark |
+| **SAFE\*** | As SAFE, but training data includes copyrighted or non-commercial material; record it, have it reviewed before a store release | Yes, with recorded caveat |
+| **RESTRICTED** | Non-commercial / research-only / proprietary-on-request | No |
+| **UNVERIFIED** | Weights terms missing, or only claimed by a re-uploader | No (research only) |
+| **PAID** | Needs payment or a commercial licence | No |
 
-**Session limits on verification:** `huggingface.co`, `zenodo.org`, `magenta.tensorflow.org` and `essentia.upf.edu` were unreachable from this audit session (network policy), so model cards and dataset pages hosted there could not be read. Every such item is marked UNVERIFIED with the exact page to check; nothing below is filled in from memory as if verified.
+A licence claimed by a **re-uploader** (someone other than the original authors) is not accepted as proof; the original source decides.
 
 ---
 
 ## 1. Rhythm, beats, downbeats, structure
 
-| Model | Task | Code licence | Weights licence | Data terms | Size | iPhone / Android | Published accuracy | Class | Recommendation |
-|---|---|---|---|---|---|---|---|---|---|
-| [Beat This!](https://github.com/CPJKU/beat_this) (CPJKU, ISMIR 2024) | Beats + downbeats, no DBN needed | MIT | **MIT** — README: "The code and the published model weights are released under the MIT license" | 16 datasets; README warns some training files are "fully copyrighted or under limited Creative Commons licenses" (affects the data, not the weight licence) | `final*` ~78 MB, `small*` ~8.1 MB (README) | Pure PyTorch transformer on spectrograms; Core ML / ONNX conversion **untested** | Paper tables (not restated in README; to be re-measured on our bench) | **SAFE** (data-provenance caveat recorded) | **Adopt for testing** — small variant first |
-| [All-In-One](https://github.com/mir-aidj/all-in-one) | Tempo, beats, downbeats, segment labels (intro/verse/chorus/…) | MIT | **Not stated** on the repository | Harmonix Set (terms not stated) | Not stated | Needs NATTEN, madmom and Demucs inside its pipeline | Not restated | **UNVERIFIED** | Research comparison only |
-| [madmom](https://github.com/CPJKU/madmom) | Beats, downbeats, chords, onsets | BSD | **CC BY-NC-SA 4.0** (README) | — | — | — | — | **RESTRICTED** | Reject |
-| librosa | Onset, tempo, beat (DSP) | ISC | — (no weights) | — | — | DSP ideas portable into Swift | — | SAFE | Use ideas only (TonePilot already implements Ellis DP) |
-| TonePilot `TempoAnalyzer` (current) | Tempo + beats | own | — | — | 0 | Shared core (iOS + Android) | **Measured:** beat F 0.92 with drums, 0.52 without; 18/24 tempo | SAFE | **Keep as fallback and for confidence** |
-| TonePilot `StructureAnalyzer` (current) | Boundaries, repeats, labels | own | — | — | 0 | Shared core | **Measured:** boundaries 4/4; grouping wrong; labels weak | SAFE | **Improve, don't replace** (no SAFE model exists) |
-
-Why Beat This! and not more: it is the only candidate with explicitly MIT weights, it gives downbeats (fixing meter 10/24 and bar alignment for Song Arpeggio), it needs no non-commercial post-processing, and its small model is ~8 MB.
-
-## 2. Instrument recognition and tone matching
-
-| Model | Task | Code licence | Weights licence | Data terms | Size | iPhone / Android | Class | Recommendation |
+| Model | Task | Code | Weights (source) | Data terms | Size | iPhone / Android | Class | Recommendation |
 |---|---|---|---|---|---|---|---|---|
-| Apple SoundAnalysis (version 1, current) | 300+ everyday sounds incl. instrument families | Apple SDK | Apple SDK | — | 0 MB (in iOS) | iOS only | **SAFE** | Keep as a free prior on iOS; **measured 14/19 (74%)** on clean instruments |
-| [LAION-CLAP](https://github.com/LAION-AI/CLAP) music checkpoint `music_audioset_epoch_15_esc_90.14.pt` | Audio–text embeddings; zero-shot instrument tags; audio similarity | **CC0-1.0** (repository) | **Not stated on GitHub**; weights hosted on Hugging Face (`lukewys/laion_clap`) — model card unreadable this session. README: training data cannot be released "due to copyright reasons"; "Please take your own risk when using this model" | Unreleased training set | HTSAT-base encoder (size **unknown** until the checkpoint is inspected in CI) | Core ML conversion **untested** | **UNVERIFIED** | Research comparison in the benchmark; adopt only if weights terms are confirmed **and** it beats the TonePilot model |
-| [Microsoft CLAP](https://github.com/microsoft/CLAP) (msclap 2022/2023) | Audio–text embeddings | MIT | Not stated on GitHub; Hugging Face card reportedly tagged MS-PL (search result only, card unreadable); Zenodo record unreadable | Not stated | Not stated | Untested; repository archived | **UNVERIFIED** | Research comparison only |
-| [MERT](https://github.com/yizhilll/MERT) v1-95M / v1-330M | Music representation | Apache-2.0 | **Not stated on GitHub**; Hugging Face cards unreadable this session | Not stated | 95M / 330M params; 24 kHz | Large for on-device | **UNVERIFIED** | Reject for production (size + unverified weights) |
-| [MuQ / MuQ-MuLan](https://github.com/tencent-ailab/MuQ) | Music representation; text–music similarity | MIT | **CC BY-NC 4.0** (README, `LICENSE_weights`) | — | ~300M / ~700M params | Too large | **RESTRICTED** | Reject |
-| [PANNs](https://github.com/qiuqiangkong/audioset_tagging_cnn) (Cnn14 etc.) | AudioSet tagging (527 classes) | MIT | Hosted on Zenodo record 3987831 — licence **unreadable this session** | AudioSet (YouTube-sourced audio) | Not stated on GitHub | Convertible CNN (untested) | **UNVERIFIED** | Research comparison only |
-| [EfficientAT](https://github.com/fschmid56/EfficientAT) (mn04–mn40, dymn) | AudioSet tagging, efficient CNNs | MIT | GitHub Releases; **licence not stated** | AudioSet | mn04 0.98M params … mn40 68M (README); mAP 43.2–48.7 | Designed for constrained devices; conversion untested | **UNVERIFIED** | Strong architecture to *retrain* on our own data (code is MIT) |
-| [BEATs](https://github.com/microsoft/unilm/tree/master/beats) | Audio representation | Repository LICENSE (not shown on the page) | OneDrive links, **no stated terms** | AudioSet | Not stated | Untested | **UNVERIFIED** | Reject for now |
-| [YAMNet](https://github.com/tensorflow/models/tree/master/research/audioset/yamnet) | AudioSet 521 classes | tensorflow/models repository licence (not shown on the page) | Not stated on the page | AudioSet | ~3.7M weights, 16 kHz | Small; TFLite path common | **UNVERIFIED** | Not needed: same job as Apple's classifier |
-| Essentia pre-trained models (instrument taggers) | Instrument tagging | AGPL (library) | Models page unreadable this session | — | — | — | **UNVERIFIED** | Reject for now |
-| TonePilot `ToneMatcher` + `PartMatcher` (current) | Nearest library tone, EQ/reverb fit | own | — | — | 0 | Shared core | SAFE | **Measured:** lead 4/12 exact, 7/12 family; keep only for EQ/reverb fine-tuning |
-| **Proposed: TonePilot Timbre model** (own) | Instrument family/instrument tags + an embedding for nearest-tone retrieval, in one small network | own | own (trained by us) | Commercially licensed training data only (see §5) | Target ≤ 5 MB (**estimate**; EfficientAT-class CNN) | Core ML + ONNX/TFLite for Android | **SAFE if the data is cleared** | **Adopt for testing** — the only path to a shippable instrument model today |
+| [Beat This!](https://github.com/CPJKU/beat_this) | Beats + downbeats, no DBN | MIT | **MIT**, README: "The code and the published model weights are released under the MIT license" | README: some training files "fully copyrighted or under limited Creative Commons licenses"; annotations/spectrograms on Zenodo 13922116 are CC BY 4.0 | `small` ~8.1 MB, `final` ~78 MB (README) | PyTorch transformer; Core ML and ONNX conversion **untested** | **SAFE\*** | **Test first** |
+| All-In-One ([code](https://github.com/mir-aidj/all-in-one), [weights](https://huggingface.co/taejunkim/allinone)) | Beats, downbeats, functional segments (intro/verse/chorus/bridge/inst/solo/outro) | MIT | **MIT** on the author's Hugging Face repo (`taejunkim/allinone`) | Harmonix Set annotations; audio not distributed | **1.4 MB per fold**, 8 folds | Needs NATTEN (neighbourhood attention) and Demucs-separated input: conversion feasibility **unknown, likely hard** | **SAFE\*** | **Test as comparison** for structure and downbeats; adopt only if convertible and better |
+| [madmom](https://github.com/CPJKU/madmom) | Beats, downbeats, chords | BSD | **CC BY-NC-SA 4.0** (README) | — | — | — | RESTRICTED | Reject |
+| Essentia models | Tagging, rhythm | AGPL lib | **CC BY-NC-SA 4.0**, "proprietary license upon request" (essentia.upf.edu/models) | — | — | — | RESTRICTED / PAID | Reject |
+| TonePilot `TempoAnalyzer` (current) | Tempo + beats | own | — | — | 0 | Shared core | SAFE | Keep as fallback and tempo cross-check |
+| TonePilot `StructureAnalyzer` (current) | Boundaries, repeats, labels | own | — | — | 0 | Shared core | SAFE | Improve (DSP) |
 
-**Indian instruments:** no checkpoint above was trained on a licensed Indian-instrument corpus, and no commercially licensed nadaswaram/veena/sarangi dataset was found (CompMusic/Saraga focus on melody; IMID licence not found). Realistic claim: **family-level recognition** (reed, bowed, plucked, flute, keys, brass, synth) plus "-like" patch mapping; exact Indian instrument names only after licensed recordings exist.
+## 2. Chords and harmony
 
-## 3. Transcription (accompaniment notes for arpeggio; melody)
-
-| Model | Task | Code licence | Weights licence | Data terms | Size | iPhone / Android | Class | Recommendation |
+| Model | Task | Code | Weights (source) | Data terms | Size | iPhone / Android | Class | Recommendation |
 |---|---|---|---|---|---|---|---|---|
-| [Spotify Basic Pitch](https://github.com/spotify/basic-pitch) | Polyphonic, instrument-agnostic note events with pitch bends | Apache-2.0 | Weights are files inside the Apache-2.0 repository (`basic_pitch/saved_models`), no separate terms | Training-data mix not restated on the README (check the ICASSP 2022 paper; some public transcription datasets carry non-commercial terms) | Not stated on README (to measure) | README lists Core ML, TFLite and ONNX conversions → iPhone and Android paths exist | **SAFE** (weights covered by the repository licence; data provenance to record) | **Adopt for testing** — accompaniment stems first, then melody cross-check |
-| [MT3](https://github.com/magenta/mt3) | Multi-instrument transcription | Apache-2.0 | **Not stated** (Colab checkpoints) | Not stated | Not stated; T5X transformer | Heavy | **UNVERIFIED** | Reject (heavy, unverified) |
-| [Omnizart](https://github.com/Music-and-Culture-Technology-Lab/omnizart) | Notes, chords, beats, vocals, drums | MIT | **Not stated** | — | — | — | **UNVERIFIED** | Reject |
-| [SOME](https://github.com/openvpi/SOME) | Sung vocal → MIDI notes | MIT | Releases page, **no separate terms**; optional RMVPE from another project | Not stated | Not stated | Conversion untested | **UNVERIFIED** (weights not separately licensed; dependency unverified) | Research comparison for melody |
-| [RMVPE](https://github.com/yxlllc/RMVPE) | Vocal pitch from mixtures | **Not stated** | **Not stated** | MIR-1K, PTDB, M4Singer synth | — | ONNX export script | **UNVERIFIED** | Reject |
-| [CREPE](https://github.com/marl/crepe) / [torchcrepe](https://github.com/maxrmorrison/torchcrepe) | Monophonic pitch | MIT | Not stated separately | — | tiny … full | Convertible | **UNVERIFIED** (weights) | Not needed (stems + current tracker) |
-| [PESTO](https://github.com/SonyCSLParis/pesto) | Monophonic pitch, streaming | LGPL-3.0 | Not stated | MIR-1K | Small (ONNX ~0.7 ms/frame per README) | ONNX export | **UNVERIFIED** | Not needed |
-| [FCPE](https://github.com/CNChTu/FCPE) | Pitch estimation | MIT | Not stated (Hugging Face + repo asset) | — | — | — | **UNVERIFIED** | Not needed |
-| [ROSVOT](https://github.com/RickyL-2000/ROSVOT) | Singing transcription | MIT | Google Drive zip, trained only on M4Singer | M4Singer terms unverified | — | GPU research code | **UNVERIFIED** | Reject |
-| [Sheet Sage](https://github.com/chrisdonahue/sheetsage) | Lead sheet from mix | MIT | **CC BY-NC-SA 3.0**; Jukebox ~10 GB, 12 GB GPU | HookTheory | — | Not feasible | **RESTRICTED** | Reject |
-| TonePilot `MelodyExtractor` (current) | Predominant melody with bends | own | — | — | 0 | Shared core | SAFE | Keep; benchmark on real vocals vs Basic Pitch |
-| TonePilot `ArpeggioLearner` (current) | Chord-relative broken-chord patterns | own | — | — | 0 | Shared core | SAFE | **Keep and extend** (100% degrees with correct inputs) |
+| [BTC](https://github.com/jayg996/BTC-ISMIR19) (Bi-directional Transformer for Chords, ISMIR 2019) | Frame-level chords; maj/min or large vocabulary | MIT (repository) | Model files ship in the MIT repository; re-packaged by `puar-playground/btc-chord` (MIT, "architecture unchanged from the official release") | Isophonics, Robbie Williams, UsPop2002 annotations; audio "collected from online music service providers" (README) | 12.2 MB (`btc_model.pt`), 12.2 MB large-vocab | Small transformer: Core ML/ONNX conversion **untested** | **SAFE\*** | **Test against improved DSP chords** |
+| ChordMini ChordNet 2E1D ([app](https://github.com/ptnghia-j/ChordMiniApp), [ONNX](https://huggingface.co/musetric/chordmini-onnx)) | Chords, ~2.3M params | MIT (app repo) | ONNX re-upload says weights are MIT "per upstream LICENSE"; upstream README doesn't state the weights' licence; trained with pseudo-labels from other models | Not stated | 17 MB ONNX | ONNX exists | **UNVERIFIED** | Research comparison only |
+| TonePilot `HarmonyAnalyzer` (current) | Key + 24 triads, beat-level Viterbi | own | — | — | 0 | Shared core | SAFE | **Improve first** (bass-aware, key-aware, beat-level changes) |
 
-## 4. Source separation
+## 3. Accompaniment transcription and melody
 
-| Model | Code | Weights | Class | Notes |
+| Model | Task | Code | Weights (source) | Data terms | Size | iPhone / Android | Class | Recommendation |
+|---|---|---|---|---|---|---|---|---|
+| [Spotify Basic Pitch](https://github.com/spotify/basic-pitch) | Instrument-agnostic polyphonic notes with bends | Apache-2.0 | Model files inside the Apache-2.0 repo; official HF card Apache-2.0; LiteRT build `litert-community/Basic-Pitch-LiteRT` Apache-2.0 | Training-data mix per ICASSP 2022 paper (record before release) | **0.84 MB** (`basicpitch.tflite`) | README lists Core ML, TFLite, ONNX; LiteRT card reports Pixel 8a and Galaxy S26 benchmarks → **Android path verified**, iPhone via Core ML (to measure) | **SAFE\*** | **Test against the existing learner, per stem** |
+| ByteDance piano transcription ([HF re-upload](https://huggingface.co/asigalov61/bytedance_piano_transcription), author repo `qiuqiangkong/piano_transcription` MIT) | Piano notes + pedal (high accuracy on piano) | Apache-2.0 / MIT | Author's HF repo MIT (`conformer2d`, 628 MB); CRNN re-upload Apache-2.0 (172 MB) | MAESTRO (CC BY-NC-SA 4.0) | 172–628 MB | Too large for the phone | SAFE\* (author repo) | **Offline reference only** (benchmark upper bound for piano stems) |
+| YourMT3 (`mimbres/YourMT3`) | Multi-instrument transcription | Apache-2.0 | Apache-2.0 (HF card) | Slakh, MAESTRO and others | 2.77 GB | Not feasible on device | SAFE\* | **Offline reference only** |
+| [MT3](https://github.com/magenta/mt3) | Multi-instrument transcription | Apache-2.0 | Not stated | Not stated | — | Heavy | UNVERIFIED | Reject |
+| [SOME](https://github.com/openvpi/SOME) | Sung vocal → MIDI | MIT | Releases, no separate terms | Not stated | — | Untested | UNVERIFIED | Research only |
+| RMVPE (via `lj1995/VoiceConversionWebUI`, MIT) | Vocal pitch in mixtures | — | Hosted in the RVC repo (MIT) but RMVPE's own repo states no licence | MIR-1K, PTDB, M4Singer synth | — | ONNX export exists | UNVERIFIED | Research only |
+| FCPE (`ChiTu/FCPE`) | Pitch estimation | MIT | **CC BY-NC-SA 4.0** (HF card) | — | 43 MB | — | RESTRICTED | Reject |
+| [PESTO](https://github.com/SonyCSLParis/pesto), [CREPE](https://github.com/marl/crepe) | Monophonic pitch | LGPL-3.0 / MIT | Not stated | — | small | ONNX | UNVERIFIED | Not needed |
+| [Sheet Sage](https://github.com/chrisdonahue/sheetsage) | Lead sheet | MIT | CC BY-NC-SA 3.0 | HookTheory | 10 GB with Jukebox | No | RESTRICTED | Reject |
+| TonePilot `ArpeggioLearner` (current) | Chord-relative patterns | own | — | — | 0 | Shared core | SAFE | **Keep and extend** |
+| TonePilot `MelodyExtractor` (current) | Melody with bends | own | — | — | 0 | Shared core | SAFE | Keep; benchmark vs Basic Pitch on vocals |
+
+## 4. Instrument recognition and tone matching
+
+| Model | Task | Code | Weights (source) | Data terms | Size | iPhone / Android | Class | Recommendation |
+|---|---|---|---|---|---|---|---|---|
+| **LAION-CLAP music** ([`laion/larger_clap_music`](https://huggingface.co/laion/larger_clap_music); original checkpoints [`lukewys/laion_clap`](https://huggingface.co/lukewys/laion_clap) CC0-1.0) | Audio–text embeddings: zero-shot instrument descriptions; audio-to-audio similarity for tone retrieval | Apache-2.0 / CC0 | **Apache-2.0** (HF card, LAION's own repo) | LAION-Audio-630k and music data; LAION states the training set can't be released "due to copyright reasons" | 776 MB full model (fp32, audio + text); audio branch only on device: **size to measure** (text side pre-computed at build time) | Core ML/ONNX: an ONNX port exists (`Xenova/clap-htsat-unfused`, general model); music model conversion **untested** | **SAFE\*** | **Test** as recognition + retrieval engine; risk = size |
+| Microsoft CLAP (`microsoft/msclap`) | Audio–text embeddings | MIT | MS-PL (HF card); CC BY 3.0 US (Zenodo 8378278) | Not stated | 4.7 GB repo (all versions) | Repo archived | SAFE\* | Secondary comparison only |
+| PANNs (Zenodo 3987831) | AudioSet tagging, 527 classes | MIT | **CC BY 4.0** (Zenodo) | AudioSet (YouTube audio; labels CC BY 4.0) | Cnn14 ~300 MB class; smaller variants in the record | Convertible CNN (untested) | SAFE\* | Comparison only (general-audio labels, like Apple's) |
+| AST (`MIT/ast-finetuned-audioset-10-10-0.4593`) | AudioSet tagging | BSD-3 | BSD-3 (HF card) | AudioSet | 693 MB repo | Too large | SAFE\* | Reject (size, general audio) |
+| MERT v1 95M / 330M | Music representation | Apache-2.0 | **CC BY-NC 4.0** (HF card) | — | 1.7 / 5.3 GB repos | — | RESTRICTED | Reject |
+| MuQ / MuQ-MuLan | Music representation, text–music | MIT | **CC BY-NC 4.0** (README + HF card) | — | ~2.7 GB | — | RESTRICTED | Reject |
+| Community instrument classifiers (`onnx-community/Musical-Instrument-Classification-ONNX` MIT, `dima806/musical_instrument_detection` Apache-2.0) | Instrument classes | — | Licences as tagged; provenance and training data undocumented | Unknown | 1.1–1.9 GB | Large | UNVERIFIED (provenance) | Reject |
+| Apple SoundAnalysis (current) | Everyday sounds incl. instruments | SDK | SDK | — | 0 | iOS only | SAFE | Keep as free iOS prior; **14/19 measured** |
+| **TonePilot Timbre model** (own) | Instrument family/instrument + embedding | own | own | **NSynth (CC BY 4.0, real instrument samples)**, **Slakh2100 (CC BY 4.0)**, PDMX synthesized (CC0 audio), own recordings, GeneralUser renders *only with the author's permission* | ≤ 5 MB target (estimate) | Core ML + LiteRT/ONNX | SAFE\* once trained | **Research**, compete with CLAP in the benchmark |
+
+**Indian instruments:** still no commercially licensed instrument-labelled Indian corpus found. CC BY 4.0 Carnatic sets exist on Hugging Face (`monodox/carnatic-raga-vocals`, `monodox/carnatic-gamaka-annotations`, `monodox/carnatic-mridangam-strokes`, `monodox/carnatic-tala-kriyanga`, `kaumudi-ai/carnatic-ragas-talas`), but their cards don't document how the audio was produced. **Inspect provenance (real recordings vs generated) before use**; they are candidates for vocal ornament and tala evaluation, not instrument identity. Claims stay at family level.
+
+## 5. Source separation
+
+| Model | Code | Weights | Data | Class |
 |---|---|---|---|---|
-| Demucs `htdemucs` (current) | MIT | README: "The license of the weights is not clear" (MUSDB research-only data) | **UNVERIFIED** | Works; keep for personal use; blocker for commercial release |
-| Demucs `htdemucs_6s` (current) | MIT | Meta internal data; CC-NC-BY "likely" (README) | **RESTRICTED (likely)** | Same |
-| BS-RoFormer / Mel-Band RoFormer ([ZFTurbo list](https://github.com/ZFTurbo/Music-Source-Separation-Training/blob/main/docs/pretrained_models.md)) | MIT (training code) | **No licence stated for any checkpoint**; community-trained; one multi-stem model trained only on MUSDB18-HQ | **UNVERIFIED** | Vocals SDR up to 10.98 on Multisong (vs htdemucs 9.00 on MUSDB HQ — different test sets, not comparable); no piano/guitar RoFormer listed |
-| [Open-Unmix](https://github.com/sigsep/open-unmix-pytorch) | MIT | `umxl` **CC BY-NC-SA 4.0**; `umxhq` terms not stated (MUSDB data) | RESTRICTED / UNVERIFIED | Reject |
-| [Spleeter](https://github.com/deezer/spleeter) | MIT | Not stated on README | **UNVERIFIED** | 5-stem includes piano; older, lower quality |
+| Demucs `htdemucs` (current) | MIT | README: weight licence "is not clear" | MUSDB18-HQ is **"other-nc"** on Zenodo 3338373 + 800 extra songs | **UNVERIFIED (non-commercial data)** |
+| Demucs `htdemucs_6s` (current) | MIT | Meta internal data; CC-NC-BY "likely" (README) | Internal | **RESTRICTED (likely)** |
+| RoFormer community checkpoints | MIT (training code) | No licence per checkpoint; a 128 GB re-host (`Politrees/UVR_resources`) tags MIT, but a re-uploader can't license others' weights | Mostly unknown | UNVERIFIED |
+| Open-Unmix `umxl` / `umxhq` | MIT | CC BY-NC-SA 4.0 / not stated (MUSDB) | MUSDB | RESTRICTED |
+| Spleeter | MIT | Not stated on README | — | UNVERIFIED |
+| **Own separator trained on Slakh2100 (CC BY 4.0) + PDMX synthesized (CC0)** | own | own | Licensed | SAFE (quality on real recordings unknown; long-term option) |
 
-**Conclusion:** no separation checkpoint with verified commercial rights was found. Options for a commercial release: (a) written permission/licence for the Demucs weights, (b) train our own separator on licensed multitracks, (c) keep separation off for commercial builds. Not a blocker for the owner's personal builds.
+## 6. Training and evaluation data (verified)
 
-## 5. Training data for a TonePilot-owned model
+| Dataset | Licence (source) | Real or synthetic | Use |
+|---|---|---|---|
+| NSynth | **CC BY 4.0** (magenta.tensorflow.org) | Real notes from 1 006 instruments, commercial sample libraries | Timbre model training, family recognition |
+| Slakh2100 | **CC BY 4.0** (Zenodo 4599666, slakh.com) | Sample-based renders of 2 100 MIDI songs, per-instrument stems + MIDI | Training/eval: instrument-in-stem, transcription, separation |
+| GuitarSet | **CC BY 4.0** (`jhartquist/guitarset`, upstream Zenodo) | Real acoustic guitar with note annotations | **Real-audio accompaniment transcription test** |
+| Beat This! annotations / spectrograms | CC BY 4.0 (Zenodo 13922116) | Annotations | Beat/downbeat references |
+| PDMX multi-instrument synthesized | CC0 audio, CC BY captions | Synthesized | Training |
+| OpenMIC-2018 (DynamicSuperb copy) | CC BY 4.0 tag | Real (FMA tracks, mixed CC licences per track) | Instrument presence evaluation (check per track) |
+| MUSDB18-HQ | "other-nc" (Zenodo) | Real | **Not usable** commercially |
+| Mridangam stroke | CC BY-NC 4.0 (Zenodo 1265188) | Real | **Not usable** commercially |
+| ccmusic-database instrument sets | CC BY-NC-ND 4.0 | Real | **Not usable** |
+| Carnatic sets (monodox, kaumudi-ai) | CC BY 4.0 (tags) | **Unknown — inspect** | Possible evaluation only after provenance check |
 
-| Source | What | Licence | Class | Use |
-|---|---|---|---|---|
-| TonePilot's own synth patches | Rendered notes | Own | SAFE | Yes |
-| GeneralUser GS | Rendered notes from 287 presets | Commercial music creation allowed; **silent on ML training**; sample origins not fully certain (licence text) | **UNVERIFIED for training** | Ask the author (S. Christian Collins) for written permission before training |
-| [Slakh2100](https://github.com/ethman/slakh-utils) | 2 100 mixed tracks, per-instrument stems, MIDI, GM classes (145 h) | Not stated on the utils repo; dataset page (slakh.com / Zenodo) unreadable | **UNVERIFIED** | Ideal for "instrument in a separated stem" training once cleared |
-| NSynth | ~300k single notes, 11 instrument families | Dataset page unreadable this session | **UNVERIFIED** | Ideal for family recognition once cleared |
-| Owner's own recordings (Casio + app) | Real performances | Owner's rights | SAFE | Validation and Indian-instrument examples |
-| Commercially licensed / CC0 music for validation | Real mixes | Per track (CC0 / CC BY only) | SAFE per track | Benchmark only, never shipped |
+## 7. Ranking by TonePilot value (revised)
 
-## 6. Ranking by practical TonePilot value
+| Rank | Candidate | Serves | Size | Class | Status |
+|---|---|---|---|---|---|
+| 1 | Beat This! small | Beat grid, downbeats, cycles (Song Arpeggio) | ~8 MB | SAFE\* | Test (Phase 2) |
+| 2 | Improved DSP chords + BTC comparison | Chord degrees (Song Arpeggio) | 0 / 12 MB | SAFE / SAFE\* | Test (Phase 3) |
+| 3 | Basic Pitch vs existing learner | Accompaniment note events | 0.84 MB | SAFE\* | Test (Phase 4) |
+| 4 | All-In-One | Structure labels, downbeats | 1.4 MB/fold | SAFE\* | Comparison (Phase 2) |
+| 5 | LAION-CLAP music vs TonePilot Timbre model | Instruments and tones | to measure / ≤5 MB | SAFE\* | Research (Phase 6) |
 
-| Rank | Integration | Why | Size | Class |
-|---|---|---|---|---|
-| 1 | **Beat This! small** | Fixes the measured weakest input of Song Arpeggio (no-drum beats 0.52, meter 10/24); gives downbeats and bars; MIT weights | ~8.1 MB | SAFE |
-| 2 | **Basic Pitch** on the accompaniment stem | Real note events → exact chord-relative patterns (register, duration, octave) instead of onset + harmonic-sum probing; same model can cross-check melody | Small (to measure) | SAFE |
-| 3 | **TonePilot Timbre model** (own, trained on cleared data) | The only shippable route to instrument recognition and tone matching that beats 4/12 | ≤ 5 MB target | SAFE once data cleared |
-| — | DSP upgrades (chords, structure, ToneMatcher method) | Measured gaps that need no model | 0 MB | SAFE |
+## 8. Rejected
 
-## 7. Rejected (and why)
-
-madmom models (CC BY-NC-SA) · MuQ / MuQ-MuLan (CC BY-NC) · Sheet Sage (CC BY-NC-SA, 10 GB) · Open-Unmix umxl (CC BY-NC-SA) · MERT (unverified + 95–330M params) · MT3, Omnizart, RMVPE, ROSVOT, All-In-One, BEATs, Spleeter, RoFormer checkpoints (weights terms not stated) · YAMNet (duplicates Apple's classifier) · any paid API.
-
-## 8. How to clear the UNVERIFIED items (zero cost)
-
-1. Allow `huggingface.co` and `zenodo.org` in the session's network settings (or read them in CI) and record the licence field of: `lukewys/laion_clap`, `microsoft/msclap`, `m-a-p/MERT-v1-95M`, Zenodo 3987831 (PANNs), Zenodo 8378278 (MS-CLAP), the Slakh2100 record, NSynth.
-2. Email the GeneralUser GS author for written permission to train on renders.
-3. Re-run the decision matrix: only items that turn SAFE **and** beat the TonePilot baseline in `TONEPILOT_BENCHMARK_PLAN.md` move forward.
+Verified non-commercial: madmom models, Essentia models, MERT, MuQ/MuQ-MuLan, FCPE, Sheet Sage, Open-Unmix umxl, MUSDB18-HQ, Mridangam stroke, ccmusic-database. Unverified weights: MT3, SOME, RMVPE, PESTO, CREPE, ChordMini, RoFormer checkpoints, Spleeter, community instrument classifiers. Too large for the phone (reference only): ByteDance piano, YourMT3, AST, Microsoft CLAP. Paid APIs: all.

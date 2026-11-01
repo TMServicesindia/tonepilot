@@ -1,0 +1,4153 @@
+{
+ "models": {
+  "lukewys/laion_clap": {
+   "error": null,
+   "license": "cc0-1.0",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2023-04-08T01:50:48.000Z",
+   "bytes": 14512372972,
+   "files": [
+    [
+     ".gitattributes",
+     1477
+    ],
+    [
+     "630k-audioset-best.pt",
+     1863587645
+    ],
+    [
+     "630k-audioset-fusion-best.pt",
+     1863889051
+    ],
+    [
+     "630k-best.pt",
+     1863587645
+    ],
+    [
+     "630k-fusion-best.pt",
+     1863894120
+    ],
+    [
+     "README.md",
+     25
+    ],
+    [
+     "music_audioset_epoch_15_esc_90.14.pt",
+     2352471003
+    ],
+    [
+     "music_speech_audioset_epoch_15_esc_89.98.pt",
+     2352471003
+    ],
+    [
+     "music_speech_epoch_15_esc_89.25.pt",
+     2352471003
+    ]
+   ],
+   "card_license_lines": [
+    "license: cc0-1.0"
+   ]
+  },
+  "laion/clap-htsat-unfused": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 883385,
+   "lastModified": "2023-04-24T14:39:57.000Z",
+   "bytes": 617901754,
+   "files": [
+    [
+     ".gitattributes",
+     1477
+    ],
+    [
+     "README.md",
+     4454
+    ],
+    [
+     "config.json",
+     5390
+    ],
+    [
+     "merges.txt",
+     456356
+    ],
+    [
+     "preprocessor_config.json",
+     541
+    ],
+    [
+     "pytorch_model.bin",
+     614525833
+    ],
+    [
+     "special_tokens_map.json",
+     280
+    ],
+    [
+     "tokenizer.json",
+     2108746
+    ],
+    [
+     "tokenizer_config.json",
+     384
+    ],
+    [
+     "vocab.json",
+     798293
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0",
+    "model = ClapModel.from_pretrained(\"laion/clap-htsat-unfused\")",
+    "processor = ClapProcessor.from_pretrained(\"laion/clap-htsat-unfused\")",
+    "model = ClapModel.from_pretrained(\"laion/clap-htsat-unfused\").to(0)",
+    "processor = ClapProcessor.from_pretrained(\"laion/clap-htsat-unfused\")",
+    "If you are using this model for your work, please consider citing the original paper:"
+   ]
+  },
+  "laion/clap-htsat-fused": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 6714783,
+   "lastModified": "2026-01-12T00:41:49.000Z",
+   "bytes": 1232468802,
+   "files": [
+    [
+     ".gitattributes",
+     1477
+    ],
+    [
+     "README.md",
+     4610
+    ],
+    [
+     "config.json",
+     5422
+    ],
+    [
+     "merges.txt",
+     456356
+    ],
+    [
+     "model.safetensors",
+     614496152
+    ],
+    [
+     "preprocessor_config.json",
+     537
+    ],
+    [
+     "pytorch_model.bin",
+     614596545
+    ],
+    [
+     "special_tokens_map.json",
+     280
+    ],
+    [
+     "tokenizer.json",
+     2108746
+    ],
+    [
+     "tokenizer_config.json",
+     384
+    ],
+    [
+     "vocab.json",
+     798293
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0",
+    "LAION-CLAP was trained on [LAION-audio-630k](https://github.com/LAION-AI/audio-dataset/blob/main/laion-audio-630k/README.md)",
+    "model = ClapModel.from_pretrained(\"laion/clap-htsat-fused\")",
+    "processor = ClapProcessor.from_pretrained(\"laion/clap-htsat-fused\")",
+    "model = ClapModel.from_pretrained(\"laion/clap-htsat-fused\").to(0)",
+    "processor = ClapProcessor.from_pretrained(\"laion/clap-htsat-fused\")",
+    "If you are using this model for your work, please consider citing the original paper:"
+   ]
+  },
+  "laion/larger_clap_music": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 266812,
+   "lastModified": "2023-10-30T19:17:40.000Z",
+   "bytes": 779815837,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     3457
+    ],
+    [
+     "config.json",
+     628
+    ],
+    [
+     "merges.txt",
+     456318
+    ],
+    [
+     "preprocessor_config.json",
+     541
+    ],
+    [
+     "pytorch_model.bin",
+     776444665
+    ],
+    [
+     "special_tokens_map.json",
+     280
+    ],
+    [
+     "tokenizer.json",
+     2108774
+    ],
+    [
+     "tokenizer_config.json",
+     1362
+    ],
+    [
+     "vocab.json",
+     798293
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0",
+    "CLAP is to audio what CLIP is to image. This is an improved CLAP checkpoint, specifically trained on music.",
+    "CLAP (Contrastive Language-Audio Pretraining) is a neural network trained on a variety of (audio, text) pairs. It can be instructed in to predict the most relevant text snippet, given an audio, without directly optimizing for the task. The CLAP model uses a SWINTransformer to get audio features from a log-Mel spectrogram input, and a RoBERTa model to get text features. Both the text and audio features are then projected to a latent space with identical dimension. The dot product between the projected audio and text features is then used as a similar score.",
+    "model = ClapModel.from_pretrained(\"laion/larger_clap_music\")",
+    "processor = ClapProcessor.from_pretrained(\"laion/larger_clap_music\")",
+    "model = ClapModel.from_pretrained(\"laion/larger_clap_music\").to(0)",
+    "processor = ClapProcessor.from_pretrained(\"laion/larger_clap_music\")",
+    "If you are using this model for your work, please consider citing the original paper:"
+   ]
+  },
+  "laion/larger_clap_music_and_speech": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 113342,
+   "lastModified": "2023-10-31T19:56:11.000Z",
+   "bytes": 779815910,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     3523
+    ],
+    [
+     "config.json",
+     635
+    ],
+    [
+     "merges.txt",
+     456318
+    ],
+    [
+     "preprocessor_config.json",
+     541
+    ],
+    [
+     "pytorch_model.bin",
+     776444665
+    ],
+    [
+     "special_tokens_map.json",
+     280
+    ],
+    [
+     "tokenizer.json",
+     2108774
+    ],
+    [
+     "tokenizer_config.json",
+     1362
+    ],
+    [
+     "vocab.json",
+     798293
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0",
+    "CLAP is to audio what CLIP is to image. This is an improved CLAP checkpoint, specifically trained on music and speech.",
+    "CLAP (Contrastive Language-Audio Pretraining) is a neural network trained on a variety of (audio, text) pairs. It can be instructed in to predict the most relevant text snippet, given an audio, without directly optimizing for the task. The CLAP model uses a SWINTransformer to get audio features from a log-Mel spectrogram input, and a RoBERTa model to get text features. Both the text and audio features are then projected to a latent space with identical dimension. The dot product between the projected audio and text features is then used as a similar score.",
+    "model = ClapModel.from_pretrained(\"laion/larger_clap_music_and_speech\")",
+    "processor = ClapProcessor.from_pretrained(\"laion/larger_clap_music_and_speech\")",
+    "model = ClapModel.from_pretrained(\"laion/larger_clap_music_and_speech\").to(0)",
+    "processor = ClapProcessor.from_pretrained(\"laion/larger_clap_music_and_speech\")",
+    "If you are using this model for your work, please consider citing the original paper:"
+   ]
+  },
+  "laion/larger_clap_general": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 346918,
+   "lastModified": "2023-10-31T19:56:46.000Z",
+   "bytes": 779815888,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     3493
+    ],
+    [
+     "config.json",
+     643
+    ],
+    [
+     "merges.txt",
+     456318
+    ],
+    [
+     "preprocessor_config.json",
+     541
+    ],
+    [
+     "pytorch_model.bin",
+     776444665
+    ],
+    [
+     "special_tokens_map.json",
+     280
+    ],
+    [
+     "tokenizer.json",
+     2108774
+    ],
+    [
+     "tokenizer_config.json",
+     1362
+    ],
+    [
+     "vocab.json",
+     798293
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0",
+    "CLAP is to audio what CLIP is to image. This is an improved CLAP checkpoint, specifically trained on general audio, music and speech.",
+    "CLAP (Contrastive Language-Audio Pretraining) is a neural network trained on a variety of (audio, text) pairs. It can be instructed in to predict the most relevant text snippet, given an audio, without directly optimizing for the task. The CLAP model uses a SWINTransformer to get audio features from a log-Mel spectrogram input, and a RoBERTa model to get text features. Both the text and audio features are then projected to a latent space with identical dimension. The dot product between the projected audio and text features is then used as a similar score.",
+    "model = ClapModel.from_pretrained(\"laion/larger_clap_general\")",
+    "processor = ClapProcessor.from_pretrained(\"laion/larger_clap_general\")",
+    "model = ClapModel.from_pretrained(\"laion/larger_clap_general\").to(0)",
+    "processor = ClapProcessor.from_pretrained(\"laion/larger_clap_general\")",
+    "If you are using this model for your work, please consider citing the original paper:"
+   ]
+  },
+  "microsoft/msclap": {
+   "error": null,
+   "license": "ms-pl",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2023-10-14T20:02:55.000Z",
+   "bytes": 4736248505,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "CLAP_weights_2022.pth",
+     2333972488
+    ],
+    [
+     "CLAP_weights_2023.pth",
+     689950036
+    ],
+    [
+     "README.md",
+     3545
+    ],
+    [
+     "clapcap_weights_2023.pth",
+     1712037386
+    ],
+    [
+     "docs/clap2_diagram.png",
+     283531
+    ]
+   ],
+   "card_license_lines": [
+    "license: ms-pl"
+   ]
+  },
+  "m-a-p/MERT-v1-95M": {
+   "error": null,
+   "license": "cc-by-nc-4.0",
+   "gated": false,
+   "downloads": 63279,
+   "lastModified": "2025-05-25T05:03:07.000Z",
+   "bytes": 1700644945,
+   "files": [
+    [
+     ".gitattributes",
+     1477
+    ],
+    [
+     "MERT-v1-95M_fairseq.pt",
+     1323058324
+    ],
+    [
+     "README.md",
+     6756
+    ],
+    [
+     "config.json",
+     1817
+    ],
+    [
+     "configuration_MERT.py",
+     5340
+    ],
+    [
+     "modeling_MERT.py",
+     18033
+    ],
+    [
+     "preprocessor_config.json",
+     211
+    ],
+    [
+     "pytorch_model.bin",
+     377552987
+    ]
+   ],
+   "card_license_lines": [
+    "license: cc-by-nc-4.0",
+    "- 17/03/2023: we release two advanced music understanding models, [MERT-v1-95M](https://huggingface.co/m-a-p/MERT-v1-95M) and [MERT-v1-330M](https://huggingface.co/m-a-p/MERT-v1-330M) , trained with new paradigm and dataset. They outperform the previous models and can better generalize to more tasks.",
+    "- 14/03/2023: we retrained the MERT-v0 model with open-source-only music dataset [MERT-v0-public](https://huggingface.co/m-a-p/MERT-v0-public)",
+    "- 29/12/2022: a music understanding model [MERT-v0](https://huggingface.co/m-a-p/MERT-v0) trained with **MLM** paradigm, which performs better at downstream tasks.",
+    "- 29/10/2022: a pre-trained MIR model [music2vec](https://huggingface.co/m-a-p/music2vec-v1) trained with **BYOL** paradigm.",
+    "- **Sample Rate**: The frequency of audio that the model is trained with.",
+    "- Change the pseudo labels to 8 codebooks from [encodec](https://github.com/facebookresearch/encodec), which potentially has higher quality and empower our model to support music generation.",
+    "model = AutoModel.from_pretrained(\"m-a-p/MERT-v1-95M\", trust_remote_code=True)",
+    "processor = Wav2Vec2FeatureExtractor.from_pretrained(\"m-a-p/MERT-v1-95M\",trust_remote_code=True)"
+   ]
+  },
+  "m-a-p/MERT-v1-330M": {
+   "error": null,
+   "license": "cc-by-nc-4.0",
+   "gated": false,
+   "downloads": 88520,
+   "lastModified": "2025-05-25T05:04:41.000Z",
+   "bytes": 5252919316,
+   "files": [
+    [
+     ".gitattributes",
+     1477
+    ],
+    [
+     "MERT-v1-330M_fairseq.pt",
+     3991038973
+    ],
+    [
+     "README.md",
+     6760
+    ],
+    [
+     "config.json",
+     2032
+    ],
+    [
+     "configuration_MERT.py",
+     5340
+    ],
+    [
+     "modeling_MERT.py",
+     18033
+    ],
+    [
+     "preprocessor_config.json",
+     212
+    ],
+    [
+     "pytorch_model.bin",
+     1261846489
+    ]
+   ],
+   "card_license_lines": [
+    "license: cc-by-nc-4.0",
+    "- 17/03/2023: we release two advanced music understanding models, [MERT-v1-95M](https://huggingface.co/m-a-p/MERT-v1-95M) and [MERT-v1-330M](https://huggingface.co/m-a-p/MERT-v1-330M) , trained with new paradigm and dataset. They outperform the previous models and can better generalize to more tasks.",
+    "- 14/03/2023: we retrained the MERT-v0 model with open-source-only music dataset [MERT-v0-public](https://huggingface.co/m-a-p/MERT-v0-public)",
+    "- 29/12/2022: a music understanding model [MERT-v0](https://huggingface.co/m-a-p/MERT-v0) trained with **MLM** paradigm, which performs better at downstream tasks.",
+    "- 29/10/2022: a pre-trained MIR model [music2vec](https://huggingface.co/m-a-p/music2vec-v1) trained with **BYOL** paradigm.",
+    "- **Sample Rate**: The frequency of audio that the model is trained with.",
+    "- Change the pseudo labels to 8 codebooks from [encodec](https://github.com/facebookresearch/encodec), which potentially has higher quality and empower our model to support music generation.",
+    "model = AutoModel.from_pretrained(\"m-a-p/MERT-v1-330M\", trust_remote_code=True)",
+    "processor = Wav2Vec2FeatureExtractor.from_pretrained(\"m-a-p/MERT-v1-330M\",trust_remote_code=True)"
+   ]
+  },
+  "OpenMuQ/MuQ-large-msd-iter": {
+   "error": null,
+   "license": "cc-by-nc-4.0",
+   "gated": false,
+   "downloads": 341750,
+   "lastModified": "2025-08-15T10:45:28.000Z",
+   "bytes": 2667799593,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     4407
+    ],
+    [
+     "config.json",
+     3133
+    ],
+    [
+     "model.safetensors",
+     1333825096
+    ],
+    [
+     "pytorch_model.bin",
+     1333965438
+    ]
+   ],
+   "card_license_lines": [
+    "license: cc-by-nc-4.0",
+    "- **MuQ**(see [this link](https://huggingface.co/OpenMuQ/MuQ-large-msd-iter)): A large music foundation model pre-trained via Self-Supervised Learning (SSL), achieving SOTA in various MIR tasks.",
+    "- **MuQ-MuLan**(see [this link](https://huggingface.co/OpenMuQ/MuQ-MuLan-large)): A music-text joint embedding model trained via contrastive learning, supporting both English and Chinese texts.",
+    "muq = MuQ.from_pretrained(\"OpenMuQ/MuQ-large-msd-iter\")",
+    "mulan = MuQMuLan.from_pretrained(\"OpenMuQ/MuQ-MuLan-large\")",
+    "**Note**: Please note that the open-sourced MuQ was trained on the Million Song Dataset. Due to differences in dataset size, the open-sourced model may not achieve the same level of performance as reported in the paper.",
+    "## License",
+    "The code is released under the MIT license.",
+    "The model weights (MuQ-large-msd-iter, MuQ-MuLan-large) are released under the CC-BY-NC 4.0 license."
+   ]
+  },
+  "OpenMuQ/MuQ-MuLan-large": {
+   "error": null,
+   "license": "cc-by-nc-4.0",
+   "gated": false,
+   "downloads": 74941,
+   "lastModified": "2025-08-21T19:00:44.000Z",
+   "bytes": 2653961172,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     4405
+    ],
+    [
+     "config.json",
+     847
+    ],
+    [
+     "pytorch_model.bin",
+     2653954401
+    ]
+   ],
+   "card_license_lines": [
+    "license: cc-by-nc-4.0",
+    "- **MuQ**(see [this link](https://huggingface.co/OpenMuQ/MuQ-large-msd-iter)): A large music foundation model pre-trained via Self-Supervised Learning (SSL), achieving SOTA in various MIR tasks.",
+    "- **MuQ-MuLan**(see [this link](https://huggingface.co/OpenMuQ/MuQ-MuLan-large)): A music-text joint embedding model trained via contrastive learning, supporting both English and Chinese texts.",
+    "mulan = MuQMuLan.from_pretrained(\"OpenMuQ/MuQ-MuLan-large\")",
+    "muq = MuQ.from_pretrained(\"OpenMuQ/MuQ-large-msd-iter\")",
+    "**Note**: Please note that the open-sourced MuQ was trained on the Million Song Dataset. Due to differences in dataset size, the open-sourced model may not achieve the same level of performance as reported in the paper.",
+    "## License",
+    "The code is released under the MIT license.",
+    "The model weights (MuQ-large-msd-iter, MuQ-MuLan-large) are released under the CC-BY-NC 4.0 license."
+   ]
+  },
+  "MIT/ast-finetuned-audioset-10-10-0.4593": {
+   "error": null,
+   "license": "bsd-3-clause",
+   "gated": false,
+   "downloads": 1574635,
+   "lastModified": "2023-09-06T14:49:15.000Z",
+   "bytes": 692880325,
+   "files": [
+    [
+     ".gitattributes",
+     1477
+    ],
+    [
+     "README.md",
+     1165
+    ],
+    [
+     "config.json",
+     26763
+    ],
+    [
+     "model.safetensors",
+     346404948
+    ],
+    [
+     "preprocessor_config.json",
+     297
+    ],
+    [
+     "pytorch_model.bin",
+     346445675
+    ]
+   ],
+   "card_license_lines": [
+    "license: bsd-3-clause"
+   ]
+  },
+  "fschmid56/EfficientAT": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "google/yamnet": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "CPJKU/beat_this": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "taejunkim/allinone": {
+   "error": null,
+   "license": "mit",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2023-10-30T19:59:47.000Z",
+   "bytes": 23856080,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     21
+    ],
+    [
+     "all-fold0-40pa2vpn.pth",
+     1406021
+    ],
+    [
+     "all-fold1-ixhnrlbv.pth",
+     1406021
+    ],
+    [
+     "all-fold2-b9yx1jtt.pth",
+     1406021
+    ],
+    [
+     "all-fold3-ri1y9ns9.pth",
+     1406021
+    ],
+    [
+     "all-fold4-u6l5vhox.pth",
+     1406021
+    ],
+    [
+     "all-fold5-m7dx7spr.pth",
+     1406021
+    ],
+    [
+     "all-fold6-4j7nqihf.pth",
+     1406021
+    ],
+    [
+     "all-fold7-f0qjbkoz.pth",
+     1406021
+    ],
+    [
+     "harmonix-fold0-0vra4ys2.pth",
+     1400571
+    ],
+    [
+     "harmonix-fold1-3ozjhtsj.pth",
+     1400571
+    ],
+    [
+     "harmonix-fold2-gmgo0nsy.pth",
+     1400571
+    ],
+    [
+     "harmonix-fold3-i92b7m8p.pth",
+     1400571
+    ],
+    [
+     "harmonix-fold4-1bql5qo0.pth",
+     1400571
+    ],
+    [
+     "harmonix-fold5-x4z5zeef.pth",
+     1400571
+    ],
+    [
+     "harmonix-fold6-x7t226rq.pth",
+     1400571
+    ],
+    [
+     "harmonix-fold7-qwwskhg6.pth",
+     1400571
+    ],
+    [
+     "raveform-fold3-mrkbf2f8.pth",
+     1401804
+    ]
+   ],
+   "card_license_lines": [
+    "license: mit"
+   ]
+  },
+  "mir-aidj/all-in-one": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "spotify/basic-pitch": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2023-09-12T18:50:41.000Z",
+   "bytes": 10440,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     8921
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0",
+    "[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)",
+    "![Supported Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Windows%20%7C%20Linux-green)",
+    "Basic Pitch is a Python library for Automatic Music Transcription (AMT), using lightweight neural network developed by [Spotify's Audio Intelligence Lab](https://research.atspotify.com/audio-intelligence/). It's small, easy-to-use, `pip install`-able and `npm install`-able via its [sibling repo](https://github.com/spotify/basic-pitch-ts).",
+    "### Research Paper",
+    "This library was released in conjunction with Spotify's publication at [ICASSP 2022](https://2022.ieeeicassp.org/). You can read more about this research in the paper, [A Lightweight Instrument-Agnostic Model for Polyphonic Note Transcription and Multipitch Estimation](https://arxiv.org/abs/2203.09893).",
+    "If you use this library in academic research, consider citing it:",
+    "**Note that we have improved Basic Pitch beyond what was presented in this paper. Therefore, if you use the output of Basic Pitch in academic research,",
+    "If you would like `basic-pitch` orchestrate the generation and saving of our various supported output file types, you may use [`predict_and_save`](basic_pitch/inference.py) instead of using [`predict`](basic_pitch/inference.py) directly:",
+    "**Supported Audio Codecs**"
+   ]
+  },
+  "mimbres/YourMT3": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2025-06-23T13:17:49.000Z",
+   "bytes": 2765814497,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     291
+    ],
+    [
+     "logs/2024/mc13_256_all_cross_v6_xk5_amp0811_edr005_attend_c_full_plus_2psn_nl26_sb_b26r_800k/checkpoints/model.ckpt",
+     541553263
+    ],
+    [
+     "logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b36_nops/checkpoints/last.ckpt",
+     561544628
+    ],
+    [
+     "logs/2024/mc13_256_g4_all_v7_mt3f_sqr_rms_moe_wf4_n8k2_silu_rope_rp_b80_ps2/checkpoints/model.ckpt",
+     758957292
+    ],
+    [
+     "logs/2024/notask_all_cross_v6_xk2_amp0811_gm_ext_plus_nops_b72/checkpoints/model.ckpt",
+     542707465
+    ],
+    [
+     "logs/2024/ptf_all_cross_rebal5_mirst_xk2_edr005_attend_c_full_plus_b100/checkpoints/model.ckpt",
+     361050039
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0"
+   ]
+  },
+  "ChiTu/FCPE": {
+   "error": null,
+   "license": "cc-by-nc-sa-4.0",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2025-09-19T13:02:16.000Z",
+   "bytes": 43364436,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "DDSP_200k.pt",
+     43362881
+    ],
+    [
+     "README.md",
+     36
+    ]
+   ],
+   "card_license_lines": [
+    "license: cc-by-nc-sa-4.0"
+   ]
+  },
+  "lj1995/VoiceConversionWebUI": {
+   "error": null,
+   "license": "mit",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2026-08-01T16:59:13.000Z",
+   "bytes": 103312651355,
+   "files": [
+    [
+     ".gitattributes",
+     1572
+    ],
+    [
+     "README.md",
+     21
+    ],
+    [
+     "RVC-beta-20230513.7z",
+     3175833437
+    ],
+    [
+     "RVC-beta-v2-0528.7z",
+     4220332519
+    ],
+    [
+     "RVC-beta-v2-0618.7z",
+     4808663151
+    ],
+    [
+     "RVC-beta-v20230331.7z",
+     3142549647
+    ],
+    [
+     "RVC-beta.7z",
+     5188847990
+    ],
+    [
+     "RVC-beta0717.7z",
+     5188847990
+    ],
+    [
+     "RVC-beta20230416.7z",
+     3147462195
+    ],
+    [
+     "RVC-beta20230428.7z",
+     3175819910
+    ],
+    [
+     "RVC-beta20230508.7z",
+     3175821212
+    ],
+    [
+     "RVC-beta20230516.7z",
+     3759009509
+    ],
+    [
+     "RVC0813AMD_Intel.7z",
+     4061028665
+    ],
+    [
+     "RVC0813Nvidia.7z",
+     5518064455
+    ],
+    [
+     "RVC1006AMD_Intel.7z",
+     4091030090
+    ],
+    [
+     "RVC1006Nvidia.7z",
+     5637154758
+    ],
+    [
+     "RVC20240604Nvidia.7z",
+     5599416462
+    ],
+    [
+     "RVC20240604Nvidia50x0.7z",
+     6035728220
+    ],
+    [
+     "RVC20260718AMD_Intel.7z",
+     5575283376
+    ],
+    [
+     "RVC20260718Nvidia.7z",
+     7799405386
+    ],
+    [
+     "RVC20260718Nvidia50x0.7z",
+     7606183207
+    ],
+    [
+     "RVCRealtime-Win64VST.zip",
+     1144352
+    ],
+    [
+     "config.py",
+     1296
+    ],
+    [
+     "ffmpeg.exe",
+     52925440
+    ],
+    [
+     "ffprobe.exe",
+     122135040
+    ]
+   ],
+   "card_license_lines": [
+    "license: mit"
+   ]
+  },
+  "openvpi/SOME": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "SonyCSLParis/pesto": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "KimberleyJensen/MelBandRoformer": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "TRvlvr/model_repo": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "Politrees/UVR_resources": {
+   "error": null,
+   "license": "mit",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2025-12-23T18:31:56.000Z",
+   "bytes": 128569673313,
+   "files": [
+    [
+     ".gitattributes",
+     12741
+    ],
+    [
+     "README.md",
+     292
+    ],
+    [
+     "impulse/VS8F-1/100-Reverb.wav",
+     1192672
+    ],
+    [
+     "impulse/VS8F-1/101-LargeHall.wav",
+     1324768
+    ],
+    [
+     "impulse/VS8F-1/102-SmallHall.wav",
+     796384
+    ],
+    [
+     "impulse/VS8F-1/103-Strings.wav",
+     1192672
+    ],
+    [
+     "impulse/VS8F-1/104-PianoHall.wav",
+     1060576
+    ],
+    [
+     "impulse/VS8F-1/105-OrchRoom.wav",
+     664288
+    ],
+    [
+     "impulse/VS8F-1/106-VocalRoom.wav",
+     796384
+    ],
+    [
+     "impulse/VS8F-1/107-MediumRm.wav",
+     424672
+    ],
+    [
+     "impulse/VS8F-1/108-LargeRoom.wav",
+     664288
+    ],
+    [
+     "impulse/VS8F-1/109-CoolPlate.wav",
+     1192672
+    ],
+    [
+     "impulse/VS8F-1/110-ShortPlt.wav",
+     842464
+    ],
+    [
+     "impulse/VS8F-1/111-VocalPlt.wav",
+     1060576
+    ],
+    [
+     "impulse/VS8F-1/112-SoftAmb.wav",
+     268000
+    ],
+    [
+     "impulse/VS8F-1/113-RoomAmb.wav",
+     268000
+    ],
+    [
+     "impulse/VS8F-1/114-Cathedral.wav",
+     1853152
+    ],
+    [
+     "impulse/VS8F-1/115-LongCave.wav",
+     2120416
+    ],
+    [
+     "impulse/VS8F-1/116-GarageDr.wav",
+     268000
+    ],
+    [
+     "impulse/VS8F-1/117-RockKick.wav",
+     326368
+    ],
+    [
+     "impulse/VS8F-1/118-RockSnare.wav",
+     400096
+    ],
+    [
+     "impulse/VS8F-2/200-R1_Reverb1.wav",
+     1192672
+    ],
+    [
+     "impulse/VS8F-2/201-R1_LargeHall.wav",
+     1324768
+    ],
+    [
+     "impulse/VS8F-2/202-R1_SmallHall.wav",
+     796384
+    ],
+    [
+     "impulse/VS8F-2/203-R1_Strings.wav",
+     1192672
+    ]
+   ],
+   "card_license_lines": [
+    "license: mit"
+   ]
+  },
+  "facebook/htdemucs": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "musetric/chordmini-onnx": {
+   "error": null,
+   "license": "mit",
+   "gated": false,
+   "downloads": 1950,
+   "lastModified": "2026-09-29T21:20:33.000Z",
+   "bytes": 17125716,
+   "files": [
+    [
+     ".gitattributes",
+     1555
+    ],
+    [
+     "README.md",
+     14985
+    ],
+    [
+     "chordnet.onnx",
+     17080550
+    ],
+    [
+     "config.json",
+     3009
+    ],
+    [
+     "cqt-plan.bin",
+     23896
+    ],
+    [
+     "cqt-plan.manifest.json",
+     1721
+    ]
+   ],
+   "card_license_lines": [
+    "license: mit",
+    "- **The model is gain-sensitive.** It was trained on `librosa.load`'s arithmetic",
+    "WebGPU EP returns **silently wrong logits** for the original graph on Adreno",
+    "original graph within 4e-6 (verified in ORT CPU). Full evidence: the musetric",
+    "In ORT CPU this revision matches the original graph within 7e-6 at 1, 5, 16, 20",
+    "In ORT CPU this revision matches the exported graph within 5.7e-6, the same as",
+    "| exported logits vs Torch ChordNet, identical inputs | max abs error < `1e-4` |",
+    "Code license and weight license are separate; ONNX conversion does not change the",
+    "weight license. Documented only as far as it is verifiable.",
+    "**MIT** (per its `LICENSE`). Upstream publishes **no Hugging Face repo**, so"
+   ]
+  },
+  "puar-playground/btc-chord": {
+   "error": null,
+   "license": "mit",
+   "gated": false,
+   "downloads": 1279,
+   "lastModified": "2026-07-09T04:36:50.000Z",
+   "bytes": 24417257,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     4424
+    ],
+    [
+     "btc_model.pt",
+     12154754
+    ],
+    [
+     "btc_model_large_voca.pt",
+     12229576
+    ],
+    [
+     "btc_src/__init__.py",
+     0
+    ],
+    [
+     "btc_src/btc_model.py",
+     6778
+    ],
+    [
+     "btc_src/features.py",
+     2455
+    ],
+    [
+     "btc_src/transformer_modules.py",
+     10477
+    ],
+    [
+     "config.json",
+     234
+    ],
+    [
+     "modeling_btc.py",
+     6991
+    ],
+    [
+     "requirements.txt",
+     49
+    ]
+   ],
+   "card_license_lines": [
+    "license: mit",
+    "> architecture are unchanged from the official release. This repo adds a `from_pretrained`",
+    "model = AutoModel.from_pretrained(\"puar-playground/btc-chord\", trust_remote_code=True)",
+    "model = AutoModel.from_pretrained(\"puar-playground/btc-chord\", trust_remote_code=True,",
+    "model = AutoModel.from_pretrained(\"puar-playground/btc-chord\", trust_remote_code=True)",
+    "model = AutoModel.from_pretrained(\"puar-playground/btc-chord\", trust_remote_code=True,",
+    "The original repo depended on `mir_eval`, `pretty_midi`, `pandas`, `pyrubberband`, and pinned",
+    "- Original repository: [jayg996/BTC-ISMIR19](https://github.com/jayg996/BTC-ISMIR19) (MIT)"
+   ]
+  },
+  "qiuqiangkong/piano_transcription": {
+   "error": null,
+   "license": "mit",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2025-02-20T15:50:49.000Z",
+   "bytes": 628300891,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     24
+    ],
+    [
+     "conformer2d_step=200000.pth",
+     628299348
+    ]
+   ],
+   "card_license_lines": [
+    "license: mit"
+   ]
+  },
+  "asigalov61/bytedance_piano_transcription": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2024-02-29T10:42:14.000Z",
+   "bytes": 171968125,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "CRNN_note_F1=0.9677_pedal_F1=0.9186.pth",
+     171966578
+    ],
+    [
+     "README.md",
+     28
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0"
+   ]
+  },
+  "litert-community/Basic-Pitch-LiteRT": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 150,
+   "lastModified": "2026-09-08T08:42:38.000Z",
+   "bytes": 938722,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     6765
+    ],
+    [
+     "assets/hero.png",
+     87810
+    ],
+    [
+     "basicpitch.tflite",
+     842628
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0",
+    "Measured on a **Pixel 8a** (Tensor G3, Android 16) with the standard TFLite [`benchmark_model`](https://ai.google.dev/edge/litert/models/measurement) tool \u2014 10 warm-up runs then 50 timed runs, reported as the tool's mean.",
+    "Measured on a **Samsung Galaxy S26** (Snapdragon 8 Elite Gen 5 / SM8850, Hexagon v81, Android 16) with LiteRT `CompiledModel` 2.2.0, one accelerator per process, 5 warm-up runs then N=50 timed runs, median reported. Every run held thermal status `NONE` throughout. Headroom 0.65\u20130.70, where 1.0 is the throttling threshold."
+   ]
+  },
+  "daserge/basic-pitch-onnx": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2026-07-19T06:17:12.000Z",
+   "bytes": 232649,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     686
+    ],
+    [
+     "nmp.onnx",
+     230444
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0",
+    "Licence: **Apache-2.0**, per [`spotify/basic-pitch`](https://github.com/spotify/basic-pitch)."
+   ]
+  },
+  "AEmotionStudio/basic-pitch-onnx-models": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2026-04-26T11:51:15.000Z",
+   "bytes": 233629,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     1666
+    ],
+    [
+     "nmp.onnx",
+     230444
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0",
+    "## License",
+    "**Apache-2.0** \u2014 commercial-use OK."
+   ]
+  },
+  "onnx-community/Musical-Instrument-Classification-ONNX": {
+   "error": null,
+   "license": "mit",
+   "gated": false,
+   "downloads": 104,
+   "lastModified": "2026-01-30T11:47:03.000Z",
+   "bytes": 1095404309,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     6580
+    ],
+    [
+     "config.json",
+     2590
+    ],
+    [
+     "onnx/model.onnx",
+     378610509
+    ],
+    [
+     "onnx/model_bnb4.onnx",
+     84631623
+    ],
+    [
+     "onnx/model_fp16.onnx",
+     189468524
+    ],
+    [
+     "onnx/model_int8.onnx",
+     95389281
+    ],
+    [
+     "onnx/model_q4.onnx",
+     89976361
+    ],
+    [
+     "onnx/model_q4f16.onnx",
+     66538151
+    ],
+    [
+     "onnx/model_quantized.onnx",
+     95389322
+    ],
+    [
+     "onnx/model_uint8.onnx",
+     95389322
+    ],
+    [
+     "preprocessor_config.json",
+     215
+    ],
+    [
+     "quantize_config.json",
+     312
+    ]
+   ],
+   "card_license_lines": [
+    "license: mit",
+    "This is an ONNX version of [Bhaveen/Musical-Instrument-Classification](https://huggingface.co/Bhaveen/Musical-Instrument-Classification). It was automatically converted and uploaded using [this Hugging Face Space](https://huggingface.co/spaces/onnx-community/convert-to-onnx).",
+    "- **License:** MIT",
+    "## Supported Instruments",
+    "feature_extractor = AutoFeatureExtractor.from_pretrained(model_name)",
+    "model = AutoModelForAudioClassification.from_pretrained(model_name)",
+    "5. **Domain Specificity:** Trained on specific instrument recordings, may not generalize to all variants or playing styles",
+    "*Model trained as part of a hackathon project*"
+   ]
+  },
+  "dima806/musical_instrument_detection": {
+   "error": null,
+   "license": "apache-2.0",
+   "gated": false,
+   "downloads": 105,
+   "lastModified": "2024-10-19T10:58:04.000Z",
+   "bytes": 1891764273,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     171
+    ],
+    [
+     "checkpoint-438/config.json",
+     2274
+    ],
+    [
+     "checkpoint-438/optimizer.pt",
+     756679525
+    ],
+    [
+     "checkpoint-438/preprocessor_config.json",
+     215
+    ],
+    [
+     "checkpoint-438/pytorch_model.bin",
+     378349587
+    ],
+    [
+     "checkpoint-438/rng_state.pth",
+     14567
+    ],
+    [
+     "checkpoint-438/scheduler.pt",
+     623
+    ],
+    [
+     "checkpoint-438/trainer_state.json",
+     53242
+    ],
+    [
+     "checkpoint-438/training_args.bin",
+     3567
+    ],
+    [
+     "config.json",
+     2274
+    ],
+    [
+     "model.safetensors",
+     378303340
+    ],
+    [
+     "preprocessor_config.json",
+     215
+    ],
+    [
+     "pytorch_model.bin",
+     378349587
+    ],
+    [
+     "training_args.bin",
+     3567
+    ]
+   ],
+   "card_license_lines": [
+    "license: apache-2.0"
+   ]
+  },
+  "Xenova/larger_clap_music": {
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null,
+   "lastModified": null,
+   "bytes": 0,
+   "files": [],
+   "card_license_lines": []
+  },
+  "Xenova/clap-htsat-unfused": {
+   "error": null,
+   "license": null,
+   "gated": false,
+   "downloads": 8038,
+   "lastModified": "2024-10-08T13:43:20.000Z",
+   "bytes": 2186519567,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     2963
+    ],
+    [
+     "config.json",
+     699
+    ],
+    [
+     "merges.txt",
+     456318
+    ],
+    [
+     "onnx/audio_model.onnx",
+     117528416
+    ],
+    [
+     "onnx/audio_model_fp16.onnx",
+     60414065
+    ],
+    [
+     "onnx/audio_model_quantized.onnx",
+     34301667
+    ],
+    [
+     "onnx/model.onnx",
+     619128635
+    ],
+    [
+     "onnx/model_fp16.onnx",
+     311602756
+    ],
+    [
+     "onnx/model_quantized.onnx",
+     161024085
+    ],
+    [
+     "onnx/text_model.onnx",
+     501513769
+    ],
+    [
+     "onnx/text_model_fp16.onnx",
+     251029088
+    ],
+    [
+     "onnx/text_model_quantized.onnx",
+     126603263
+    ],
+    [
+     "preprocessor_config.json",
+     541
+    ],
+    [
+     "quantize_config.json",
+     3044
+    ],
+    [
+     "special_tokens_map.json",
+     280
+    ],
+    [
+     "tokenizer.json",
+     2108774
+    ],
+    [
+     "tokenizer_config.json",
+     1392
+    ],
+    [
+     "vocab.json",
+     798293
+    ]
+   ],
+   "card_license_lines": [
+    "const tokenizer = await AutoTokenizer.from_pretrained('Xenova/clap-htsat-unfused');",
+    "const text_model = await ClapTextModelWithProjection.from_pretrained('Xenova/clap-htsat-unfused');",
+    "const processor = await AutoProcessor.from_pretrained('Xenova/clap-htsat-unfused');",
+    "const audio_model = await ClapAudioModelWithProjection.from_pretrained('Xenova/clap-htsat-unfused');"
+   ]
+  },
+  "stelee/piano-transcription-onnx": {
+   "error": null,
+   "license": "mit",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2026-06-14T03:48:47.000Z",
+   "bytes": 154209053,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     794
+    ],
+    [
+     "piano_crnn.onnx",
+     154206740
+    ]
+   ],
+   "card_license_lines": [
+    "license: mit"
+   ]
+  },
+  "ktpss97094/melody-extraction-unet": {
+   "error": null,
+   "license": "mit",
+   "gated": false,
+   "downloads": 0,
+   "lastModified": "2026-08-07T07:39:03.000Z",
+   "bytes": 53249409,
+   "files": [
+    [
+     ".gitattributes",
+     1519
+    ],
+    [
+     "README.md",
+     21
+    ],
+    [
+     "accuracy.csv",
+     1547
+    ],
+    [
+     "loss.csv",
+     1142
+    ],
+    [
+     "loss_plot.png",
+     25223
+    ],
+    [
+     "model.pth",
+     53215813
+    ],
+    [
+     "orchset_accuracy.csv",
+     4025
+    ],
+    [
+     "\u8aaa\u660e.txt",
+     119
+    ]
+   ],
+   "card_license_lines": [
+    "license: mit"
+   ]
+  }
+ },
+ "datasets": {
+  "Jacobvs/slakh2100": {
+   "card_lines": [],
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null
+  },
+  "Slakh/slakh2100": {
+   "card_lines": [],
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null
+  },
+  "google/nsynth": {
+   "card_lines": [],
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null
+  },
+  "jg583/NSynth": {
+   "card_lines": [
+    "license: cc-by-4.0",
+    "- name: instrument_source",
+    "- name: instrument_source_str",
+    "The NSynth dataset is an audio dataset containing over 300,000 musical notes across over 1000 commercially-sampled instruments, distinguished by pitch, timbre, and envelope. Each recording was made by playing and holding a musical note for three seconds and letting it decay for one second. The collection of four-second recordings ranges over every pitch on a standard MIDI piano (or as many as possible for the given instrument), played at five different velocities.",
+    "Since some instruments are not capable of producing all 88 pitches in the MIDI piano's range, there is an average of 65.4 pitches per instrument. Furthermore, the commercial sample packs occasionally contain duplicate sounds across multiple velocities, leaving an average of 4.75 unique velocities per pitch.",
+    "1. Source: The method of sound production for the note\u2019s instrument. This can be one of `acoustic` or `electronic` for instruments that were recorded from acoustic or electronic instruments, respectively, or `synthetic` for synthesized instruments.",
+    "|2|synthetic|",
+    "2. Family: The high-level family of which the note\u2019s instrument is a member. Each instrument is a member of exactly one family. See the complete list of families and their frequencies by source below."
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 1611
+  },
+  "amaai-lab/MusicBench": {
+   "card_lines": [
+    "license: cc-by-sa-3.0",
+    "**License:** cc-by-sa-3.0"
+   ],
+   "error": null,
+   "license": "cc-by-sa-3.0",
+   "gated": false,
+   "downloads": 825
+  },
+  "mtg-upf/irmas": {
+   "card_lines": [],
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null
+  },
+  "AudioSet/audioset": {
+   "card_lines": [],
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null
+  },
+  "agkphysics/AudioSet": {
+   "card_lines": [
+    "license: cc-by-4.0",
+    "source_datasets:",
+    "### Source Data",
+    "#### Who are the source language producers?",
+    "The AudioSet data is licensed under CC-BY-4.0"
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 55414
+  },
+  "marsyas/gtzan": {
+   "card_lines": [
+    "- [Source Data](#source-data)",
+    "- [Who are the source language producers?](#who-are-the-source-language-producers)",
+    "### Source Data",
+    "#### Who are the source language producers?"
+   ],
+   "error": null,
+   "license": null,
+   "gated": false,
+   "downloads": 13768
+  },
+  "ccmusic-database/instrument_timbre": {
+   "card_lines": [
+    "license: cc-by-nc-nd-4.0",
+    "The original dataset is sourced from the [National Musical Instruments Timbre Evaluation Dataset](https://ccmusic-database.github.io/en/database/ccm.html#shou4), which includes subjective timbre evaluation scores using 16 terms such as bright, dark, raspy, etc., evaluated across 37 Chinese instruments and 24 Western instruments by Chinese participants with musical backgrounds in a subjective evaluation experiment. Additionally, it contains 10 spectrogram analysis reports for 10 instruments.",
+    "### Source Data"
+   ],
+   "error": null,
+   "license": "cc-by-nc-nd-4.0",
+   "gated": false,
+   "downloads": 244
+  },
+  "ccmusic-database/Guzheng_Tech99": {
+   "card_lines": [
+    "license: cc-by-nc-nd-4.0",
+    "This dataset is created and used by [[1]](https://arxiv.org/pdf/2303.13272) for frame-level Guzheng playing technique detection. The original dataset encompasses 99 solo compositions for Guzheng, recorded by professional musicians within a studio environment. Each composition is annotated for every note, indicating the onset, offset, pitch, and playing techniques. This is different from the GZ IsoTech, which is annotated at the clip-level. Also, its playing technique categories differ slightly, encompassing a total of seven techniques. They are: _Vibrato (chanyin \u98a4\u97f3), Plucks (boxian \u62e8\u5f26), Upward Portamento (shanghua \u4e0a\u6ed1), Downward Portamento (xiahua \u4e0b\u6ed1), Glissando (huazhi\\guazou\\lianmo\\liantuo \u82b1\u6307\\\u522e\u594f\\\u8fde\u62b9\\\u8fde\u6258), Tremolo (yaozhi \u6447\u6307), and Point Note (dianyin \u70b9\u97f3)_. This meticulous annotation results in a total of 63,352 annotated labels.",
+    "The dataset comprises 99 Guzheng solo compositions, recorded by professionals in a studio, totaling 9064.6 seconds. It includes seven playing techniques labeled for each note (onset, offset, pitch, vibrato, point note, upward portamento, downward portamento, plucks, glissando, and tremolo), resulting in 63,352 annotated labels. The dataset is divided into 79, 10, and 10 songs for the training, validation, and test sets, respectively.",
+    "The integrated version provides the original content and the spectrogram generated in the experimental part of the paper cited above. For the second part, the pre-process in the paper is replicated. Each audio clip is a 3-second segment sampled at 44,100Hz, which is subsequently converted into a log Constant-Q Transform (CQT) spectrogram. A CQT accompanied by a label constitutes a single data entry, forming the first and second columns, respectively. The CQT is a 3-dimensional array with the dimension of 88 x 258 x 1, representing the frequency-time structure of the audio. The label, on the other hand, is a 2-dimensional array with dimensions of 7 x 258, which indicates the presence of seven distinct techniques across each time frame. indicating the existence of the seven techniques in each time frame. In the end, given that the raw dataset has already been split into train, valid, and test sets, the integrated dataset maintains the same split method. This dataset can be used for frame-level guzheng playing technique detection."
+   ],
+   "error": null,
+   "license": "cc-by-nc-nd-4.0",
+   "gated": false,
+   "downloads": 376
+  },
+  "ccmusic-database/song_structure": {
+   "card_lines": [],
+   "error": null,
+   "license": "cc-by-nc-nd-4.0",
+   "gated": "auto",
+   "downloads": 44
+  },
+  "mtg-jamendo/mtg-jamendo-dataset": {
+   "card_lines": [],
+   "error": "HTTP Error 401: Unauthorized",
+   "license": null,
+   "gated": null,
+   "downloads": null
+  },
+  "MLCommons/peoples_speech": {
+   "card_lines": [
+    "- crowdsourced",
+    "- machine-generated",
+    "- crowdsourced",
+    "- machine-generated",
+    "license:",
+    "source_datasets:",
+    "- [Source Data](#source-data)",
+    "The People's Speech Dataset is among the world's largest English speech recognition corpus today that is licensed for academic and commercial usage under CC-BY-SA and CC-BY 4.0. It includes 30,000+ hours of transcribed speech in English languages with a diverse set of speakers. This open dataset is large enough to train speech-to-text systems and crucially is available with a permissive license."
+   ],
+   "error": null,
+   "license": [
+    "cc-by-2.0",
+    "cc-by-2.5",
+    "cc-by-3.0",
+    "cc-by-4.0",
+    "cc-by-sa-3.0",
+    "cc-by-sa-4.0"
+   ],
+   "gated": false,
+   "downloads": 38377
+  },
+  "monodox/carnatic-raga-vocals": {
+   "card_lines": [
+    "license: cc-by-4.0"
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 32
+  },
+  "monodox/carnatic-gamaka-annotations": {
+   "card_lines": [
+    "license: cc-by-4.0"
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 10
+  },
+  "monodox/carnatic-mridangam-strokes": {
+   "card_lines": [
+    "license: cc-by-4.0"
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 18
+  },
+  "monodox/carnatic-tala-kriyanga": {
+   "card_lines": [
+    "license: cc-by-4.0"
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 8
+  },
+  "kaumudi-ai/carnatic-ragas-talas": {
+   "card_lines": [
+    "license: cc-by-4.0"
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 32
+  },
+  "jhartquist/guitarset": {
+   "card_lines": [
+    "license: cc-by-4.0",
+    "License: CC-BY 4.0 (same as the upstream Zenodo distribution; see `LICENSE`)."
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 822
+  },
+  "openmusic/pdmx-multi-instrument-synthesized": {
+   "card_lines": [
+    "license:",
+    "Captions are auto-generated with Qwen2 Audio.",
+    "Audio is licensed under CC0 (from PDMX). Captions are licensed under CC-BY."
+   ],
+   "error": null,
+   "license": [
+    "cc0-1.0",
+    "cc-by-4.0"
+   ],
+   "gated": false,
+   "downloads": 163
+  },
+  "DynamicSuperb/InstrumentCombinationRecognition_OpenMIC-2018": {
+   "card_lines": [
+    "license: cc-by-4.0"
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 19
+  },
+  "cueharbor/starter-instruments": {
+   "card_lines": [
+    "license: cc0-1.0",
+    "catalog.json                     { \"instruments\": [{ id, name, license, path, bytes, description, ... }] }",
+    "<id>/provenance.json             per-file source URL, source filename, license, mapping and format",
+    "Sample files are kept at their source resolution (no resampling, no bit-depth reduction). Processing was limited to trimming leading/trailing digital silence (below \u221266 dBFS before the attack, \u221280 dBFS after the tail), a short fade on trimmed tails, and, for long piano/bell decays, a length cap with a 1 s fade (felt piano 12 s, grand 16 s, upright 20 s). Octave naming in the sources was checked per folder with pitch detection, so roots are correct MIDI notes. The kalimba is retuned to equal temperament with per-zone `tune`.",
+    "Velocity layers, round-robins (`seq_length`/`seq_position`, DecentSampler `seqMode=\"round_robin\"`) and release-trigger samples are mapped wherever the source has them.",
+    "| Instrument | Preset | Category | License | Vel layers | Round-robins | Release samples | Keys (MIDI) | Format | Size | Source |",
+    "## Sources and licenses",
+    "| Source | URL | License | License evidence |"
+   ],
+   "error": null,
+   "license": "cc0-1.0",
+   "gated": false,
+   "downloads": 1111
+  },
+  "severyn-k/isolated-guitar-chords": {
+   "card_lines": [
+    "license: cc-by-4.0",
+    "The data was intentionally recorded in **realistic acoustic conditions**, including minor background sounds, to improve robustness during inference in real-world environments.",
+    "- Recorded using a **single guitar and player**",
+    "- synthetic data",
+    "## License",
+    "This dataset is released under the **Creative Commons Attribution 4.0 International (CC BY 4.0)** license.",
+    "You are free to use, modify, and redistribute the dataset, including for commercial purposes, **provided appropriate credit is given**.",
+    "If you use this dataset in academic research or commercial applications, please cite:"
+   ],
+   "error": null,
+   "license": "cc-by-4.0",
+   "gated": false,
+   "downloads": 827
+  }
+ },
+ "searches": {
+  "models:beat tracking": [
+   {
+    "id": "ginchiostro/music_beat_tracking",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "JacobLinCool/exp-beat-tracking-task",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ryanlinjui/exp-beat-tracking-task",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "JacobLinCool/beat-tracking-alex-20260110",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:downbeat": [],
+  "models:chord recognition": [],
+  "models:chord": [
+   {
+    "id": "cstr/btc-chords-GGUF",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 2073,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "musetric/chordmini-onnx",
+    "license": "mit",
+    "downloads": 1950,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "puar-playground/btc-chord",
+    "license": "mit",
+    "downloads": 1279,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ckeen302/chordcraft-chord-transformer",
+    "license": "cc-by-nc-4.0",
+    "downloads": 209,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "musiclang/musiclang-chord-v2-4k",
+    "license": null,
+    "downloads": 168,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "musiclang/text-chord-predictor",
+    "license": null,
+    "downloads": 104,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "chordai/wav2vec2-base960h-aligner-coreml",
+    "license": "apache-2.0",
+    "downloads": 50,
+    "pipeline": "automatic-speech-recognition",
+    "gated": false
+   },
+   {
+    "id": "shawon/alberto-chord-crnn",
+    "license": "cc-by-4.0",
+    "downloads": 47,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "StravynDynamics/ChordBert",
+    "license": "apache-2.0",
+    "downloads": 44,
+    "pipeline": "fill-mask",
+    "gated": false
+   },
+   {
+    "id": "weblab-LLM-M/Ramen-CHORD-Qwen3-Next-80B-A3B-Instruct",
+    "license": "apache-2.0",
+    "downloads": 36,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "alejogil35/distilhubert-finetuned-chorddetection",
+    "license": "apache-2.0",
+    "downloads": 29,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "alejogil35/distilhubert-finetuned-chorddetection2",
+    "license": "apache-2.0",
+    "downloads": 23,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "aliciiavs/chord-final-model",
+    "license": "apache-2.0",
+    "downloads": 22,
+    "pipeline": "image-classification",
+    "gated": false
+   },
+   {
+    "id": "chordai/mms-fa-aligner-coreml",
+    "license": "cc-by-nc-4.0",
+    "downloads": 22,
+    "pipeline": "automatic-speech-recognition",
+    "gated": false
+   },
+   {
+    "id": "gary109/ai-light-dance_chord_ft_wav2vec2-large-xlsr-53",
+    "license": "apache-2.0",
+    "downloads": 16,
+    "pipeline": "automatic-speech-recognition",
+    "gated": false
+   }
+  ],
+  "models:music transcription": [
+   {
+    "id": "Razvanix/automatic-music-transcription",
+    "license": "unlicense",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Razvanix/music-transcription-model",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:piano transcription": [
+   {
+    "id": "cstr/piano-transcription-GGUF",
+    "license": "apache-2.0",
+    "downloads": 556,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "asigalov61/bytedance_piano_transcription",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "KoalaBrainResearcher/piano_transcription",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ddPn08/piano-transcription-research",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "qiuqiangkong/piano_transcription",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "felixliao617/piano-transcription-onnx",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "stelee/piano-transcription-onnx",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "LanOss/mobimml-piano-transcription",
+    "license": "cc-by-4.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "rtikw/piano-transcription-crnn",
+    "license": "cc-by-4.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ericfithian/piano-duet-recording-transcription-onnx",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ericfithian/piano-duet-live-transcription-onnx",
+    "license": "cc-by-4.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:guitar transcription": [],
+  "models:basic pitch": [
+   {
+    "id": "cstr/basic-pitch-GGUF",
+    "license": "apache-2.0",
+    "downloads": 549,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "litert-community/Basic-Pitch-LiteRT",
+    "license": "apache-2.0",
+    "downloads": 150,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "spotify/basic-pitch",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Aliwan/Basic_pitch_from_Spotify",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "AEmotionStudio/basic-pitch-onnx-models",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "daserge/basic-pitch-onnx",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "TTSCloneAPI/basic-pitch",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": "auto"
+   }
+  ],
+  "models:instrument recognition": [
+   {
+    "id": "MazenElhusseiny/instrument_recognition",
+    "license": null,
+    "downloads": 7,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:instrument classification": [
+   {
+    "id": "onnx-community/Musical-Instrument-Classification-ONNX",
+    "license": "mit",
+    "downloads": 104,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "Bhaveen/Musical-Instrument-Classification",
+    "license": "mit",
+    "downloads": 78,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "ahanadeb/wav2vec2-large-indian-instrument-emotion-classification-v1",
+    "license": null,
+    "downloads": 10,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ahanadeb/wav2vec2-large-indian-instrument-classification-v1",
+    "license": null,
+    "downloads": 7,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ahanadeb/wav2vec2-large-indian-instrument-classification-5sec",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "AndreMitri/icenptiontime_instrument_classification",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Mebanpynshai/Khasi_Instruments_Audio_Classification",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": "audio-classification",
+    "gated": false
+   }
+  ],
+  "models:musical instrument": [
+   {
+    "id": "dima806/musical_instrument_detection",
+    "license": "apache-2.0",
+    "downloads": 105,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "onnx-community/Musical-Instrument-Classification-ONNX",
+    "license": "mit",
+    "downloads": 104,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "Bhaveen/Musical-Instrument-Classification",
+    "license": "mit",
+    "downloads": 78,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "ntc-ai/SDXL-LoRA-slider.playing-a-musical-instrument",
+    "license": "mit",
+    "downloads": 31,
+    "pipeline": "text-to-image",
+    "gated": false
+   },
+   {
+    "id": "flavianv/qwen3-4b-musical-instruments-full-sft-shared-20260923",
+    "license": null,
+    "downloads": 25,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "onnx-community/musical-instruments-ONNX",
+    "license": null,
+    "downloads": 11,
+    "pipeline": "image-classification",
+    "gated": false
+   },
+   {
+    "id": "JosuePerez/MusicalInstrument_pricer-2025-06-01_16.33.56",
+    "license": "llama3.1",
+    "downloads": 10,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "flavianv/qwen3-4b-musical-instruments-full-ranker-20260923-v1",
+    "license": "apache-2.0",
+    "downloads": 10,
+    "pipeline": "text-classification",
+    "gated": false
+   },
+   {
+    "id": "larynx1982/musical-instruments",
+    "license": null,
+    "downloads": 7,
+    "pipeline": "image-classification",
+    "gated": false
+   },
+   {
+    "id": "davidschulte/ESM_kuroneko5943__snap21_Musical_Instruments_5",
+    "license": "apache-2.0",
+    "downloads": 6,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Bhaveen/epoch_musical_instruments_identification",
+    "license": null,
+    "downloads": 4,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "adarshrkumar/musical-instrument-detection-onnx",
+    "license": null,
+    "downloads": 3,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "jegan2/qwen_2.5_7b-owl_musical_instruments-seed1",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "jegan2/qwen_2.5_7b-cat_musical_instruments-seed1",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "jegan2/qwen_2.5_7b-panda_musical_instruments-seed1",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:music tagging": [],
+  "models:indian music": [
+   {
+    "id": "veeceey/RagaLoRA-indian-music-ace-step",
+    "license": "apache-2.0",
+    "downloads": 594,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "SidSaxena/musicgen-melody-lora-indian-classical-fusion-as-updated",
+    "license": "cc-by-nc-4.0",
+    "downloads": 13,
+    "pipeline": "text-to-audio",
+    "gated": false
+   },
+   {
+    "id": "DevPanda004/musicgen-melody-indian",
+    "license": "cc-by-nc-4.0",
+    "downloads": 9,
+    "pipeline": "text-to-audio",
+    "gated": false
+   },
+   {
+    "id": "istvanj/musicgen-melody-lora-indianduwali-colab",
+    "license": "cc-by-nc-4.0",
+    "downloads": 5,
+    "pipeline": "text-to-audio",
+    "gated": false
+   },
+   {
+    "id": "yav1327/music-gen-indian-songs",
+    "license": "cc-by-nc-4.0",
+    "downloads": 3,
+    "pipeline": "text-to-audio",
+    "gated": false
+   },
+   {
+    "id": "DevPanda004/musicgen-medium-indian",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "aruncodeshere/cqtnet-indian-music",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:carnatic": [
+   {
+    "id": "chaumi-k/qwen2audio-carnatic-swara",
+    "license": "apache-2.0",
+    "downloads": 10,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "chaumi-k/carnatic-bilstm-transcription",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 8,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sarayusapa/sam-carnatic",
+    "license": "mit",
+    "downloads": 7,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "lickkc/musicgen-melody-carnatic",
+    "license": "cc-by-nc-4.0",
+    "downloads": 6,
+    "pipeline": "text-to-audio",
+    "gated": false
+   },
+   {
+    "id": "sumukha2002/carnatic-raga-classifier-lgbm",
+    "license": "mit",
+    "downloads": 5,
+    "pipeline": "audio-classification",
+    "gated": false
+   },
+   {
+    "id": "sarayusapa/sam-carnatic-v1",
+    "license": null,
+    "downloads": 2,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "chaumi-k/carnatic-swara-cnn",
+    "license": null,
+    "downloads": 2,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "chaumi-k/carnatic-pitch-swara-transcription",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 2,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "lickkc/musicgen-small-lora-carnatic",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sarayusapa/sam_carnatic_v2",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:hindustani": [
+   {
+    "id": "nitya2405/sangeet-hindustani-lm",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "neerajaabhyankar/cqt-histogram-hindustani-raag-small",
+    "license": "other",
+    "downloads": 0,
+    "pipeline": "audio-classification",
+    "gated": false
+   }
+  ],
+  "models:raga": [
+   {
+    "id": "ragavsachdeva/magiv2",
+    "license": null,
+    "downloads": 10759,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ragavsachdeva/magiv3",
+    "license": null,
+    "downloads": 2462,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ragavsachdeva/magi",
+    "license": null,
+    "downloads": 2294,
+    "pipeline": "feature-extraction",
+    "gated": false
+   },
+   {
+    "id": "veeceey/RagaLoRA-indian-music-ace-step",
+    "license": "apache-2.0",
+    "downloads": 594,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ragavsachdeva/magiv2-crop-embedder",
+    "license": null,
+    "downloads": 376,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Sri2901/watch_raga_shift",
+    "license": "other",
+    "downloads": 301,
+    "pipeline": "text-to-image",
+    "gated": false
+   },
+   {
+    "id": "Sri2901/Watch_raga",
+    "license": "other",
+    "downloads": 137,
+    "pipeline": "text-to-image",
+    "gated": false
+   },
+   {
+    "id": "ragarwal/deberta-v3-base-nli-mixer-binary",
+    "license": "mit",
+    "downloads": 40,
+    "pipeline": "text-classification",
+    "gated": false
+   },
+   {
+    "id": "VSRV/raga-radar-v2-Q6_K-GGUF",
+    "license": "gemma",
+    "downloads": 29,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "huggingtweets/cuckoldresss-qobetty-ragamuffin197",
+    "license": null,
+    "downloads": 23,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "RichardErkhov/DrCacao_-_RAGANGPT-3b-4bits",
+    "license": null,
+    "downloads": 23,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "VSRV/raga-radar-v2-Q3_K_M-GGUF",
+    "license": "gemma",
+    "downloads": 23,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "Muhammad-Ikhwan-Fathulloh/sunda-ragam-basa-tagger",
+    "license": "mit",
+    "downloads": 23,
+    "pipeline": "token-classification",
+    "gated": false
+   },
+   {
+    "id": "RichardErkhov/DrCacao_-_RAGANGPT-3b-8bits",
+    "license": null,
+    "downloads": 22,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ragarwal/args-me-biencoder-v1",
+    "license": null,
+    "downloads": 21,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:tabla": [
+   {
+    "id": "tablane/distilbert-base-uncased.finetuned-emotion",
+    "license": "apache-2.0",
+    "downloads": 9,
+    "pipeline": "text-classification",
+    "gated": false
+   },
+   {
+    "id": "nathantablang/question-answering-tablang",
+    "license": null,
+    "downloads": 7,
+    "pipeline": "question-answering",
+    "gated": false
+   },
+   {
+    "id": "nathantablang/question-answering-qa-may-tablang",
+    "license": null,
+    "downloads": 7,
+    "pipeline": "question-answering",
+    "gated": false
+   },
+   {
+    "id": "nathantablang/question-answering-qa-may-tablang-LOCAL",
+    "license": null,
+    "downloads": 4,
+    "pipeline": "question-answering",
+    "gated": false
+   },
+   {
+    "id": "nathantablang/demo-tablang-t5-qa",
+    "license": null,
+    "downloads": 3,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "nathantablang/question-answering-qa-may-12-tablang-LOCAL",
+    "license": "mit",
+    "downloads": 3,
+    "pipeline": "question-answering",
+    "gated": false
+   },
+   {
+    "id": "Tablado/stablediffusion",
+    "license": "openrail",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ferkor/tabla",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ltorresglez/TablasdeSanAndres",
+    "license": "artistic-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Fernando123max/Tablas",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Ajedrexa/tablasdemadera",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "victorborder7/alertas-tabla",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "cstr/tab-labeler-onnx",
+    "license": "cc-by-4.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "becausereasons/yue2-qwwl-qawwali-sufi-tabla",
+    "license": "cc-by-nc-4.0",
+    "downloads": 0,
+    "pipeline": "text-to-audio",
+    "gated": false
+   }
+  ],
+  "models:sitar": [
+   {
+    "id": "sita-raja/llama3.18B-Fine-tuned-LORA-ToxicChat",
+    "license": "apache-2.0",
+    "downloads": 12,
+    "pipeline": "text-generation",
+    "gated": false
+   },
+   {
+    "id": "SitaraRafaqat/illama_cp_python",
+    "license": "mit",
+    "downloads": 8,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Someman/sitar-psych",
+    "license": "creativeml-openrail-m",
+    "downloads": 6,
+    "pipeline": "text-to-image",
+    "gated": false
+   },
+   {
+    "id": "Sitara/falcon-7b-instruct-ft-adapters",
+    "license": null,
+    "downloads": 5,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Sitar89/ppo-LunarLander-v3",
+    "license": null,
+    "downloads": 2,
+    "pipeline": "reinforcement-learning",
+    "gated": false
+   },
+   {
+    "id": "sitaramireddy/donut-base-sroie",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sitaramireddy/my_awesome_qa_model",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sitaramireddyp/test",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "SitarEswar/GreenAI",
+    "license": "gpl",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sitaram05s/blockassist-bc-raging_sneaky_camel_1756216699",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sitaram05s/blockassist-bc-raging_sneaky_camel_1756611872",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sitaram05s/blockassist-bc-raging_sneaky_camel_1756718514",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sitaram05s/blockassist-bc-raging_sneaky_camel_1756790140",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sitaram05s/blockassist-bc-raging_sneaky_camel_1756881892",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sitaram05s/blockassist-bc-raging_sneaky_camel_1756955474",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:music structure": [
+   {
+    "id": "sandernotenbaert/okai-musiclang-structure",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "sandernotenbaert/okai-musiclang-structure-v002",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:source separation": [
+   {
+    "id": "Awais/Audio_Source_Separation",
+    "license": "cc-by-sa-4.0",
+    "downloads": 13,
+    "pipeline": "audio-to-audio",
+    "gated": false
+   },
+   {
+    "id": "mlobj/music_source_separation",
+    "license": "gpl",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "RSNuts/Universal_Source_Separation",
+    "license": "apache-2.0",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Eddycrack864/Music-Source-Separation-Training",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "xavriley/source_separation_mirror",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Pragmaticl/music-source-separation-training-model",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Livum/Music-Source-Separation-Training",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:melody extraction": [
+   {
+    "id": "tsha/melodyextraction",
+    "license": null,
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ktpss97094/melody-extraction-swinunet",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ktpss97094/melody-extraction-unet",
+    "license": "mit",
+    "downloads": 0,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "models:pitch estimation": [],
+  "datasets:instrument": [
+   {
+    "id": "AghaTizi/Instrumental-LAION-Audio-300M",
+    "license": null,
+    "downloads": 17234,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "cueharbor/starter-instruments",
+    "license": "cc0-1.0",
+    "downloads": 1111,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "maxhallan7/robotic-instrument-segmentation-miccai-2017",
+    "license": "cc-by-nc-4.0",
+    "downloads": 1094,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "mrfakename/pdmx-multi-instrument-synthesized",
+    "license": null,
+    "downloads": 775,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "aisa-group/instrumental-choices-agent-traces",
+    "license": null,
+    "downloads": 715,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "aaronsu11/so100_instrument",
+    "license": "apache-2.0",
+    "downloads": 495,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "purdueviperlab/Surgical_Instruments_Unsupervised_Defect_Detection",
+    "license": "cc-by-nc-nd-4.0",
+    "downloads": 406,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "AdamAtractor/Crypto-L2-Orderbook-Depth-24-Instruments",
+    "license": "cc-by-4.0",
+    "downloads": 322,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "leeyujun/Beyond-Binary-Instrument-QA",
+    "license": "cc-by-4.0",
+    "downloads": 286,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ccmusic-database/instrument_timbre",
+    "license": "cc-by-nc-nd-4.0",
+    "downloads": 244,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "flavianv/musical-instruments-id-overlap-reward-20260923-v1",
+    "license": null,
+    "downloads": 191,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "theodoredc/instrument_covers",
+    "license": null,
+    "downloads": 166,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "openmusic/pdmx-multi-instrument-synthesized",
+    "license": [
+     "cc0-1.0",
+     "cc-by-4.0"
+    ],
+    "downloads": 163,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Tuugu/mongolian_instruments_dataset",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 152,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Marod0692/surgical-instruments-pick-place",
+    "license": "apache-2.0",
+    "downloads": 147,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:indian music": [
+   {
+    "id": "rojin254/PP4-indian-music-csi",
+    "license": null,
+    "downloads": 54,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "AIniruddh/fma-indian-music-merged",
+    "license": null,
+    "downloads": 30,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:carnatic": [
+   {
+    "id": "sarayusapa/carnatic-ragas",
+    "license": null,
+    "downloads": 52,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "saahily/carnatic-music",
+    "license": null,
+    "downloads": 37,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "34data/v13-carnatic-varnam",
+    "license": null,
+    "downloads": 35,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "monodox/carnatic-raga-vocals",
+    "license": "cc-by-4.0",
+    "downloads": 32,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "kaumudi-ai/carnatic-ragas-talas",
+    "license": "cc-by-4.0",
+    "downloads": 32,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "monodox/carnatic-mridangam-strokes",
+    "license": "cc-by-4.0",
+    "downloads": 18,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "prats1j/carnatic-musicgen",
+    "license": null,
+    "downloads": 12,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "monodox/carnatic-gamaka-annotations",
+    "license": "cc-by-4.0",
+    "downloads": 10,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "monodox/carnatic-tala-kriyanga",
+    "license": "cc-by-4.0",
+    "downloads": 8,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "monodox/carnatic-malayalam-lyrics",
+    "license": "cc-by-4.0",
+    "downloads": 5,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "kubhase-naveen/carnatic-raga-classsification-dataset-part2",
+    "license": null,
+    "downloads": 3,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:hindustani": [
+   {
+    "id": "neerajaabhyankar/hindustani-raag-small",
+    "license": "other",
+    "downloads": 383,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:chord": [
+   {
+    "id": "Leon299/muse-cn-chord",
+    "license": null,
+    "downloads": 955,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ailsntua/Chordonomicon",
+    "license": "cc-by-nc-4.0",
+    "downloads": 888,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "severyn-k/isolated-guitar-chords",
+    "license": "cc-by-4.0",
+    "downloads": 827,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ryangowe/guitar-chord-mix",
+    "license": "cc-by-4.0",
+    "downloads": 797,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Itsuki-music/BACHI_Chord_Recognition",
+    "license": "mit",
+    "downloads": 735,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "dduka/guitar-chords",
+    "license": null,
+    "downloads": 641,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "j-asra-j/guitar-chords",
+    "license": null,
+    "downloads": 486,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "noamFF/guitar-chords",
+    "license": null,
+    "downloads": 349,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Leon299/muse_mucodec_chord",
+    "license": "apache-2.0",
+    "downloads": 267,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "mikezhu/chord-experiments-data",
+    "license": "other",
+    "downloads": 206,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "gabrielaltay/msk-chord-2024",
+    "license": "cc-by-nc-nd-4.0",
+    "downloads": 169,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "mikezhu/chord-distill-data",
+    "license": "other",
+    "downloads": 126,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "m-a-p/Chords1217",
+    "license": "cc-by-nc-4.0",
+    "downloads": 116,
+    "pipeline": null,
+    "gated": "auto"
+   },
+   {
+    "id": "rodriler/isolated-guitar-chords",
+    "license": "cc-by-4.0",
+    "downloads": 100,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "clm-project/jev-boost-ar-bachi-classical-chords-qwen3.6-35b-a3b-fp8-embeddings",
+    "license": "other",
+    "downloads": 95,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:beat": [
+   {
+    "id": "haiyangliu0/BEAT2",
+    "license": "apache-2.0",
+    "downloads": 12860,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "haiyangliu0/BEAT",
+    "license": "apache-2.0",
+    "downloads": 11317,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "AbstractPhil/geolip-beatrix-anima-data",
+    "license": "other",
+    "downloads": 2431,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "m-hamza-mughal/beat2-additional-annotations",
+    "license": "apache-2.0",
+    "downloads": 2405,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "project-riz/osu-beatmaps",
+    "license": "other",
+    "downloads": 2082,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "fdaudens/briefing-beatbox-votes",
+    "license": null,
+    "downloads": 1472,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Beatcenture/beatles_lyrics",
+    "license": "apache-2.0",
+    "downloads": 1438,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "beatsprom/autonomous-ai-agents-multi-agent-swarms-2026",
+    "license": "cc-by-4.0",
+    "downloads": 961,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "beatrizh/sn38-round17",
+    "license": null,
+    "downloads": 780,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Louisnguyen/sft-robo2-data-beat_block_hammer",
+    "license": "mit",
+    "downloads": 754,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "abbuibuibui/Beatrice-Dataset",
+    "license": "creativeml-openrail-m",
+    "downloads": 625,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "aibengineering/beat-the-game-minecraft",
+    "license": "cc-by-4.0",
+    "downloads": 510,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "suz22/RoboTwin_beat_block_hammer_randomized",
+    "license": "apache-2.0",
+    "downloads": 435,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "haiyangliu0/BEAT_Rendered_Videos",
+    "license": "apache-2.0",
+    "downloads": 353,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "CSCSXX/Franka_beat_block_hammer",
+    "license": "apache-2.0",
+    "downloads": 344,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:music transcription": [],
+  "datasets:slakh": [
+   {
+    "id": "aashishbishow/slakh2100_midi_only_redux",
+    "license": "cc-by-nc-4.0",
+    "downloads": 4927,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "DreamyWanderer/Slakh2100-FLAC-Redux-Reduced",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 3463,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "projectlosangeles/Slakh2100",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 2184,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "choihy/slakh2100_yourmt3_16k",
+    "license": null,
+    "downloads": 1329,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "choihy/slakh2100_midi_by_ymt3",
+    "license": null,
+    "downloads": 519,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "tvergho/slakh",
+    "license": null,
+    "downloads": 336,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "lucainiao/slakh2100-flac-redux-aug",
+    "license": "apache-2.0",
+    "downloads": 212,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Higobeatz/slakh2100",
+    "license": null,
+    "downloads": 160,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "malerlab/slakh-unidac4-ytsv",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 156,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "WhiRik/slakh_flac",
+    "license": null,
+    "downloads": 124,
+    "pipeline": null,
+    "gated": "auto"
+   },
+   {
+    "id": "choihy/Slakh2100_preprocessed",
+    "license": null,
+    "downloads": 69,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "clm-project/jev-boost-ar3-slakh-band-chords-qwen3.6-35b-a3b-fp8-embeddings",
+    "license": "other",
+    "downloads": 59,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "DemianChumachenko/slakh-midi",
+    "license": null,
+    "downloads": 58,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "StephenBrade/slakh_preencode",
+    "license": "mit",
+    "downloads": 43,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "StephenBrade/slakh_preencode_1024",
+    "license": null,
+    "downloads": 32,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:nsynth": [
+   {
+    "id": "jg583/NSynth",
+    "license": "cc-by-4.0",
+    "downloads": 1611,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "confit/nsynth-parquet",
+    "license": null,
+    "downloads": 1447,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "anime-sh/NSYNTH_PITCH_HEAR",
+    "license": null,
+    "downloads": 234,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "mteb/nsynth-mini",
+    "license": null,
+    "downloads": 221,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "confit/nsynth",
+    "license": null,
+    "downloads": 185,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "vvolhejn/nsynth",
+    "license": "cc-by-4.0",
+    "downloads": 151,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Codec-SUPERB/Nsynth-test_synth",
+    "license": null,
+    "downloads": 149,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "krish123445/NSynth",
+    "license": "cc-by-4.0",
+    "downloads": 138,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ltuncay/chime-nsynth",
+    "license": "other",
+    "downloads": 79,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "TwinkStart/Nsynth",
+    "license": null,
+    "downloads": 41,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "DynamicSuperb/InstrumentClassification_Nsynth",
+    "license": null,
+    "downloads": 40,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "RaulZBergamo/nsynth-train",
+    "license": null,
+    "downloads": 34,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "RaulZBergamo/nsynth-test",
+    "license": "mit",
+    "downloads": 27,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "DynamicSuperb/InstrumentPitchClassification_Nsynth",
+    "license": null,
+    "downloads": 22,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "DynamicSuperb/InstrumentSourceClassification_Nsynth",
+    "license": null,
+    "downloads": 22,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:irmas": [
+   {
+    "id": "Hibou-Foundation/irmas_ds_1",
+    "license": null,
+    "downloads": 72,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "confit/irmas",
+    "license": null,
+    "downloads": 25,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "charisreneec/IRMAS-Test",
+    "license": null,
+    "downloads": 16,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:openmic": [
+   {
+    "id": "CPJKU/openmic",
+    "license": null,
+    "downloads": 682,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "seungheondoh/openmic-2018",
+    "license": null,
+    "downloads": 161,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "mookiezi/Discord-OpenMicae",
+    "license": "apache-2.0",
+    "downloads": 109,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "kkoutini/openmic",
+    "license": null,
+    "downloads": 83,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "cfilt/AI-OpenMic",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 30,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "DynamicSuperb/InstrumentCombinationRecognition_OpenMIC-2018",
+    "license": "cc-by-4.0",
+    "downloads": 19,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "DorayakiLin/open_microwave_25_08_21_lerobotv2.1",
+    "license": null,
+    "downloads": 7,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:musicnet": [
+   {
+    "id": "DreamyWanderer/MusicNet",
+    "license": null,
+    "downloads": 8780,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "malerlab/musicnet-unidac4-ytsv",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 248,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "seungheondoh/cmd-musicnet-metadata",
+    "license": null,
+    "downloads": 136,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "K-Gonzalez/MusicNet789169",
+    "license": null,
+    "downloads": 108,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "jonflynn/musicnet_jukebox_embeddings",
+    "license": "cc-by-4.0",
+    "downloads": 102,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ltuncay/chime-musicnet",
+    "license": "other",
+    "downloads": 72,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "epr-labs/music-net",
+    "license": null,
+    "downloads": 47,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Ftsos/MusicNet",
+    "license": "cc-by-4.0",
+    "downloads": 8,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:guitarset": [
+   {
+    "id": "jhartquist/guitarset",
+    "license": "cc-by-4.0",
+    "downloads": 822,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "taohu/guitarset",
+    "license": null,
+    "downloads": 389,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ltuncay/chime-guitarset",
+    "license": "cc-by-4.0",
+    "downloads": 100,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "clm-project/jev-boost-ar2-guitarset-chords-qwen3.6-35b-a3b-fp8-embeddings",
+    "license": "other",
+    "downloads": 54,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "jonflynn/guitarset_jukebox_embeddings",
+    "license": "mit",
+    "downloads": 28,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:maestro": [
+   {
+    "id": "ddPn08/maestro-v3.0.0",
+    "license": null,
+    "downloads": 3950,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "malerlab/maestro-unidac4-ytsv",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 2754,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "aspire-osu/maestro-eeg-dataset",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 1628,
+    "pipeline": null,
+    "gated": "auto"
+   },
+   {
+    "id": "DreamyWanderer/MAESTRO-v3.0-FLAC",
+    "license": null,
+    "downloads": 1387,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "bryel-labs/MAESTROCaps",
+    "license": "other",
+    "downloads": 873,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "projectlosangeles/maestro-v3.0.0",
+    "license": "cc-by-nc-sa-4.0",
+    "downloads": 621,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "Codec-SUPERB/maestro_synth",
+    "license": null,
+    "downloads": 429,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "cm2435-new/maestro",
+    "license": null,
+    "downloads": 420,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "RichardErkhov/maestro",
+    "license": null,
+    "downloads": 296,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ben2002chou/MAESTRO-E",
+    "license": "cc-by-4.0",
+    "downloads": 291,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "kaust-generative-ai/maestro-mas-benchmark",
+    "license": "cc-by-nc-4.0",
+    "downloads": 252,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "ddPn08/maestro-v3.0.0-preprocessed-with-pedal",
+    "license": null,
+    "downloads": 246,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "annon124816/maestro",
+    "license": "other",
+    "downloads": 191,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "yairk/maestro",
+    "license": "mit",
+    "downloads": 183,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "hrhraj/adaptive-dice-maestro-dataset-merged",
+    "license": null,
+    "downloads": 180,
+    "pipeline": null,
+    "gated": false
+   }
+  ],
+  "datasets:medleydb": [
+   {
+    "id": "jzgdev/medleydb_sample",
+    "license": "mit",
+    "downloads": 408,
+    "pipeline": null,
+    "gated": false
+   },
+   {
+    "id": "seungheondoh/cmd-medleydb-metadata",
+    "license": null,
+    "downloads": 104,
+    "pipeline": null,
+    "gated": false
+   }
+  ]
+ },
+ "zenodo": {
+  "PANNs checkpoints": {
+   "record": "3987831",
+   "error": null,
+   "title": "PANNs: Large-Scale Pretrained Audio Neural Networks for Audio Pattern Recognition (Pretrained Models)",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": [
+    [
+     "Wavegram_Cnn14_mAP=0.389.pth",
+     324062653
+    ],
+    [
+     "ResNet22_mAP=0.430.pth",
+     259135254
+    ],
+    [
+     "Cnn14_emb512_mAP=0.420.pth",
+     311601537
+    ],
+    [
+     "LeeNet24_mAP=0.336.pth",
+     40082648
+    ],
+    [
+     "Wavegram_Logmel_Cnn14_mAP=0.439.pth",
+     328692198
+    ],
+    [
+     "Cnn14_mAP=0.431.pth",
+     327428481
+    ],
+    [
+     "Res1dNet51_mAP=0.355.pth",
+     426511058
+    ],
+    [
+     "Cnn14_emb32_mAP=0.364.pth",
+     306655610
+    ],
+    [
+     "ResNet54_mAP=0.429.pth",
+     421919312
+    ],
+    [
+     "Cnn6_mAP=0.343.pth",
+     23698321
+    ],
+    [
+     "Res1dNet31_mAP=0.365.pth",
+     322101335
+    ],
+    [
+     "DaiNet19_mAP=0.295.pth",
+     17605195
+    ],
+    [
+     "ResNet38_mAP=0.434.pth",
+     299615982
+    ],
+    [
+     "MobileNetV1_mAP=0.389.pth",
+     23639473
+    ],
+    [
+     "paper_statistics.zip",
+     106029362
+    ],
+    [
+     "MobileNetV2_mAP=0.383.pth",
+     20834417
+    ],
+    [
+     "Cnn14_DecisionLevelMax_mAP=0.385.pth",
+     327428481
+    ],
+    [
+     "Cnn14_emb128_mAP=0.412.pth",
+     307644796
+    ],
+    [
+     "LeeNet11_mAP=0.266.pth",
+     3012373
+    ],
+    [
+     "CNN14_emb128_mAP=0.412.pth",
+     307644796
+    ]
+   ]
+  },
+  "MS-CLAP weights": {
+   "record": "8378278",
+   "error": null,
+   "title": "CLAP: Learning Audio Concepts From Natural Language Supervision (Pretrained Model)",
+   "license": "cc-by-3.0-us",
+   "access": "open",
+   "files": [
+    [
+     "CLAP_weights_2023.pth",
+     689950036
+    ],
+    [
+     "CLAP_weights_2022.pth",
+     2333972488
+    ],
+    [
+     "clapcap_weights_2023.pth",
+     1712037386
+    ]
+   ]
+  },
+  "Slakh2100": {
+   "record": "4599666",
+   "error": null,
+   "title": "Slakh2100",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": [
+    [
+     "slakh2100_flac_redux.tar.gz",
+     104322767708
+    ]
+   ]
+  },
+  "Beat This! spectrograms": {
+   "record": "13922116",
+   "error": null,
+   "title": "Beat This! Spectrograms for Beat and Downbeat Tracking",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": [
+    [
+     "gtzan.zip",
+     306944985
+    ],
+    [
+     "beat_this_annotations.zip",
+     7241621
+    ],
+    [
+     "asap.zip",
+     32907248063
+    ],
+    [
+     "guitarset.zip",
+     1356129024
+    ],
+    [
+     "candombe.zip",
+     2072957923
+    ],
+    [
+     "ballroom.zip",
+     4780542478
+    ],
+    [
+     "beatles.zip",
+     6497097885
+    ],
+    [
+     "filosax.zip",
+     3963179080
+    ],
+    [
+     "hainsworth.zip",
+     2730746482
+    ],
+    [
+     "groove_midi.zip",
+     8792618537
+    ],
+    [
+     "harmonix.zip",
+     45143352598
+    ],
+    [
+     "hjdb.zip",
+     2673043467
+    ],
+    [
+     "rwc.zip",
+     13711470935
+    ],
+    [
+     "smc.zip",
+     2096168666
+    ],
+    [
+     "simac.zip",
+     2749307625
+    ],
+    [
+     "jaah.zip",
+     5724026990
+    ],
+    [
+     "tapcorrect.zip",
+     5719975934
+    ]
+   ]
+  },
+  "MUSDB18-HQ": {
+   "record": "3338373",
+   "error": null,
+   "title": "MUSDB18-HQ - an uncompressed version of MUSDB18",
+   "license": "other-nc",
+   "access": "open",
+   "files": [
+    [
+     "musdb18hq.zip",
+     22656664047
+    ]
+   ]
+  },
+  "Mridangam stroke": {
+   "record": "1265188",
+   "error": null,
+   "title": "Mridangam Stroke Dataset",
+   "license": "cc-by-nc-4.0",
+   "access": "open",
+   "files": [
+    [
+     "mridangam_stroke_1.0.zip",
+     143111120
+    ]
+   ]
+  }
+ },
+ "pages": {
+  "NSynth": {
+   "url": "https://magenta.tensorflow.org/datasets/nsynth",
+   "lines": [
+    "License",
+    "unique pitch, timbre, and envelope. For 1,006 instruments from commercial sample",
+    "commercial sample packs occasionally contain duplicate sounds across multiple",
+    "License",
+    "Creative Commons Attribution 4.0 International (CC BY 4.0) license ."
+   ],
+   "error": null
+  },
+  "Essentia models": {
+   "url": "https://essentia.upf.edu/models.html",
+   "lines": [
+    "License",
+    "All the models created by the MTG are licensed under  CC BY-NC-SA 4.0  and are also available under proprietary license upon  request . Check the  LICENSE  of the models.",
+    "action  ,   adventure  ,   advertising  ,   background  ,   ballad  ,   calm  ,   children  ,   christmas  ,   commercial  ,   cool  ,   corporate  ,   dark  ,   deep  ,"
+   ],
+   "error": null
+  },
+  "Slakh site": {
+   "url": "http://www.slakh.com/",
+   "lines": [
+    "License and Attribution",
+    "License and Attribution",
+    "Slakh2100 and Flakh2100 are licensed under a  Creative Commons Attribution 4.0 International License ."
+   ],
+   "error": null
+  },
+  "Beat This! README": {
+   "url": "https://raw.githubusercontent.com/CPJKU/beat_this/main/README.md",
+   "lines": [
+    "* [License](#license)",
+    "## License",
+    "The code and the published model weights are released under the [MIT license](LICENSE). Note that some of the training files are fully copyrighted or under limited Creative Commons licenses, and it is up to the user to assess whether this may impact their use case."
+   ],
+   "error": null
+  },
+  "Basic Pitch NOTICE/LICENSE": {
+   "url": "https://raw.githubusercontent.com/spotify/basic-pitch/main/LICENSE",
+   "lines": [
+    "Apache License",
+    "http://www.apache.org/licenses/",
+    "\"License\" shall mean the terms and conditions for use, reproduction,",
+    "the copyright owner that is granting the License.",
+    "exercising permissions granted by this License.",
+    "Object form, made available under the License, as indicated by a",
+    "of this License, Derivative Works shall not include works that remain",
+    "2. Grant of Copyright License. Subject to the terms and conditions of",
+    "this License, each Contributor hereby grants to You a perpetual,",
+    "copyright license to reproduce, prepare Derivative Works of,",
+    "publicly display, publicly perform, sublicense, and distribute the",
+    "3. Grant of Patent License. Subject to the terms and conditions of"
+   ],
+   "error": null
+  }
+ }
+}
