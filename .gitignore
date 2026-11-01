@@ -27,3 +27,5 @@ Packages/TonePilotCore/.rb.log
 Packages/TonePilotCore/.hb.log
 Packages/TonePilotCore/.ab.log
 Packages/TonePilotCore/.build-docker2/
+__pycache__/
+*.pyc
