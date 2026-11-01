@@ -1,0 +1,49 @@
+name: TonePilot Lab — iPhone benchmark app (research only; separate from TonePilot)
+
+# Builds the unsigned TonePilot Lab .ipa with the Gate 2 Core ML models and fixtures, for the
+# owner to sideload and run once. The main TonePilot app is not built or changed here.
+on:
+  workflow_dispatch:
+    inputs:
+      gate2_run_id:
+        description: "coreml-gate2 run id (for the converted models)"
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  lab:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+      - uses: actions/download-artifact@v4
+        with: { name: coreml-models, path: /tmp/models, run-id: "${{ inputs.gate2_run_id }}", github-token: "${{ github.token }}" }
+      - name: Models (compiled) and fixtures
+        run: |
+          set -euo pipefail
+          mkdir -p Lab/Resources
+          for v in fp16 fp32; do
+            xcrun coremlcompiler compile "/tmp/models/EfficientAT_mn10_as_${v}.mlpackage" Lab/Resources/ > /dev/null
+          done
+          git fetch -q origin +ci/coreml-gate2:refs/remotes/origin/ci/coreml-gate2
+          for f in audio mel ref_probs ref_embedding; do git show "origin/ci/coreml-gate2:gate2/fixture/$f.f32" > "Lab/Resources/$f.f32" || true; done
+          ls -la Lab/Resources
+      - name: Build (unsigned)
+        run: |
+          set -o pipefail
+          brew install xcodegen > /dev/null
+          xcodegen generate --spec Lab/project.yml
+          xcodebuild -project Lab/TonePilotLab.xcodeproj -scheme TonePilotLab -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -derivedDataPath build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build > lab.log 2>&1 || true
+          grep -E "error:|BUILD (SUCCEEDED|FAILED)" lab.log | sort -u | head -40 | while IFS= read -r l; do echo "::notice title=Lab build::$l"; done
+          grep -q "BUILD SUCCEEDED" lab.log
+          mkdir -p Payload && cp -R build/Build/Products/Release-iphoneos/TonePilotLab.app Payload/ && zip -qry TonePilotLab.ipa Payload
+          echo "::notice title=Lab app size::$(du -sh Payload/TonePilotLab.app | cut -f1)"
+      - uses: actions/upload-artifact@v4
+        with: { name: TonePilotLab-ipa, path: TonePilotLab.ipa, retention-days: 14 }

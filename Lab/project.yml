@@ -1,0 +1,39 @@
+# TonePilot Lab — iPhone benchmark harness (research only; separate app, the main app is untouched).
+# Generate with: xcodegen generate --spec Lab/project.yml   (CI: .github/workflows/lab-build.yml)
+name: TonePilotLab
+options:
+  bundleIdPrefix: com.yourname
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  TonePilotCore:
+    path: ../Packages/TonePilotCore
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: ""
+targets:
+  TonePilotLab:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Resources
+        type: folder
+        buildPhase: resources
+        optional: true
+    dependencies:
+      - package: TonePilotCore
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: TonePilot Lab
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        UILaunchScreen: {}
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.yourname.tonepilot.lab

@@ -50,6 +50,10 @@ fx.astype("<f4").tofile(f"{out}/fixture/audio.f32")
 with torch.no_grad():
     fm = mel(torch.from_numpy(fx)[None]).numpy()[0]          # [128, frames]
 fm.astype("<f4").tofile(f"{out}/fixture/mel.f32")
+# PyTorch reference outputs for the fixture's first 1 s window (101 frames), for on-device checks.
+with torch.no_grad():
+    fp_, fe_ = net(torch.from_numpy(fm[None, None, :, :101].copy()))
+fp_.numpy()[0].astype("<f4").tofile(f"{out}/fixture/ref_probs.f32"); fe_.numpy()[0].astype("<f4").tofile(f"{out}/fixture/ref_embedding.f32")
 json.dump({"sample_rate": SR, "n_mels": 128, "frames": int(fm.shape[1]), "layout": "mel-major [128][frames]",
            "n_fft": 1024, "win_length": 800, "hop": 320, "window": "hann periodic=False, centred in n_fft",
            "preemphasis": [-0.97, 1], "fmin": 0, "fmax": 15000, "mel": "kaldi get_mel_banks + zero column", "log": "ln(x+1e-5)", "norm": "(x+4.5)/5"},
