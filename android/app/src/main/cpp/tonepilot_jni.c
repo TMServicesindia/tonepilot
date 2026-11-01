@@ -25,6 +25,7 @@ extern char *tp_call(const char *request);
 extern void tp_free(char *p);
 extern void tp_pcm_append(const char *key, const float *samples, int32_t count);
 extern void tp_listen_append(const float *samples, int32_t count, double sampleRate);
+extern char *tp_pipeline_check(const char *expectedPath);
 
 #define BLOCK 1024
 static float scratchL[BLOCK], scratchR[BLOCK];
@@ -195,4 +196,15 @@ JNIEXPORT void JNICALL FN(listenAppend)(JNIEnv *env, jclass cls, jfloatArray sam
     float *p = (*env)->GetFloatArrayElements(env, samples, NULL);
     tp_listen_append(p, count, sampleRate);
     (*env)->ReleaseFloatArrayElements(env, samples, p, JNI_ABORT);
+}
+
+// Cross-platform parity check (tests only): runs the shared mix-only fixture through the core and
+// compares with the expected output recorded on Linux/macOS. Returns JSON {"passed":…, "difference":…}.
+JNIEXPORT jstring JNICALL FN(pipelineCheck)(JNIEnv *env, jclass cls, jstring expectedPath) {
+    const char *path = (*env)->GetStringUTFChars(env, expectedPath, NULL);
+    char *res = tp_pipeline_check(path);
+    (*env)->ReleaseStringUTFChars(env, expectedPath, path);
+    jstring out = (*env)->NewStringUTF(env, res ? res : "{\"error\":\"no result\"}");
+    if (res) tp_free(res);
+    return out;
 }

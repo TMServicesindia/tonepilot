@@ -22,6 +22,8 @@ object NativeBridge {
     @JvmStatic external fun call(request: String): String
     @JvmStatic external fun pcmAppend(key: String, samples: FloatArray, count: Int)
     @JvmStatic external fun listenAppend(samples: FloatArray, count: Int, sampleRate: Double)
+    /** Tests only: shared-fixture parity check (see CoreParityTest). */
+    @JvmStatic external fun pipelineCheck(expectedPath: String): String
 
     fun cmd(name: String, vararg args: Pair<String, Any?>): JSONObject {
         val req = JSONObject().put("cmd", name)

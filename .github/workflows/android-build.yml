@@ -28,9 +28,18 @@ env:
 
 jobs:
   swift-core:
-    name: Swift core for Android (arm64)
+    name: Swift core for Android (${{ matrix.abi }})
     runs-on: ubuntu-24.04
     container: swift:6.4.1-noble
+    # The x86_64 build serves only the emulator tests: it must never block the phone APK.
+    continue-on-error: ${{ matrix.abi == 'x86_64' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: aarch64, abi: arm64-v8a, filetype: "ARM aarch64", ndkdir: aarch64-linux-android }
+          # x86_64 only for the emulator parity tests (not shipped in the APK).
+          - { arch: x86_64, abi: x86_64, filetype: "x86-64", ndkdir: x86_64-linux-android }
     defaults:
       run:
         shell: bash
@@ -64,8 +73,8 @@ jobs:
           set -uo pipefail
           SDK_NAME=$(swift sdk list | grep -i android | head -1 | tr -d ' ')
           ok=0
-          for args in "--swift-sdk aarch64-unknown-linux-android28" \
-                      "--swift-sdk $SDK_NAME --triple aarch64-unknown-linux-android28"; do
+          for args in "--swift-sdk ${{ matrix.arch }}-unknown-linux-android28" \
+                      "--swift-sdk $SDK_NAME --triple ${{ matrix.arch }}-unknown-linux-android28"; do
             echo "::group::swift build $args"
             if swift build -c release $args --static-swift-stdlib --product TonePilotBridge 2>&1 | tee build.log; then ok=1; echo "::endgroup::"; break; fi
             echo "::endgroup::"
@@ -83,13 +92,13 @@ jobs:
           LIB=$(find Packages/TonePilotCore/.build -name libTonePilotBridge.so -ipath '*release*' | head -1)
           test -n "$LIB"
           file "$LIB"
-          file "$LIB" | grep -q "ARM aarch64"
-          OUT=jniLibs/arm64-v8a
+          file "$LIB" | grep -q "${{ matrix.filetype }}"
+          OUT=jniLibs/${{ matrix.abi }}
           mkdir -p "$OUT"
           cp "$LIB" "$OUT/"
           READELF=$(find "$ANDROID_NDK_HOME" -name llvm-readelf | head -1)
           test -x "$READELF"
-          cp "$(find "$ANDROID_NDK_HOME" -path '*aarch64-linux-android/libc++_shared.so' | head -1)" "$OUT/"
+          cp "$(find "$ANDROID_NDK_HOME" -path '*${{ matrix.ndkdir }}/libc++_shared.so' | head -1)" "$OUT/"
           # Copy any Swift runtime libraries that weren't linked statically.
           SYSTEM="libc.so libm.so libdl.so liblog.so libandroid.so libz.so libc++_shared.so libaaudio.so libOpenSLES.so"
           for i in 1 2 3; do
@@ -97,7 +106,7 @@ jobs:
               for need in $("$READELF" -d "$f" | awk '/NEEDED/ {gsub(/[\[\]]/, "", $5); print $5}'); do
                 case " $SYSTEM " in *" $need "*) continue ;; esac
                 [ -f "$OUT/$need" ] && continue
-                found=$(find ~/.swiftpm ~/.config/swiftpm ~/.local/share/swiftpm -path '*aarch64*' -name "$need" 2>/dev/null | head -1 || true)
+                found=$(find ~/.swiftpm ~/.config/swiftpm ~/.local/share/swiftpm -path '*${{ matrix.arch }}*' -name "$need" 2>/dev/null | head -1 || true)
                 if [ -z "$found" ]; then echo "::error title=Missing library::$need (needed by $(basename "$f"))"; exit 1; fi
                 cp "$found" "$OUT/"
               done
@@ -110,7 +119,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: jniLibs
+          name: jniLibs-${{ matrix.abi }}
           path: jniLibs
 
   apk:
@@ -122,7 +131,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: jniLibs
+          name: jniLibs-arm64-v8a
           path: android/app/src/main/jniLibs
 
       - uses: actions/setup-java@v4
@@ -187,3 +196,43 @@ jobs:
             Build ${{ github.run_number }} · ${{ github.sha }}
           files: TonePilot.apk
           make_latest: false
+
+  emulator-tests:
+    # iOS/Android parity: the shared core on an x86_64 emulator must reproduce the fixtures recorded on
+    # Linux/macOS. A measurement of parity, not of musical accuracy.
+    name: Android emulator — core parity tests
+    needs: swift-core
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: jniLibs-x86_64
+          path: android/app/src/main/jniLibs
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Instrumented parity tests (API 30, x86_64)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          disable-animations: true
+          script: cd android && gradle connectedDebugAndroidTest -PtpAbis=x86_64 --stacktrace > ../emulator.log 2>&1 || (tail -80 ../emulator.log; exit 1)
+      - name: Report
+        if: always()
+        run: |
+          grep -E "PARITY|Tests? .*(passed|failed)|FAILED|BUILD (SUCCESSFUL|FAILED)" emulator.log | head -20 | while IFS= read -r l; do echo "::notice title=Android parity::$l"; done
+          r=$(find android -path '*androidTest-results*' -name '*.xml' | head -1); [ -n "$r" ] && grep -oE 'tests="[0-9]+" failures="[0-9]+"' "$r" | head -1 | while IFS= read -r l; do echo "::notice title=Android parity tests::$l"; done || true
+

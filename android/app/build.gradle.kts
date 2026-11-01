@@ -4,6 +4,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+// ABIs to build: arm64 for phones (default); the emulator parity tests add x86_64 (-PtpAbis=x86_64).
+val tpAbis = (project.findProperty("tpAbis") as String?)?.split(",")?.map { it.trim() } ?: listOf("arm64-v8a")
+
 // Build number from CI so every release installs over the previous one.
 val buildNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
 
@@ -25,7 +28,8 @@ android {
         targetSdk = 35
         versionCode = buildNumber
         versionName = "0.4.$buildNumber"
-        ndk { abiFilters += listOf("arm64-v8a") }
+        ndk { abiFilters += tpAbis }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -59,6 +63,13 @@ android {
         }
     }
 
+    // Instrumented tests read the shared cross-platform fixtures directly (no copies).
+    sourceSets {
+        getByName("androidTest") {
+            assets.srcDirs("../../Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/pipeline")
+        }
+    }
+
     lint {
         checkReleaseBuilds = false
         abortOnError = false
@@ -87,4 +98,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.3")
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test:core:1.6.1")
 }
