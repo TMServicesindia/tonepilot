@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       control_ref:
-        description: "Control build (tag or commit)"
+        description: "Control build (tag, branch or FULL 40-character commit SHA; short SHAs fail in checkout)"
         default: "v0.3.71"
       runner:
         description: "Runner class (same as the full build by default)"
