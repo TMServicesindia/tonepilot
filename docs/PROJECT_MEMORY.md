@@ -1,0 +1,90 @@
+# TonePilot — Project Memory
+
+**Purpose:** durable memory of the whole working history with the owner, so any future session (or person) can continue without the chat. Read this first, then `CLAUDE.md` and the `docs/TONEPILOT_*.md` documents. Last updated: 1 November 2026.
+
+---
+
+## 1. Owner, setup and goals
+
+- **Owner:** keyboard player in India (times are given in **IST**). Plays a **Casio CT-X870IN** (61 keys) over USB-MIDI into an **iPhone 15**; an Android app also exists.
+- **Install:** unsigned `.ipa` from GitHub Releases, sideloaded with Sideloadly (never recommend free-signing/enterprise-certificate services).
+- **What TonePilot is (owner's words, final):** a *song-aware accompaniment reconstruction system* — import a song, the app understands its accompaniment, extracts the actual pattern, and the player recreates it by playing simple chords (e.g. root–fifth) on the Casio. Instrument recognition and tone matching are secondary.
+- **Owner's standing requirements:** every build smooth, fast, no crashes (see `CLAUDE.md`); report measured speed numbers with each build; give the download link when ready; the **full build (all tests) is mandatory** — the quick build (`ios-quick.yml`) and `[publish-anyway]` are one-off tools used only when the owner explicitly asks.
+- **Constraints:** don't analyse ripped/pirated MP3s (e.g. MassTamilan files) or download from YouTube/piracy sites; use the owner's email only for identification; zero paid APIs; free and commercially usable models only; offline-first.
+
+## 2. Repository and builds
+
+- Repo `TMServicesindia/tonepilot` (public so the app can download models from GitHub Releases).
+- iOS app (SwiftUI, `App/`), shared Swift package **TonePilotCore** (`Packages/TonePilotCore`), Android app (`android/`, Kotlin + C bridge), optional Python server (`server/`).
+- Core tests: Docker `swift:6.0-noble` (`dockerd &` if down) → `swift test` (178 tests at v0.3.71).
+- CI: `ios-build.yml` (core tests in release + speed budgets, MP3 check, instrument check, iPhone build, simulator speed & crash test, publishes `v0.3.N` release); `coreml-convert.yml` (Demucs Core ML + quality gate, publishes `models-v1`); `android-build.yml`; `ios-quick.yml` (one-off, no tests); `model-research.yml` (research-only licence scan; results on branch `research/model-scan`).
+- Logs/artifacts from Actions are not downloadable from the cloud session (blob storage blocked); read **annotations** via the API instead. `huggingface.co`, `zenodo.org`, `magenta.tensorflow.org`, `essentia.upf.edu` are blocked in the session but reachable from CI.
+
+## 3. History (chronological)
+
+1. **Separation speed:** Demucs on-device; Core ML network (Neural Engine) with C++ fallback; random shift removed (deterministic); models downloaded in-app (`models-v1`: 4-part and 6-part); quality gate in CI.
+2. **UI redesign**, then **speed & crash gate** for every build (CLAUDE.md rules).
+3. **Song Arpeggio:** learned patterns per section; preview; then **live fill** (v3): fill starts after the player's R·5, speed from the song, 70% volume, softer and on top, full chord → silent, chord memory with reset, adjustable split point.
+4. **Main tone vs Tone per section** as the user's choice; fixed icons; per-part volume sliders.
+5. **Song parts:** Lead/Backing split of "other" (`LeadSplitter`), 6-part model, models downloaded in-app.
+6. **Record tab:** records only app music + keyboard, starts on first key, exports MP3 (LAME).
+7. **AI tones for mass songs (Hukum):** intensity, Apple sound classifier, power tones (Power Brass, Brass Stabs, Supersaw…), drive, chorus fallback, AI main tone. Owner said the Hukum main tone was "entirely ruined" and asked for ~"98% exact" tones.
+8. **Phase B:** supersaw unison, filter envelope, velocity brightness, 26-tone Film Tone Library (90s→2026), era filters.
+9. **Quick build** requested once ("for this time alone") → `quick-2`; full build `v0.3.67` (publish-anyway once).
+10. Owner: "the entire app was messed; previous build better" → reverted advice to `v0.3.61`; found and fixed:
+    - **Stuck notes** (mono held-key list kept stale keys after tone switches; only one of two stereo voices glided; chords on mono tones) → v0.3.70.
+    - **Song Arpeggio melody bug** (melody notes above the split changed the chord) → v0.3.70.
+    - **Live fill freeze** (deadlock: `LiveFill` held a non-recursive lock while the arpeggiator's callbacks took the same lock) → `LiveFill` moved to core with separate locks, tests prove old design hung → **v0.3.71**.
+11. **ToneMatcher/PartMatcher** (analysis-by-synthesis tone matching) + 20 Indian film instruments (mandolin, sarangi, kuzhal, kombu, tanpura, duduk, …). Owner's real-song test: poor — sections all "Cinematic Low Strings" + "Tanpura-like Drone"; the "Guess 21%" badge is section-name confidence, not tone quality (confusing label).
+12. Owner asked for an expert listener (musician + sound engineer + sound designer) and suggested tools (Songscription, Klangio, La Touche Musicale, Mirelo, ACE Studio; models RoFormer, Demucs, SOME, ROSVOT, VOCANO, Sheet Sage). Evaluated: commercial tools are reference only; SOME (MIT) candidate for vocals; Sheet Sage non-commercial; RoFormer weights unlicensed.
+13. **Architecture & Models** Claude Doc: https://claude.ai/artifact/V7byAXXNTFPCC5Nrx8aDGf (note: it lists Demucs as "MIT" — true for code only).
+14. **Phase 0 audit** (owner's assignment; no production code changed) → `docs/TONEPILOT_*.md`, revisions 1–3, owner reviews each time.
+
+## 4. Audit findings (measured 1 Nov 2026, synthetic songs rendered from GeneralUser GS)
+
+| Area | Result |
+|---|---|
+| Tone matching | lead 4/12 exact (7/12 family); backing 2/12 (5/12) |
+| Beats | F 0.92 with drums, **0.52 without** |
+| Tempo | 18/24 (6 half/double/×1.5) |
+| Time signature | **10/24** |
+| Chords | 70% of bars; minor keys 25–44%; 7ths/inversions 75% |
+| Sections | boundaries 4/4; grouping wrong (ABCBD vs ABABC) |
+| ArpeggioLearner | **100% degrees, step F 1.00 with true beats/chords** → inputs are the bottleneck |
+| Apple classifier | 14/19 clean instruments (CI) |
+
+Licensing: **Demucs weights not cleared for commercial use** (README: weight licence "not clear"; MUSDB18-HQ "other-nc"; 6-part "likely" NC) → personal builds only until cleared. Verified at source: Beat This! MIT (code+weights), Basic Pitch Apache-2.0 (LiteRT 0.84 MB), BTC chords MIT (12 MB), All-In-One weights MIT (author, 1.4 MB/fold), LAION-CLAP music Apache-2.0, NSynth/Slakh2100/GuitarSet CC BY 4.0. Rejected (non-commercial): madmom, Essentia, MERT, MuQ, FCPE, Sheet Sage, Open-Unmix umxl. Full detail: `docs/TONEPILOT_AI_MODEL_RESEARCH.md`, `docs/TONEPILOT_LICENSING_CHECKLIST.md`, scan in `docs/research/`.
+
+## 5. Approved direction (revision 3) and conditions
+
+Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypotheses; bass = evidence) → note events (DSP probe default; Basic Pitch per stem only if better) → conservative accompaniment type (default no fill; false arpeggios = 0) → pattern learning preserving actual order/timing/duration/register/variations (objective checks + owner listening) → live fill (no invented thirds; stop modes compared; tested on the owner's Casio)**. Instruments/tones later (CLAP music vs own model on NSynth/Slakh). Android parity in every phase. SAFE\* ≠ commercial clearance. Protected (unchanged): Melody Player, ToneEngine, NoteRouter, MIDI, normal playing, Record, Song Studio, Tone Studio.
+
+**Owner approval (1 Nov 2026): Phase 1 only, foundation, with conditions:**
+1. Capture current import/analysis outputs as regression fixtures **before** changing `AppModel`/`AppCore`.
+2. `SongImportPipeline` = behaviour-preserving migration; no algorithm redesign.
+3. Keep old orchestration as fallback until equivalence is shown.
+4. Test Core ML, LiteRT and ReplayBackend independently (contract tests, loading, errors, numeric tolerance).
+5. Basic Pitch = test model only; not shipped, not a production dependency.
+6. Android emulator integration tests; physical Android USB-MIDI validation stays for Phase 5.
+7. Indian acceptance dataset with source, licence, annotations, train/test split; 20 clips = minimum start, not proof. Infrastructure may proceed in parallel; Phase 2 rhythm acceptance waits for a representative set.
+8. Separate licence records (code, weights, deps, data); SAFE\* never passes the commercial gate.
+9. Don't modify ToneEngine, NoteRouter, MIDI, LiveArpeggiator, LiveFill, Recorder, Melody Player, Song Studio, Tone Studio.
+10. No algorithm replacement, no new production models, no user-visible change in Phase 1.
+
+**Deliver before Phase 2:** updated docs; every file changed; iOS + Android build results; before/after pipeline equivalence report; backend contract-test results; benchmark baseline report; dataset manifest + licensing checklist; known issues and risks. **If a gate fails: stop and report, don't weaken it. Wait for explicit approval before Phase 2.**
+
+## 6. Phase 1 status (in progress)
+
+- Checkpoint order: (1) fixtures of current behaviour → (2) `SongImportPipeline` + flag fallback → (3) equivalence report → (4) `InferenceBackend` (Core ML, LiteRT, Replay) + contract tests with Basic Pitch test model (reference outputs generated in CI) → (5) Android emulator instrumented fixture tests (needs x86_64 Swift core build) → (6) benchmark harness + reproducible baselines (`bench.yml`) → (7) Indian dataset manifest/schema/validator (clips + annotations need the owner) → (8) licence manifest + commercial gate.
+- Findings so far: `AppModel.analyze` (iOS) and `AppCore.analyze` (Android) both wrap `SongPipeline.run`; iOS adds stems decode, server melody, instrument recogniser, tone loader, stem-info replacement, auto-separate; Android adds the listened default + notice. Android has no test source set yet; the Swift core is built for arm64 only.
+- Audit benchmark code lives in the session scratchpad (`AuditBenchTests.swift`, `SongBenchTests.swift`); to be added to the repo as opt-in benchmarks in Phase 1.
+
+## 7. Open owner decisions
+
+- Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
+- Owner recordings for the Indian acceptance set (Casio performances; Tamil/Telugu/Hindi film-style accompaniments; Indian rhythmic cycles).
+- Agree benchmark gates (`docs/TONEPILOT_BENCHMARK_PLAN.md` §6).
+
+## 8. Release history (latest first)
+
+v0.3.71 (live fill deadlock fix; all gates passed; launch 3.47 s) · v0.3.70 (stuck notes, arpeggio melody bug, ToneMatcher, 20 instruments; launch 3.86 s) · v0.3.67 (publish-anyway; Film Tone Library) · quick-2 · v0.3.61 (Record; owner's preferred older build) · earlier v0.3.x.

@@ -1,5 +1,7 @@
 # TonePilot — working rules
 
+**Start here:** read `docs/PROJECT_MEMORY.md` (full project history, owner decisions, approvals and current phase) before doing anything else, and keep it updated after each milestone.
+
 ## Every feature: smooth, fast, no crashes (the owner's standing requirement)
 
 A change is not done until all of these hold:
