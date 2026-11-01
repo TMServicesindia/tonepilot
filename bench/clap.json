@@ -1,0 +1,14 @@
+{
+ "model": "clap",
+ "params": 68611864,
+ "load_s": 8.6,
+ "audio_s": 18312.0,
+ "infer_s": 1623.3,
+ "s_per_audio_min": 5.32,
+ "window_s": 10.0,
+ "source_classes": [
+  "acoustic",
+  "electronic",
+  "imitation"
+ ]
+}

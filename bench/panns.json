@@ -1,0 +1,13 @@
+{
+ "model": "panns",
+ "params": 81837071,
+ "load_s": 442.4,
+ "audio_s": 18312.0,
+ "infer_s": 765.2,
+ "s_per_audio_min": 2.51,
+ "window_s": 1.0,
+ "source_classes": [
+  "acoustic",
+  "electronic"
+ ]
+}

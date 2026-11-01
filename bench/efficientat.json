@@ -1,0 +1,13 @@
+{
+ "model": "efficientat",
+ "params": 4876831,
+ "load_s": 2.8,
+ "audio_s": 18312.0,
+ "infer_s": 133.2,
+ "s_per_audio_min": 0.44,
+ "window_s": 1.0,
+ "source_classes": [
+  "acoustic",
+  "electronic"
+ ]
+}

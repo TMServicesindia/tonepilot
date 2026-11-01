@@ -1,0 +1,13 @@
+{
+ "model": "yamnet",
+ "params": null,
+ "load_s": 5.8,
+ "audio_s": 18312.0,
+ "infer_s": 191.7,
+ "s_per_audio_min": 0.63,
+ "window_s": 1.0,
+ "source_classes": [
+  "acoustic",
+  "electronic"
+ ]
+}
