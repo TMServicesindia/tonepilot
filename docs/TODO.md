@@ -97,7 +97,8 @@ Rules that apply to every item:
 | 3.1 | Audit of current recognition (Apple, iOS only, 13 families) vs tone matching | ✅ |
 | 3.2 | Taxonomy v2 (+ acoustic / electronic / imitation / unknown) | ✅ |
 | 3.3 | Proxy clip generator (FluidR3 train bank vs GeneralUser test bank, timed layered tracks, variants) | ✅ tested locally |
-| 3.4 | Proxy benchmark A (Apple, YAMNet, EfficientAT, PANNs, CLAP) and C (embeddings + head): run 41315008400 | 🔨 running in CI |
+| 3.4 | Proxy benchmark A vs C (run 41315008400): off-the-shelf labels unusable (Apple 94% unknown); **C · EfficientAT + head leads: 59% exact, 75% family, layered window F1 0.37**; ~25% confident wrong family. See `docs/benchmark/INSTRUMENT_PROXY_RESULTS.md` | 🧪 |
+| 3.4b | Calibrated abstention (wrong family ≤ 5% on DEV) + coverage; more layered training; fair CLAP run | ⏳ next |
 | 3.5 | Add NSynth real-sample set (families, acoustic/electronic/synthetic) to the benchmark | ⏳ |
 | 3.6 | Add licensed real recordings (GuitarSet, Saraga, CC clips) | ⏳ (needs 2.6) |
 | 3.7 | Fine-tuning experiment (B), only if C leaves a measured gap; resumable on free Colab/Kaggle | ⏳ (approval for large training: 👤) |

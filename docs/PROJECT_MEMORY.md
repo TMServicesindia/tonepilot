@@ -141,6 +141,7 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - **No-fill-unless-sure** `Analysis/AccompanimentClassifier.swift` (not wired): evidence = activity, density, bar repeatability, chord-tone share, simultaneity; benchmark gated learner: false arpeggios 0/7 (dev, held-out 88 BPM, held-out-2 112 BPM), unwanted fills 0/4; arpeggios kept 1/2, 2/2, 1/2. maxSimultaneity 2.7 = midpoint of dev classes; otherwise initial thresholds.
 - **Owner (~21:00 IST): iPhone/iOS main priority, Android second. The whole strategy and to-do list is for iOS first.**
 - **Android parity:** x86_64 core build (matrix, non-blocking), JNI `pipelineCheck`, `android/app/src/androidTest/.../CoreParityTest.kt` reading shared fixtures, emulator job (reactivecircus, API 30) → **passes** (run 41314957089). APK still arm64-only (`-PtpAbis` selects ABIs).
+- **First proxy instrument results** (run 41315008400, synthetic): A unusable (Apple 2% exact/94% unknown); C heads: EfficientAT 59% exact/75% family (best, layered window F1 0.37), PANNs 55/77, YAMNet 54/73, CLAP 28/41 (under-measured: 1 s windows). EfficientAT Core ML fp16 9.9 MB, 4.5 ms/window. Too many confident wrong answers → calibrate next. `docs/benchmark/INSTRUMENT_PROXY_RESULTS.md`.
 - Instrument proxy benchmark pipeline: `.github/workflows/instrument-bench.yml` (render → variants → YAMNet/EfficientAT/PANNs/CLAP + Apple → evaluate A/C) → branch ci/instrument-bench. First run 41312723399.
 
 ## 7. Open owner decisions
