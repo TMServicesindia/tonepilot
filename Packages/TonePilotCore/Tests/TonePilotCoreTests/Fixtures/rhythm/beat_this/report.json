@@ -1,0 +1,32 @@
+{
+ "checkpoint_sha256": "6074be2c4d490c5f6101fcc374a1ec72ae93456e23bb6019783b849f5dc7d47b",
+ "frames": 1701,
+ "hparams": {
+  "spect_dim": 128,
+  "fps": 50,
+  "transformer_dim": 128,
+  "ff_mult": 4,
+  "n_layers": 6,
+  "stem_dim": 32,
+  "lr": 0.0008,
+  "weight_decay": 0.01,
+  "head_dim": 32,
+  "loss_type": "shift_tolerant_weighted_bce",
+  "warmup_steps": 1000,
+  "max_epochs": 100,
+  "use_dbn": false,
+  "eval_trim_beats": 5,
+  "sum_head": true,
+  "partial_transformers": true
+ },
+ "coreml_cpuOnly_max_abs_diff": {
+  "beat": 1.9073486328125e-05,
+  "downbeat": 1.800060272216797e-05
+ },
+ "coreml_cpuOnly_same_peaks": true,
+ "coreml_all_max_abs_diff": {
+  "beat": 1.9073486328125e-05,
+  "downbeat": 1.800060272216797e-05
+ },
+ "coreml_all_same_peaks": true
+}

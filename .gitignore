@@ -21,3 +21,4 @@ App/Resources/Models/
 Native/build/
 Native/lame/
 Packages/TonePilotCore/.test-release.log
+Packages/TonePilotCore/.build-docker/
