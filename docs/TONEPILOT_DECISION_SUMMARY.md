@@ -1,105 +1,62 @@
-# TonePilot — Decision Summary (revision 2)
+# TonePilot — Decision Summary (revision 3)
 
-**Date:** 1 November 2026 · **For:** the owner's approval before any implementation. Revision 2 includes the owner's Phase 0 review and a Hugging Face / Zenodo licence scan run in CI (`docs/research/model_scan.md`).
+**Date:** 1 November 2026 · **Status:** final refinement for the owner's approval. **No production code has been modified; implementation starts only after explicit approval.**
 
-**Recommendation:** spend most of the effort on the Song Arpeggio chain — **rhythm → chords → accompaniment notes → pattern → live fill** — because measurements show the arpeggio learner is right when its inputs are right. Candidate models are small and commercially licensed, and each is adopted only if it beats today's code on real audio:
+**What TonePilot is becoming:** a song-aware accompaniment reconstruction system. It listens to a song, understands its accompaniment, extracts the actual pattern, and lets the player recreate it by playing simple chords on the Casio CT-X870IN. Most effort goes to the Song Arpeggio chain: rhythm → harmony → note events → accompaniment type → pattern → live fill. Instruments and tones come later and stay separate.
 
-- **Beat This! small** (MIT, ~8 MB) for beats.
-- **BTC chords** (MIT, 12 MB) against improved DSP chords.
-- **Basic Pitch** (Apache-2.0, 0.84 MB) per stem, against the existing learner.
+Documents:
+- `TONEPILOT_ARCHITECTURE_AUDIT.md`: what exists, measured baselines.
+- `TONEPILOT_AI_MODEL_RESEARCH.md`: candidates and licences.
+- `TONEPILOT_RECOMMENDED_ARCHITECTURE.md`: revision 3, change register C1–C10.
+- `TONEPILOT_IMPLEMENTATION_ROADMAP.md`: revision 3, including the Phase 1 file list.
+- `TONEPILOT_BENCHMARK_PLAN.md`: revision 3, acceptance criteria in §6.
+- `TONEPILOT_LICENSING_CHECKLIST.md`: new; per-dependency records.
 
-Instruments and tones come after the live fill is validated on the Casio, choosing between **LAION-CLAP music (now verified Apache-2.0)** and a small TonePilot model trained on **NSynth and Slakh2100 (both CC BY 4.0)**.
+## Measured vs target vs unknown
 
-Detail: `TONEPILOT_ARCHITECTURE_AUDIT.md` · `TONEPILOT_AI_MODEL_RESEARCH.md` · `TONEPILOT_RECOMMENDED_ARCHITECTURE.md` · `TONEPILOT_BENCHMARK_PLAN.md` · `TONEPILOT_IMPLEMENTATION_ROADMAP.md`.
+| Fact | Kind | Value |
+|---|---|---|
+| Arpeggio learner with true beats/chords | **Measured** (synthetic) | 100% degrees, step F 1.00 |
+| Beat F without / with drums | **Measured** (synthetic) | 0.52 / 0.92 |
+| Time signature | **Measured** (synthetic) | 10/24 |
+| Chords (bar level) | **Measured** (synthetic) | 70%; minor keys 25–44% |
+| Tone matching lead / backing (exact) | **Measured** (synthetic) | 4/12 / 2/12 |
+| Any result on real Tamil/Telugu/Hindi film audio | **Unknown** | Phase 1 builds the set; every stage must pass on it |
+| No-drum beat F ≥ 0.85; cycle ≥ 85%; chords ≥ 85% (minor ≥ 75%); false arpeggios 0; pattern degrees ≥ 90% with estimated inputs | **Targets** | For approval |
+| Beat This! / BTC / Basic Pitch speed on iPhone and Android | **Unknown** | Phases 1–4 measure |
+| Sizes: Beat This! small ~8.1 MB, BTC 12.2 MB, Basic Pitch LiteRT 0.84 MB | **Source** (READMEs / Hugging Face) | — |
+| Effort per phase | **Estimates** | See roadmap |
 
----
+## Revision 3 changes (owner's review)
 
-**1. Keep**
-- **Live playing:** ToneEngine, MIDI and NoteRouter, LiveFill threading.
-- **Studio and tools:** Record, Song Studio, Tone Studio, model download, LeadSplitter, CI gates.
-- **Core learner:** ArpeggioLearner (100% chord degrees with correct inputs).
-- **Fallback:** TempoAnalyzer, kept as fallback and tempo cross-check.
+1. **Android from Phase 1:** `InferenceBackend` (Core ML + LiteRT + replay test backend), Android instrumented test harness on an emulator, cross-platform fixtures, shared import pipeline. Every later phase lands on both platforms.
+2. **Rhythm:** Beat This! gives beat/downbeat **evidence** only; a separate cycle-inference stage decides, with confident/ambiguous/unknown states, and never forces a Western label.
+3. **Harmony:** bass is root **evidence**; bass + chroma + key + time context + optional BTC give ranked hypotheses; drone/modal passages are never forced to a triad; changes allowed on any beat.
+4. **Transcription:** Basic Pitch is an optional experiment per stem type; the existing DSP probe wins unless Basic Pitch measures better.
+5. **Accompaniment type:** a conservative classifier where the default is no fill; **false-arpeggio rate = 0** is the primary gate, reported separately from accuracy.
+6. **Pattern validation:** objective checks (order, timing, duration, register, degrees, variations) **and** owner listening, both required.
+7. **Live fill:** immediate, one-cycle and configurable stop behaviours benchmarked; zero stuck or duplicate notes; latency gate; complete only after your CT-X870IN test.
+8. **Real Indian audio:** owner recordings and licensed Indian-style recordings are **mandatory** acceptance data.
+9. **Licensing:** SAFE\* is not commercial clearance. Separate records for code, weights, dependencies and data; a commercial-build gate in CI; no uncleared Demucs weights or datasets in commercial builds.
+10. **Protected functionality:** Melody Player, ToneEngine, NoteRouter, normal playing, Record, Song Studio and Tone Studio stay unchanged and regression-tested.
 
-**2. Improve (no new model)**
-- **Chords:** bass-aware, key-aware, changes on any beat, a drone/modal state.
-- **Rhythmic cycles** instead of forced time signatures.
-- **Accompaniment type per section:** broken-chord, rhythmic, sustained, hook, bass-only or none.
-- **Pattern learning:** from note events, keeping variations.
-- **Live-fill rules:** no invented thirds; stop after a silent cycle.
-- **Structure:** grouping and confidence tiers.
-- **Shared pipeline:** moved into the core, with an Android inference back-end.
+## Approval conditions (as set by the owner, built into the plan)
 
-**3. Replace (only if measured better)**
-- The beat/downbeat stage (Beat This!).
-- Possibly the chord engine (BTC vs improved DSP).
-- Tone and instrument evidence (CLAP music or own model).
-- Demucs weights, for commercial builds only.
+1. Phase 1 delivers licence records, reproducible benchmarks and the shared iOS/Android inference interface.
+2. Every model must improve on the current implementation on independent real audio before adoption.
+3. Indian rhythmic cycles, minor keys, drones, half-bar chord changes and dense accompaniment are explicitly tested.
+4. Song Arpeggio preserves actual note order, timing, duration, register and variations.
+5. Live fill is tested on the owner's CT-X870IN before it counts as complete.
+6. No feature compromises Melody Player, Tone Studio, recording or normal keyboard playing.
+7. Commercial builds use no uncleared Demucs weights or datasets.
 
-**4. Best model integrations to test**
+## Phase 1 at a glance
 
-| # | Model | Job | Size | Licence (verified at source) |
-|---|---|---|---|---|
-| 1 | Beat This! small | Beats, downbeats | ~8.1 MB | MIT code and weights (README) |
-| 2 | Basic Pitch | Note events per stem | 0.84 MB (LiteRT) | Apache-2.0 (repo, official HF, LiteRT card) |
-| 3 | BTC chord model | Chords, comparison | 12.2 MB | MIT (repository) |
-
-Comparisons only: All-In-One (MIT weights by its author, 1.4 MB per fold; conversion hard), LAION-CLAP music (Apache-2.0; size to measure).
-
-**5. Free and commercially safe**
-- **Rhythm, chords, notes:** Beat This!, Basic Pitch, BTC, All-In-One weights.
-- **Instruments:** LAION-CLAP (`laion/larger_clap_music` Apache-2.0; `lukewys/laion_clap` CC0), PANNs (CC BY 4.0), Microsoft CLAP (MS-PL / CC BY 3.0).
-- **Platform and audio:** Apple frameworks, demucs.cpp, Eigen, LAME (LGPL obligations), GeneralUser GS for playback.
-- **Training and test data:** NSynth, Slakh2100, GuitarSet (all CC BY 4.0), PDMX synthesized (CC0).
-- Items marked * in the research doc carry training-data notes to record before a store release.
-
-**6. Reject**
-- **Verified non-commercial:** madmom, Essentia models, MERT, MuQ/MuQ-MuLan, FCPE, Sheet Sage, Open-Unmix UMXL, MUSDB18-HQ, Mridangam stroke data, ccmusic-database.
-- **Unverified weights:** MT3, SOME, RMVPE, ChordMini, RoFormer checkpoints, Spleeter, community instrument classifiers.
-- **Too large for the phone** (offline reference only): ByteDance piano (172–628 MB), YourMT3 (2.8 GB), AST, Microsoft CLAP.
-
-**7. Improving instrument and tone recognition (later phase)**
-- Separate recognition from matching.
-- Compare CLAP music against a small own model trained on **real** instrument audio (NSynth samples, Slakh stems, your recordings), not only TonePilot patches.
-- Embed library tones at several pitches and velocities.
-- Grade against ground truth and your blind listening.
-- Indian instruments at family level until licensed recordings exist.
-
-**8. Improving rhythm and structure**
-- Beat This! fused with the current tempo analysis.
-- A rhythmic cycle (beats per cycle, subdivision, accents, confidence), with a Western label only when it truly fits.
-- Structure on the bar grid, with key-invariant repeat grouping and vocal-aware section types.
-
-**9. Improving exact broken-chord extraction**
-1. Correct beat grid and cycle.
-2. Correct, time-varying chords.
-3. Note events per stem, whichever method measures best for that stem.
-4. An accompaniment-type gate.
-5. Learning the exact note order, register, duration and accents, with variations.
-6. A/B validation against the original stem.
-
-Basic Pitch is one input, never the whole answer.
-
-**10. Order**
-1. Licensing and benchmark foundation, with real audio.
-2. Rhythm.
-3. Chords.
-4. Accompaniment extraction.
-5. Live Song Arpeggio on the Casio.
-6. Instruments and tones.
-7. Android parity, regression and release.
-
-Android parity is an acceptance item in every phase.
-
----
-
-**Demucs:** confirmed risk. Its README says the weight licence "is not clear", and its MUSDB18-HQ training data is "other-nc" on Zenodo. The plan:
-- Personal builds keep it.
-- Ask the Demucs author and Meta for permission in Phase 1.
-- Consider our own separator trained on Slakh2100 (CC BY 4.0) only if permission fails and a commercial release is planned.
-- A commercial build never silently downloads the current weights.
-
-**Decisions needed from the owner**
-1. Approve revision 2 of the roadmap.
-2. Approve sending permission requests to the Demucs author/Meta and the GeneralUser GS author (I'll draft both).
-3. Agree the gates in `TONEPILOT_BENCHMARK_PLAN.md` §6.
-4. Start the owner-recorded clips for the real-audio set: Casio performances and played accompaniments in Tamil, Telugu and Hindi film styles, including Indian rhythmic cycles.
+| Item | Detail |
+|---|---|
+| Scope | Licence records and permission requests; benchmark harness and baselines in CI; real Indian acceptance set started (≥ 20 annotated clips); `InferenceBackend` with Core ML, LiteRT and replay back-ends; Android instrumented fixture tests; shared import pipeline (outputs unchanged) |
+| New downloads | Basic Pitch LiteRT/Core ML as the back-end **test model** (CI only, not shipped) |
+| Files | Listed in the roadmap ("Phase 1 — files that would change") |
+| Not touched | ToneEngine, NoteRouter, MIDI, LiveArpeggiator, LiveFill, Recorder, Melody Player, Song Studio and Tone Studio screens, Demucs download, any analysis algorithm's behaviour |
+| Effort | 12–16 days (estimate) |
+| Owner input needed | Approval; permission emails (drafts on request); first owner recordings for the Indian set |

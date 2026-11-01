@@ -1,4 +1,4 @@
-# TonePilot — Benchmark Plan (revision 2)
+# TonePilot — Benchmark Plan (revision 3)
 
 **Date:** 1 November 2026 · **Purpose:** every change to listening, rhythm, transcription or matching must beat today's measured baseline on **independent** test data before it ships. A model's own similarity score is never its accuracy.
 
@@ -73,24 +73,26 @@ Rules: no ripped, pirated or YouTube-downloaded audio; benchmark audio is never 
 4. Speed and memory are measured on device (iPhone 15) for any model added: time per 4-min song, peak memory, energy (Instruments).
 5. Results are stored as CI annotations and a JSON artifact per build.
 
-## 6. Quality gates (proposed CI additions)
+## 6. Acceptance criteria (revision 3)
 
-| Gate | Threshold (proposed) | Blocks release |
-|---|---|---|
-| Existing gates (tests, speed & crash, separation) | unchanged | Yes |
-| Beat F (S1 + S2, no-drum subset) | ≥ baseline + 0.20, never below 0.85 once Beat This! lands | Yes after Phase 2 |
-| Meter accuracy | ≥ 20/24 on S1 meter set | Yes after Phase 2 |
-| Chord beat-level accuracy | ≥ 85% on S1, minor-key subset ≥ 75%, half-bar changes detected | Yes after Phase 3 |
-| Arpeggio degree accuracy, **estimated** beats/chords | ≥ 90% on S1 patterns | Yes after Phase 4 |
-| Cycle length | ≥ 85% on S1 + S6 | Yes after Phase 2 |
-| False arpeggios in hook/solo/none sections | 0 | Yes after Phase 4 |
-| Android parity | Same rhythm/chord/pattern outputs on the reference songs within tolerance | Yes, every phase |
-| Tone matching Top-3 (family-correct) | ≥ 10/12 on S1 leads, ≥ 9/12 backing | Yes after Phase 6 |
-| Live fill duplicate-note rate | 0 | Yes |
-| Live fill latency | < 1 ms per note in core | Yes |
-| Added analysis time | ≤ 60 s per 4-min song on device | Reported; blocks if > 90 s |
+All thresholds below are **targets** for approval, not measured results. "Real" means S3 (owner recordings) and S4/S6 (licensed real audio). **S3 and S6 (Tamil, Telugu and Hindi film-style material and Indian rhythmic cycles) are mandatory acceptance data for every stage they apply to; a stage cannot pass on synthetic or Western data alone.**
 
-Thresholds are proposals to agree with the owner; they are raised as real-audio results arrive.
+| Stage | Primary gate (blocks adoption) | Reported separately (must not regress) | Data |
+|---|---|---|---|
+| Beat evidence (C1) | No-drum beat F ≥ 0.85 (S1) **and** better than TempoAnalyzer on S6 | Downbeat F; CMLt/AMLt; time per 4-min song | S1, S2, **S6** |
+| Rhythmic cycle (C2) | Cycle length ≥ 85%, subdivision ≥ 90% (S1 + S6) | **Wrong confident labels ≤ 5%**; "ambiguous/unknown" on ≥ 80% of rubato clips | S1, S5, **S6** |
+| Harmony (C3) | Beat-level accuracy ≥ 85% (S1); minor keys ≥ 75%; better than current on real | Half-bar change detection; drone passages labelled drone ≥ 90%; alternatives contain the truth ≥ 95% | S1, S2, S4, **S6** |
+| Note events (C4) | Per stem type: Basic Pitch enabled only where note F beats the DSP probe | Offset F; octave errors; time | GuitarSet, Slakh, S1, **S3**, **S6** |
+| Accompaniment type (C5) | **False-arpeggio rate = 0** in hook, solo, sparse and sustained sections | Overall accuracy (target ≥ 85%); missed-arpeggio rate; full confusion matrix | S1, S4, S5, **S6** |
+| Pattern (C6) | Degree accuracy ≥ 90%, median onset error ≤ 30 ms, median edit distance ≤ 1 event/bar — with **estimated** beats and chords — **and** owner listening approval on 10 real sections. Both required | Duration error; register (octave) accuracy; variation placement ≥ 80% | S1, **S3**, **S6** |
+| Live fill (C7) | Duplicate notes 0; stuck notes 0; core decision < 1 ms; note-in to first fill note < 10 ms on device; **owner's CT-X870IN test passed** | Stop modes (immediate, one cycle, configurable) compared on: stop delay (ms), notes played after release, owner preference | Core tests + device checklist |
+| Structure (C8) | Exact grouping on the S1 structure set; no "Chorus" without vocal + repetition evidence | Boundary F (±0.5/±3 s); label accuracy per tier | S1, S4, **S6** |
+| Instruments/tones (C9) | Top-3 family-correct ≥ 10/12 leads, ≥ 9/12 backing (S1); better than baseline on real; owner blind preference ≥ 70% | Macro F1; per-class recall; Indian instruments family-level only | S1, S2c, S4, **S3** |
+| Shared pipeline (C10) | Fixtures identical (or within documented tolerance) on Linux, iOS simulator and Android emulator; pipeline move changes no output | Android runtime size; inference time on a mid-range Android | Fixtures |
+| **Protected functionality** | Existing tests + speed & crash stress test green; Melody Player, ToneEngine, NoteRouter, normal playing, Record, Song Studio, Tone Studio unchanged | Launch time, peak memory, engine load | Every phase |
+| Speed | Added analysis ≤ 60 s per 4-min song on iPhone 15 (blocks if > 90 s); Android measured and reported | Battery and thermal notes | Device |
+
+**Adoption rule:** a model replaces or augments existing code only if its primary gate passes on real data **and** nothing in "reported separately" regresses beyond the documented tolerance. A model's own confidence or similarity score is never accepted as its accuracy.
 
 ## 7. Test cases that must exist
 
@@ -100,5 +102,7 @@ Thresholds are proposals to agree with the owner; they are raised as real-audio 
 - Arpeggios: 16ths, 8ths, triplets, syncopated 3-3-2, register changes, accents, per-bar variations (bar-4 fills), a section where the accompaniment is a melodic phrase (must not become an arpeggio), rhythmic strum/stab patterns, sustained pads.
 - Chords: changes on beat 3 (half-bar), two chords per beat in fast passages, drone sections with no triad.
 - Transcription: the same pattern played by piano, guitar, strings and synth stems, to choose the note-event method per stem type.
-- Live fill: R-5 input, full chord input (silent), right-hand melody above the split, chord change mid-bar, MIDI unplug mid-note, song paused vs playing, tempo scale change.
+- Live fill: R-5 input, full chord input (silent), right-hand melody above the split, chord change mid-bar, MIDI unplug mid-note, song paused vs playing, tempo scale change, each stop mode (immediate, one cycle, configurable).
+- Pattern validation: cases where the A/B sounds right but one note is in the wrong order or octave (must fail the objective check).
+- Protected functionality: Melody Player on/off during live fill, Record while live fill plays, Tone Studio edits while a pattern plays.
 - Recognition: each family alone, with leakage, and in a dense mix; Indian-instrument "-like" mappings at family level.

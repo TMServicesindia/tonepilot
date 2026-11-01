@@ -1,20 +1,45 @@
-# TonePilot — Recommended Architecture (revision 2)
+# TonePilot — Recommended Architecture (revision 3)
 
-**Date:** 1 November 2026 · **Status:** for the owner's approval; nothing implemented. Revision 2 adds the owner's Phase 0 review: transcription is one input among several, chords before patterns, rhythmic cycles instead of forced time signatures, accompaniment-type classification, a real-audio dataset, Demucs licensing, and Android parity for every change.
+**Date:** 1 November 2026 · **Status:** for the owner's approval; nothing implemented. Revision 3 applies the owner's final review:
+- Android parity starts in Phase 1.
+- Model outputs are evidence, not decisions.
+- Bass notes are root evidence, not roots.
+- Transcription is optional per stem.
+- False arpeggios get a separate zero gate.
+- Pattern validation checks the actual notes, not only the sound.
+- Stop behaviours are compared.
+- Real Indian audio is mandatory.
+- SAFE\* is never unconditional clearance.
+- Existing features are protected.
 
-**Product focus:** TonePilot's advantage is understanding a song's **accompaniment** and letting the player recreate it by playing simple chords on the Casio. Most engineering effort goes to the Song Arpeggio chain: rhythm → chords → accompaniment notes → pattern → live fill. Instrument recognition and tone matching are a separate, later programme.
+**Product core:** TonePilot is a *song-aware accompaniment reconstruction system*. It listens to a song, understands its accompaniment, extracts the actual pattern, and lets the player recreate it by playing simple chords on the Casio CT-X870IN. The Song Arpeggio chain (rhythm → harmony → note events → accompaniment type → pattern → live fill) gets most of the effort. Instrument recognition and tone matching come later and stay separate.
 
-Evidence labels (Measured / Source / Estimate / Unknown) follow `TONEPILOT_ARCHITECTURE_AUDIT.md`; licence classes (SAFE, SAFE\*, RESTRICTED, UNVERIFIED) follow `TONEPILOT_AI_MODEL_RESEARCH.md`.
+## Evidence labels (used throughout)
+
+| Label | Meaning |
+|---|---|
+| **Measured** | Run on 1 Nov 2026 with the audit harness (synthetic songs rendered from GeneralUser GS; real audio not yet measured) |
+| **Target** | An acceptance threshold proposed for approval; not yet achieved |
+| **Estimate** | Engineering judgement |
+| **Unknown** | Not established; the phase that will establish it is named |
 
 ---
 
 ## 1. Principles
 
-1. **Accuracy before model count.** Nothing ships unless it beats the current code on independent data, real audio included.
-2. **Shared core, two inference back-ends.** All logic, pre- and post-processing live in TonePilotCore. Each model runs through a small `InferenceBackend` interface: Core ML on iOS, LiteRT (TFLite) or ONNX Runtime on Android. **A model without a working Android back-end is not approved.**
-3. **Separate questions, separate tests.** Note transcription, harmony, rhythm, pattern detection, phrase-vs-pattern classification, recognition and tone matching are distinct stages.
-4. **Honest confidence.** Every output carries confidence and a "don't know" state; the UI never shows a confident label from weak evidence.
-5. **Live playing is protected.** No analysis on the main, MIDI or audio threads; ToneEngine, NoteRouter, Record and Tone Studio are unchanged by this programme.
+1. **Accuracy before model count.** A model is adopted only when it beats the current code on independent **real** audio, including the Indian acceptance set.
+2. **Evidence, not verdicts.** A neural model contributes evidence with confidence. Final musical decisions (cycle, chord, accompaniment type, pattern) are made in TonePilotCore, and can always answer "unknown".
+3. **Shared core, two inference back-ends, from Phase 1.** All pre-processing, post-processing and decision logic live in TonePilotCore. Inference runs behind one `InferenceBackend` interface: Core ML on iOS; LiteRT (TFLite) or ONNX Runtime on Android. **No model is approved without a working Android back-end.**
+4. **Separate stages, separate tests:** note transcription, harmony, rhythm, accompaniment type, pattern learning, recognition and tone matching.
+5. **Protected functionality.** These stay unchanged and regression-tested unless a separately approved change says otherwise:
+    - Melody Player (melody guide)
+    - ToneEngine
+    - NoteRouter and MIDI
+    - normal keyboard playing
+    - Record
+    - Song Studio
+    - Tone Studio
+6. **Commercial builds** contain only models, weights, dependencies and data whose licence records are complete and reviewed (`TONEPILOT_LICENSING_CHECKLIST.md`). Personal builds may keep the current Demucs.
 
 ## 2. Data flow
 
@@ -22,188 +47,186 @@ Evidence labels (Measured / Source / Estimate / Unknown) follow `TONEPILOT_ARCHI
 Import (audio the user has rights to)
  │
  ├─ Decode, first analysis (existing)
- ├─ Separation (existing Demucs — personal builds; commercial builds need cleared weights, §5)
+ ├─ Separation (existing Demucs in personal builds; commercial builds: cleared weights only, §4)
  │      vocals · drums · bass · other (+ piano · guitar) → Lead / Backing (existing DSP)
  │
- ├─ R. RHYTHM: beat grid + rhythmic cycle
- │      Beat This! small (activations) ⊕ TempoAnalyzer (tempo cross-check) ⊕ onset subdivision
- │      → beats, downbeats, cycle = {beats per cycle, subdivision 2/3/4, accent pattern, confidence}
- │        conventional label (4/4, 3/4, 6/8…) only when confident; otherwise "cycle of N, unlabelled"
+ ├─ R1 BEAT EVIDENCE   Beat This! small → beat/downbeat activations   (model, evidence only)
+ │                     TempoAnalyzer → tempo + onset periodicity       (existing DSP)
+ │                     onset subdivision (2/3/4 per beat) from stems   (DSP)
  │
- ├─ H. HARMONY: time-varying chords on the beat grid
- │      bass stem → root · backing/other → bass-free chroma · key-aware HMM (major + minor)
- │      chord changes allowed on any beat (half-bar changes) · 7ths/inversions recognised and
- │      folded for degree mapping · drone/modal detector → "drone" state, never a guessed triad
- │      (BTC model evaluated as an alternative)
+ ├─ R2 CYCLE INFERENCE (separate stage, own code)
+ │      accent periodicity over beats + downbeat evidence + chord-change timing + repetition
+ │      → RhythmCycle {beats per cycle, subdivision, accent groups (3+2+2, 4+4…),
+ │                     confidence, state: confident | ambiguous | unknown}
+ │      Western label only when confident and conventional; never forced
  │
- ├─ N. NOTE EVENTS per accompaniment stem
- │      Basic Pitch (evaluated per stem) ⊕ existing onset/harmonic probe (fallback, cross-check)
- │      → onset, offset, pitch, velocity, confidence per note
+ ├─ H  HARMONY (hypotheses, not a single forced answer)
+ │      evidence: bass pitch (root evidence), bass-free chroma, key context, temporal smoothing,
+ │                optional BTC chord posteriors (model, evidence only)
+ │      → per beat: best chord + ranked alternatives + confidence; states: chord | drone/modal | no-chord
  │
- ├─ A. ACCOMPANIMENT TYPE per section (new classifier, rules + features)
- │      broken-chord pattern · rhythmic chord pattern (strums/stabs) · sustained pad/chords ·
- │      melodic hook/phrase · bass-line only · none (sparse/solo) → decides what live fill may do
+ ├─ N  NOTE EVENTS per accompaniment stem
+ │      existing DSP probe (always) ⊕ Basic Pitch (only for stem types where it measured better)
+ │      → onset, offset, pitch, velocity, confidence
  │
- ├─ P. PATTERN LEARNING (existing ArpeggioLearner, extended — combines R + H + N + A)
- │      notes → chord-relative events: cycle position, degree, octave offset, duration, accent,
- │      register; repeated-bar clustering → main pattern + variations; confidence per event
- │      A/B validation against the original stem before live use
+ ├─ A  ACCOMPANIMENT TYPE per section (rules + features; conservative)
+ │      broken-chord · rhythmic chord · sustained · hook/phrase · bass-only · none · uncertain
+ │      live fill allowed only for broken-chord / rhythmic chord with high confidence
  │
- ├─ L. LIVE FILL (existing LiveArpeggiator + LiveFill, rules tightened)
+ ├─ P  PATTERN LEARNING (existing ArpeggioLearner, extended; combines R2 + H + N + A)
+ │      actual note order, timing, duration, register, accents → chord-relative events
+ │      main pattern + per-bar variations + per-event confidence
+ │      validation: objective note-event checks + owner listening (both required)
  │
- └─ T. INSTRUMENTS AND TONES (separate programme, later)
-        recognition (what plays) and matching (which TonePilot tone) — CLAP music vs own model
+ ├─ L  LIVE FILL (existing LiveArpeggiator + LiveFill, rules tightened)
+ │
+ └─ T  INSTRUMENTS AND TONES (later, separate): recognition vs matching
 ```
 
 ## 3. Change register
 
-Each change lists: current implementation · proposed improvement · why · licence · expected benefit · size and device needs · benchmark and acceptance · fallback.
+Fields per change: current · proposed · why · licence (record status, see checklist) · expected benefit · size and device · benchmark and acceptance · fallback.
 
-### C1 — Beat grid and downbeats
-
-| Field | Content |
-|---|---|
-| Current | `TempoAnalyzer`: onset autocorrelation + Ellis DP beats; meter from beat-strength periodicity |
-| Proposed | Beat This! small for beat + downbeat activations; fuse with TempoAnalyzer tempo; one shared grid for chords, structure and patterns |
-| Why | Measured: beat F 0.52 without drums (0.92 with); 6 of 24 tempo errors were half/double/×1.5 |
-| Licence | Beat This! code + weights MIT (README) — **SAFE\*** (training-data note) |
-| Expected benefit | Paper reports strong results on many datasets (to be **re-measured**; no figure claimed here). Target: no-drum beat F ≥ 0.85 |
-| Size / device | ~8.1 MB; inference on 4-min song **untested**; iOS Core ML + Android LiteRT/ONNX conversions to be proven in CI |
-| Benchmark / acceptance | S1 rhythm set (24 + new cases), S2, S4 real audio incl. Indian film-style: beat F, downbeat F, CMLt/AMLt; must beat TempoAnalyzer on S4 and keep added time ≤ 10 s per 4-min song on iPhone 15 |
-| Fallback | Feature flag → current TempoAnalyzer |
-
-### C2 — Rhythmic cycle instead of a forced time signature
+### C1 — Beat evidence
 
 | Field | Content |
 |---|---|
-| Current | `SectionInsights.timeSignature` and `ArpeggioLearner.downbeatPhase`: two heuristics, 10/24 correct |
-| Proposed | One `RhythmCycle` model in the core: beats per cycle (2–16), subdivision (2, 3, 4), accent pattern (e.g. 3+3+2, 3+2+2 for misra chapu-like 7, 4+4 for 8-beat cycles), confidence. A Western label is shown only when it fits confidently; else "7-beat cycle (3+2+2)" or "cycle unclear" |
-| Why | Owner: Indian film rhythms don't always map to 4/4, 3/4, 6/8; forcing a label breaks patterns |
-| Licence | Own code — SAFE |
-| Expected benefit | Correct pattern length per cycle; fewer wrong-grid patterns (measured grid errors 3/5 even with true beats) |
+| Current | `TempoAnalyzer`: onset autocorrelation + Ellis DP beats |
+| Proposed | Beat This! small supplies beat and downbeat **activations as evidence**; TempoAnalyzer supplies tempo and periodicity; a fusion step in TonePilotCore produces the beat grid and passes downbeat evidence to C2. Beat This! never decides the cycle on its own |
+| Why | **Measured:** beat F 0.52 without drums, 0.92 with; 6/24 tempo errors (half/double/×1.5) |
+| Licence | Code and weights MIT (README). Training data includes copyrighted / limited-CC files (README). **SAFE\*: model record complete; data provenance needs review before a commercial release** |
+| Expected benefit | **Unknown** until Phase 2 measures it. **Target:** no-drum beat F ≥ 0.85 on synthetic data, and better than TempoAnalyzer on the real Indian set |
+| Size / device | ~8.1 MB (README). Inference time and memory: **unknown** (Phase 2, iPhone 15 and one mid-range Android) |
+| Benchmark / acceptance | Beat F, downbeat F, CMLt/AMLt on S1, S2 and the mandatory real Indian set (S6); improvement required on S6 |
+| Fallback | TempoAnalyzer only (feature flag) |
+
+### C2 — Rhythmic cycle inference (separate stage)
+
+| Field | Content |
+|---|---|
+| Current | Two heuristics (`SectionInsights.timeSignature`, `ArpeggioLearner.downbeatPhase`). **Measured:** 10/24 |
+| Proposed | `RhythmCycle` stage in the core. Evidence: accent periodicity, Beat This! downbeats, chord-change timing, bar repetition, subdivision. Output: beats per cycle (2–16), subdivision (2/3/4), accent groups, confidence, and a state of confident, ambiguous or unknown. Patterns and live fill use the cycle; the UI shows "7-beat cycle (3+2+2)", "6/8", or "cycle unclear" |
+| Why | A beat/downbeat model doesn't identify tala or Indian rhythmic cycles. A forced label creates wrong pattern lengths |
+| Licence | Own code |
+| Expected benefit | **Target:** cycle length ≥ 85%, subdivision ≥ 90% on S1 + S6; on rubato, ≥ 80% of clips reported as ambiguous or unknown, not a wrong label |
 | Size / device | 0 MB; shared core |
-| Benchmark / acceptance | S1 + S5 cases: 4/4, 3/4, 6/8, tisra, 5- and 7-beat cycles, syncopation, rubato intro, tempo change; cycle length right ≥ 85%, subdivision right ≥ 90%, and "unclear" (not a wrong label) on rubato |
-| Fallback | Current heuristics |
+| Benchmark / acceptance | S1 rhythm set, S6 Indian cycles (mandatory), S5 rubato/tempo change; wrong confident labels reported separately (target: ≤ 5%) |
+| Fallback | Current heuristics, shown as "unclear" when they disagree with downbeat evidence |
 
-### C3 — Time-varying, bass- and key-aware chords
-
-| Field | Content |
-|---|---|
-| Current | `HarmonyAnalyzer`: KK key profiles, 24 triad templates, Viterbi over beats on the full-mix chroma |
-| Proposed | Bass stem → root evidence; backing/other stem → chroma without vocals; key-aware transition priors (major and minor keys, relative-key ambiguity kept as alternatives); changes on any beat; seventh/sus/inversion templates folded to a degree map; drone/modal detector (strong sustained pitch class + weak triad fit → "drone on X") |
-| Why | Measured: 70% of bars; minor-key songs 25–44% with wrong keys; sevenths/inversions 75%. Wrong chords = wrong thirds in the fill |
-| Licence | Own DSP — SAFE. Alternative evaluated: BTC (MIT repository, 12.2 MB) — **SAFE\*** |
-| Expected benefit | Target ≥ 85% bar accuracy overall, ≥ 75% minor keys, half-bar changes detected |
-| Size / device | 0 MB (DSP) or 12.2 MB (BTC, conversion untested) |
-| Benchmark / acceptance | S1 chord set extended (half-bar changes, slash chords, drones), S2 (MIDI-derived chords), S4 real audio: beat-level accuracy, change-time error; BTC adopted only if it beats improved DSP on S4 |
-| Fallback | Current analyzer |
-
-### C4 — Accompaniment note events (transcription as one input)
+### C3 — Harmony with hypotheses
 
 | Field | Content |
 |---|---|
-| Current | `ArpeggioLearner`: onset envelope on the step grid + harmonic-sum pitch probe at each onset |
-| Proposed | Evaluate per stem (piano, guitar, backing, other): (a) existing probe, (b) Basic Pitch notes, (c) both with agreement. Output note events with onset, offset, pitch, velocity, confidence. Heavy transcribers (ByteDance piano, YourMT3) run only offline in CI as reference "upper bounds" |
-| Why | The learner needs register, durations and exact chord tones; the probe only finds the strongest new pitch per onset. Owner: Basic Pitch must not be assumed to handle dense film accompaniment |
-| Licence | Basic Pitch Apache-2.0 (repo + official HF + LiteRT card) — **SAFE\*** |
-| Expected benefit | Unknown until measured; the benchmark reports per-stem note F so the right method can be chosen per stem type |
-| Size / device | 0.84 MB LiteRT (Android benchmarks on the card); Core ML conversion listed in README (to measure on iPhone) |
-| Benchmark / acceptance | GuitarSet (real guitar, CC BY 4.0), Slakh stems (CC BY 4.0), S1, S3 owner recordings: note F (onset ±50 ms), offset F, octave errors, per stem; Basic Pitch used only for stem types where it beats the probe |
-| Fallback | Existing probe (always available) |
+| Current | `HarmonyAnalyzer`: KK key profiles, 24 triad templates, beat-level Viterbi on full-mix chroma. **Measured:** 70% of bars; minor keys 25–44%; sevenths/inversions 75% |
+| Proposed | Per beat, combine (a) bass pitch as root **evidence** (inversions and pedal bass allowed), (b) bass-free chroma from backing/other, (c) key context, major and minor, with relative-key ambiguity, (d) temporal smoothing, (e) optional BTC posteriors. Output the best chord, ranked alternatives and a confidence. States: chord, drone/modal (no triad forced) or no-chord. Changes allowed on any beat |
+| Why | A wrong chord makes the fill play a wrong third. Bass notes are not always roots |
+| Licence | Own DSP. BTC: MIT repository with model files (SAFE\*; data: Isophonics, Robbie Williams, UsPop annotations; audio collected by the authors) |
+| Expected benefit | **Target:** ≥ 85% beat-level accuracy, minor keys ≥ 75%, half-bar changes found; drone passages labelled drone ≥ 90% (S1) |
+| Size / device | 0 MB DSP; BTC 12.2 MB, conversion **unknown** |
+| Benchmark / acceptance | S1 chord set (minor keys, 7ths, inversions, slash chords, half-bar changes, drones), S2, S4/S6 real audio; BTC adopted only if it beats improved DSP on real audio |
+| Fallback | Current analyzer; low-confidence chords feed the live-fill third rule (C7) |
 
-### C5 — Accompaniment-type classifier
+### C4 — Note events (transcription as an optional experiment)
 
 | Field | Content |
 |---|---|
-| Current | Learner returns either a step pattern or "sustained" |
-| Proposed | Per section: **broken-chord pattern** (repeating chord-tone sequence), **rhythmic chord pattern** (simultaneous chord hits: strums, stabs, comping), **sustained** (pads, held chords), **melodic hook/phrase** (non-repeating or scale-wise lines), **bass line only**, **none** (sparse, solo, rubato). Features: notes per onset (polyphony), cross-bar repetition, chord-tone ratio, step-wise motion ratio, onset density |
-| Why | Owner: never force an arpeggio into a hook, solo or passage where it doesn't belong |
-| Licence | Own — SAFE |
-| Expected benefit | Live fill plays only where the song has a repeatable accompaniment; hooks offered as a hook, not as an arpeggio |
+| Current | ArpeggioLearner onset envelope + harmonic-sum probe |
+| Proposed | The existing probe always runs. Basic Pitch runs as an experiment per stem type (piano, guitar, strings, synth, mixed backing). It is enabled only for stem types where it measurably improves note-event F; otherwise the DSP probe wins. ByteDance piano and YourMT3 run only offline as reference upper bounds |
+| Why | Dense strings, piano and orchestral backing are hard for any transcriber |
+| Licence | Basic Pitch Apache-2.0 (repo, official HF card, LiteRT card). SAFE\*: training-data list to record. **Not a required dependency** |
+| Expected benefit | **Unknown** per stem type until Phase 4 |
+| Size / device | 0.84 MB LiteRT (Android benchmarks on its card); iPhone Core ML **unknown** |
+| Benchmark / acceptance | Note F (onset ±50 ms), offset F, octave-error rate, per stem type on GuitarSet, Slakh, S1, S3 and S6 |
+| Fallback | DSP probe |
+
+### C5 — Accompaniment type (conservative)
+
+| Field | Content |
+|---|---|
+| Current | Pattern or "sustained" |
+| Proposed | Classes: broken-chord, rhythmic chord, sustained, hook/phrase, bass-only, none, uncertain. Decision rule: **live fill only for broken-chord or rhythmic chord with confidence above a strict threshold; everything else defaults to no fill.** Features: polyphony per onset, cross-bar repetition, chord-tone ratio, step-wise motion, onset density |
+| Why | A violin hook or flute solo must never become an arpeggio |
+| Licence | Own |
+| Expected benefit | **Target (primary): false-arpeggio rate = 0** in hook, solo, sparse and sustained sections across S1, S4, S5 and S6. Secondary: overall type accuracy ≥ 85%, reported separately. Missed arpeggios (fill suppressed where allowed) are reported but secondary |
 | Size / device | 0 MB |
-| Benchmark / acceptance | Labelled sections in S1/S4/S5; type accuracy ≥ 85%; **zero** arpeggios generated in sections labelled hook/solo/none |
-| Fallback | Current two-way behaviour |
+| Benchmark / acceptance | Labelled sections; confusion matrix published; the false-positive rate is gated separately from accuracy |
+| Fallback | No fill (safe default) |
 
-### C6 — Pattern learning that preserves the song's actual sequence
+### C6 — Pattern learning that preserves the song
 
 | Field | Content |
 |---|---|
-| Current | `ArpeggioPattern`: steps × degrees with velocity and length, one pattern per repeated section group; 100% correct with true beats/chords (measured) |
-| Proposed | Learn from note events (C4) on the cycle grid (C2) with chords (C3): event = cycle position, degree, octave offset, duration, accent, register; cluster bars → main pattern + variations (e.g. bar 4 fill); keep the original order of notes (e.g. Root → Fifth → Octave → Third → Fifth → Octave) exactly; per-event confidence; A/B preview against the original stem and a note list; tap-to-correct (exists); approve per section |
-| Why | Owner: extract the actual sequence and timing, then map to the player's chord |
-| Licence | Own — SAFE |
-| Expected benefit | Keep ≥ 90% degree accuracy with **estimated** beats/chords (today's 100% assumes perfect inputs) |
+| Current | `ArpeggioPattern` steps × degrees, velocity and length. **Measured:** 100% degrees and step F 1.00 **with true beats and chords** |
+| Proposed | Learn from note events on the cycle grid with chord hypotheses. Each event keeps cycle position, chord degree, octave offset, duration, accent and register. The original note order is kept exactly (e.g. Root → Fifth → Octave → Third → Fifth → Octave). Bars are clustered into a main pattern plus variations, with per-event confidence |
+| Validation | **Both are required:** (1) objective checks against the reference (note order, onset timing, duration, register, chord degree, variation placement); (2) owner listening with A/B against the original stem. Passing one without the other fails |
+| Why | An A/B can sound convincing while the sequence is wrong |
+| Licence | Own |
+| Expected benefit | **Target:** degree accuracy ≥ 90% and onset error ≤ 30 ms median with **estimated** beats and chords (S1); variation placement ≥ 80% (S1); owner approval on 10 real sections from S3/S6 |
 | Size / device | 0 MB |
-| Benchmark / acceptance | S1 pattern set with estimated inputs; S3 owner-played patterns; owner approval on 10 real sections; sequence edit distance ≤ 1 event per bar median |
-| Fallback | Current learner output |
+| Benchmark / acceptance | Per-event metrics + edit distance per bar (median ≤ 1) + listening sheet |
+| Fallback | Current learner output, marked "approximate" |
 
-### C7 — Live fill rules
+### C7 — Live fill
 
 | Field | Content |
 |---|---|
-| Current | `LiveArpeggiator` + `LiveFill`: fill after R·5, melody above the split ignored, full chord silent, chord memory, MIDI-thread with separate locks |
-| Proposed | (1) Never invent a third: play one only if the player played it, memory holds it, or the song's chord at this moment has confidence ≥ threshold; else root-fifth-octave voicings. (2) Stop after one silent cycle. (3) Use only validated patterns for the current section and its accompaniment type. (4) Mid-bar chord change replans from the next step. (5) MIDI disconnect stops the fill and releases notes (panic path exists) |
-| Why | Owner requirements; measured chord errors make invented thirds likely today |
-| Licence | Own — SAFE |
-| Expected benefit | Fewer wrong notes; clean stops |
-| Size / device | 0 MB; < 1 ms per note budget |
-| Benchmark / acceptance | Core tests + Casio device checklist: R-5, full chord, melody above split, chord change mid-bar, cable unplug, paused/playing, tempo scale; duplicate-note rate 0, stuck notes 0 |
+| Current | Fill after R·5; melody above the split ignored; full chord silent; chord memory; MIDI-thread processing with separate locks; continues to the chord's end |
+| Proposed | (1) **Third rule:** play a third only if the player played it, memory holds it, or the song chord's confidence is above the threshold; else root-fifth-octave voicings. (2) **Stop behaviour benchmarked:** immediate stop on release, stop after one silent cycle, and a configurable option (setting with a sensible default chosen from the test). (3) Validated patterns for allowed accompaniment types only. (4) Mid-bar chord change replans from the next step. (5) MIDI disconnect stops the fill and releases notes |
+| Why | Owner: a one-cycle stop may feel delayed; no stuck or duplicate notes; no delayed response |
+| Licence | Own |
+| Expected benefit | **Target:** duplicate-note rate 0; stuck notes 0; note-in to first fill note < 10 ms on device (core decision < 1 ms); owner prefers the default stop behaviour on the Casio |
+| Size / device | 0 MB |
+| Benchmark / acceptance | Core tests + CT-X870IN checklist (R-5, full chords, melody above split, chord change mid-bar, cable unplug, paused/playing, tempo change, each stop mode); **complete only after the owner's Casio test** |
 | Fallback | Current rules |
 
-### C8 — Structure (sections) with confidence tiers
+### C8 — Structure with confidence tiers
 
 | Field | Content |
 |---|---|
-| Current | Foote novelty boundaries (measured 4/4), SSM grouping (measured wrong: ABCBD), labels by rules |
-| Proposed | Bar-aligned features (C1/C2), key-invariant repeat grouping, vocal presence from the vocals stem for verse/chorus vs interlude, three display states (boundary · predicted type · guess); All-In-One evaluated as an alternative for labels |
-| Why | Song Arpeggio learns per repeated section; wrong grouping splits evidence |
-| Licence | Own — SAFE; All-In-One weights MIT on the author's HF repo — **SAFE\*** |
-| Expected benefit | Correct grouping on repeats; no "Chorus" from loudness alone |
-| Size / device | 0 MB, or 1.4 MB/fold (NATTEN conversion feasibility unknown) |
-| Benchmark / acceptance | Boundary F ±0.5/±3 s, pairwise grouping F, label accuracy per tier on S1/S4 |
+| Current | Foote boundaries (**measured** 4/4), grouping wrong (ABCBD), rule labels |
+| Proposed | Bar/cycle-aligned features, key-invariant repeat grouping, vocal presence for section type, tiers: boundary, predicted type, guess. All-In-One as comparison (MIT weights by its author; NATTEN conversion **unknown**) |
+| Why | Patterns are learned per repeated section |
+| Licence | Own; All-In-One SAFE\* |
+| Expected benefit | **Target:** exact grouping on the S1 structure set; no "Chorus" without vocal and repetition evidence |
+| Size / device | 0 MB (1.4 MB/fold if All-In-One wins and converts) |
+| Benchmark / acceptance | Boundary F, pairwise grouping F, label accuracy per tier on S1/S4/S6 |
 | Fallback | Current analyzer + manual section editor |
 
-### C9 — Instruments and tones (separate programme)
+### C9 — Instruments and tones (later programme)
 
 | Field | Content |
 |---|---|
-| Current | Apple SoundAnalysis (14/19 clean) + hand-built fingerprint matcher (lead 4/12, backing 2/12) |
-| Proposed | Two outputs: recognition (what plays, per 3 s window, family level for Indian instruments) and matching (nearest TonePilot tone by embedding similarity, library rendered at 3 registers × 2 velocities, then existing EQ/reverb fit). Engine chosen by benchmark: **LAION-CLAP music (Apache-2.0)** vs **TonePilot Timbre model** trained on NSynth (CC BY 4.0, real samples) + Slakh2100 (CC BY 4.0) + PDMX (CC0) + own recordings, so it learns real instruments, not only our patches |
-| Why | Measured weakness; owner wants it after the arpeggio chain |
-| Licence | CLAP music SAFE\*; own model SAFE\* (data attribution) |
-| Expected benefit | Target Top-3 family-correct ≥ 10/12 leads and ≥ 9/12 backing on S1, better than baseline on S4 |
-| Size / device | CLAP audio branch: to measure (full model 776 MB fp32 — too large unless the audio branch is far smaller); own model ≤ 5 MB target |
-| Benchmark / acceptance | Macro F1 (recognition), Top-1/Top-3 (matching), owner blind preference ≥ 70% |
-| Fallback | Current matcher + Apple prior |
+| Current | Apple SoundAnalysis (**measured** 14/19 clean) + fingerprint matcher (**measured** lead 4/12, backing 2/12) |
+| Proposed | Recognition (what plays) and matching (which TonePilot tone) kept separate. LAION-CLAP music (Apache-2.0, SAFE\*) is compared with a TonePilot model trained on real instrument audio (NSynth, Slakh2100, PDMX, owner recordings); library tones rendered at 3 registers × 2 velocities |
+| Why | Measured weakness; scheduled after live fill |
+| Licence | See checklist (SAFE\* items need data review) |
+| Expected benefit | **Target:** Top-3 family-correct ≥ 10/12 leads, ≥ 9/12 backing (S1); better than baseline on real audio; owner blind preference ≥ 70% |
+| Size / device | CLAP audio branch **unknown** (full model 776 MB fp32); own model ≤ 5 MB (**estimate**) |
+| Benchmark / acceptance | Macro F1, Top-1/Top-3, listening |
+| Fallback | Current matcher |
 
-### C10 — Shared pipeline and Android back-end
+### C10 — Shared pipeline, inference interface and Android harness (Phase 1)
 
 | Field | Content |
 |---|---|
-| Current | Import pipeline duplicated in `AppModel` (iOS) and `AppCore` (Android); separation, live fill, Record, recognition are iOS-only |
-| Proposed | `SongImportPipeline` in TonePilotCore; `InferenceBackend` protocol (Core ML / LiteRT / ONNX Runtime); live fill wired into `AppCore` (pure core logic, already MIDI-thread safe) |
-| Why | Owner: shared-core functionality is a requirement for every feature |
-| Licence | ONNX Runtime MIT, LiteRT Apache-2.0 — SAFE |
-| Expected benefit | Each feature lands on both platforms |
-| Size / device | Runtime libraries on Android (size to measure) |
-| Benchmark / acceptance | Same core tests on both; Android build runs the rhythm, chord and pattern stages on a reference song with identical results (tolerance documented) |
-| Fallback | Feature hidden on Android until parity passes |
+| Current | Import pipeline duplicated in `AppModel` (iOS) and `AppCore` (Android). No model inference on Android. No Android test source set |
+| Proposed | **Phase 1:** `InferenceBackend` protocol in TonePilotCore (tensor in → tensor out, named model). iOS Core ML implementation. Android LiteRT implementation registered through the C bridge. A test backend that replays recorded outputs. Cross-platform fixtures (input audio + expected outputs) used by Linux core tests, iOS tests and an Android instrumented test on an emulator in CI. The import pipeline moves into the core. **Later phases:** each new stage lands on both platforms in the same phase |
+| Why | Owner: Android parity from Phase 1, not Phase 7 |
+| Licence | LiteRT Apache-2.0; ONNX Runtime MIT (if used) |
+| Expected benefit | Identical analysis results on both platforms within a documented tolerance |
+| Size / device | LiteRT runtime added to the APK (size **unknown**, Phase 1 measures) |
+| Benchmark / acceptance | The fixture suite passes on Linux, iOS simulator and Android emulator; a sample model (Basic Pitch, 0.84 MB) runs through both back-ends with outputs matching within tolerance |
+| Fallback | Keep the current per-platform orchestration while the shared pipeline stabilises |
 
-## 4. Real-audio evaluation data (summary)
+## 4. Demucs and commercial builds
 
-Synthetic data alone is not accepted as evidence. The benchmark adds: GuitarSet (real guitar, CC BY 4.0), Slakh stems (CC BY 4.0), the owner's own recordings (Casio and played accompaniments in Tamil, Telugu and Hindi film styles), and CC0/CC BY tracks with per-track licence records, all annotated by hand for beats, cycles, chords, sections, accompaniment type and patterns. No claim about Indian film music or instruments is made without results on that set. Details: `TONEPILOT_BENCHMARK_PLAN.md`.
+| Build | Separation | Condition |
+|---|---|---|
+| Personal (owner) | Current Demucs downloads | Allowed |
+| Commercial / store | **None until cleared** | Written permission for `htdemucs`, or our own separator trained on cleared data (Slakh2100 CC BY 4.0, PDMX CC0, licensed multitracks), or analysis from the mix only |
 
-## 5. Demucs licensing and alternatives
+Commercial builds must not download, bundle or call uncleared weights or use uncleared datasets. A build flag enforces this, and CI checks the licence manifest.
 
-| Option | What | Cost | Risk |
-|---|---|---|---|
-| A. Personal builds only (now) | Keep current Demucs downloads for the owner's own use | 0 | None for personal use |
-| B. Ask for permission | Contact Meta / the Demucs author about commercial redistribution of `htdemucs` weights | 0 | May be refused or unanswered |
-| C. Own separator | Train an HT-Demucs-style model (MIT code) on Slakh2100 (CC BY 4.0) + PDMX (CC0) + licensed multitracks | Compute time only (CI or owner's Mac) | Quality on real recordings unknown; long project |
-| D. No separation in commercial builds | Analyse from the mix; arpeggio quality drops | 0 | Product quality |
+## 5. Protected functionality and regression
 
-Recommendation: A now; start B in Phase 1; evaluate C only if B fails and a commercial release is planned. The commercial build must never silently download the current weights.
-
-## 6. What stays unchanged
-
-ToneEngine, NoteRouter and MIDI, Record, Song Studio mixer, Tone Studio, model download, LeadSplitter, the CI gates, the section editor.
+Melody Player (melody guide), ToneEngine, NoteRouter and MIDI, normal keyboard playing, Record, Song Studio and Tone Studio keep their current tests and the speed and crash stress test. Each phase adds a regression check, and no phase modifies them without a separate approval.
