@@ -23,15 +23,15 @@ production selection. Machine-readable results: `COREML_DEPLOYMENT_RESULTS.json`
 - **Cold start** (load + first prediction): 300–470 ms per model and unit.
 - **Full song, inference only (estimated from Mac):** 4 min ≈ 1.3–1.6 s at 0.5 s hop.
 - **Front-end (Swift mel, measured Linux CPU):** matches PyTorch to 2.2e-5. 2.6 s per 4-min song after
-  the sparse-band optimisation, so **the front-end now costs more than inference**. Next: an
-  Accelerate (vDSP) FFT path on iOS.
+  the sparse-band optimisation; **with the Accelerate (vDSP) path on Apple platforms: 0.12 s per 4-min song**
+  on the Mac runner, same accuracy (2.2e-5). Inference is now the larger stage.
 
 ## End-to-end stages (4-min song)
 
 | Stage | Cost | Status |
 |---|---|---|
 | Decode + resample to 32 kHz | — | Pending (iPhone; uses existing app decoder) |
-| Mel front-end (Swift) | 2.6 s Linux CPU | Measured (Linux); iPhone pending |
+| Mel front-end (Swift) | **0.12 s with Accelerate (Mac runner)**; 2.5 s portable path (Linux) | Measured (Mac/Linux); iPhone pending |
 | Core ML inference (fp16) | ~1.3–1.6 s | Estimated (Mac) |
 | Heads + calibration + time aggregation | < 0.1 s (logistic heads) | Estimated |
 

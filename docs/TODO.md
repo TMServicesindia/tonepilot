@@ -107,8 +107,8 @@ Rules that apply to every item:
 | 3.7 | Fine-tuning experiment (B), only if C leaves a measured gap; resumable on free Colab/Kaggle | ⏳ (approval for large training: 👤) |
 | 3.8 | Five-stage analyser prototype (content → family → instrument → time aggregation → tone mapping), Core ML, shadow mode | ⏳ (approval: 👤) |
 | G2.1 | **Gate 2 Core ML** (run 41323484719, macos-26): fp16 9.9 MB, 99.5% family-decision agreement, ~4 ms/window (Mac); int8 5.1 MB 97.2%; 6-bit rejected (87.2%). `docs/benchmark/COREML_DEPLOYMENT_REPORT.md` | 🧪 Mac measured |
-| G2.2 | Swift EfficientAT mel front-end: **matches PyTorch (2.2e-5)**; 2.6 s per 4-min song (Linux CPU), now costlier than inference → Accelerate FFT next | ✅ tested |
-| G2.3 | **TonePilot Lab**: separate iPhone benchmark app (main app untouched); device latency per compute unit, full-song time, footprint, thermal, battery, on-device numerics → JSON report | 🔨 written; build after G2.1 (`lab-build.yml`) |
+| G2.2 | Swift EfficientAT mel front-end: **matches PyTorch (2.2e-5)** on Linux and macOS; **Accelerate vDSP path: 0.12 s per 4-min song** (Mac runner; portable path 2.5 s on Linux) | ✅ tested (Mac/Linux); iPhone via Lab |
+| G2.3 | **TonePilot Lab**: separate iPhone benchmark app (main app untouched); device latency per compute unit, full-song time, footprint, thermal, battery, on-device numerics → JSON report. **Built: 32 MB unsigned IPA** (run 41326170801, artifact `TonePilotLab-ipa`, 14 days) | 🔨 built; not yet run on any device |
 | G2.4 | **Physical iPhone run** of TonePilot Lab (sideload, press Full run, share the JSON) | 👤 (one session) |
 | G2.5 | Developer-only shadow mode in the main app (off by default; production recognizer stays authoritative) | ⏳ after G2.4 |
 | 3.9 | Real-song evaluation per language with verified annotations | 📝 |
