@@ -22,9 +22,6 @@ jobs:
         run: |
           apt-get update -qq && apt-get install -y -qq curl > /dev/null
           curl -fsSL -o /tmp/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
-      - name: Build (release)
-        working-directory: Packages/TonePilotCore
-        run: swift build -c release --build-tests
       - name: Run twice
         working-directory: Packages/TonePilotCore
         env:
@@ -32,7 +29,7 @@ jobs:
         run: |
           set -o pipefail
           for i in 1 2; do
-            swift test -c release --skip-build --filter "AnalysisBaselineBenchmarks|ToneMatchingBenchmarks" 2>&1 | tee run$i.log
+            swift test -c release --filter "AnalysisBaselineBenchmarks|ToneMatchingBenchmarks" 2>&1 | tee run$i.log
             grep -E "^(AUDIT|BENCH)" run$i.log | sort > results$i.txt
           done
           grep -E "RESULT" results1.txt | while IFS= read -r l; do echo "::notice title=Baseline::$l"; done
