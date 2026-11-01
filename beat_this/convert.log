@@ -1,0 +1,53 @@
+Torch version 2.5.1 has not been tested with coremltools. You may run into unexpected errors. Torch 2.5.0 is the most recent version that has been tested.
+/tmp/beat_this/beat_this/model/beat_tracker.py:291: TracerWarning: Using len to get tensor shape might cause the trace to be incorrect. Recommended usage would be tensor.shape[0]. Passing a tensor of different shape might lead to errors or silently give incorrect results.
+  b = len(x)
+/tmp/beat_this/beat_this/model/roformer.py:117: TracerWarning: Iterating over a tensor might cause the trace to be incorrect. Passing a tensor of different shape won't change the number of iterations executed (and might lead to errors or silently give incorrect results).
+  q, k, v = rearrange(
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/rotary_embedding_torch/rotary_embedding_torch.py:334: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  if (
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/rotary_embedding_torch/rotary_embedding_torch.py:337: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  (offset + seq_len) <= self.cached_freqs_seq_len
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/rotary_embedding_torch/rotary_embedding_torch.py:63: TracerWarning: Converting a tensor to a Python boolean might cause the trace to be incorrect. We can't record the data flow of Python values, so this value will be treated as a constant in the future. This means that the trace might not generalize to other inputs!
+  assert rot_dim <= t.shape[-1], f'feature dimension {t.shape[-1]} is not of sufficient size to rotate in all the positions {rot_dim}'
+/tmp/beat_this/beat_this/model/beat_tracker.py:318: TracerWarning: Iterating over a tensor might cause the trace to be incorrect. Passing a tensor of different shape won't change the number of iterations executed (and might lead to errors or silently give incorrect results).
+  beat, downbeat = rearrange(beat_downbeat, "b t c -> c b t", c=2)
+Tuple detected at graph output. This will be flattened in the converted model.
+Converting PyTorch Frontend ==> MIL Ops:   0%|          | 0/3028 [00:00<?, ? ops/s]Converting PyTorch Frontend ==> MIL Ops:  22%|██▏       | 660/3028 [00:00<00:00, 6597.02 ops/s]Converting PyTorch Frontend ==> MIL Ops:  44%|████▎     | 1320/3028 [00:00<00:00, 3231.22 ops/s]Converting PyTorch Frontend ==> MIL Ops:  63%|██████▎   | 1902/3028 [00:00<00:00, 3985.06 ops/s]Converting PyTorch Frontend ==> MIL Ops:  87%|████████▋ | 2645/3028 [00:00<00:00, 4994.71 ops/s]Converting PyTorch Frontend ==> MIL Ops: 100%|█████████▉| 3026/3028 [00:00<00:00, 4847.90 ops/s]
+Running MIL frontend_pytorch pipeline:   0%|          | 0/5 [00:00<?, ? passes/s]Running MIL frontend_pytorch pipeline: 100%|██████████| 5/5 [00:00<00:00, 57.18 passes/s]
+Running MIL default pipeline:   0%|          | 0/87 [00:00<?, ? passes/s]Running MIL default pipeline:   8%|▊         | 7/87 [00:00<00:01, 64.20 passes/s]Running MIL default pipeline:  20%|█▉        | 17/87 [00:00<00:00, 78.33 passes/s]Running MIL default pipeline:  30%|██▉       | 26/87 [00:00<00:00, 80.48 passes/s]Running MIL default pipeline:  40%|████      | 35/87 [00:00<00:00, 68.79 passes/s]Running MIL default pipeline:  49%|████▉     | 43/87 [00:00<00:00, 63.62 passes/s]Running MIL default pipeline:  57%|█████▋    | 50/87 [00:00<00:00, 64.02 passes/s]Running MIL default pipeline:  66%|██████▌   | 57/87 [00:00<00:00, 51.37 passes/s]Running MIL default pipeline:  72%|███████▏  | 63/87 [00:01<00:00, 45.98 passes/s]Running MIL default pipeline:  80%|████████  | 70/87 [00:01<00:00, 50.59 passes/s]Running MIL default pipeline:  91%|█████████ | 79/87 [00:01<00:00, 59.17 passes/s]Running MIL default pipeline:  99%|█████████▉| 86/87 [00:01<00:00, 54.68 passes/s]Running MIL default pipeline: 100%|██████████| 87/87 [00:01<00:00, 58.44 passes/s]
+Running MIL backend_mlprogram pipeline:   0%|          | 0/12 [00:00<?, ? passes/s]Running MIL backend_mlprogram pipeline:  75%|███████▌  | 9/12 [00:00<00:00, 74.24 passes/s]Running MIL backend_mlprogram pipeline: 100%|██████████| 12/12 [00:00<00:00, 68.09 passes/s]
+{
+ "checkpoint_sha256": "6074be2c4d490c5f6101fcc374a1ec72ae93456e23bb6019783b849f5dc7d47b",
+ "frames": 1701,
+ "hparams": {
+  "spect_dim": 128,
+  "fps": 50,
+  "transformer_dim": 128,
+  "ff_mult": 4,
+  "n_layers": 6,
+  "stem_dim": 32,
+  "lr": 0.0008,
+  "weight_decay": 0.01,
+  "head_dim": 32,
+  "loss_type": "shift_tolerant_weighted_bce",
+  "warmup_steps": 1000,
+  "max_epochs": 100,
+  "use_dbn": false,
+  "eval_trim_beats": 5,
+  "sum_head": true,
+  "partial_transformers": true
+ },
+ "coreml_cpuOnly_max_abs_diff": {
+  "beat": 1.9073486328125e-05,
+  "downbeat": 1.800060272216797e-05
+ },
+ "coreml_cpuOnly_same_peaks": true,
+ "coreml_all_max_abs_diff": {
+  "beat": 1.9073486328125e-05,
+  "downbeat": 1.800060272216797e-05
+ },
+ "coreml_all_same_peaks": true
+}
+RESULT reference: 57 beats, 15 downbeats in 34 s (truth 56 beats at 100 BPM)
+RESULT Core ML cpuOnly: max |diff| beat 1.91e-05, downbeat 1.80e-05; same peaks True
+RESULT Core ML all: max |diff| beat 1.91e-05, downbeat 1.80e-05; same peaks True
