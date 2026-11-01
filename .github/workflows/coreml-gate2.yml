@@ -1,0 +1,47 @@
+name: Core ML Gate 2 — EfficientAT optimisation and validation (research only, no app build)
+
+# fp32/fp16/int8/palettised × CPU / CPU+NE / all × batch sizes; numerical suite vs PyTorch on real
+# benchmark windows; latency percentiles; Mac full-song estimates; Swift mel fixture.
+# Mac CI measurements only — never iPhone results. Free GitHub runners (zero budget).
+on:
+  workflow_dispatch:
+    inputs:
+      bench_run_id:
+        description: "instrument-bench run id (for its rendered clips)"
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  gate2:
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: iset, path: /tmp/iset, run-id: "${{ inputs.bench_run_id }}", github-token: "${{ github.token }}" }
+      - name: Install
+        run: |
+          pip install -q "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2" "numpy<2" scipy scikit-learn "coremltools==8.2"
+          git clone -q --depth 1 https://github.com/fschmid56/EfficientAT /tmp/eat
+          echo "EAT_COMMIT=$(git -C /tmp/eat rev-parse HEAD)" >> $GITHUB_ENV
+      - name: Convert, optimise, validate, time
+        run: |
+          set -o pipefail
+          python Native/tools/instruments/gate2_coreml.py /tmp/eat /tmp/iset /tmp/g2 2>&1 | tee /tmp/g2.log | grep -E "GATE2|Error|error|Traceback|\|" | tail -40
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: coreml-models, path: "/tmp/g2/*.mlpackage", retention-days: 7 }
+      - name: Push report + fixture to branch ci/coreml-gate2
+        if: always()
+        run: |
+          [ -f /tmp/g2/COREML_DEPLOYMENT_RESULTS.json ] || exit 0
+          mkdir -p /tmp/pub && cp -r /tmp/g2/COREML_DEPLOYMENT_* /tmp/g2/fixture /tmp/g2.log /tmp/pub/
+          echo "EfficientAT ${EAT_COMMIT} · tonepilot ${GITHUB_SHA} · run ${GITHUB_RUN_ID} · clips from bench run ${{ inputs.bench_run_id }}" > /tmp/pub/SOURCE.txt
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/coreml-gate2 && git rm -rqf . && mkdir -p gate2 && cp -r /tmp/pub/* gate2/
+          git add gate2 && git commit -qm "Core ML Gate 2 results" && git push -qf origin ci/coreml-gate2
