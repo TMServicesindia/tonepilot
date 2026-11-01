@@ -195,6 +195,8 @@ def main(root, outdir, report_path):
         data = load_model(path)
         info = json.load(open(path[:-4] + ".json")) if os.path.exists(path[:-4] + ".json") else {}
         infos[name] = info
+        global WIN
+        WIN = float(info.get("window_s", 1.0))
         train_solo = [c for c in clips if c["split"] == "train" and c["kind"] == "solo" and c["file"] in data]
         # A: mapped labels; thresholds from TRAIN only.
         items = [(data[c["file"]]["inst"].mean(0), data[c["file"]]["fam"].mean(0), solo_truth(c)) for c in train_solo]

@@ -93,7 +93,9 @@ final class InstrumentSetRender: XCTestCase {
             let all = Self.patches().filter { $0.key != "drums" }
             var rng: UInt64 = split == "test" ? 0xA11CE : 0xB0B
             func rand(_ n: Int) -> Int { rng = rng &* 6364136223846793005 &+ 1442695040888963407; return Int((rng >> 33) % UInt64(n)) }
-            for t in 0..<24 {
+            // More layered training mixtures on request (TP_LAYERED_TRAIN); the test bank stays at 24.
+            let layeredCount = split == "train" ? Int(env["TP_LAYERED_TRAIN"] ?? "") ?? 24 : 24
+            for t in 0..<layeredCount {
                 let seconds = 24.0, count = 2 + rand(3)
                 var mix = [Float](repeating: 0, count: Int(seconds * Self.sr)), events: [[String: Any]] = []
                 var used = Set<String>()

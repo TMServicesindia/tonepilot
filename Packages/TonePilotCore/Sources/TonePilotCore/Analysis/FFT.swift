@@ -15,7 +15,8 @@ public final class MagnitudeFFT {
     private var im: [Float]
 
     /// - Parameter size: power of two, e.g. 2048.
-    public init(size: Int) {
+    /// - Parameter customWindow: optional analysis window of `size` samples (default: periodic Hann).
+    public init(size: Int, customWindow: [Float]? = nil) {
         precondition(size >= 2 && size & (size - 1) == 0, "FFT size must be a power of two")
         self.size = size
         var l = 0
@@ -29,7 +30,12 @@ public final class MagnitudeFFT {
             return r
         }
         // Periodic Hann window.
-        window = (0..<size).map { Float(0.5 - 0.5 * cos(2 * Double.pi * Double($0) / Double(size))) }
+        if let w = customWindow {
+            precondition(w.count == size, "window must have `size` samples")
+            window = w
+        } else {
+            window = (0..<size).map { Float(0.5 - 0.5 * cos(2 * Double.pi * Double($0) / Double(size))) }
+        }
         re = [Float](repeating: 0, count: size)
         im = [Float](repeating: 0, count: size)
     }

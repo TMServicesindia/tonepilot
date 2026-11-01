@@ -14,7 +14,7 @@ jobs:
   render:
     runs-on: ubuntu-latest
     container: swift:6.0-noble
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - name: Sound banks (GeneralUser GS = test; FluidR3 GM, MIT = train)
@@ -28,9 +28,12 @@ jobs:
           TP_SF2: /tmp/GeneralUser-GS.sf2
           TP_SF2_TRAIN: /usr/share/sounds/sf2/FluidR3_GM.sf2
           TP_RENDER_SET: /tmp/iset
+          TP_LAYERED_TRAIN: "96"
         run: swift test -c release --filter InstrumentSetRender 2>&1 | grep -E "RENDER|error:|Executed" | tail -5
       - name: Variants (reverb, compressed, short)
         run: python3 Native/tools/instruments/variants.py /tmp/iset
+      - name: NSynth (CC BY 4.0) — cross-domain DEV (valid) and extra TEST (test)
+        run: python3 Native/tools/instruments/nsynth.py /tmp/iset 60
       - uses: actions/upload-artifact@v4
         with: { name: iset, path: /tmp/iset, retention-days: 3 }
 
@@ -105,11 +108,13 @@ jobs:
           pip install -q "numpy<2" scipy scikit-learn
           ls /tmp/out
           python Native/tools/instruments/evaluate.py /tmp/iset /tmp/out /tmp/report.md | tee /tmp/eval.log | tail -60
+          python Native/tools/instruments/calibrate.py /tmp/iset /tmp/out /tmp/calibration.md | tail -60
       - name: Push results to branch ci/instrument-bench
         if: always()
         run: |
           [ -f /tmp/report.md ] || exit 0
           mkdir -p /tmp/pub && cp /tmp/report.md /tmp/report.json /tmp/pub/ && cp /tmp/out/*.json /tmp/pub/ 2>/dev/null || true
+          cp /tmp/calibration.md /tmp/calibration.json /tmp/pub/ 2>/dev/null || true
           echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID} · $(date -u +%FT%TZ)" > /tmp/pub/SOURCE.txt
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           git checkout -q --orphan ci/instrument-bench && git rm -rqf . && mkdir -p bench && cp /tmp/pub/* bench/

@@ -4,7 +4,7 @@ embeddings (input to approach C), plus timing and model-size facts.
 Usage: embed.py <render dir> <model: yamnet|efficientat|panns|clap> <out dir> [--eat <EfficientAT repo>]"""
 import json, os, sys, time
 import numpy as np
-from common import taxonomy, map_scores, read_wav, resample, windows, load_clips, WIN
+from common import taxonomy, map_scores, read_wav, resample, windows, load_clips, WIN, HOP, MODEL_WINDOWS
 
 _, INSTRUMENTS, FAMILIES, FAM_OF = taxonomy()
 
@@ -96,7 +96,8 @@ def run(root, name, out, eat_repo=None):
     for k, c in enumerate(meta["clips"]):
         x, sr = read_wav(os.path.join(root, c["file"]))
         x = resample(x, sr, model.sr)
-        starts, wins = windows(x, model.sr)
+        mw, mh = MODEL_WINDOWS.get(name, (WIN, HOP))
+        starts, wins = windows(x, model.sr, mw, mh)
         t = time.time()
         scores, emb = model(wins)
         infer_s += time.time() - t; audio_s += len(x) / model.sr
@@ -121,7 +122,7 @@ def run(root, name, out, eat_repo=None):
             flat[f"{i}|{key}"] = v
     np.savez_compressed(os.path.join(out, f"{name}.npz"), files=np.array(list(res.keys())), **flat)
     info = {"model": name, "params": model.params, "load_s": round(load_s, 1), "audio_s": round(audio_s, 1), "infer_s": round(infer_s, 1),
-            "s_per_audio_min": round(infer_s / max(1e-6, audio_s) * 60, 2), "window_s": WIN,
+            "s_per_audio_min": round(infer_s / max(1e-6, audio_s) * 60, 2), "window_s": MODEL_WINDOWS.get(name, (WIN, HOP))[0],
             "source_classes": ["acoustic", "electronic", "imitation"] if name == "clap" else ["acoustic", "electronic"]}
     json.dump(info, open(os.path.join(out, f"{name}.json"), "w"), indent=1)
     print("EMBED done", json.dumps(info))

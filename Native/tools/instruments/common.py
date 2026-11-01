@@ -6,10 +6,13 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 WIN, HOP = 1.0, 0.5   # analysis window and hop in seconds (time-based detection)
+MODEL_WINDOWS = {"clap": (10.0, 1.0)}   # CLAP was trained on 10 s clips: give it 10 s windows
 
 
 def taxonomy():
     t = json.load(open(os.path.join(HERE, "taxonomy.json")))
+    for f in t["families"]:   # NSynth clips carry family-level truth only
+        t["keys"][f"nsynth:{f}"] = {"instrument": None, "family": f, "source": "unknown"}
     instruments = sorted({i for fam in t["families"].values() for i in fam})
     families = sorted(t["families"])
     fam_of = {i: f for f, items in t["families"].items() for i in items}
@@ -102,9 +105,9 @@ def resample(x, sr, target):
     return ss.resample_poly(x, int(target) // g, int(sr) // g).astype(np.float32)
 
 
-def windows(x, sr):
-    """Window start times and slices (WIN s, HOP s); a clip shorter than WIN gives one padded window."""
-    n, h = int(WIN * sr), int(HOP * sr)
+def windows(x, sr, win=WIN, hop=HOP):
+    """Window start times and slices (win s, hop s); a clip shorter than win gives one padded window."""
+    n, h = int(win * sr), int(hop * sr)
     if len(x) <= n:
         return [0.0], [np.pad(x, (0, n - len(x)))]
     starts = list(range(0, len(x) - n + 1, h))

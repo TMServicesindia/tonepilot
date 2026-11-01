@@ -1,0 +1,60 @@
+import Foundation
+
+/// EfficientAT (fschmid56, MIT) mel front-end, reproduced exactly for on-device use (research;
+/// not used by the app). Matches `models/preprocess.py` `AugmentMelSTFT` in eval mode:
+/// pre-emphasis [-0.97, 1] → STFT (n_fft 1024, symmetric Hann 800 centred in the frame, hop 320,
+/// centre + reflect padding) → power → Kaldi mel bank (128 bins, 0–15 kHz, 32 kHz) →
+/// ln(x + 1e-5) → (x + 4.5) / 5. Output: mel-major [128][frames].
+public enum EfficientATFrontEnd {
+    public static let sampleRate = 32_000.0
+    public static let nFFT = 1024, winLength = 800, hop = 320, nMels = 128
+    public static let fMin = 0.0, fMax = 15_000.0
+
+    static let window: [Float] = {
+        var w = [Float](repeating: 0, count: nFFT)
+        let off = (nFFT - winLength) / 2
+        for n in 0..<winLength { w[off + n] = Float(0.5 - 0.5 * cos(2 * Double.pi * Double(n) / Double(winLength - 1))) }
+        return w
+    }()
+
+    /// Kaldi `get_mel_banks` (no VTLN warping), 128 × 512 (the Nyquist bin gets weight 0).
+    static let melBank: [[Float]] = {
+        func mel(_ f: Double) -> Double { 1127.0 * log(1 + f / 700.0) }
+        let bins = nFFT / 2, width = sampleRate / Double(nFFT)
+        let lo = mel(fMin), hi = mel(fMax), delta = (hi - lo) / Double(nMels + 1)
+        return (0..<nMels).map { b in
+            let left = lo + Double(b) * delta, center = left + delta, right = center + delta
+            return (0..<bins).map { i in
+                let m = mel(width * Double(i))
+                return Float(max(0, min((m - left) / (center - left), (right - m) / (right - center))))
+            }
+        }
+    }()
+
+    /// Log-mel for mono audio at 32 kHz. Returns (frames, values[mel * frames + t]).
+    public static func logMel(_ x: [Float]) -> (frames: Int, values: [Float]) {
+        guard x.count > 2 else { return (0, []) }
+        var y = [Float](repeating: 0, count: x.count - 1)
+        for n in 0..<(x.count - 1) { y[n] = x[n + 1] - 0.97 * x[n] }
+        let pad = nFFT / 2
+        guard y.count > pad else { return (0, []) }
+        var p = [Float](repeating: 0, count: y.count + 2 * pad)
+        for i in 0..<y.count { p[pad + i] = y[i] }
+        for i in 0..<pad { p[pad - 1 - i] = y[i + 1]; p[pad + y.count + i] = y[y.count - 2 - i] }
+        let frames = 1 + y.count / hop
+        let fft = MagnitudeFFT(size: nFFT, customWindow: window)
+        var mag = [Float](repeating: 0, count: nFFT / 2 + 1)
+        var out = [Float](repeating: 0, count: nMels * frames)
+        let bank = melBank
+        for t in 0..<frames {
+            fft.magnitudes(p, offset: t * hop, into: &mag)
+            for m in 0..<nMels {
+                var acc = 0.0
+                let row = bank[m]
+                for k in 0..<(nFFT / 2) where row[k] != 0 { acc += Double(row[k]) * Double(mag[k]) * Double(mag[k]) }
+                out[m * frames + t] = Float((log(acc + 1e-5) + 4.5) / 5)
+            }
+        }
+        return (frames, out)
+    }
+}
