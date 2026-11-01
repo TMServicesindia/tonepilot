@@ -1,0 +1,40 @@
+name: Instrument recognition — Gate 1 calibration (research only, no app build)
+
+# Re-uses the clips and per-model outputs of an instrument-bench run (no model recomputation) and
+# reports calibrated abstention, coverage, source type and layered timing. Synthetic proxy data only.
+on:
+  workflow_dispatch:
+    inputs:
+      bench_run_id:
+        description: "instrument-bench run id whose artifacts to use"
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: iset, path: /tmp/iset, run-id: "${{ inputs.bench_run_id }}", github-token: "${{ github.token }}" }
+      - uses: actions/download-artifact@v4
+        with: { pattern: "out-*", path: /tmp/out, merge-multiple: true, run-id: "${{ inputs.bench_run_id }}", github-token: "${{ github.token }}" }
+      - name: Calibrate
+        run: |
+          pip install -q "numpy<2" scipy scikit-learn
+          python Native/tools/instruments/calibrate.py /tmp/iset /tmp/out /tmp/calibration.md | tail -40
+      - name: Push to branch ci/instrument-calibration
+        if: always()
+        run: |
+          [ -f /tmp/calibration.md ] || exit 0
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/instrument-calibration && git rm -rqf . && mkdir -p calib
+          cp /tmp/calibration.md /tmp/calibration.json calib/
+          echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID} · bench run ${{ inputs.bench_run_id }}" > calib/SOURCE.txt
+          git add calib && git commit -qm "Instrument calibration" && git push -qf origin ci/instrument-calibration
