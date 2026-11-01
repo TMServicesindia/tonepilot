@@ -112,3 +112,29 @@ TEST = GeneralUser GS (untouched) and NSynth-test (separate). Heads trained on F
   onset error median 0.5 s / p90 7.7 s. Little change from 4× more mixtures.
 - Source type: imitation tones still mostly classified as acoustic (9/36 right).
 - CLAP with 10 s windows: still poor (head 0% coverage on clean). It stays optional, as decided.
+
+
+---
+
+## Gate 1 v3 — NSynth-train (real notes, CC BY 4.0) added to TRAIN (bench run 41325343802, calibration run 41327588521)
+
+EfficientAT + head (coverage / wrong family / selective family accuracy):
+
+| TEST set | v2 (GM-only training) | **v3 (+ NSynth training notes)** |
+|---|---|---|
+| NSynth-test (real notes, different instruments) | 11% / 8% / 33% | **47% / 6% / 87%** |
+| GeneralUser (synthetic), clean | 41% / 3% / 94% | 78% / **17%** / 78% |
+| GeneralUser, 1 s clips | 81% / 25% / 69% | 96% / 36% / 62% |
+
+YAMNet + head v3:
+- GeneralUser: 62% / 9% / 85%;
+- NSynth: 25% / 5% / 78%.
+
+Findings:
+1. **Real recorded training notes transform real-instrument generalisation**: 33% → 87% selective
+   accuracy on unseen real NSynth instruments. Licensed real recordings are the lever.
+2. **One threshold does not fit two sound domains.** Calibrated on a mixed DEV (FluidR3 + NSynth), it
+   became too lenient for the synthetic set.
+3. Calibration must therefore come from DEV audio that resembles the target (real film music); until
+   that exists, per-condition thresholds (duration-aware, added in v4) are the principled interim step.
+4. Layered (v3): window instrument F1 0.37, family F1 0.55, onset error median 0.5 s / p90 6.4 s.
