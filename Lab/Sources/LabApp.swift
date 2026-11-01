@@ -13,9 +13,9 @@ struct LabView: View {
         NavigationStack {
             List {
                 Section("Run") {
-                    Button("Quick run (~3 min)") { Task { await bench.run(sustainedSeconds: 60) } }
+                    Button("Quick run (~3 min, one run per song length)") { Task { await bench.run(sustainedSeconds: 60) } }
                         .disabled(bench.running).accessibilityIdentifier("lab.quick")
-                    Button("Full run (~10 min, keep the phone unplugged)") { Task { await bench.run(sustainedSeconds: 300) } }
+                    Button("Full run (~20 min, 3 runs per song length → median/p90; keep the phone unplugged)") { Task { await bench.run(sustainedSeconds: 300) } }
                         .disabled(bench.running).accessibilityIdentifier("lab.full")
                     if let url = bench.reportURL { ShareLink("Share report (JSON)", item: url).accessibilityIdentifier("lab.share") }
                 }

@@ -22,8 +22,15 @@ final class LabBenchmark: ObservableObject {
 
     /// All measurement work, synchronous and off the main thread (UIKit state is read on main).
     nonisolated static func measure(sustainedSeconds: Int, say: @Sendable (String) -> Void) -> [String: Any] {
-        var report: [String: Any] = ["label": "MEASURED on a physical device by TonePilot Lab", "date": ISO8601DateFormatter().string(from: Date()),
+        #if targetEnvironment(simulator)
+        let where_ = "SIMULATED: iOS Simulator on a Mac. NOT a physical iPhone result."
+        #else
+        let where_ = "MEASURED on a physical iPhone by TonePilot Lab"
+        #endif
+        var report: [String: Any] = ["label": where_, "lab_version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?",
+                                     "date": ISO8601DateFormatter().string(from: Date()),
                                      "device": onMain { Self.deviceInfo() }, "sustained_seconds": sustainedSeconds]
+        say(where_)
         say("Device \(Self.machine()), iOS \(onMain { UIDevice.current.systemVersion })")
 
         // 1. Front-end parity on device (Swift mel vs the PyTorch fixture).
@@ -55,8 +62,9 @@ final class LabBenchmark: ObservableObject {
                 var warm: [Double] = []
                 for _ in 0..<110 { let w0 = Date(); _ = try? model.prediction(from: provider); warm.append(Date().timeIntervalSince(w0) * 1000) }
                 warm = Array(warm.dropFirst(10)).sorted()
-                let q = { (p: Double) in warm[min(warm.count - 1, Int(p * Double(warm.count)))] }
-                var r: [String: Any] = ["load_ms": loadMs, "first_prediction_ms": firstMs, "warm_ms_median": q(0.5), "warm_ms_p90": q(0.9), "warm_ms_p95": q(0.95),
+                let q = { (p: Double) in Self.pct(warm, p) }
+                var r: [String: Any] = ["load_ms": loadMs, "first_prediction_ms": firstMs,
+                                        "cold_note": "load_ms + first_prediction_ms = cold start in this process (the OS may cache compiled models between launches; first unit tested is the coldest)", "warm_ms_median": q(0.5), "warm_ms_p90": q(0.9), "warm_ms_p95": q(0.95),
                                         "footprint_mb": Self.footprintMB()]
                 if let probs = first?.featureValue(for: "probs")?.multiArrayValue, let ref = Self.floats("ref_probs"), ref.count == probs.count {
                     var d: Float = 0; for i in 0..<ref.count { d = max(d, abs(probs[i].floatValue - ref[i])) }
@@ -75,8 +83,11 @@ final class LabBenchmark: ObservableObject {
 
         // 3. Full-song analysis time (front-end + inference, 1 s windows, 0.5 s hop) for 1/3/4/5 minutes.
         var songs: [String: Any] = [:]
+        let repeats = sustainedSeconds >= 300 ? 3 : 1   // full run: three repeats per length → median / p90
         for minutes in [1, 3, 4, 5] {
-            let x = Self.synthetic(seconds: Double(minutes * 60))
+          let x = Self.synthetic(seconds: Double(minutes * 60))
+          var totals: [Double] = []; var runs: [[String: Any]] = []
+          for rep in 1...repeats {
             let a0 = Date(); let m = EfficientATFrontEnd.logMel(x); let feS = Date().timeIntervalSince(a0)
             let b0 = Date(); var windows = 0
             for start in stride(from: 0, through: m.frames - 101, by: 50) {
@@ -87,9 +98,13 @@ final class LabBenchmark: ObservableObject {
                 windows += 1
             }
             let infS = Date().timeIntervalSince(b0)
-            songs["\(minutes)min"] = ["front_end_s": feS, "inference_s": infS, "total_s": feS + infS, "windows": windows,
-                                      "real_time_factor": (feS + infS) / Double(minutes * 60), "footprint_mb": Self.footprintMB()]
-            say("\(minutes)-min song: \(String(format: "%.2f", feS + infS)) s (front-end \(String(format: "%.2f", feS)) s)")
+            totals.append(feS + infS)
+            runs.append(["front_end_s": feS, "inference_s": infS, "total_s": feS + infS, "windows": windows,
+                         "real_time_factor": (feS + infS) / Double(minutes * 60), "footprint_mb": Self.footprintMB(), "thermal": Self.thermal()])
+            say("\(minutes)-min song, run \(rep)/\(repeats): \(String(format: "%.2f", feS + infS)) s (front-end \(String(format: "%.2f", feS)) s)")
+          }
+          songs["\(minutes)min"] = ["runs": runs, "total_s_median": Self.pct(totals, 0.5), "total_s_p90": Self.pct(totals, 0.9),
+                                    "total_s_values": totals, "repeats": repeats]
         }
         report["full_song"] = songs
 
@@ -111,7 +126,8 @@ final class LabBenchmark: ObservableObject {
                                "battery_level_after": batteryAfter < 0 ? "unavailable" : batteryAfter as Any,
                                "battery_state_before": state0, "battery_state_after": stateAfter,
                                "note": "Battery level has 1% (or 5%) granularity on iOS; precise energy is not exposed to apps."]
-        report["peak_footprint_mb"] = Self.footprintMB()
+        report["footprint_mb_at_end"] = Self.footprintMB()
+        report["peak_footprint_mb"] = Self.peakFootprintMB()   // OS ledger: highest footprint of this process so far
         return report
     }
 
@@ -142,6 +158,17 @@ final class LabBenchmark: ObservableObject {
         var info = task_vm_info_data_t(); var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
         let kr = withUnsafeMutablePointer(to: &info) { $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count) } }
         return kr == KERN_SUCCESS ? Double(info.phys_footprint) / 1_048_576 : -1
+    }
+    nonisolated static func peakFootprintMB() -> Double {
+        var info = task_vm_info_data_t(); var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
+        let kr = withUnsafeMutablePointer(to: &info) { $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) { task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count) } }
+        return kr == KERN_SUCCESS ? Double(info.ledger_phys_footprint_peak) / 1_048_576 : -1
+    }
+    /// Percentile with linear interpolation between ranks.
+    nonisolated static func pct(_ xs: [Double], _ p: Double) -> Double {
+        let s = xs.sorted(); guard !s.isEmpty else { return .nan }
+        let k = p * Double(s.count - 1); let lo = Int(k), hi = min(lo + 1, s.count - 1)
+        return s[lo] + (s[hi] - s[lo]) * (k - Double(lo))
     }
     nonisolated static func sizeMB(_ url: URL) -> Double {
         let e = FileManager.default.enumerator(at: url, includingPropertiesForKeys: [.fileSizeKey])
