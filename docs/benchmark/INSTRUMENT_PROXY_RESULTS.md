@@ -178,3 +178,7 @@ Findings:
    - onset error median 0.5 s, p90 7.0 s.
    - Little change from v3.
 5. The Apple SoundAnalysis job crashed again near the end of NSynth (about 4,200 of 4,356 clips). A per-clip autorelease-pool fix is committed and will be checked on the next bench run.
+6. CLAP (10 s windows, bench evaluate job; finished after the calibration run):
+   - head: 3% coverage on clean (57% selective);
+   - argmax: 93% wrong family.
+   - CLAP stays optional and is not pursued further, as decided.
