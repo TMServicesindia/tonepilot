@@ -160,12 +160,16 @@ def main(root, outdir, report_path):
             items = lambda r, v=None: [(sf(c["file"])[1].mean(0), sf(c["file"])[2].mean(0), solo_truth(c)) for c in clips
                                         if c["kind"] == "solo" and role(c) == r and c["file"] in data and (v is None or c["variant"] == v or (v == "imitation" and solo_truth(c)[3] == "imitation"))]
             ti, tf, dev_st, reached = calibrate(items("dev"))
+            # Short inputs (1 s clips) get their own DEV-calibrated thresholds.
+            short_dev = [it for it, c in zip(items("dev"), [c for c in clips if c["kind"] == "solo" and role(c) == "dev" and c["file"] in data]) if c["variant"] == "short"]
+            ts_i, ts_f, short_st, short_reached = calibrate(short_dev) if len(short_dev) >= 20 else (ti, tf, None, None)
             if kind == "A":   # best-guess variant: always answer (no abstention)
                 results.append({"system": f"A-argmax · {name}", "thresholds": [0, 0], "dev": solo_stats(items("dev"), 0, 0), "target_reached_on_dev": None,
                                 "test": {v: solo_stats(items("test", v), 0, 0) for v in ("original", "reverb", "compressed", "short", "imitation")},
                                 "test_nsynth": solo_stats(items("test_nsynth"), 0, 0), "coverage_curve_test": coverage_curve(items("test", "original"))})
             rep = {"system": label, "thresholds": [round(float(ti), 3), round(float(tf), 3)], "dev": dev_st, "target_reached_on_dev": reached,
-                   "test": {v: solo_stats(items("test", v), ti, tf) for v in ("original", "reverb", "compressed", "short", "imitation")},
+                   "test": {v: solo_stats(items("test", v), *((ts_i, ts_f) if v == "short" else (ti, tf))) for v in ("original", "reverb", "compressed", "short", "imitation")},
+                   "short_thresholds": [round(float(ts_i), 3), round(float(ts_f), 3)], "short_target_reached_on_dev": short_reached,
                    "coverage_curve_test": coverage_curve(items("test", "original")),
                    "test_nsynth": solo_stats(items("test_nsynth"), ti, tf), "dev_nsynth_only": solo_stats([(sf(c["file"])[1].mean(0), sf(c["file"])[2].mean(0), solo_truth(c)) for c in clips if c["split"] == "dev_nsynth" and c["file"] in data], ti, tf)}
             # Source type (C only: A has no imitation class).
