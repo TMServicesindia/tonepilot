@@ -1,0 +1,26 @@
+name: Core tests on macOS (on demand; research/validation, no app build)
+
+# Runs TonePilotCore tests on Apple hardware (Accelerate / Core ML code paths that Linux cannot run).
+on:
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: "swift test --filter (empty = all)"
+        default: "EfficientATFrontEndTests"
+      runner:
+        default: "macos-26"
+
+jobs:
+  test:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: swift test
+        working-directory: Packages/TonePilotCore
+        run: |
+          set -o pipefail
+          F="${{ inputs.filter }}"; ARGS=""; [ -n "$F" ] && ARGS="--filter $F"
+          swift test -c release $ARGS 2>&1 | tee t.log | grep -E "error:|Executed|SPEED|EFFICIENTAT" | tail -20
+          grep -E "^(SPEED|EFFICIENTAT)" t.log | while IFS= read -r l; do echo "::notice title=macOS core tests::$l"; done
+          ! grep -qE "error:|with [1-9][0-9]* failures?" t.log

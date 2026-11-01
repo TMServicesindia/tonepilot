@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(Accelerate)
+import Accelerate
+#endif
 
 /// EfficientAT (fschmid56, MIT) mel front-end, reproduced exactly for on-device use (research;
 /// not used by the app). Matches `models/preprocess.py` `AugmentMelSTFT` in eval mode:
@@ -48,20 +51,44 @@ public enum EfficientATFrontEnd {
         for i in 0..<y.count { p[pad + i] = y[i] }
         for i in 0..<pad { p[pad - 1 - i] = y[i + 1]; p[pad + y.count + i] = y[y.count - 2 - i] }
         let frames = 1 + y.count / hop
-        let fft = MagnitudeFFT(size: nFFT, customWindow: window)
-        var mag = [Float](repeating: 0, count: nFFT / 2 + 1)
+        let half = nFFT / 2
         var out = [Float](repeating: 0, count: nMels * frames)
         let bank = sparseBank
-        var power = [Double](repeating: 0, count: nFFT / 2)
-        for t in 0..<frames {
-            fft.magnitudes(p, offset: t * hop, into: &mag)
-            for k in 0..<(nFFT / 2) { let v = Double(mag[k]); power[k] = v * v }
+        var power = [Double](repeating: 0, count: half)
+        func melRow(_ t: Int) {
             for m in 0..<nMels {
                 let band = bank[m]
                 var acc = 0.0
                 for (j, w) in band.weights.enumerated() { acc += Double(w) * power[band.start + j] }
                 out[m * frames + t] = Float((log(acc + 1e-5) + 4.5) / 5)
             }
+        }
+        #if canImport(Accelerate)
+        // vDSP real DFT (iPhone/Mac). Output is scaled by 2; DC is packed in outR[0].
+        if let setup = vDSP_DFT_zrop_CreateSetup(nil, vDSP_Length(nFFT), .FORWARD) {
+            defer { vDSP_DFT_DestroySetup(setup) }
+            var frame = [Float](repeating: 0, count: nFFT)
+            var inR = [Float](repeating: 0, count: half), inI = inR, outR = inR, outI = inR
+            let w = window
+            for t in 0..<frames {
+                p.withUnsafeBufferPointer { src in
+                    vDSP_vmul(src.baseAddress! + t * hop, 1, w, 1, &frame, 1, vDSP_Length(nFFT))
+                }
+                for k in 0..<half { inR[k] = frame[2 * k]; inI[k] = frame[2 * k + 1] }
+                vDSP_DFT_Execute(setup, inR, inI, &outR, &outI)
+                power[0] = Double(outR[0] / 2) * Double(outR[0] / 2)
+                for k in 1..<half { let r = Double(outR[k]) / 2, i = Double(outI[k]) / 2; power[k] = r * r + i * i }
+                melRow(t)
+            }
+            return (frames, out)
+        }
+        #endif
+        let fft = MagnitudeFFT(size: nFFT, customWindow: window)
+        var mag = [Float](repeating: 0, count: half + 1)
+        for t in 0..<frames {
+            fft.magnitudes(p, offset: t * hop, into: &mag)
+            for k in 0..<half { let v = Double(mag[k]); power[k] = v * v }
+            melRow(t)
         }
         return (frames, out)
     }
