@@ -88,6 +88,16 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - Linux core: 195 tests, 0 failures, 8 skipped. Session note: job logs ARE readable via `gh api repos/.../actions/jobs/<id>/logs` once a job finishes.
 - **Pending:** Android x86_64 core build, LiteRT Kotlin back-end, JNI hook, androidTest + emulator job. Then wait for explicit Phase 2 approval.
 
+
+## 6b. Phase 2 (rhythm) — owner said "Continue with other phases also. One by one slowly" (1 Nov)
+
+- Report: **`docs/TONEPILOT_PHASE2_REPORT.md`**. Nothing wired into the app (no user-visible change).
+- Beat This! small0 (sha256 6074be2c…) → Core ML via `beat-this-convert.yml` (branch `ci/beat-this`): diff 1.9e-5 vs PyTorch. Swift front-end/post-processing (`Rhythm/BeatThis.swift`) identical to official (log-mel 6.4e-5; torchaudio here divides magnitudes by sqrt(n_fft)).
+- `RhythmCycleInference` (`Rhythm/RhythmCycle.swift`): confident/ambiguous/unknown; accents = bass + chord change; longest cycle whose start beats every other position; double/half checks; model–accent disagreement blocks confidence.
+- Rhythm benchmark (36 rendered songs incl. khanda 5, misra 7, adi 8; `bench.yml` macOS job → branch `ci/rhythm-results`): current metre 6/36 (83% wrong-confident); **cycle stage on current beats 31/36, 0% wrong-confident**; Beat This! + cycle 12/36, 3%; Beat This! beat F 0.80 vs current 0.82 (no drums 0.75 vs 0.82); 16–18 s per 4-min song on CI Mac.
+- **Gate failed: Beat This! not adopted.** Cycle stage stays off until real Indian clips (0 so far).
+- `CoreMLBackend` now lives in TonePilotCore (`#if canImport(CoreML)`).
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
