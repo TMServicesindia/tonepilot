@@ -182,3 +182,27 @@ Findings:
    - head: 3% coverage on clean (57% selective);
    - argmax: 93% wrong family.
    - CLAP stays optional and is not pursued further, as decided.
+
+### v4b — head variants for confidently-wrong answers (calibration run 41333007005, same bench run)
+
+This run tests three variants of each head (SYNTHETIC proxy):
+- **C**: as before.
+- **C-reg**: stronger regularisation (C=0.02, unweighted).
+- **C-agree**: answer only when the instrument head's best guess belongs to the family head's best family.
+
+The variant is chosen on DEV only.
+
+EfficientAT (coverage / wrong family / selective family accuracy), measured on TEST:
+
+| Variant | DEV cov / wrong | GeneralUser clean | GeneralUser 1 s clips | Imitation tones | NSynth-test (real notes) |
+|---|---|---|---|---|---|
+| **C (DEV-selected)** | 73% / 5% | 72% / 10% / 86% | 95% / 25% / 73% | 78% / 22% / 72% | **50% / 7% / 87%** |
+| C-reg | 72% / 5% | 76% / 12% / 84% | 100% / 29% / 71% | 76% / 23% / 70% | 46% / 4% / 90% |
+| C-agree | 55% / 5% | **70% / 6% / 91%** | **60% / 7% / 88%** | 64% / 12% / 82% | 24% / 9% / 61% |
+
+Findings:
+1. **C-agree fixes the short-clip problem on the synthetic sets**: 1 s clips go from 25% to 7% wrong-family. It is also the only EfficientAT variant whose short-clip thresholds reach the 5% target on DEV.
+2. **But C-agree is worse on real NSynth notes**: wrong-family rises from 7% to 9% and selective accuracy falls from 87% to 61%. It also has lower DEV coverage, so the agreed DEV rule (highest DEV coverage at ≤5% wrong) still selects plain C. **The official result stays C.**
+3. A stricter DEV rule, "meet the target on DEV overall and on DEV short clips", would pick C-agree. That rule was thought of *after* seeing TEST, so it is not adopted here. It needs confirming on data not yet looked at; the first real annotated DEV/TEST set is the right place.
+4. Stronger regularisation (C-reg) changes little. Overconfidence comes from the domain gap between sound banks, not overfitting within one.
+5. No variant reaches ≤5% wrong-family on every TEST condition. The remaining lever is the same as v3 concluded: **licensed real recordings** for training, DEV and TEST.
