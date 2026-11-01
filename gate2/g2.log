@@ -1,0 +1,433 @@
+scikit-learn version 1.9.1 is not supported. Minimum required version: 0.17. Maximum required version: 1.5.1. Disabling scikit-learn conversion API.
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/torchvision/ops/misc.py:120: UserWarning: Don't use ConvNormActivation directly, please use Conv2dNormActivation and Conv3dNormActivation instead.
+  warnings.warn(
+Downloading: "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/mn10_as_mAP_471.pt" to resources/mn10_as_mAP_471.pt
+  0%|          | 0.00/18.8M [00:00<?, ?B/s] 48%|████▊     | 9.08M/18.8M [00:00<00:00, 95.2MB/s] 97%|█████████▋| 18.2M/18.8M [00:00<00:00, 47.6MB/s]100%|██████████| 18.8M/18.8M [00:00<00:00, 51.6MB/s]
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/torch/functional.py:660: UserWarning: stft with return_complex=False is deprecated. In a future pytorch release, stft will return complex tensors for all inputs, and return_complex=False will raise an error.
+Note: you can still call torch.view_as_real on the complex output to recover the old return format. (Triggered internally at /Users/runner/work/pytorch/pytorch/pytorch/aten/src/ATen/native/SpectralOps.cpp:879.)
+  return _VF.stft(input, n_fft, hop_length, win_length, window,  # type: ignore[attr-defined]
+Tuple detected at graph output. This will be flattened in the converted model.
+MN(
+  (features): Sequential(
+    (0): ConvNormActivation(
+      (0): Conv2d(1, 16, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+      (1): BatchNorm2d(16, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+      (2): Hardswish()
+    )
+    (1): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=16, bias=False)
+          (1): BatchNorm2d(16, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(16, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (2): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(16, 64, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=64, bias=False)
+          (1): BatchNorm2d(64, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): ConvNormActivation(
+          (0): Conv2d(64, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(24, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (3): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(72, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (1): BatchNorm2d(72, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): ConvNormActivation(
+          (0): Conv2d(72, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(24, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (4): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(24, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(72, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(72, 72, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=72, bias=False)
+          (1): BatchNorm2d(72, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): ConcurrentSEBlock(
+          (conc_se_layers): ModuleList(
+            (0): SqueezeExcitation(
+              (fc1): Linear(in_features=72, out_features=24, bias=True)
+              (fc2): Linear(in_features=24, out_features=72, bias=True)
+              (activation): ReLU()
+              (scale_activation): Sigmoid()
+            )
+          )
+        )
+        (3): ConvNormActivation(
+          (0): Conv2d(72, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(40, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (5): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(40, 120, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(120, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(120, 120, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=120, bias=False)
+          (1): BatchNorm2d(120, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): ConcurrentSEBlock(
+          (conc_se_layers): ModuleList(
+            (0): SqueezeExcitation(
+              (fc1): Linear(in_features=120, out_features=32, bias=True)
+              (fc2): Linear(in_features=32, out_features=120, bias=True)
+              (activation): ReLU()
+              (scale_activation): Sigmoid()
+            )
+          )
+        )
+        (3): ConvNormActivation(
+          (0): Conv2d(120, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(40, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (6): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(40, 120, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(120, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(120, 120, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=120, bias=False)
+          (1): BatchNorm2d(120, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): ReLU(inplace=True)
+        )
+        (2): ConcurrentSEBlock(
+          (conc_se_layers): ModuleList(
+            (0): SqueezeExcitation(
+              (fc1): Linear(in_features=120, out_features=32, bias=True)
+              (fc2): Linear(in_features=32, out_features=120, bias=True)
+              (activation): ReLU()
+              (scale_activation): Sigmoid()
+            )
+          )
+        )
+        (3): ConvNormActivation(
+          (0): Conv2d(120, 40, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(40, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (7): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(40, 240, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(240, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(240, 240, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), groups=240, bias=False)
+          (1): BatchNorm2d(240, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): ConvNormActivation(
+          (0): Conv2d(240, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(80, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (8): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(80, 200, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(200, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(200, 200, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=200, bias=False)
+          (1): BatchNorm2d(200, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): ConvNormActivation(
+          (0): Conv2d(200, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(80, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (9): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(80, 184, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(184, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(184, 184, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=184, bias=False)
+          (1): BatchNorm2d(184, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): ConvNormActivation(
+          (0): Conv2d(184, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(80, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (10): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(80, 184, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(184, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(184, 184, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=184, bias=False)
+          (1): BatchNorm2d(184, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): ConvNormActivation(
+          (0): Conv2d(184, 80, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(80, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (11): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(80, 480, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(480, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(480, 480, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=480, bias=False)
+          (1): BatchNorm2d(480, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): ConcurrentSEBlock(
+          (conc_se_layers): ModuleList(
+            (0): SqueezeExcitation(
+              (fc1): Linear(in_features=480, out_features=120, bias=True)
+              (fc2): Linear(in_features=120, out_features=480, bias=True)
+              (activation): ReLU()
+              (scale_activation): Sigmoid()
+            )
+          )
+        )
+        (3): ConvNormActivation(
+          (0): Conv2d(480, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(112, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (12): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(672, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(672, 672, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=672, bias=False)
+          (1): BatchNorm2d(672, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): ConcurrentSEBlock(
+          (conc_se_layers): ModuleList(
+            (0): SqueezeExcitation(
+              (fc1): Linear(in_features=672, out_features=168, bias=True)
+              (fc2): Linear(in_features=168, out_features=672, bias=True)
+              (activation): ReLU()
+              (scale_activation): Sigmoid()
+            )
+          )
+        )
+        (3): ConvNormActivation(
+          (0): Conv2d(672, 112, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(112, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (13): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(112, 672, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(672, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(672, 672, kernel_size=(5, 5), stride=(2, 2), padding=(2, 2), groups=672, bias=False)
+          (1): BatchNorm2d(672, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): ConcurrentSEBlock(
+          (conc_se_layers): ModuleList(
+            (0): SqueezeExcitation(
+              (fc1): Linear(in_features=672, out_features=168, bias=True)
+              (fc2): Linear(in_features=168, out_features=672, bias=True)
+              (activation): ReLU()
+              (scale_activation): Sigmoid()
+            )
+          )
+        )
+        (3): ConvNormActivation(
+          (0): Conv2d(672, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(160, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (14): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(960, 960, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=960, bias=False)
+          (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): ConcurrentSEBlock(
+          (conc_se_layers): ModuleList(
+            (0): SqueezeExcitation(
+              (fc1): Linear(in_features=960, out_features=240, bias=True)
+              (fc2): Linear(in_features=240, out_features=960, bias=True)
+              (activation): ReLU()
+              (scale_activation): Sigmoid()
+            )
+          )
+        )
+        (3): ConvNormActivation(
+          (0): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(160, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (15): InvertedResidual(
+      (block): Sequential(
+        (0): ConvNormActivation(
+          (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (1): ConvNormActivation(
+          (0): Conv2d(960, 960, kernel_size=(5, 5), stride=(1, 1), padding=(2, 2), groups=960, bias=False)
+          (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+          (2): Hardswish()
+        )
+        (2): ConcurrentSEBlock(
+          (conc_se_layers): ModuleList(
+            (0): SqueezeExcitation(
+              (fc1): Linear(in_features=960, out_features=240, bias=True)
+              (fc2): Linear(in_features=240, out_features=960, bias=True)
+              (activation): ReLU()
+              (scale_activation): Sigmoid()
+            )
+          )
+        )
+        (3): ConvNormActivation(
+          (0): Conv2d(960, 160, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (1): BatchNorm2d(160, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+        )
+      )
+    )
+    (16): ConvNormActivation(
+      (0): Conv2d(160, 960, kernel_size=(1, 1), stride=(1, 1), bias=False)
+      (1): BatchNorm2d(960, eps=0.001, momentum=0.01, affine=True, track_running_stats=True)
+      (2): Hardswish()
+    )
+  )
+  (classifier): Sequential(
+    (0): AdaptiveAvgPool2d(output_size=1)
+    (1): Flatten(start_dim=1, end_dim=-1)
+    (2): Linear(in_features=960, out_features=1280, bias=True)
+    (3): Hardswish()
+    (4): Dropout(p=0.2, inplace=True)
+    (5): Linear(in_features=1280, out_features=527, bias=True)
+  )
+)
+Warning: FMAX is None setting to 15000 
+Converting PyTorch Frontend ==> MIL Ops:   0%|          | 0/506 [00:00<?, ? ops/s]Converting PyTorch Frontend ==> MIL Ops:  23%|██▎       | 115/506 [00:00<00:00, 1140.70 ops/s]Converting PyTorch Frontend ==> MIL Ops:  60%|█████▉    | 302/506 [00:00<00:00, 1562.96 ops/s]Converting PyTorch Frontend ==> MIL Ops:  95%|█████████▍| 480/506 [00:00<00:00, 1654.24 ops/s]Converting PyTorch Frontend ==> MIL Ops: 100%|█████████▉| 504/506 [00:00<00:00, 1456.40 ops/s]
+Running MIL frontend_pytorch pipeline:   0%|          | 0/5 [00:00<?, ? passes/s]Running MIL frontend_pytorch pipeline: 100%|██████████| 5/5 [00:00<00:00, 41.41 passes/s]Running MIL frontend_pytorch pipeline: 100%|██████████| 5/5 [00:00<00:00, 41.33 passes/s]
+Running MIL default pipeline:   0%|          | 0/87 [00:00<?, ? passes/s]Running MIL default pipeline:   6%|▌         | 5/87 [00:00<00:01, 43.82 passes/s]Running MIL default pipeline:  11%|█▏        | 10/87 [00:00<00:01, 44.22 passes/s]Running MIL default pipeline:  17%|█▋        | 15/87 [00:00<00:01, 44.71 passes/s]Running MIL default pipeline:  23%|██▎       | 20/87 [00:00<00:01, 37.53 passes/s]Running MIL default pipeline:  28%|██▊       | 24/87 [00:00<00:01, 37.85 passes/s]Running MIL default pipeline:  33%|███▎      | 29/87 [00:00<00:01, 40.75 passes/s]Running MIL default pipeline:  39%|███▉      | 34/87 [00:00<00:01, 29.20 passes/s]Running MIL default pipeline:  45%|████▍     | 39/87 [00:01<00:01, 30.58 passes/s]Running MIL default pipeline:  49%|████▉     | 43/87 [00:01<00:01, 26.20 passes/s]Running MIL default pipeline:  55%|█████▌    | 48/87 [00:01<00:01, 29.27 passes/s]Running MIL default pipeline:  61%|██████    | 53/87 [00:01<00:01, 33.65 passes/s]Running MIL default pipeline:  66%|██████▌   | 57/87 [00:01<00:01, 25.04 passes/s]Running MIL default pipeline:  72%|███████▏  | 63/87 [00:01<00:00, 31.43 passes/s]Running MIL default pipeline:  80%|████████  | 70/87 [00:02<00:00, 38.81 passes/s]Running MIL default pipeline:  89%|████████▊ | 77/87 [00:02<00:00, 45.11 passes/s]Running MIL default pipeline:  97%|█████████▋| 84/87 [00:02<00:00, 38.12 passes/s]Running MIL default pipeline: 100%|██████████| 87/87 [00:02<00:00, 35.43 passes/s]
+Running MIL backend_mlprogram pipeline:   0%|          | 0/12 [00:00<?, ? passes/s]Running MIL backend_mlprogram pipeline:  58%|█████▊    | 7/12 [00:00<00:00, 58.46 passes/s]Running MIL backend_mlprogram pipeline: 100%|██████████| 12/12 [00:00<00:00, 59.10 passes/s]
+Tuple detected at graph output. This will be flattened in the converted model.
+Converting PyTorch Frontend ==> MIL Ops:   0%|          | 0/506 [00:00<?, ? ops/s]Converting PyTorch Frontend ==> MIL Ops:  37%|███▋      | 188/506 [00:00<00:00, 1861.85 ops/s]Converting PyTorch Frontend ==> MIL Ops:  74%|███████▍  | 375/506 [00:00<00:00, 1705.46 ops/s]Converting PyTorch Frontend ==> MIL Ops: 100%|█████████▉| 504/506 [00:00<00:00, 1551.48 ops/s]
+Running MIL frontend_pytorch pipeline:   0%|          | 0/5 [00:00<?, ? passes/s]Running MIL frontend_pytorch pipeline:  80%|████████  | 4/5 [00:00<00:00, 39.83 passes/s]Running MIL frontend_pytorch pipeline: 100%|██████████| 5/5 [00:00<00:00, 40.67 passes/s]
+Running MIL default pipeline:   0%|          | 0/89 [00:00<?, ? passes/s]Running MIL default pipeline:   6%|▌         | 5/89 [00:00<00:01, 42.13 passes/s]Running MIL default pipeline:  11%|█         | 10/89 [00:00<00:01, 42.39 passes/s]Running MIL default pipeline:  17%|█▋        | 15/89 [00:00<00:01, 38.86 passes/s]Running MIL default pipeline:  21%|██▏       | 19/89 [00:00<00:02, 30.83 passes/s]Running MIL default pipeline:  26%|██▌       | 23/89 [00:00<00:02, 32.31 passes/s]Running MIL default pipeline:  31%|███▏      | 28/89 [00:00<00:01, 36.31 passes/s]Running MIL default pipeline:  37%|███▋      | 33/89 [00:00<00:01, 39.62 passes/s]Running MIL default pipeline:  43%|████▎     | 38/89 [00:01<00:01, 27.63 passes/s]Running MIL default pipeline:  47%|████▋     | 42/89 [00:01<00:02, 22.25 passes/s]Running MIL default pipeline:  53%|█████▎    | 47/89 [00:01<00:01, 26.61 passes/s]Running MIL default pipeline:  57%|█████▋    | 51/89 [00:01<00:01, 28.47 passes/s]Running MIL default pipeline:  63%|██████▎   | 56/89 [00:01<00:01, 23.27 passes/s]Running MIL default pipeline:  66%|██████▋   | 59/89 [00:02<00:03,  9.64 passes/s]Running MIL default pipeline:  70%|██████▉   | 62/89 [00:03<00:02, 10.43 passes/s]Running MIL default pipeline:  72%|███████▏  | 64/89 [00:03<00:02, 11.25 passes/s]Running MIL default pipeline:  80%|███████▉  | 71/89 [00:03<00:00, 18.47 passes/s]Running MIL default pipeline:  87%|████████▋ | 77/89 [00:03<00:00, 24.77 passes/s]Running MIL default pipeline:  94%|█████████▍| 84/89 [00:03<00:00, 32.18 passes/s]Running MIL default pipeline: 100%|██████████| 89/89 [00:03<00:00, 28.95 passes/s]Running MIL default pipeline: 100%|██████████| 89/89 [00:03<00:00, 23.38 passes/s]
+Running MIL backend_mlprogram pipeline:   0%|          | 0/12 [00:00<?, ? passes/s]Running MIL backend_mlprogram pipeline:  58%|█████▊    | 7/12 [00:00<00:00, 61.13 passes/s]Running MIL backend_mlprogram pipeline: 100%|██████████| 12/12 [00:00<00:00, 53.94 passes/s]
+Running compression pass linear_quantize_weights:   0%|          | 0/128 [00:00<?, ? ops/s]/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/coremltools/optimize/_utils.py:113: RuntimeWarning: invalid value encountered in divide
+  quantized_data = np.round(weight / scale)
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/coremltools/optimize/_utils.py:294: RuntimeWarning: invalid value encountered in cast
+  quantized_data = quantized_data.reshape(weight.shape).astype(np_dtype)
+/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages/coremltools/optimize/_utils.py:113: RuntimeWarning: divide by zero encountered in divide
+  quantized_data = np.round(weight / scale)
+Running compression pass linear_quantize_weights:  71%|███████   | 91/128 [00:00<00:00, 905.31 ops/s]Running compression pass linear_quantize_weights: 100%|██████████| 128/128 [00:00<00:00, 314.36 ops/s]
+Running MIL frontend_milinternal pipeline: 0 passes [00:00, ? passes/s]Running MIL frontend_milinternal pipeline: 0 passes [00:00, ? passes/s]
+Running MIL default pipeline:   0%|          | 0/87 [00:00<?, ? passes/s]Running MIL default pipeline:   5%|▍         | 4/87 [00:00<00:02, 31.04 passes/s]Running MIL default pipeline:   9%|▉         | 8/87 [00:00<00:03, 22.68 passes/s]Running MIL default pipeline:  13%|█▎        | 11/87 [00:00<00:03, 22.92 passes/s]Running MIL default pipeline:  17%|█▋        | 15/87 [00:00<00:02, 27.07 passes/s]Running MIL default pipeline:  21%|██        | 18/87 [00:00<00:02, 26.93 passes/s]Running MIL default pipeline:  25%|██▌       | 22/87 [00:00<00:02, 30.41 passes/s]Running MIL default pipeline:  30%|██▉       | 26/87 [00:00<00:01, 31.20 passes/s]Running MIL default pipeline:  37%|███▋      | 32/87 [00:01<00:01, 38.08 passes/s]Running MIL default pipeline:  41%|████▏     | 36/87 [00:01<00:01, 27.83 passes/s]Running MIL default pipeline:  46%|████▌     | 40/87 [00:01<00:01, 30.04 passes/s]Running MIL default pipeline:  53%|█████▎    | 46/87 [00:01<00:01, 36.54 passes/s]Running MIL default pipeline:  59%|█████▊    | 51/87 [00:01<00:00, 38.83 passes/s]Running MIL default pipeline:  64%|██████▍   | 56/87 [00:01<00:01, 30.79 passes/s]Running MIL default pipeline:  70%|███████   | 61/87 [00:01<00:00, 34.28 passes/s]Running MIL default pipeline:  76%|███████▌  | 66/87 [00:02<00:00, 37.67 passes/s]Running MIL default pipeline:  83%|████████▎ | 72/87 [00:02<00:00, 41.49 passes/s]Running MIL default pipeline:  89%|████████▊ | 77/87 [00:02<00:00, 42.62 passes/s]Running MIL default pipeline:  94%|█████████▍| 82/87 [00:02<00:00, 43.20 passes/s]Running MIL default pipeline: 100%|██████████| 87/87 [00:02<00:00, 33.14 passes/s]Running MIL default pipeline: 100%|██████████| 87/87 [00:02<00:00, 33.28 passes/s]
+Running MIL backend_mlprogram pipeline:   0%|          | 0/12 [00:00<?, ? passes/s]Running MIL backend_mlprogram pipeline:  50%|█████     | 6/12 [00:00<00:00, 53.07 passes/s]Running MIL backend_mlprogram pipeline: 100%|██████████| 12/12 [00:00<00:00, 44.63 passes/s]Running MIL backend_mlprogram pipeline: 100%|██████████| 12/12 [00:00<00:00, 45.68 passes/s]
+Running compression pass palettize_weights:   0%|          | 0/128 [00:00<?, ? ops/s]Running compression pass palettize_weights:  21%|██        | 27/128 [00:00<00:01, 58.59 ops/s]Running compression pass palettize_weights:  26%|██▌       | 33/128 [00:00<00:01, 55.23 ops/s]Running compression pass palettize_weights:  30%|███       | 39/128 [00:00<00:01, 51.30 ops/s]Running compression pass palettize_weights:  35%|███▌      | 45/128 [00:00<00:01, 49.70 ops/s]Running compression pass palettize_weights:  39%|███▉      | 50/128 [00:00<00:01, 49.29 ops/s]Running compression pass palettize_weights:  43%|████▎     | 55/128 [00:01<00:03, 23.88 ops/s]Running compression pass palettize_weights:  46%|████▌     | 59/128 [00:01<00:03, 22.93 ops/s]Running compression pass palettize_weights:  48%|████▊     | 62/128 [00:01<00:03, 20.06 ops/s]Running compression pass palettize_weights:  51%|█████     | 65/128 [00:02<00:03, 18.58 ops/s]Running compression pass palettize_weights:  53%|█████▎    | 68/128 [00:02<00:03, 16.66 ops/s]Running compression pass palettize_weights:  55%|█████▌    | 71/128 [00:02<00:03, 15.44 ops/s]Running compression pass palettize_weights:  57%|█████▋    | 73/128 [00:02<00:04, 11.40 ops/s]Running compression pass palettize_weights:  60%|██████    | 77/128 [00:03<00:05,  9.43 ops/s]Running compression pass palettize_weights:  62%|██████▏   | 79/128 [00:04<00:06,  7.43 ops/s]Running compression pass palettize_weights:  63%|██████▎   | 81/128 [00:04<00:07,  6.65 ops/s]Running compression pass palettize_weights:  65%|██████▍   | 83/128 [00:04<00:07,  6.04 ops/s]Running compression pass palettize_weights:  68%|██████▊   | 87/128 [00:05<00:06,  6.64 ops/s]Running compression pass palettize_weights:  70%|██████▉   | 89/128 [00:05<00:06,  5.96 ops/s]Running compression pass palettize_weights:  71%|███████   | 91/128 [00:06<00:06,  5.57 ops/s]Running compression pass palettize_weights:  73%|███████▎  | 93/128 [00:06<00:06,  5.50 ops/s]Running compression pass palettize_weights:  74%|███████▍  | 95/128 [00:06<00:05,  6.13 ops/s]Running compression pass palettize_weights:  76%|███████▌  | 97/128 [00:07<00:05,  5.35 ops/s]Running compression pass palettize_weights:  77%|███████▋  | 99/128 [00:07<00:06,  4.59 ops/s]Running compression pass palettize_weights:  79%|███████▉  | 101/128 [00:08<00:05,  4.53 ops/s]Running compression pass palettize_weights:  80%|████████  | 103/128 [00:08<00:06,  4.15 ops/s]Running compression pass palettize_weights:  82%|████████▏ | 105/128 [00:09<00:04,  4.66 ops/s]Running compression pass palettize_weights:  84%|████████▎ | 107/128 [00:09<00:04,  4.57 ops/s]Running compression pass palettize_weights:  85%|████████▌ | 109/128 [00:10<00:04,  4.42 ops/s]Running compression pass palettize_weights:  87%|████████▋ | 111/128 [00:10<00:03,  4.38 ops/s]Running compression pass palettize_weights:  88%|████████▊ | 113/128 [00:11<00:03,  4.16 ops/s]Running compression pass palettize_weights:  90%|████████▉ | 115/128 [00:11<00:02,  4.74 ops/s]Running compression pass palettize_weights:  91%|█████████▏| 117/128 [00:12<00:02,  4.48 ops/s]Running compression pass palettize_weights:  93%|█████████▎| 119/128 [00:12<00:02,  4.27 ops/s]Running compression pass palettize_weights:  95%|█████████▍| 121/128 [00:12<00:01,  4.36 ops/s]Running compression pass palettize_weights:  96%|█████████▌| 123/128 [00:13<00:01,  4.37 ops/s]Running compression pass palettize_weights:  98%|█████████▊| 125/128 [00:14<00:00,  3.29 ops/s]Running compression pass palettize_weights:  99%|█████████▉| 127/128 [00:15<00:00,  3.07 ops/s]Running compression pass palettize_weights: 100%|██████████| 128/128 [00:15<00:00,  8.46 ops/s]
+Running MIL frontend_milinternal pipeline: 0 passes [00:00, ? passes/s]Running MIL frontend_milinternal pipeline: 0 passes [00:00, ? passes/s]
+Running MIL default pipeline:   0%|          | 0/87 [00:00<?, ? passes/s]Running MIL default pipeline:   7%|▋         | 6/87 [00:00<00:01, 57.15 passes/s]Running MIL default pipeline:  15%|█▍        | 13/87 [00:00<00:01, 58.75 passes/s]Running MIL default pipeline:  22%|██▏       | 19/87 [00:00<00:01, 47.09 passes/s]Running MIL default pipeline:  28%|██▊       | 24/87 [00:00<00:01, 43.71 passes/s]Running MIL default pipeline:  34%|███▍      | 30/87 [00:00<00:01, 45.96 passes/s]Running MIL default pipeline:  40%|████      | 35/87 [00:00<00:01, 26.71 passes/s]Running MIL default pipeline:  45%|████▍     | 39/87 [00:01<00:01, 27.73 passes/s]Running MIL default pipeline:  51%|█████     | 44/87 [00:01<00:01, 31.34 passes/s]Running MIL default pipeline:  56%|█████▋    | 49/87 [00:01<00:01, 34.50 passes/s]Running MIL default pipeline:  62%|██████▏   | 54/87 [00:01<00:00, 37.00 passes/s]Running MIL default pipeline:  68%|██████▊   | 59/87 [00:01<00:00, 29.27 passes/s]Running MIL default pipeline:  75%|███████▍  | 65/87 [00:01<00:00, 34.33 passes/s]Running MIL default pipeline:  80%|████████  | 70/87 [00:01<00:00, 37.63 passes/s]Running MIL default pipeline:  86%|████████▌ | 75/87 [00:02<00:00, 37.54 passes/s]Running MIL default pipeline:  92%|█████████▏| 80/87 [00:02<00:00, 37.69 passes/s]Running MIL default pipeline:  98%|█████████▊| 85/87 [00:02<00:00, 31.48 passes/s]Running MIL default pipeline: 100%|██████████| 87/87 [00:02<00:00, 35.30 passes/s]
+Running MIL backend_mlprogram pipeline:   0%|          | 0/12 [00:00<?, ? passes/s]Running MIL backend_mlprogram pipeline:  50%|█████     | 6/12 [00:00<00:00, 57.19 passes/s]Running MIL backend_mlprogram pipeline: 100%|██████████| 12/12 [00:00<00:00, 47.09 passes/s]Running MIL backend_mlprogram pipeline: 100%|██████████| 12/12 [00:00<00:00, 48.32 passes/s]
+GATE2 fp32 cpuOnly {"cold_load_and_first_ms": 622.2, "warm_ms_median": 12.077, "warm_ms_p90": 12.821, "warm_ms_p95": 13.148, "batch8_ms_per_window": 5.883, "batch16_ms_per_window": 5.699, "windows_per_s": 175.5, "full_song_s_estimate_hop0.5": {"1min": 0.68, "3min": 2.05, "4min": 2.74, "5min": 3.42}, "max_abs_diff_probs": 2.9802322387695312e-06, "mean_abs_diff_probs": 7.660311829305044e-10, "rmse_probs": 2.451113267909477e-08, "embedding_cosine_mean": 1.0, "embedding_cosine_min": 0.9999997615814209, "top1_agreement": 1.0, "top5_overlap": 1.0, "family_decision_agreement": 1.0, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 fp32 cpuAndNE {"cold_load_and_first_ms": 567.5, "warm_ms_median": 11.284, "warm_ms_p90": 12.637, "warm_ms_p95": 13.08, "batch8_ms_per_window": 6.368, "batch16_ms_per_window": 5.909, "windows_per_s": 169.2, "full_song_s_estimate_hop0.5": {"1min": 0.71, "3min": 2.13, "4min": 2.84, "5min": 3.55}, "max_abs_diff_probs": 2.9802322387695312e-06, "mean_abs_diff_probs": 7.660311829305044e-10, "rmse_probs": 2.451113267909477e-08, "embedding_cosine_mean": 1.0, "embedding_cosine_min": 0.9999997615814209, "top1_agreement": 1.0, "top5_overlap": 1.0, "family_decision_agreement": 1.0, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 fp32 all {"cold_load_and_first_ms": 948.2, "warm_ms_median": 11.012, "warm_ms_p90": 12.26, "warm_ms_p95": 12.528, "batch8_ms_per_window": 6.034, "batch16_ms_per_window": 5.947, "windows_per_s": 168.2, "full_song_s_estimate_hop0.5": {"1min": 0.71, "3min": 2.14, "4min": 2.85, "5min": 3.57}, "max_abs_diff_probs": 2.9802322387695312e-06, "mean_abs_diff_probs": 7.660311829305044e-10, "rmse_probs": 2.451113267909477e-08, "embedding_cosine_mean": 1.0, "embedding_cosine_min": 0.9999997615814209, "top1_agreement": 1.0, "top5_overlap": 1.0, "family_decision_agreement": 1.0, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 fp16 cpuOnly {"cold_load_and_first_ms": 598.1, "warm_ms_median": 14.423, "warm_ms_p90": 15.729, "warm_ms_p95": 15.906, "batch8_ms_per_window": 6.748, "batch16_ms_per_window": 5.863, "windows_per_s": 170.6, "full_song_s_estimate_hop0.5": {"1min": 0.7, "3min": 2.11, "4min": 2.81, "5min": 3.52}, "max_abs_diff_probs": 0.007483124732971191, "mean_abs_diff_probs": 2.6478060135559645e-06, "rmse_probs": 7.980191730894148e-05, "embedding_cosine_mean": 0.9999995827674866, "embedding_cosine_min": 0.9999973773956299, "top1_agreement": 1.0, "top5_overlap": 0.9174311926605505, "family_decision_agreement": 1.0, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 fp16 cpuAndNE {"cold_load_and_first_ms": 542.3, "warm_ms_median": 13.173, "warm_ms_p90": 14.365, "warm_ms_p95": 14.63, "batch8_ms_per_window": 6.533, "batch16_ms_per_window": 6.321, "windows_per_s": 158.2, "full_song_s_estimate_hop0.5": {"1min": 0.76, "3min": 2.28, "4min": 3.03, "5min": 3.79}, "max_abs_diff_probs": 0.007483124732971191, "mean_abs_diff_probs": 2.6478060135559645e-06, "rmse_probs": 7.980191730894148e-05, "embedding_cosine_mean": 0.9999995827674866, "embedding_cosine_min": 0.9999973773956299, "top1_agreement": 1.0, "top5_overlap": 0.9174311926605505, "family_decision_agreement": 1.0, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 fp16 all {"cold_load_and_first_ms": 560.3, "warm_ms_median": 13.266, "warm_ms_p90": 14.728, "warm_ms_p95": 14.98, "batch8_ms_per_window": 6.404, "batch16_ms_per_window": 5.85, "windows_per_s": 170.9, "full_song_s_estimate_hop0.5": {"1min": 0.7, "3min": 2.11, "4min": 2.81, "5min": 3.51}, "max_abs_diff_probs": 0.007483124732971191, "mean_abs_diff_probs": 2.6478060135559645e-06, "rmse_probs": 7.980191730894148e-05, "embedding_cosine_mean": 0.9999995827674866, "embedding_cosine_min": 0.9999973773956299, "top1_agreement": 1.0, "top5_overlap": 0.9174311926605505, "family_decision_agreement": 1.0, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 int8-weights cpuOnly {"cold_load_and_first_ms": 706.5, "warm_ms_median": 13.819, "warm_ms_p90": 15.283, "warm_ms_p95": 15.455, "batch8_ms_per_window": 6.416, "batch16_ms_per_window": 6.336, "windows_per_s": 157.8, "full_song_s_estimate_hop0.5": {"1min": 0.76, "3min": 2.28, "4min": 3.04, "5min": 3.8}, "max_abs_diff_probs": 0.047177791595458984, "mean_abs_diff_probs": 2.4818587917252444e-05, "rmse_probs": 0.0007187107694335282, "embedding_cosine_mean": 0.9999830722808838, "embedding_cosine_min": 0.9999464154243469, "top1_agreement": 1.0, "top5_overlap": 0.9174311926605505, "family_decision_agreement": 0.9724770642201835, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 int8-weights cpuAndNE {"cold_load_and_first_ms": 705.1, "warm_ms_median": 13.346, "warm_ms_p90": 14.453, "warm_ms_p95": 14.634, "batch8_ms_per_window": 6.488, "batch16_ms_per_window": 7.338, "windows_per_s": 154.1, "full_song_s_estimate_hop0.5": {"1min": 0.78, "3min": 2.34, "4min": 3.11, "5min": 3.89}, "max_abs_diff_probs": 0.047177791595458984, "mean_abs_diff_probs": 2.4818587917252444e-05, "rmse_probs": 0.0007187107694335282, "embedding_cosine_mean": 0.9999830722808838, "embedding_cosine_min": 0.9999464154243469, "top1_agreement": 1.0, "top5_overlap": 0.9174311926605505, "family_decision_agreement": 0.9724770642201835, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 int8-weights all {"cold_load_and_first_ms": 773.1, "warm_ms_median": 12.837, "warm_ms_p90": 15.131, "warm_ms_p95": 15.755, "batch8_ms_per_window": 6.586, "batch16_ms_per_window": 6.559, "windows_per_s": 152.5, "full_song_s_estimate_hop0.5": {"1min": 0.79, "3min": 2.36, "4min": 3.15, "5min": 3.94}, "max_abs_diff_probs": 0.047177791595458984, "mean_abs_diff_probs": 2.4818587917252444e-05, "rmse_probs": 0.0007187107694335282, "embedding_cosine_mean": 0.9999830722808838, "embedding_cosine_min": 0.9999464154243469, "top1_agreement": 1.0, "top5_overlap": 0.9174311926605505, "family_decision_agreement": 0.9724770642201835, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 palettized-6bit cpuOnly {"cold_load_and_first_ms": 574.5, "warm_ms_median": 13.426, "warm_ms_p90": 14.669, "warm_ms_p95": 15.003, "batch8_ms_per_window": 6.64, "batch16_ms_per_window": 5.903, "windows_per_s": 169.4, "full_song_s_estimate_hop0.5": {"1min": 0.71, "3min": 2.13, "4min": 2.83, "5min": 3.54}, "max_abs_diff_probs": 0.2432701587677002, "mean_abs_diff_probs": 0.00016716495156288147, "rmse_probs": 0.004515757784247398, "embedding_cosine_mean": 0.9995179772377014, "embedding_cosine_min": 0.9987169504165649, "top1_agreement": 1.0, "top5_overlap": 0.9174311926605505, "family_decision_agreement": 0.8623853211009175, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 palettized-6bit cpuAndNE {"cold_load_and_first_ms": 644.6, "warm_ms_median": 12.996, "warm_ms_p90": 14.013, "warm_ms_p95": 14.541, "batch8_ms_per_window": 6.324, "batch16_ms_per_window": 6.025, "windows_per_s": 166.0, "full_song_s_estimate_hop0.5": {"1min": 0.72, "3min": 2.17, "4min": 2.89, "5min": 3.62}, "max_abs_diff_probs": 0.2432701587677002, "mean_abs_diff_probs": 0.00016716495156288147, "rmse_probs": 0.004515757784247398, "embedding_cosine_mean": 0.9995179772377014, "embedding_cosine_min": 0.9987169504165649, "top1_agreement": 1.0, "top5_overlap": 0.9174311926605505, "family_decision_agreement": 0.8623853211009175, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+GATE2 palettized-6bit all {"cold_load_and_first_ms": 626.5, "warm_ms_median": 12.924, "warm_ms_p90": 14.358, "warm_ms_p95": 15.027, "batch8_ms_per_window": 6.657, "batch16_ms_per_window": 5.984, "windows_per_s": 167.1, "full_song_s_estimate_hop0.5": {"1min": 0.72, "3min": 2.15, "4min": 2.87, "5min": 3.59}, "max_abs_diff_probs": 0.2432701587677002, "mean_abs_diff_probs": 0.00016716495156288147, "rmse_probs": 0.004515757784247398, "embedding_cosine_mean": 0.9995179772377014, "embedding_cosine_min": 0.9987169504165649, "top1_agreement": 1.0, "top5_overlap": 0.9174311926605505, "family_decision_agreement": 0.8623853211009175, "process_peak_rss_mb": 1393.7, "rss_growth_mb": 0.0}
+# Core ML deployment — Gate 2 results (EfficientAT mn10_as)
+
+**All timings are MAC CI measurements (macos-15-intel / Intel(R) Core(TM) i7-8700B CPU @ 3.20GHz) or estimates from them — NOT iPhone results.**
+Validation windows: 218 ({'compressed': 64, 'layered': 24, 'minus40dB': 1, 'original': 64, 'reverb': 64, 'silence': 1}). Reference: PyTorch fp32. Family decisions via a logistic head trained on the FluidR3 train bank.
+
+| Variant | Size MB | Units | Cold load+1st (ms) | Warm median / p90 / p95 (ms) | Best ms/window | 4-min song est. (s) | Max abs diff | Emb. cosine min | Top-1 agree | Family agree |
+|---|---|---|---|---|---|---|---|---|---|---|
+| fp32 | 19.58 | cpuOnly | 622.2 | 12.077 / 12.821 / 13.148 | 5.70 | 2.74 | 3.0e-06 | 1.00000 | 100.0% | 100.0% |
+| fp32 | 19.58 | cpuAndNE | 567.5 | 11.284 / 12.637 / 13.08 | 5.91 | 2.84 | 3.0e-06 | 1.00000 | 100.0% | 100.0% |
+| fp32 | 19.58 | all | 948.2 | 11.012 / 12.26 / 12.528 | 5.95 | 2.85 | 3.0e-06 | 1.00000 | 100.0% | 100.0% |
+| fp16 | 9.86 | cpuOnly | 598.1 | 14.423 / 15.729 / 15.906 | 5.86 | 2.81 | 7.5e-03 | 1.00000 | 100.0% | 100.0% |
+| fp16 | 9.86 | cpuAndNE | 542.3 | 13.173 / 14.365 / 14.63 | 6.32 | 3.03 | 7.5e-03 | 1.00000 | 100.0% | 100.0% |
+| fp16 | 9.86 | all | 560.3 | 13.266 / 14.728 / 14.98 | 5.85 | 2.81 | 7.5e-03 | 1.00000 | 100.0% | 100.0% |
+| int8-weights | 5.09 | cpuOnly | 706.5 | 13.819 / 15.283 / 15.455 | 6.34 | 3.04 | 4.7e-02 | 0.99995 | 100.0% | 97.2% |
+| int8-weights | 5.09 | cpuAndNE | 705.1 | 13.346 / 14.453 / 14.634 | 6.49 | 3.11 | 4.7e-02 | 0.99995 | 100.0% | 97.2% |
+| int8-weights | 5.09 | all | 773.1 | 12.837 / 15.131 / 15.755 | 6.56 | 3.15 | 4.7e-02 | 0.99995 | 100.0% | 97.2% |
+| palettized-6bit | 3.84 | cpuOnly | 574.5 | 13.426 / 14.669 / 15.003 | 5.90 | 2.83 | 2.4e-01 | 0.99872 | 100.0% | 86.2% |
+| palettized-6bit | 3.84 | cpuAndNE | 644.6 | 12.996 / 14.013 / 14.541 | 6.03 | 2.89 | 2.4e-01 | 0.99872 | 100.0% | 86.2% |
+| palettized-6bit | 3.84 | all | 626.5 | 12.924 / 14.358 / 15.027 | 5.98 | 2.87 | 2.4e-01 | 0.99872 | 100.0% | 86.2% |
+
+Flexible batch: True. Params: 4876831. Front-end fixture written for the Swift mel implementation.
