@@ -31,6 +31,12 @@ public enum EfficientATFrontEnd {
         }
     }()
 
+    /// Each band's non-zero bins (first bin, weights): a band covers a few bins, not all 512.
+    static let sparseBank: [(start: Int, weights: [Float])] = melBank.map { row in
+        guard let a = row.firstIndex(where: { $0 != 0 }), let b = row.lastIndex(where: { $0 != 0 }) else { return (0, []) }
+        return (a, Array(row[a...b]))
+    }
+
     /// Log-mel for mono audio at 32 kHz. Returns (frames, values[mel * frames + t]).
     public static func logMel(_ x: [Float]) -> (frames: Int, values: [Float]) {
         guard x.count > 2 else { return (0, []) }
@@ -45,13 +51,15 @@ public enum EfficientATFrontEnd {
         let fft = MagnitudeFFT(size: nFFT, customWindow: window)
         var mag = [Float](repeating: 0, count: nFFT / 2 + 1)
         var out = [Float](repeating: 0, count: nMels * frames)
-        let bank = melBank
+        let bank = sparseBank
+        var power = [Double](repeating: 0, count: nFFT / 2)
         for t in 0..<frames {
             fft.magnitudes(p, offset: t * hop, into: &mag)
+            for k in 0..<(nFFT / 2) { let v = Double(mag[k]); power[k] = v * v }
             for m in 0..<nMels {
+                let band = bank[m]
                 var acc = 0.0
-                let row = bank[m]
-                for k in 0..<(nFFT / 2) where row[k] != 0 { acc += Double(row[k]) * Double(mag[k]) * Double(mag[k]) }
+                for (j, w) in band.weights.enumerated() { acc += Double(w) * power[band.start + j] }
                 out[m * frames + t] = Float((log(acc + 1e-5) + 4.5) / 5)
             }
         }

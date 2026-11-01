@@ -1,0 +1,19 @@
+{
+ "sample_rate": 32000,
+ "n_mels": 128,
+ "frames": 250,
+ "layout": "mel-major [128][frames]",
+ "n_fft": 1024,
+ "win_length": 800,
+ "hop": 320,
+ "window": "hann periodic=False, centred in n_fft",
+ "preemphasis": [
+  -0.97,
+  1
+ ],
+ "fmin": 0,
+ "fmax": 15000,
+ "mel": "kaldi get_mel_banks + zero column",
+ "log": "ln(x+1e-5)",
+ "norm": "(x+4.5)/5"
+}
