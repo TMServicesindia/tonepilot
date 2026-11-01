@@ -119,7 +119,7 @@ final class LabBenchmark: ObservableObject {
         let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let url = dir.appendingPathComponent("tonepilot-lab-\(Int(Date().timeIntervalSince1970)).json")
         if let d = try? JSONSerialization.data(withJSONObject: report, options: [.prettyPrinted, .sortedKeys]) { try? d.write(to: url); reportURL = url }
-        say("Report saved: \(url.lastPathComponent) (Files app → TonePilot Lab)")
+        log.append("Report saved: \(url.lastPathComponent) (Files app → TonePilot Lab)")
     }
 
     // MARK: Helpers
