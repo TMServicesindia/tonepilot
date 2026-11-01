@@ -1,0 +1,420 @@
+{
+ "version": 1,
+ "families": {
+  "Strings": [
+   "violin",
+   "viola",
+   "cello",
+   "double bass",
+   "string ensemble",
+   "sarangi"
+  ],
+  "Indian winds": [
+   "bansuri",
+   "nadaswaram",
+   "shehnai",
+   "kuzhal"
+  ],
+  "Western winds": [
+   "flute",
+   "piccolo",
+   "oboe",
+   "clarinet",
+   "saxophone"
+  ],
+  "Other winds": [
+   "pan flute",
+   "shakuhachi",
+   "duduk"
+  ],
+  "Indian plucked": [
+   "veena",
+   "sitar",
+   "tanpura"
+  ],
+  "Other plucked": [
+   "guitar",
+   "electric guitar",
+   "mandolin",
+   "harp",
+   "koto"
+  ],
+  "Keys": [
+   "piano",
+   "electric piano",
+   "organ",
+   "accordion",
+   "harmonium"
+  ],
+  "Bells": [
+   "celesta",
+   "glockenspiel",
+   "music box",
+   "vibraphone",
+   "marimba",
+   "tubular bells",
+   "kalimba",
+   "santoor"
+  ],
+  "Percussion": [
+   "tabla",
+   "mridangam",
+   "dholak",
+   "drums"
+  ],
+  "Electronic": [
+   "synth lead",
+   "synth pad",
+   "orchestral synth",
+   "bass synth",
+   "synth brass"
+  ],
+  "Bass": [
+   "bass guitar"
+  ],
+  "Other": [
+   "trumpet",
+   "trombone",
+   "french horn",
+   "brass section",
+   "kombu",
+   "choir",
+   "vocal-like synth"
+  ]
+ },
+ "sources": {
+  "acoustic": "a physical instrument (recorded or sampled), including amplified ones such as electric guitar",
+  "electronic": "an electronic or synthesised instrument in its own right (synth lead, pad, FM piano)",
+  "imitation": "a synthesised or processed sound imitating a specific traditional instrument",
+  "unknown": "not enough evidence"
+ },
+ "not_covered_yet": [
+  "viola",
+  "tabla",
+  "mridangam",
+  "dholak"
+ ],
+ "notes": "Owner's taxonomy (1 Nov 2026) plus 'Other winds' and 'Bass'. Imitation labels name the *perceived* instrument (TonePilot's own naming); score them at family and source level.",
+ "keys": {
+  "gm0": {
+   "instrument": "piano",
+   "family": "Keys",
+   "source": "acoustic"
+  },
+  "gm4": {
+   "instrument": "electric piano",
+   "family": "Keys",
+   "source": "acoustic"
+  },
+  "gm5": {
+   "instrument": "electric piano",
+   "family": "Keys",
+   "source": "electronic"
+  },
+  "gm8": {
+   "instrument": "celesta",
+   "family": "Bells",
+   "source": "acoustic"
+  },
+  "gm9": {
+   "instrument": "glockenspiel",
+   "family": "Bells",
+   "source": "acoustic"
+  },
+  "gm10": {
+   "instrument": "music box",
+   "family": "Bells",
+   "source": "acoustic"
+  },
+  "gm11": {
+   "instrument": "vibraphone",
+   "family": "Bells",
+   "source": "acoustic"
+  },
+  "gm12": {
+   "instrument": "marimba",
+   "family": "Bells",
+   "source": "acoustic"
+  },
+  "gm14": {
+   "instrument": "tubular bells",
+   "family": "Bells",
+   "source": "acoustic"
+  },
+  "gm16": {
+   "instrument": "organ",
+   "family": "Keys",
+   "source": "acoustic"
+  },
+  "gm19": {
+   "instrument": "organ",
+   "family": "Keys",
+   "source": "acoustic"
+  },
+  "gm21": {
+   "instrument": "accordion",
+   "family": "Keys",
+   "source": "acoustic"
+  },
+  "gm24": {
+   "instrument": "guitar",
+   "family": "Other plucked",
+   "source": "acoustic"
+  },
+  "gm25": {
+   "instrument": "guitar",
+   "family": "Other plucked",
+   "source": "acoustic"
+  },
+  "gm27": {
+   "instrument": "electric guitar",
+   "family": "Other plucked",
+   "source": "acoustic"
+  },
+  "gm30": {
+   "instrument": "electric guitar",
+   "family": "Other plucked",
+   "source": "acoustic"
+  },
+  "gm32": {
+   "instrument": "double bass",
+   "family": "Strings",
+   "source": "acoustic"
+  },
+  "gm33": {
+   "instrument": "bass guitar",
+   "family": "Bass",
+   "source": "acoustic"
+  },
+  "gm38": {
+   "instrument": "bass synth",
+   "family": "Electronic",
+   "source": "electronic"
+  },
+  "gm40": {
+   "instrument": "violin",
+   "family": "Strings",
+   "source": "acoustic"
+  },
+  "gm42": {
+   "instrument": "cello",
+   "family": "Strings",
+   "source": "acoustic"
+  },
+  "gm44": {
+   "instrument": "string ensemble",
+   "family": "Strings",
+   "source": "acoustic"
+  },
+  "gm45": {
+   "instrument": "string ensemble",
+   "family": "Strings",
+   "source": "acoustic"
+  },
+  "gm46": {
+   "instrument": "harp",
+   "family": "Other plucked",
+   "source": "acoustic"
+  },
+  "gm48": {
+   "instrument": "string ensemble",
+   "family": "Strings",
+   "source": "acoustic"
+  },
+  "gm50": {
+   "instrument": "orchestral synth",
+   "family": "Electronic",
+   "source": "electronic"
+  },
+  "gm52": {
+   "instrument": "choir",
+   "family": "Other",
+   "source": "acoustic"
+  },
+  "gm54": {
+   "instrument": "vocal-like synth",
+   "family": "Other",
+   "source": "electronic"
+  },
+  "gm56": {
+   "instrument": "trumpet",
+   "family": "Other",
+   "source": "acoustic"
+  },
+  "gm57": {
+   "instrument": "trombone",
+   "family": "Other",
+   "source": "acoustic"
+  },
+  "gm60": {
+   "instrument": "french horn",
+   "family": "Other",
+   "source": "acoustic"
+  },
+  "gm61": {
+   "instrument": "brass section",
+   "family": "Other",
+   "source": "acoustic"
+  },
+  "gm62": {
+   "instrument": "synth brass",
+   "family": "Electronic",
+   "source": "electronic"
+  },
+  "gm65": {
+   "instrument": "saxophone",
+   "family": "Western winds",
+   "source": "acoustic"
+  },
+  "gm68": {
+   "instrument": "oboe",
+   "family": "Western winds",
+   "source": "acoustic"
+  },
+  "gm71": {
+   "instrument": "clarinet",
+   "family": "Western winds",
+   "source": "acoustic"
+  },
+  "gm72": {
+   "instrument": "piccolo",
+   "family": "Western winds",
+   "source": "acoustic"
+  },
+  "gm73": {
+   "instrument": "flute",
+   "family": "Western winds",
+   "source": "acoustic"
+  },
+  "gm75": {
+   "instrument": "pan flute",
+   "family": "Other winds",
+   "source": "acoustic"
+  },
+  "gm77": {
+   "instrument": "shakuhachi",
+   "family": "Other winds",
+   "source": "acoustic"
+  },
+  "gm80": {
+   "instrument": "synth lead",
+   "family": "Electronic",
+   "source": "electronic"
+  },
+  "gm81": {
+   "instrument": "synth lead",
+   "family": "Electronic",
+   "source": "electronic"
+  },
+  "gm88": {
+   "instrument": "synth pad",
+   "family": "Electronic",
+   "source": "electronic"
+  },
+  "gm89": {
+   "instrument": "synth pad",
+   "family": "Electronic",
+   "source": "electronic"
+  },
+  "gm90": {
+   "instrument": "synth pad",
+   "family": "Electronic",
+   "source": "electronic"
+  },
+  "gm94": {
+   "instrument": "synth pad",
+   "family": "Electronic",
+   "source": "electronic"
+  },
+  "gm104": {
+   "instrument": "sitar",
+   "family": "Indian plucked",
+   "source": "acoustic"
+  },
+  "gm107": {
+   "instrument": "koto",
+   "family": "Other plucked",
+   "source": "acoustic"
+  },
+  "gm108": {
+   "instrument": "kalimba",
+   "family": "Bells",
+   "source": "acoustic"
+  },
+  "gm110": {
+   "instrument": "violin",
+   "family": "Strings",
+   "source": "acoustic"
+  },
+  "gm111": {
+   "instrument": "shehnai",
+   "family": "Indian winds",
+   "source": "acoustic"
+  },
+  "drums": {
+   "instrument": "drums",
+   "family": "Percussion",
+   "source": "acoustic"
+  },
+  "tp_bansuri_like": {
+   "instrument": "bansuri",
+   "family": "Indian winds",
+   "source": "imitation"
+  },
+  "tp_bansuri_low_like": {
+   "instrument": "bansuri",
+   "family": "Indian winds",
+   "source": "imitation"
+  },
+  "tp_santoor_like": {
+   "instrument": "santoor",
+   "family": "Bells",
+   "source": "imitation"
+  },
+  "tp_veena_like": {
+   "instrument": "veena",
+   "family": "Indian plucked",
+   "source": "imitation"
+  },
+  "tp_harmonium_like": {
+   "instrument": "harmonium",
+   "family": "Keys",
+   "source": "imitation"
+  },
+  "tp_nadaswaram_like": {
+   "instrument": "nadaswaram",
+   "family": "Indian winds",
+   "source": "imitation"
+  },
+  "tp_mandolin_like": {
+   "instrument": "mandolin",
+   "family": "Other plucked",
+   "source": "imitation"
+  },
+  "tp_sarangi_like": {
+   "instrument": "sarangi",
+   "family": "Strings",
+   "source": "imitation"
+  },
+  "tp_kuzhal_like": {
+   "instrument": "kuzhal",
+   "family": "Indian winds",
+   "source": "imitation"
+  },
+  "tp_tanpura_like": {
+   "instrument": "tanpura",
+   "family": "Indian plucked",
+   "source": "imitation"
+  },
+  "tp_kombu_like": {
+   "instrument": "kombu",
+   "family": "Other",
+   "source": "imitation"
+  },
+  "tp_duduk_like": {
+   "instrument": "duduk",
+   "family": "Other winds",
+   "source": "imitation"
+  }
+ }
+}
