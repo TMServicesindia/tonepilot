@@ -112,6 +112,7 @@ Rules that apply to every item:
 | G2.4 | **Physical iPhone run** of TonePilot Lab (sideload, press Full run, share the JSON) | 👤 (one session) |
 | G2.5 | Developer-only shadow mode in the main app (off by default; production recognizer stays authoritative) | ⏳ after G2.4 |
 | 3.9 | Real-song evaluation per language with verified annotations | 📝 |
+| 3.10a | **Wikimedia Commons survey** (metadata only, branch `research/indian-audio`): eligible (CC0/PD/CC BY) candidates: tabla 21, veena 28, viola 17, dholak 10, mridangam 1, thavil 1, nadaswaram 1; **none** for ghatam, dhol, bansuri, shehnai, sitar, santoor, tanpura, sarangi, harmonium. Search hits are UNVERIFIED (some are not the instrument; some licences are uploader claims on old recordings) | 🧪 survey done; listening verification 👤/⏳ |
 | 3.10 | **Indian instrument coverage tracker** (dataset clips and recognition accuracy, real vs synthetic) for bansuri, nadaswaram, shehnai, veena, sitar, santoor, tabla, mridangam, dholak, ghatam, kanjira, thavil. Today: real licensed clips = **0 for all**; synthetic imitations exist only for bansuri, nadaswaram, shehnai (GM), veena, sitar (GM), santoor | ⏳ |
 | 3.11 | **Real-world accuracy dashboard** per language (Tamil / Telugu / Hindi): songs collected, annotated, evaluated; exact accuracy; family accuracy; multi-label P/R/F1; unknown detection and calibration; coverage by family and arrangement complexity | ⏳ (structure ✅ in strategy §6) |
 
