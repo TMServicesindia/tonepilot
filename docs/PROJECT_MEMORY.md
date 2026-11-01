@@ -150,7 +150,13 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
 - Owner recordings for the Indian acceptance set (Casio performances; Tamil/Telugu/Hindi film-style accompaniments; Indian rhythmic cycles).
 - Agree benchmark gates (`docs/TONEPILOT_BENCHMARK_PLAN.md` §6).
+- **Launch gate on shared CI simulators** (re-run 1 Nov 23:32 IST, run 41334484025):
+  - Launch averaged 4.34 s against the 4 s limit (three runs: 4.23 / 5.29 / 3.50 s, 17% spread). Every other check passed.
+  - The launch path is unchanged since v0.3.71, which launched in 3.47 s. The control build v0.3.71 took 9.28 s on an earlier slow runner, so this is runner noise.
+  - Options for the owner: (a) re-run again; (b) measure the median of 5 launches instead of the average of 3 (same 4 s limit); (c) one-off `[publish-anyway]`.
+  - The gate is left unchanged until the owner decides.
+  - The publish 403 (Settings → Actions → Workflow permissions → Read and write) is still unresolved; publishing has not been reached since.
 
 ## 8. Release history (latest first)
 
-(v0.3.72 attempted: Phase 1 iPhone foundation; publish 403) · v0.3.71 (live fill deadlock fix; all gates passed; launch 3.47 s) · v0.3.70 (stuck notes, arpeggio melody bug, ToneMatcher, 20 instruments; launch 3.86 s) · v0.3.67 (publish-anyway; Film Tone Library) · quick-2 · v0.3.61 (Record; owner's preferred older build) · earlier v0.3.x.
+(1 Nov 23:32 IST re-run: launch 4.34 s > 4 s, not published) · (v0.3.72 attempted: Phase 1 iPhone foundation; publish 403) · v0.3.71 (live fill deadlock fix; all gates passed; launch 3.47 s) · v0.3.70 (stuck notes, arpeggio melody bug, ToneMatcher, 20 instruments; launch 3.86 s) · v0.3.67 (publish-anyway; Film Tone Library) · quick-2 · v0.3.61 (Record; owner's preferred older build) · earlier v0.3.x.
