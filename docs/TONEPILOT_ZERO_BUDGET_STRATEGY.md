@@ -184,6 +184,8 @@ Included in `docs/TODO.md`:
 
 Regression, stability and security work runs in parallel throughout.
 
+**Platform priority (owner, 1 Nov ~21:00 IST): iPhone/iOS is the main priority; Android second** (parity still required, but after iPhone).
+
 **Next milestone:** a reliable instrument benchmark on actual instruments in Tamil, Telugu and Hindi music.
 
 ## 7. Phased plan (zero budget)

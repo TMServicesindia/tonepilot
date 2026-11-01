@@ -29,6 +29,7 @@ Rules that apply to every item:
 5. Accompaniment and Live Song Arpeggio (section 6)
 6. Android parity and release readiness (sections 7, 8)
 
+**Platform priority (owner, 1 Nov ~21:00 IST): iPhone/iOS first; Android second.** Every feature lands and is validated on iPhone first; Android parity follows.
 **In parallel, always:** critical bug fixes, stability, security, regression (section 1).
 **Next milestone:** a reliable instrument benchmark on actual instruments in Tamil, Telugu and Hindi music.
 
