@@ -1,0 +1,56 @@
+name: Benchmarks (baselines, no app build)
+
+# Phase 1 benchmark harness: analysis baselines (tempo/beats/meter, chords, sections, arpeggio)
+# and tone matching on songs rendered from GeneralUser GS with known answers. Runs twice and
+# fails if the results differ (reproducibility). Real-audio acceptance sets join in later phases.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 21 * * *"
+
+permissions:
+  contents: write   # pushes the results to branch ci/bench-results
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    container: swift:6.0-noble
+    steps:
+      - uses: actions/checkout@v4
+      - name: GeneralUser GS (GeneralUser GS License v2.0)
+        run: |
+          apt-get update -qq && apt-get install -y -qq curl > /dev/null
+          curl -fsSL -o /tmp/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+      - name: Build (release)
+        working-directory: Packages/TonePilotCore
+        run: swift build -c release --build-tests
+      - name: Run twice
+        working-directory: Packages/TonePilotCore
+        env:
+          TP_SF2: /tmp/GeneralUser-GS.sf2
+        run: |
+          set -o pipefail
+          for i in 1 2; do
+            swift test -c release --skip-build --filter "AnalysisBaselineBenchmarks|ToneMatchingBenchmarks" 2>&1 | tee run$i.log
+            grep -E "^(AUDIT|BENCH)" run$i.log | sort > results$i.txt
+          done
+          grep -E "RESULT" results1.txt | while IFS= read -r l; do echo "::notice title=Baseline::$l"; done
+          if ! diff -u results1.txt results2.txt; then echo "::error title=Benchmarks::results differ between two runs (not reproducible)"; exit 1; fi
+          echo "::notice title=Benchmarks::reproducible across two runs ($(wc -l < results1.txt) result lines)"
+      - name: Push results to branch ci/bench-results
+        if: always()
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          cp Packages/TonePilotCore/results1.txt /tmp/results.txt 2>/dev/null || exit 0
+          cp Packages/TonePilotCore/run1.log /tmp/run1.log 2>/dev/null || true
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout --orphan ci/bench-results && git rm -rqf . && mkdir -p bench
+          cp /tmp/results.txt bench/results.txt; cp /tmp/run1.log bench/run1.log 2>/dev/null || true
+          echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID} · $(date -u +%FT%TZ)" > bench/SOURCE.txt
+          git add bench && git commit -qm "Benchmark results for ${GITHUB_SHA}" && git push -f origin ci/bench-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-results
+          path: Packages/TonePilotCore/results*.txt

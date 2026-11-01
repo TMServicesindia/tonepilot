@@ -1,0 +1,21 @@
+{
+  "id": "owner-0001",
+  "split": "test",
+  "source": "owner recording (Casio CT-X870IN, line out)",
+  "rights_holder": "owner",
+  "licence": "owner's own recording; train + evaluate",
+  "licence_status": "Cleared",
+  "audio": {"location": "owner Google Drive /TonePilot/indian-set/owner-0001.wav", "sha256": "<64 hex>", "duration_s": 45.0, "sample_rate": 44100},
+  "style": {"language": "Tamil", "genre": "film", "era": "1990s"},
+  "tags": ["drone", "minor-key", "half-bar-changes", "no-drums", "dense-accompaniment"],
+  "annotations": {
+    "annotator": "owner",
+    "cycle": {"name": "adi", "beats_per_cycle": 8, "state": "confident"},
+    "tempo_bpm": 96,
+    "beats": [0.52, 1.14],
+    "downbeats": [0.52],
+    "chords": [{"start": 0.52, "end": 2.98, "label": "A:min", "state": "confident"}],
+    "accompaniment": [{"start": 0.52, "end": 20.0, "type": "arpeggio", "pattern": "R-5-8-5"}],
+    "sections": [{"start": 0.0, "end": 20.0, "label": "pallavi"}]
+  }
+}

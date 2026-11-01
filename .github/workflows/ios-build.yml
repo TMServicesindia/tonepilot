@@ -87,6 +87,34 @@ jobs:
           grep -E "^MISS" instruments.log | while IFS= read -r l; do echo "::warning title=Instrument recognition::$l"; done
           [ $code = 0 ] || echo "::warning title=Instrument recognition::check exited $code"
 
+      - name: Inference back-end contract (Core ML, Basic Pitch test model — CI only, not shipped)
+        # Phase 1 gate: the app's CoreMLBackend must load the official Basic Pitch nmp.mlpackage
+        # (Apache-2.0) and reproduce the reference outputs of the official nmp.tflite within 1e-3 (CPU).
+        run: |
+          set -uo pipefail
+          mkdir -p build-inference && cd build-inference
+          git clone --depth 1 https://github.com/spotify/basic-pitch.git basic-pitch > /dev/null 2>&1
+          sed '/^import TonePilotCore$/d' ../App/Sources/Audio/CoreMLBackend.swift > CoreMLBackend.swift
+          if ! swiftc -O -target "$(uname -m)-apple-macos14" $(find ../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') \
+               CoreMLBackend.swift ../Native/tools/inference_check/main.swift -o inference_check > compile.log 2>&1; then
+            grep -E "error:" compile.log | sort -u | head -10 | while IFS= read -r l; do echo "::error title=Inference check didn't compile::$l"; done
+            exit 1
+          fi
+          code=0
+          ./inference_check basic-pitch/basic_pitch/saved_models/icassp_2022/nmp.mlpackage \
+            ../Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/inference/basic_pitch > inference.log 2>&1 || code=$?
+          cat inference.log
+          grep -E "^RESULT" inference.log | while IFS= read -r l; do echo "::notice title=Inference contract::$l"; done
+          [ $code = 0 ] || tail -20 inference.log | while IFS= read -r l; do echo "::error title=Inference contract (exit $code)::$l"; done
+          exit $code
+
+      - name: Licence gate (personal build) and Indian set manifest
+        run: |
+          python3 Native/tools/licences/check_manifest.py docs/LICENSES/manifest.json --self-test
+          python3 Native/tools/licences/check_manifest.py docs/LICENSES/manifest.json --build personal
+          python3 Native/tools/dataset/validate_indian_set.py docs/benchmark/indian-set/manifest.json --self-test
+          python3 Native/tools/dataset/validate_indian_set.py docs/benchmark/indian-set/manifest.json
+
       - name: In-app model download is published
         run: |
           if curl -fsSL "https://github.com/${GITHUB_REPOSITORY}/releases/download/models-v1/manifest.json" -o manifest.json; then
