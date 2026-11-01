@@ -108,6 +108,14 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - Owner suggested masstamilan.dev songs for learning → declined (piracy site; standing rule); offered owner recordings / CC BY-CC0 / permission.
 - `HarmonyBenchmarks` (3 sets): current 73/59/66% beat accuracy vs **new 90/89/82%**; minor 50→84/85/70%; half-bar 23→100%; drone 0→100/90/31%; alternatives 82→98/98/92%. Held-out 2 (84 BPM) is the only untouched set: targets **not met** there. Not wired into the app.
 
+
+## 6d. Phase 4 start and Tamil cinema dataset survey (1 Nov, ~18:30 IST)
+
+- Phase 4 step 1: `Benchmarks/AccompanimentBenchmarks.swift` (9 section kinds, true inputs). Current learner: **false arpeggios 7/7** (both orders); real arpeggios learned well (step F 1.00, degrees 19/20). Classifier (default no fill) is next.
+- Owner sent sources to "train": masstamilan (piracy, excluded); sajeevan16/tamil-songs-corpus (lyrics text only); code-mohanprakash/tamil (librosa features from masstamilan rips); HF Thanushs25/tamil-audio-emotion-classification (195 WAV of Tamil *speech*, no licence). None usable.
+- Owner's dataset brief → `docs/benchmark/tamil-cinema/` (SOURCE_SURVEY.md, catalogue.json with 20 songs and train/dev/test by song identity, README). CI survey `dataset-survey.yml` → branch research/dataset-survey (205 HF datasets, 123 Zenodo records): **no lawful Tamil cinema audio anywhere**. Saraga Audiovisual (CC BY 4.0, classical) is a candidate for rhythm-cycle acceptance after licence text check. Route: owner Casio recordings (preferred), written permission, or purchased copies for private evaluation only.
+- Incident: `git ls-tree -l` on a blob-less clone fetched ~108 MB (spectrogram PNGs) from AMAAI-Lab repo; stopped, names only read, deleted unopened.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
