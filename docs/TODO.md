@@ -98,11 +98,18 @@ Rules that apply to every item:
 | 3.2 | Taxonomy v2 (+ acoustic / electronic / imitation / unknown) | ✅ |
 | 3.3 | Proxy clip generator (FluidR3 train bank vs GeneralUser test bank, timed layered tracks, variants) | ✅ tested locally |
 | 3.4 | Proxy benchmark A vs C (run 41315008400): off-the-shelf labels unusable (Apple 94% unknown); **C · EfficientAT + head leads: 59% exact, 75% family, layered window F1 0.37**; ~25% confident wrong family. See `docs/benchmark/INSTRUMENT_PROXY_RESULTS.md` | 🧪 |
-| 3.4b | Calibrated abstention (wrong family ≤ 5% on DEV) + coverage; more layered training; fair CLAP run | ⏳ next |
+| 3.4b | **Gate 1 calibration v1** (run 41321228828): ≤5% met on DEV but **not on TEST** (C·EfficientAT: coverage 99%, wrong family 26%). Cause: DEV came from the same sound bank as TRAIN, so the heads were over-confident. Coverage curve on TEST: 88% family accuracy at 70% coverage, 94% at 50%. Source type: imitation tones mostly read as acoustic (8/36) | 🧪 (finding) |
+| 3.4c | **Gate 1 v2** (run 41321917030): NSynth (CC BY 4.0, real notes) as cross-domain DEV and extra TEST; 96 layered training mixtures; CLAP on 10 s windows + argmax; calibration in the pipeline | 🔨 running |
+| 3.4d | Source-type head improvement (imitation vs acoustic) and hybrid sounds | ⏳ |
 | 3.5 | Add NSynth real-sample set (families, acoustic/electronic/synthetic) to the benchmark | ⏳ |
 | 3.6 | Add licensed real recordings (GuitarSet, Saraga, CC clips) | ⏳ (needs 2.6) |
 | 3.7 | Fine-tuning experiment (B), only if C leaves a measured gap; resumable on free Colab/Kaggle | ⏳ (approval for large training: 👤) |
-| 3.8 | Five-stage analyser prototype (content → family → instrument → time aggregation → tone mapping), Core ML + LiteRT, shadow mode | ⏳ (approval: 👤) |
+| 3.8 | Five-stage analyser prototype (content → family → instrument → time aggregation → tone mapping), Core ML, shadow mode | ⏳ (approval: 👤) |
+| G2.1 | **Gate 2 Core ML**: fp32 / fp16 / int8 / 6-bit × CPU / CPU+NE / all × batch 1/8/16; numerics vs PyTorch on benchmark windows; latency p50/p90/p95; Mac full-song estimates (run 41322117074) | 🔨 queued (Mac runner) |
+| G2.2 | Swift EfficientAT mel front-end (`Instruments/EfficientATFrontEnd.swift`) + fixture test | 🔨 written; test waits for the Gate 2 fixture |
+| G2.3 | **TonePilot Lab**: separate iPhone benchmark app (main app untouched); device latency per compute unit, full-song time, footprint, thermal, battery, on-device numerics → JSON report | 🔨 written; build after G2.1 (`lab-build.yml`) |
+| G2.4 | **Physical iPhone run** of TonePilot Lab (sideload, press Full run, share the JSON) | 👤 (one session) |
+| G2.5 | Developer-only shadow mode in the main app (off by default; production recognizer stays authoritative) | ⏳ after G2.4 |
 | 3.9 | Real-song evaluation per language with verified annotations | 📝 |
 | 3.10 | **Indian instrument coverage tracker** (dataset clips and recognition accuracy, real vs synthetic) for bansuri, nadaswaram, shehnai, veena, sitar, santoor, tabla, mridangam, dholak, ghatam, kanjira, thavil. Today: real licensed clips = **0 for all**; synthetic imitations exist only for bansuri, nadaswaram, shehnai (GM), veena, sitar (GM), santoor | ⏳ |
 | 3.11 | **Real-world accuracy dashboard** per language (Tamil / Telugu / Hindi): songs collected, annotated, evaluated; exact accuracy; family accuracy; multi-label P/R/F1; unknown detection and calibration; coverage by family and arrangement complexity | ⏳ (structure ✅ in strategy §6) |

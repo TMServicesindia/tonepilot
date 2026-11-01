@@ -190,6 +190,14 @@ Regression, stability and security work runs in parallel throughout.
 
 **Next milestone:** a reliable instrument benchmark on actual instruments in Tamil, Telugu and Hindi music.
 
+## 6c. Instrument Analyser gates (owner, 1 Nov ~21:30 IST)
+
+- **Gate 1 — reliable classification:** calibrated abstention (wrong family ≤ 5% on DEV, confirmed on untouched TEST), reported with coverage and selective accuracy at several coverage levels; layered recognition with onset/offset distributions; source type (acoustic / electronic / imitation / hybrid / unknown).
+- **Gate 2 — iPhone deployment evidence:** Core ML optimisation (precision × compute units × batch), numerical suite, Mac CI timings (labelled as Mac), the TonePilot Lab harness for physical-iPhone latency, memory, thermal and battery, then developer-only shadow mode.
+- **Gate 3 — real Indian music validation:** licensed Indian instrument recordings, verified annotations, legally permitted film recordings, per language and family.
+- **Candidate status:** EfficientAT + head leads (exact, layered, size, speed); PANNs + head is slightly higher on family. Not a production selection. CLAP stays optional.
+- **Lesson from Gate 1 v1:** DEV must come from a different source than TRAIN, or calibration fails to transfer. This will matter even more on real film audio.
+
 ## 7. Phased plan (zero budget)
 
 | # | Phase | Free resources | Depends on | Status |
