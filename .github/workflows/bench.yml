@@ -32,8 +32,8 @@ jobs:
         run: |
           set -o pipefail
           for i in 1 2; do
-            swift test -c release --filter "AnalysisBaselineBenchmarks|ToneMatchingBenchmarks" 2>&1 | tee run$i.log
-            grep -E "^(AUDIT|BENCH)" run$i.log | sort > results$i.txt
+            swift test -c release --filter "AnalysisBaselineBenchmarks|ToneMatchingBenchmarks|HarmonyBenchmarks/testCurrentAnalyzer" 2>&1 | tee run$i.log
+            grep -E "^(AUDIT|BENCH|HARMONY)" run$i.log | grep -v "HARMONY time" | sort > results$i.txt
           done
           grep -E "RESULT" results1.txt | while IFS= read -r l; do echo "::notice title=Baseline::$l"; done
           if ! diff -u results1.txt results2.txt; then echo "::error title=Benchmarks::results differ between two runs (not reproducible)"; exit 1; fi

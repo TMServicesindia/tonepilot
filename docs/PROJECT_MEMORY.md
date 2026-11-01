@@ -99,6 +99,13 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - `CoreMLBackend` now lives in TonePilotCore (`#if canImport(CoreML)`).
 - **Launch gate failing on CI today:** a4ab124 a2 4.55 s, b0eb8ae 4.93 s, control v0.3.71 9.28 s (passed 3.47 s this morning) → runner slowness. No release since v0.3.71. Owner to decide: re-run later, or change launch measurement (gate change = owner's call).
 
+
+## 6c. Phase 3 (harmony) — owner: "Re-run the build later and start Phase 3" (1 Nov, ~17:00 IST)
+
+- Full iPhone build re-run scheduled for 23:30 IST (scheduled task trig_01A9w7uttFtRtFQmBXdzQjVE; push latest main without [skip ci]).
+- Report: **`docs/TONEPILOT_PHASE3_REPORT.md`**. `Harmony/HarmonyHypotheses.swift`: NNLS notes on a log-frequency spectrum, bass as evidence, triads with optional 7th, key bonus, weak melody top voice, drone rule (Sa–Pa steady, no third; tonic = root of fifth chain), long beats split at 0.6 s, ranked alternatives. 1.37 s per 4-min song.
+- `HarmonyBenchmarks` (3 sets): current 73/59/66% beat accuracy vs **new 90/89/82%**; minor 50→84/85/70%; half-bar 23→100%; drone 0→100/90/31%; alternatives 82→98/98/92%. Held-out 2 (84 BPM) is the only untouched set: targets **not met** there. Not wired into the app.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
