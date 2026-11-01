@@ -1,5 +1,5 @@
 {
- "version": 1,
+ "version": 2,
  "families": {
   "Strings": [
    "violin",
@@ -56,18 +56,14 @@
    "kalimba",
    "santoor"
   ],
-  "Percussion": [
-   "tabla",
-   "mridangam",
-   "dholak",
-   "drums"
-  ],
   "Electronic": [
    "synth lead",
    "synth pad",
    "orchestral synth",
    "bass synth",
-   "synth brass"
+   "synth brass",
+   "ambient texture",
+   "hybrid orchestral texture"
   ],
   "Bass": [
    "bass guitar"
@@ -80,6 +76,20 @@
    "kombu",
    "choir",
    "vocal-like synth"
+  ],
+  "Indian percussion": [
+   "tabla",
+   "mridangam",
+   "dholak",
+   "ghatam",
+   "kanjira",
+   "thavil",
+   "dhol"
+  ],
+  "Other percussion": [
+   "drums",
+   "electronic percussion",
+   "frame drums"
   ]
  },
  "sources": {
@@ -92,7 +102,11 @@
   "viola",
   "tabla",
   "mridangam",
-  "dholak"
+  "dholak",
+  "ghatam",
+  "kanjira",
+  "thavil",
+  "dhol"
  ],
  "notes": "Owner's taxonomy (1 Nov 2026) plus 'Other winds' and 'Bass'. Imitation labels name the *perceived* instrument (TonePilot's own naming); score them at family and source level.",
  "keys": {
@@ -353,7 +367,7 @@
   },
   "drums": {
    "instrument": "drums",
-   "family": "Percussion",
+   "family": "Other percussion",
    "source": "acoustic"
   },
   "tp_bansuri_like": {

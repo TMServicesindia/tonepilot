@@ -124,6 +124,13 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - Candidates: EfficientAT (MIT repo) best size/quality for hybrid; YAMNet (Apache code; weights licence to confirm); LAION-CLAP music (Apache, large); PANNs (CC BY 4.0 weights); MS-CLAP (comparison).
 - Phase 4 paused after its benchmark baseline (false arpeggios 7/7).
 
+
+## 6f. Indian film music accuracy-first strategy (owner, 1 Nov ~19:30 IST)
+
+- Owner reframed: Indian film music (Tamil/Telugu/Hindi) is the primary domain for every feature; instrument Analyser + Maker first; larger licensed TRAIN set (20 songs = sealed TEST only); "accuracy improved" only on unseen real recordings; build TonePilot's own Indian-music intelligence layer.
+- First deliverable (8 parts): **`docs/TONEPILOT_INDIAN_FILM_STRATEGY.md`**. Awaiting approval; no large training, no production change.
+- Tooling committed (not wired): `Native/tools/instruments/taxonomy.json` v2 (families incl. Indian percussion; sources acoustic/electronic/imitation/unknown), `Benchmarks/InstrumentSetRender.swift` (FluidR3 GM MIT train bank vs GeneralUser test bank; solo + timed layered). FluidR3 licence verified MIT (Debian copyright).
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
