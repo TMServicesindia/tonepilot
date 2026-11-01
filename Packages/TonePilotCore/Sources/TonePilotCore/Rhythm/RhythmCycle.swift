@@ -118,8 +118,10 @@ public enum RhythmCycleInference {
             chosen = top
             let second = ranked.dropFirst().first?.2 ?? 0
             let rivalRelated = ranked.dropFirst().contains { related($0.0, top.0) && top.2 - $0.2 < confidentMargin }
-            // Accents may confirm or cast doubt; they never overrule the model on their own.
-            let accentsDisagree = accentPick.map { $0.0 != top.0 && !related($0.0, top.0) && $0.2 >= accentConfident } ?? false
+            // Accents may confirm or cast doubt; they never overrule the model on their own. Any
+            // valid accent reading of another length — including a multiple (the model may be
+            // counting half-cycles, as Western-trained models do with adi or chapu) — blocks confidence.
+            let accentsDisagree = accentPick.map { $0.0 != top.0 } ?? false
             state = top.2 >= confidentScore && top.2 - second >= confidentMargin && !rivalRelated && !accentsDisagree ? .confident : .ambiguous
             alternatives = ranked.map { .init(beats: $0.0, phase: $0.1, score: $0.2) }
         } else {

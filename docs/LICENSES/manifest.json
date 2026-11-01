@@ -1,19 +1,146 @@
 {
-  "schema": 1,
-  "note": "Separate records for code, exact weights, runtime dependencies and training/evaluation data. Status: Cleared | SAFE* | Personal only | Rejected | Unverified. Only Cleared may ship in a commercial build. Human review is required for Cleared; this file and its CI check do not establish legal clearance by themselves.",
-  "items": [
-    {"id": "demucs-htdemucs", "shipped": "download", "code": "MIT (github.com/adefossez/demucs)", "weights": "htdemucs (dl.fbaipublicfiles); README: weight licence 'not clear'", "dependencies": "demucs.cpp MIT; Eigen MPL-2.0", "data": "MUSDB18-HQ 'other-nc' (Zenodo 3338373) + 800 internal songs", "status": "Personal only", "reviewer": null},
-    {"id": "demucs-htdemucs_6s", "shipped": "download", "code": "MIT", "weights": "htdemucs_6s; README: CC-NC-BY 'likely' (Meta internal data)", "dependencies": "demucs.cpp MIT; Eigen MPL-2.0", "data": "Meta internal", "status": "Personal only", "reviewer": null},
-    {"id": "generaluser-gs", "shipped": "bundled", "code": null, "weights": "GeneralUser GS SoundFont: music creation private or commercial; use in software projects", "dependencies": null, "data": "Sample origins not fully verified by the author; training use not addressed", "status": "Cleared", "reviewer": "pending owner review", "scope": "playback only"},
-    {"id": "lame-3.100", "shipped": "bundled", "code": "LGPL-2.0", "weights": null, "dependencies": null, "data": null, "status": "Cleared", "reviewer": "pending owner review", "obligations": "LGPL notice; relinkable objects or source offer"},
-    {"id": "apple-coreml-soundanalysis", "shipped": "system", "code": "Apple SDK", "weights": "Apple", "dependencies": null, "data": null, "status": "Cleared", "reviewer": "n/a (platform)"},
-    {"id": "basic-pitch-test-model", "shipped": "no", "code": "Apache-2.0 (github.com/spotify/basic-pitch)", "weights": "icassp_2022 nmp.mlpackage / nmp.tflite / nmp.onnx in the Apache-2.0 repository", "dependencies": "ai-edge-litert, onnxruntime (CI only)", "data": "Per ICASSP 2022 paper (to record)", "status": "SAFE*", "reviewer": null, "scope": "CI test model only (Phase 1); must not ship"},
-    {"id": "beat-this-small", "shipped": "no", "code": "MIT (github.com/CPJKU/beat_this)", "weights": "small* checkpoint, MIT per README", "dependencies": "PyTorch (conversion only)", "data": "16 datasets; some files copyrighted or limited CC (README)", "status": "SAFE*", "reviewer": null, "scope": "Phase 2 candidate"},
-    {"id": "btc-chords", "shipped": "no", "code": "MIT (github.com/jayg996/BTC-ISMIR19)", "weights": "btc_model.pt (12.2 MB) in the MIT repository", "dependencies": "PyTorch (conversion only)", "data": "Isophonics, Robbie Williams, UsPop2002 annotations; audio collected by authors", "status": "SAFE*", "reviewer": null, "scope": "Phase 3 comparison"},
-    {"id": "laion-clap-music", "shipped": "no", "code": "Apache-2.0 / CC0", "weights": "laion/larger_clap_music Apache-2.0 (776 MB fp32)", "dependencies": "transformers Apache-2.0", "data": "LAION-Audio-630k + music; not releasable 'due to copyright reasons'", "status": "SAFE*", "reviewer": null, "scope": "Phase 6 comparison"},
-    {"id": "mir-eval", "shipped": "no", "code": "MIT", "weights": null, "dependencies": null, "data": null, "status": "Cleared", "reviewer": "n/a (CI only)"},
-    {"id": "dataset-nsynth", "shipped": "no", "code": null, "weights": null, "dependencies": null, "data": "CC BY 4.0", "status": "SAFE*", "reviewer": null, "scope": "training/evaluation"},
-    {"id": "dataset-slakh2100", "shipped": "no", "code": null, "weights": null, "dependencies": null, "data": "CC BY 4.0 (Zenodo 4599666)", "status": "SAFE*", "reviewer": null, "scope": "training/evaluation"},
-    {"id": "dataset-guitarset", "shipped": "no", "code": null, "weights": null, "dependencies": null, "data": "CC BY 4.0", "status": "SAFE*", "reviewer": null, "scope": "evaluation"}
-  ]
+ "schema": 1,
+ "note": "Separate records for code, exact weights, runtime dependencies and training/evaluation data. Status: Cleared | SAFE* | Personal only | Rejected | Unverified. Only Cleared may ship in a commercial build. Human review is required for Cleared; this file and its CI check do not establish legal clearance by themselves.",
+ "items": [
+  {
+   "id": "demucs-htdemucs",
+   "shipped": "download",
+   "code": "MIT (github.com/adefossez/demucs)",
+   "weights": "htdemucs (dl.fbaipublicfiles); README: weight licence 'not clear'",
+   "dependencies": "demucs.cpp MIT; Eigen MPL-2.0",
+   "data": "MUSDB18-HQ 'other-nc' (Zenodo 3338373) + 800 internal songs",
+   "status": "Personal only",
+   "reviewer": null
+  },
+  {
+   "id": "demucs-htdemucs_6s",
+   "shipped": "download",
+   "code": "MIT",
+   "weights": "htdemucs_6s; README: CC-NC-BY 'likely' (Meta internal data)",
+   "dependencies": "demucs.cpp MIT; Eigen MPL-2.0",
+   "data": "Meta internal",
+   "status": "Personal only",
+   "reviewer": null
+  },
+  {
+   "id": "generaluser-gs",
+   "shipped": "bundled",
+   "code": null,
+   "weights": "GeneralUser GS SoundFont: music creation private or commercial; use in software projects",
+   "dependencies": null,
+   "data": "Sample origins not fully verified by the author; training use not addressed",
+   "status": "Cleared",
+   "reviewer": "pending owner review",
+   "scope": "playback only"
+  },
+  {
+   "id": "lame-3.100",
+   "shipped": "bundled",
+   "code": "LGPL-2.0",
+   "weights": null,
+   "dependencies": null,
+   "data": null,
+   "status": "Cleared",
+   "reviewer": "pending owner review",
+   "obligations": "LGPL notice; relinkable objects or source offer"
+  },
+  {
+   "id": "apple-coreml-soundanalysis",
+   "shipped": "system",
+   "code": "Apple SDK",
+   "weights": "Apple",
+   "dependencies": null,
+   "data": null,
+   "status": "Cleared",
+   "reviewer": "n/a (platform)"
+  },
+  {
+   "id": "basic-pitch-test-model",
+   "shipped": "no",
+   "code": "Apache-2.0 (github.com/spotify/basic-pitch)",
+   "weights": "icassp_2022 nmp.mlpackage / nmp.tflite / nmp.onnx in the Apache-2.0 repository",
+   "dependencies": "ai-edge-litert, onnxruntime (CI only)",
+   "data": "Per ICASSP 2022 paper (to record)",
+   "status": "SAFE*",
+   "reviewer": null,
+   "scope": "CI test model only (Phase 1); must not ship"
+  },
+  {
+   "id": "beat-this-small",
+   "shipped": "no",
+   "code": "MIT (github.com/CPJKU/beat_this)",
+   "weights": "small0.ckpt (cloud.cp.jku.at, MIT per README), sha256 6074be2c4d490c5f6101fcc374a1ec72ae93456e23bb6019783b849f5dc7d47b; Core ML conversion BeatThisSmall.mlpackage (branch ci/beat-this)",
+   "dependencies": "PyTorch + coremltools (CI conversion only); runtime: Apple Core ML",
+   "data": "16 datasets; some files copyrighted or limited CC (README)",
+   "status": "SAFE*",
+   "reviewer": null,
+   "scope": "Phase 2 evaluation; not shipped or downloaded by the app",
+   "source_commit": "CPJKU/beat_this b95c8ab0c58c2d9fcfd40508ae8dffbc05ac4f5c"
+  },
+  {
+   "id": "btc-chords",
+   "shipped": "no",
+   "code": "MIT (github.com/jayg996/BTC-ISMIR19)",
+   "weights": "btc_model.pt (12.2 MB) in the MIT repository",
+   "dependencies": "PyTorch (conversion only)",
+   "data": "Isophonics, Robbie Williams, UsPop2002 annotations; audio collected by authors",
+   "status": "SAFE*",
+   "reviewer": null,
+   "scope": "Phase 3 comparison"
+  },
+  {
+   "id": "laion-clap-music",
+   "shipped": "no",
+   "code": "Apache-2.0 / CC0",
+   "weights": "laion/larger_clap_music Apache-2.0 (776 MB fp32)",
+   "dependencies": "transformers Apache-2.0",
+   "data": "LAION-Audio-630k + music; not releasable 'due to copyright reasons'",
+   "status": "SAFE*",
+   "reviewer": null,
+   "scope": "Phase 6 comparison"
+  },
+  {
+   "id": "mir-eval",
+   "shipped": "no",
+   "code": "MIT",
+   "weights": null,
+   "dependencies": null,
+   "data": null,
+   "status": "Cleared",
+   "reviewer": "n/a (CI only)"
+  },
+  {
+   "id": "dataset-nsynth",
+   "shipped": "no",
+   "code": null,
+   "weights": null,
+   "dependencies": null,
+   "data": "CC BY 4.0",
+   "status": "SAFE*",
+   "reviewer": null,
+   "scope": "training/evaluation"
+  },
+  {
+   "id": "dataset-slakh2100",
+   "shipped": "no",
+   "code": null,
+   "weights": null,
+   "dependencies": null,
+   "data": "CC BY 4.0 (Zenodo 4599666)",
+   "status": "SAFE*",
+   "reviewer": null,
+   "scope": "training/evaluation"
+  },
+  {
+   "id": "dataset-guitarset",
+   "shipped": "no",
+   "code": null,
+   "weights": null,
+   "dependencies": null,
+   "data": "CC BY 4.0",
+   "status": "SAFE*",
+   "reviewer": null,
+   "scope": "evaluation"
+  }
+ ]
 }
