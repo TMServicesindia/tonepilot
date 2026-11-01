@@ -1,5 +1,7 @@
 # TonePilot — To-Do List
 
+> **Platform rule (owner): this whole strategy and to-do list is for the iPhone/iOS app first.** Every model, tone, benchmark and feature is built, measured and validated on iPhone (Core ML, on-device) before Android. Android parity follows as the second priority.
+
 **Updated:** 1 November 2026, ~20:40 IST (owner's additions A–G and priority order included). Source: `TONEPILOT_ZERO_BUDGET_STRATEGY.md` (governing) and the phase reports.
 
 Status tags:

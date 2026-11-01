@@ -1,5 +1,7 @@
 # TonePilot — Zero-Budget, Indian Film Music Accuracy-First Strategy (consolidated)
 
+> **Platform rule (owner): this whole strategy and to-do list is for the iPhone/iOS app first.** Every model, tone, benchmark and feature is built, measured and validated on iPhone (Core ML, on-device) before Android. Android parity follows as the second priority.
+
 **Date:** 1 November 2026 (IST). **Supersedes** `TONEPILOT_INDIAN_FILM_STRATEGY.md` where they differ
 (that file is kept as history). Source: the owner's final consolidated instruction.
 
