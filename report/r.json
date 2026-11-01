@@ -1,0 +1,32 @@
+{
+ "model": "mn10_as",
+ "params": 4876831,
+ "input_shape": [
+  1,
+  1,
+  128,
+  100
+ ],
+ "float32_cpuOnly": {
+  "max_abs_diff_probs": 2.980232238769531e-07,
+  "max_abs_diff_embedding": 1.5497207641601562e-06,
+  "ms_per_1s_window": 8.39
+ },
+ "float32_all": {
+  "max_abs_diff_probs": 2.980232238769531e-07,
+  "max_abs_diff_embedding": 1.5497207641601562e-06,
+  "ms_per_1s_window": 7.15
+ },
+ "float32_size_mb": 19.57,
+ "float16_cpuOnly": {
+  "max_abs_diff_probs": 0.0004023909568786621,
+  "max_abs_diff_embedding": 0.01310110092163086,
+  "ms_per_1s_window": 13.68
+ },
+ "float16_all": {
+  "max_abs_diff_probs": 0.0004023909568786621,
+  "max_abs_diff_embedding": 0.01310110092163086,
+  "ms_per_1s_window": 4.48
+ },
+ "float16_size_mb": 9.86
+}
