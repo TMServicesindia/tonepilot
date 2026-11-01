@@ -163,6 +163,29 @@ Per feature, the report shows:
 Metrics are as listed in the owner's §9. Machine-readable results live in the CI branches
 (`ci/*-bench`, `ci/*-results`) and render into one Markdown report per run.
 
+## 6b. Owner's additions (1 Nov, ~20:30 IST)
+
+Included in `docs/TODO.md`:
+- **A** large-scale growing song catalogue, keeping audio and metadata apart;
+- **B** formal annotation workflow with AI pre-annotation and prioritised verification;
+- **C** Indian instrument coverage tracking;
+- **D** Instrument Maker chain test in full arrangements and on the CT-X870IN;
+- **E** per-language real-world dashboard;
+- **F** free-compute management;
+- **G** legal dependency for film-song evaluation.
+
+**Execution priority:**
+1. Dataset and ground truth.
+2. Instrument Analyser.
+3. Instrument Maker.
+4. Song intelligence.
+5. Accompaniment and Live Song Arpeggio.
+6. Android parity and release.
+
+Regression, stability and security work runs in parallel throughout.
+
+**Next milestone:** a reliable instrument benchmark on actual instruments in Tamil, Telugu and Hindi music.
+
 ## 7. Phased plan (zero budget)
 
 | # | Phase | Free resources | Depends on | Status |
