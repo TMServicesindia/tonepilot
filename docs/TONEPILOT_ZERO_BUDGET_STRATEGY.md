@@ -198,6 +198,46 @@ Regression, stability and security work runs in parallel throughout.
 - **Candidate status:** EfficientAT + head leads (exact, layered, size, speed); PANNs + head is slightly higher on family. Not a production selection. CLAP stays optional.
 - **Lesson from Gate 1 v1:** DEV must come from a different source than TRAIN, or calibration fails to transfer. This will matter even more on real film audio.
 
+## 6d. Gate 1 and Gate 2 decisions (owner, 2 Nov ~00:30 IST)
+
+**Gate 1: instrument recognition**
+- **Official candidate:** plain EfficientAT + TonePilot head (C), chosen under the existing DEV selection rule.
+- **C-agree is not adopted.** It improved synthetic 1 s clips but did worse on NSynth-test (real notes).
+- The selection rule is never changed after seeing TEST, and thresholds are never tuned against TEST.
+- **No more threshold-only variants** unless new DEV data justifies them.
+  - Gate 1 has shown a **domain-generalisation problem**, not just a confidence-threshold one.
+  - The next real improvement must come from **licensed real recordings**: first Indian instruments, then acoustic-versus-imitation pairs.
+- The v2, v3, v4 and v4b reports are kept as they are.
+- Synthetic proxy results and real recorded-instrument results are always labelled separately.
+- Every condition is reported with coverage, wrong-family rate, selective accuracy and unknown rate.
+- **The 5% wrong-family target is not yet met on every condition.** The dashboard must keep showing that.
+
+**Launch gate**
+- The gate is the median of five launches; the 4 s limit is unchanged.
+- Every individual timing is recorded, with median, mean and p90.
+- Runner characteristics and the build version are recorded with each measurement.
+- The old average-of-3 view is kept for comparison.
+- A control build (v0.3.71) is measured on the same runner class.
+- No outlier is hidden or removed without an explanation.
+- Nothing is published until the gate passes and the publishing permission is fixed.
+
+**Gate 2**
+- Mac CI numbers are never presented as iPhone numbers.
+- The 28.3 ms Core ML contract time is one test-model call, not a full-song iPhone time.
+- The physical-iPhone run (TonePilot Lab) is still pending.
+- Shadow mode is developer-only and off by default.
+  - The production recognizer stays authoritative.
+  - Experimental predictions never alter user-visible output or saved arrangements.
+
+**Still not approved:** replacing the production recognizer, turning experimental recognition on for users, and Android implementation.
+
+**Result labels used everywhere:**
+- Measured on Mac CI.
+- Measured on physical iPhone.
+- Estimated.
+- Simulated (iOS Simulator or synthetic audio).
+- Pending.
+
 ## 7. Phased plan (zero budget)
 
 | # | Phase | Free resources | Depends on | Status |

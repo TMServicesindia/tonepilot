@@ -145,6 +145,45 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - **Gates (1 Nov evening):** Gate 1 v2 (NSynth cross-domain DEV): EfficientAT+head ≤5% wrong family on TEST at 41% coverage (94% selective); fails on 1 s clips; poor on NSynth-test (GM-only training doesn't transfer) → v3 adds streamed NSynth-train + short DEV (run 41325343802). Gate 2 (macos-26): fp16 9.9 MB 99.5% family agreement, int8 97.2%, 6-bit rejected; Swift front-end 2.2e-5, Accelerate 0.12 s/4-min; TonePilot Lab (Lab/, separate app) built (run 41326170801). Mac runners: macos-15 arm64 capacity exhausted, macos-14 retiring → use macos-26 (Xcode 26) for research jobs.
 - Instrument proxy benchmark pipeline: `.github/workflows/instrument-bench.yml` (render → variants → YAMNet/EfficientAT/PANNs/CLAP + Apple → evaluate A/C) → branch ci/instrument-bench. First run 41312723399.
 
+## 6h. Gate 1 / Gate 2 decisions (owner, 2 Nov ~00:30 IST) — see strategy §6d
+
+**Gate 1**
+- Plain EfficientAT + head C stays the official candidate under the DEV rule; C-agree is not adopted (worse on NSynth).
+- No more threshold-only variants. Next lever: licensed real recordings (Indian instruments, acoustic vs imitation pairs).
+- The 5% wrong-family target is not met on every condition, and the dashboard says so.
+
+**Launch gate**
+- Median of five launches, limit 4 s.
+- Every timing is recorded with mean and p90, plus the old avg-of-3 view; runner info and history go to `ci/launch-history`.
+- Control comparison: `launch-control.yml` (v0.3.71 vs main, same runner class).
+- The peak-memory gate never matched Xcode's metric name ("Memory Peak Physical (tonepilot), kB"), so the 1.5 GB check never ran. Fixed.
+
+**Gate 2**
+- Core ML conversion, numerics and Mac timings are measured.
+- Every iPhone number is pending (TonePilot Lab rebuilt: run 41340171940, with simulator/physical labels, peak footprint and 3 repeats).
+
+**Shadow mode** (developer-only, off by default)
+- Enabled only by files in `Documents/Developer`; the production recognizer stays authoritative.
+- Writes only `Documents/Developer/shadow/*.json`.
+- Code: `App/Sources/Services/DeveloperShadowMode.swift` + core `Instruments/ShadowInstruments.swift`.
+
+**Not approved:** replacing production recognition, enabling it for users, and Android implementation.
+**No publishing** until the gate passes and the 403 publishing permission is fixed.
+
+## 6i. Competitor research, Phase A (owner, 2 Nov ~01:00 IST)
+
+Research only; no app code changed for it.
+- Three documents in `docs/research/`: competitor research, gap analysis, roadmap proposal.
+- Evidence came from web search; direct fetches of the vendor sites were blocked by the session network. No app was tested hands-on.
+
+Recommendations awaiting the owner:
+- Position TonePilot as **song → arrangement → keyboard performance**.
+- Accompaniment approach **E (hybrid)**: keep the separated backing and generate only the left-hand song pattern.
+- First milestone **M1, "Play this song on my Casio"**.
+- Don't build: a separator, a DAW/note editor, sheet music, text-to-music, or generic grooves.
+
+**Wait for explicit approval before implementing any of it.**
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
@@ -153,8 +192,8 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - **Launch gate on shared CI simulators** (re-run 1 Nov 23:32 IST, run 41334484025):
   - Launch averaged 4.34 s against the 4 s limit (three runs: 4.23 / 5.29 / 3.50 s, 17% spread). Every other check passed.
   - The launch path is unchanged since v0.3.71, which launched in 3.47 s. The control build v0.3.71 took 9.28 s on an earlier slow runner, so this is runner noise.
-  - Options for the owner: (a) re-run again; (b) measure the median of 5 launches instead of the average of 3 (same 4 s limit); (c) one-off `[publish-anyway]`.
-  - The gate is left unchanged until the owner decides.
+  - Options offered: (a) re-run again; (b) median of 5 launches (same 4 s limit); (c) one-off `[publish-anyway]`.
+  - **Owner chose (b), 2 Nov, with safeguards (§6h). Implemented.**
   - The publish 403 (Settings → Actions → Workflow permissions → Read and write) is still unresolved; publishing has not been reached since.
 
 ## 8. Release history (latest first)

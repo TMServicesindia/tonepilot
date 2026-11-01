@@ -35,6 +35,20 @@ Rules that apply to every item:
 **In parallel, always:** critical bug fixes, stability, security, regression (section 1).
 **Next milestone:** a reliable instrument benchmark on actual instruments in Tamil, Telugu and Hindi music.
 
+## R. Product and competitor research (Phase A, 2 Nov) — **proposals awaiting owner review, not approved**
+
+Documents:
+- [`research/TONEPILOT_COMPETITOR_RESEARCH.md`](research/TONEPILOT_COMPETITOR_RESEARCH.md)
+- [`research/TONEPILOT_PRODUCT_GAP_ANALYSIS.md`](research/TONEPILOT_PRODUCT_GAP_ANALYSIS.md)
+- [`research/TONEPILOT_PRODUCT_ROADMAP.md`](research/TONEPILOT_PRODUCT_ROADMAP.md)
+
+| # | Item | Status |
+|---|---|---|
+| R.1 | Findings, from public information only (web-search evidence; direct fetches blocked; no hands-on testing):<br>• analysis (stems, chords, BPM) is commodity;<br>• the documented white space is a song-specific left-hand pattern + matched tones on a Casio CT-X;<br>• Casio's own app supports CT-S/LK-S only;<br>• Yamaha Chord Tracker already does phone-to-keyboard (not our innovation) | ✅ researched |
+| R.2 | Proposed M1, "Play this song on my Casio": workspace lanes → tone per section → melody + Live Song Arpeggio over the separated backing (accompaniment approach E, hybrid) | 👤 owner review |
+| R.3 | Owner hands-on competitor test with lawful audio (protocol in the research doc §7) | 👤 |
+| R.4 | Contradictions to resolve:<br>• `CAPABILITIES.md` is stale (118 vs 224 tests);<br>• "instrument recognition secondary" (memory §1) vs "main differentiation" (new brief) | 👤 |
+
 ## 0. Owner actions (blocking)
 
 | # | Item | Status |
@@ -109,9 +123,11 @@ Rules that apply to every item:
 | 3.8 | Five-stage analyser prototype (content → family → instrument → time aggregation → tone mapping), Core ML, shadow mode | ⏳ (approval: 👤) |
 | G2.1 | **Gate 2 Core ML** (run 41323484719, macos-26): fp16 9.9 MB, 99.5% family-decision agreement, ~4 ms/window (Mac); int8 5.1 MB 97.2%; 6-bit rejected (87.2%). `docs/benchmark/COREML_DEPLOYMENT_REPORT.md` | 🧪 Mac measured |
 | G2.2 | Swift EfficientAT mel front-end: **matches PyTorch (2.2e-5)** on Linux and macOS; **Accelerate vDSP path: 0.12 s per 4-min song** (Mac runner; portable path 2.5 s on Linux) | ✅ tested (Mac/Linux); iPhone via Lab |
-| G2.3 | **TonePilot Lab**: separate iPhone benchmark app (main app untouched); device latency per compute unit, full-song time, footprint, thermal, battery, on-device numerics → JSON report. **Built: 32 MB unsigned IPA** (run 41326170801, artifact `TonePilotLab-ipa`, 14 days) | 🔨 built; not yet run on any device |
+| G2.3 | **TonePilot Lab**: separate iPhone benchmark app (main app untouched). Measures:<br>• cold and warm latency per compute unit (median, p90, p95);<br>• full-song time for 1/3/4/5 min, 3 repeats each with median and p90 on a full run;<br>• OS-ledger peak footprint, thermal state, battery before and after;<br>• on-device numerics → JSON report.<br>Reports from a simulator are labelled SIMULATED. Rebuilt 2 Nov: run 41340171940, artifact `TonePilotLab-ipa` | 🔨 built; **physical-iPhone measurements pending** |
 | G2.4 | **Physical iPhone run** of TonePilot Lab (sideload, press Full run, share the JSON) | 👤 (one session) |
-| G2.5 | Developer-only shadow mode in the main app (off by default; production recognizer stays authoritative) | ⏳ after G2.4 |
+| G2.5 | **Developer-only shadow mode** in the main app:<br>• off by default; runs only when `shadow-enabled`, `efficientat_head.json` and the fp16 model are placed in Documents/Developer;<br>• runs after the production result is final and writes only `Documents/Developer/shadow/*.json`;<br>• songs, arrangements and the UI are unchanged.<br>Core comparison code: `Instruments/ShadowInstruments.swift`, 6 tests. Speed budget: 2.42 s per 4-min song for front-end + head (Linux, no Core ML). The head JSON is exported by the calibration workflow | 🔨 implemented; full build pending; on-device validation pending (G2.4) |
+| G2.6 | **Launch gate: median of 5** (limit 4 s; every timing, mean and p90, runner info, history on `ci/launch-history`). Also fixes the peak-memory gate, which never matched Xcode's metric name. Control comparison workflow `launch-control.yml` (v0.3.71 vs main, same runner class) | 🔨 implemented; awaiting runs |
+| 3.4g | **Gate 1 decision (owner, 2 Nov):**<br>• plain C stays official;<br>• C-agree not adopted;<br>• no more threshold-only variants without new DEV data;<br>• next lever is licensed real recordings (Indian instruments, acoustic vs imitation pairs);<br>• 5% wrong-family target **not yet met on all conditions** | ✅ decided |
 | 3.9 | Real-song evaluation per language with verified annotations | 📝 |
 | 3.10a | **Wikimedia Commons survey** (metadata only, branch `research/indian-audio`): eligible (CC0/PD/CC BY) candidates: tabla 21, veena 28, viola 17, dholak 10, mridangam 1, thavil 1, nadaswaram 1; **none** for ghatam, dhol, bansuri, shehnai, sitar, santoor, tanpura, sarangi, harmonium. Search hits are UNVERIFIED (some are not the instrument; some licences are uploader claims on old recordings) | 🧪 survey done; listening verification 👤/⏳ |
 | 3.10 | **Indian instrument coverage tracker** (dataset clips and recognition accuracy, real vs synthetic) for bansuri, nadaswaram, shehnai, veena, sitar, santoor, tabla, mridangam, dholak, ghatam, kanjira, thavil. Today: real licensed clips = **0 for all**; synthetic imitations exist only for bansuri, nadaswaram, shehnai (GM), veena, sitar (GM), santoor | ⏳ |

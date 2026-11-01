@@ -9,6 +9,25 @@ production selection. Machine-readable results: `COREML_DEPLOYMENT_RESULTS.json`
 | **Estimated** | Derived from Mac measurements (full-song = windows × per-window time) |
 | **Pending (iPhone)** | Needs one TonePilot Lab run on a physical iPhone |
 
+## Gate 2 status (2 Nov 2026)
+
+| Requirement | Status | Label |
+|---|---|---|
+| Core ML conversion (fp32, fp16, int8; 6-bit rejected) | Passed | Measured on Mac CI |
+| Numerical consistency (max/mean/RMSE, cosine, top-k, family and decision agreement) | Passed (fp16 99.5% family-decision agreement) | Measured on Mac CI |
+| Mac inference performance (about 4 ms per 1 s window, fp16) | Measured | Measured on Mac CI (not iPhone) |
+| Inference contract in the full build (Basic Pitch test model: all units 28.3 ms, CPU only 44.8 ms, max error 9.5e-7) | Passed | Measured on Mac CI. One test-model call, **not** a full-song or iPhone time |
+| Swift mel front-end parity (2.2e-5 vs PyTorch) and speed (0.12 s per 4-min song, Accelerate) | Passed | Measured on Mac CI / Linux |
+| Shadow-mode own work (front-end + head, no Core ML): 2.42 s per 4-min song | Measured | Measured on Linux CI |
+| Actual iPhone latency (cold/warm, median/p90/p95) | **Pending** | Physical iPhone run of TonePilot Lab (G2.4) |
+| Full-song analysis time on a physical iPhone (1/3/4/5 min) | **Pending** | same |
+| Physical-device peak memory | **Pending** | same |
+| Battery behaviour | **Pending** | same (1–5% granularity; precise energy isn't exposed to apps) |
+| Thermal behaviour | **Pending** | same |
+| Shadow-mode validation on real songs | **Pending** | Developer-only; needs G2.4 and the head/model files on the device |
+
+No physical iPhone is connected to this project's CI. The pending rows stay pending until the owner runs TonePilot Lab and shares the JSON. Nothing in this report is an estimate of iPhone performance.
+
 ## Variants (measured, Mac CI; ~200 real benchmark windows: clean, reverb, compressed, layered, silence, −40 dB)
 
 | Variant | Size | Warm median (ms per 1 s window) | Max abs diff (probs) | Embedding cosine (min) | Top-1 agreement | Family-decision agreement | Verdict |
