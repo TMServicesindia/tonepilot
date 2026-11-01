@@ -116,6 +116,14 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - Owner's dataset brief → `docs/benchmark/tamil-cinema/` (SOURCE_SURVEY.md, catalogue.json with 20 songs and train/dev/test by song identity, README). CI survey `dataset-survey.yml` → branch research/dataset-survey (205 HF datasets, 123 Zenodo records): **no lawful Tamil cinema audio anywhere**. Saraga Audiovisual (CC BY 4.0, classical) is a candidate for rhythm-cycle acceptance after licence text check. Route: owner Casio recordings (preferred), written permission, or purchased copies for private evaluation only.
 - Incident: `git ls-tree -l` on a blob-less clone fetched ~108 MB (spectrogram PNGs) from AMAAI-Lab repo; stopped, names only read, deleted unopened.
 
+
+## 6e. Instrument recognition project (owner: "Priority: Highest", 1 Nov ~19:00 IST)
+
+- Deliverables 1–7 in **`docs/TONEPILOT_INSTRUMENT_RECOGNITION_PLAN.md`** (audit, candidate comparison, dataset/licensing plan, baseline report, fine-tuning feasibility, hybrid C proposal, size/cost). **No implementation until owner approval.**
+- Audit facts: recognition = Apple SNClassifySoundRequest v1 on stems (iOS only; Android has none) → 13 families per section, no exact/unknown; tone matching = ToneMatcher (analysis-by-synthesis). The 4/12·7/12·2/12·5/12 numbers are *tone matching* on rendered GM songs; 14/19 is Apple family recognition on clean GM phrases. Nothing measured on real film music.
+- Candidates: EfficientAT (MIT repo) best size/quality for hybrid; YAMNet (Apache code; weights licence to confirm); LAION-CLAP music (Apache, large); PANNs (CC BY 4.0 weights); MS-CLAP (comparison).
+- Phase 4 paused after its benchmark baseline (false arpeggios 7/7).
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
