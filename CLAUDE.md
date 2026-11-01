@@ -9,7 +9,8 @@ A change is not done until all of these hold:
 1. **Speed & crash gate passes** (`.github/workflows/ios-build.yml`, step "Speed & crash tests"):
    the app is driven through every tab and Song Studio page on an iPhone simulator
    (`App/UITests/TonePilotUITests.swift`, demo song from `App/Sources/Services/UITestSeed.swift`).
-   A crash, a freeze (a screen not responding within its limit), launch > 4 s or peak memory
+   A crash, a freeze (a screen not responding within its limit), a launch median > 4 s (five launches,
+   every timing reported with mean and p90; `.github/scripts/launch_gate.py`) or peak memory
    > 1.5 GB fails the build, and nothing is published.
 2. **Speed budgets pass** (`Packages/TonePilotCore/Tests/TonePilotCoreTests/SpeedBudgetTests.swift`,
    run in release): engine < 25% of real time, pattern learning < 20 s per 4-minute song,

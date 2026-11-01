@@ -1,0 +1,73 @@
+# Launch-time comparison on the same runner class: a control build (default v0.3.71, the last build that
+# passed the launch gate, 3.47 s) and current main, each launched five times on an iPhone simulator.
+# Measurement only: it publishes nothing and never changes the gate. Every timing is kept (no outliers removed).
+name: Launch control comparison
+
+on:
+  workflow_dispatch:
+    inputs:
+      control_ref:
+        description: "Control build (tag or commit)"
+        default: "v0.3.71"
+      runner:
+        description: "Runner class (same as the full build by default)"
+        default: "macos-15"
+
+permissions:
+  contents: read
+
+jobs:
+  launch:
+    strategy:
+      fail-fast: false
+      matrix:
+        which: [control, main]
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: tools        # gate script from main
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.which == 'control' && inputs.control_ref || github.sha }}
+          path: app
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+
+      - name: Sounds and native sources (as the full build)
+        working-directory: app
+        run: |
+          curl -fsSL -o App/Resources/SoundFonts/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+          [ -x Native/fetch-demucs.sh ] && Native/fetch-demucs.sh || true
+          [ -x Native/fetch-lame.sh ] && Native/fetch-lame.sh || true
+          mkdir -p App/Resources/Models
+
+      - name: Five-launch test (same as the full build)
+        working-directory: app
+        run: |
+          # The control's own launch test may use 3 iterations; use 5 for both so the numbers are comparable.
+          sed -i '' -E 's/(XCTApplicationLaunchMetric\(\)\], options: \{ let o = XCTMeasureOptions\(\); o.iterationCount = )[0-9]+/\15/' App/UITests/TonePilotUITests.swift
+          grep -n "iterationCount" App/UITests/TonePilotUITests.swift | head -3
+          brew install xcodegen >/dev/null && xcodegen generate
+          DEV=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)['devices']
+          phones = [x for k, v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPhone')]
+          pick = [x for x in phones if x['name'] in ('iPhone 16', 'iPhone 15')] or phones
+          print(pick[0]['udid'])")
+          xcodebuild test -project TonePilot.xcodeproj -scheme TonePilot -destination "id=$DEV" -derivedDataPath build-sim \
+            -only-testing:TonePilotUITests/TonePilotUITests/testLaunchIsQuick > uitest.log 2>&1 || echo "::warning title=${{ matrix.which }}::test run exited non-zero"
+          grep -E "Test Case .*(passed|failed)|measured \[" uitest.log | head -5
+          TP_SIMULATOR="$(xcrun simctl list devices -j | python3 -c "import json,sys;d=json.load(sys.stdin)['devices'];print(next(x['name']+' ('+k.split('.')[-1]+')' for k,v in d.items() for x in v if x['udid']=='$DEV'))" 2>/dev/null)" \
+            TP_APP_VERSION="${{ matrix.which == 'control' && inputs.control_ref || 'main' }}" \
+            python3 ../tools/.github/scripts/launch_gate.py uitest.log launch-${{ matrix.which }}.json ${{ matrix.which }} --no-gate
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: launch-${{ matrix.which }}
+          path: |
+            app/launch-${{ matrix.which }}.json
+            app/uitest.log

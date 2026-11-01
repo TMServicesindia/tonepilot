@@ -36,7 +36,7 @@ final class TonePilotUITests: XCTestCase {
     func page(_ id: String) { tap(element("page.\(id)"), "Song Studio page \(id)") }
 
     func testLaunchIsQuick() {
-        measure(metrics: [XCTApplicationLaunchMetric()], options: { let o = XCTMeasureOptions(); o.iterationCount = 3; return o }()) {
+        measure(metrics: [XCTApplicationLaunchMetric()], options: { let o = XCTMeasureOptions(); o.iterationCount = 5; return o }()) {   // gate: median of 5 (owner, 1 Nov)
             app.launch()
         }
     }

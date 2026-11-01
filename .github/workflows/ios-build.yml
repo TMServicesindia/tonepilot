@@ -177,22 +177,23 @@ jobs:
           if [ $code != 0 ] && ! grep -qE "error:" uitest.log; then
             grep -vE "^\s*$|^    (cd|export|builtin|/Applications)" uitest.log | tail -40 | while IFS= read -r l; do echo "::error title=Speed & crash tests (log tail)::$l"; done
           fi
-          # Budgets on the simulator: launch under 4 s, peak memory under 1.5 GB.
+          # Budgets on the simulator: launch median of 5 under 4 s (all five timings reported), peak memory under 1.5 GB.
           budgets=0
-          python3 - <<'PY' || budgets=$?
-          import re, sys
-          log = open("uitest.log").read()
-          def avg(name):
-              m = re.findall(r"measured \[" + re.escape(name) + r"\] average: ([0-9.]+)", log)
-              return max(map(float, m)) if m else None
-          bad = []
-          launch = avg("Duration (AppLaunch), s")
-          if launch is not None and launch > 4: bad.append(f"launch takes {launch:.2f} s (budget 4 s)")
-          peak = avg("Memory Peak Physical, kB")
-          if peak is not None and peak > 1.5e6: bad.append(f"peak memory {peak/1024:.0f} MB (budget 1500 MB)")
-          for b in bad: print(f"::error title=Speed budget::{b}")
-          sys.exit(1 if bad else 0)
+          TP_SIMULATOR="$(xcrun simctl list devices -j | python3 -c "import json,sys;d=json.load(sys.stdin)['devices'];print(next(x['name']+' ('+k.split('.')[-1]+')' for k,v in d.items() for x in v if x['udid']=='$DEV'))" 2>/dev/null)" \
+            TP_APP_VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' build-sim/Build/Products/*-iphonesimulator/TonePilot.app/Info.plist 2>/dev/null | head -1)" \
+            python3 .github/scripts/launch_gate.py uitest.log launch-gate.json build || budgets=$?
+          # Compare with the previous recorded build (history kept on branch ci/launch-history; never pruned).
+          if git fetch -q origin ci/launch-history 2>/dev/null; then
+            git show FETCH_HEAD:history.jsonl > prev-history.jsonl 2>/dev/null || true
+            python3 - <<'PY' || true
+          import json
+          cur = json.load(open("launch-gate.json")); rows = [json.loads(l) for l in open("prev-history.jsonl") if l.strip()]
+          prev = next((r for r in reversed(rows) if r.get("label") == "build" and r.get("launch")), None)
+          if prev and cur.get("launch"):
+              c, p = cur["launch"], prev["launch"]
+              print(f"::notice title=Launch vs previous build::median {c['median_s']:.2f} s vs {p['median_s']:.2f} s (run {prev.get('run_id')}, {prev['runner'].get('image_version')}, {prev['runner'].get('cpu')})")
           PY
+          fi
           [ $code = 0 ] && [ $budgets = 0 ]
 
       - uses: actions/upload-artifact@v4
@@ -201,8 +202,21 @@ jobs:
           name: speed-and-crash-tests
           path: |
             uitest.log
+            launch-gate.json
             UITests.xcresult
           if-no-files-found: ignore
+
+      # Every launch measurement is appended to ci/launch-history (pass or fail), so trends and slow runners stay visible.
+      - name: Record launch history
+        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          [ -f launch-gate.json ] || exit 0
+          git fetch -q origin ci/launch-history 2>/dev/null && git show FETCH_HEAD:history.jsonl > history.jsonl 2>/dev/null || : > history.jsonl
+          python3 -c "import json;print(json.dumps(json.load(open('launch-gate.json'))))" >> history.jsonl
+          D=$(mktemp -d); cp history.jsonl "$D/"; cd "$D"; git init -q; git checkout -q -b ci/launch-history
+          git config user.name github-actions; git config user.email github-actions@users.noreply.github.com
+          git add history.jsonl; git commit -qm "Launch history: run ${GITHUB_RUN_ID}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci/launch-history || echo "::warning title=Launch history::could not push (permissions)"
 
       - name: Report errors as annotations
         if: failure()
