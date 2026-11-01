@@ -1,0 +1,63 @@
+{
+ "onnx_inputs": [
+  [
+   "serving_default_input_2:0",
+   [
+    "unk__749",
+    43844,
+    1
+   ]
+  ]
+ ],
+ "onnx_outputs": {
+  "StatefulPartitionedCall:0": [
+   1,
+   172,
+   264
+  ],
+  "StatefulPartitionedCall:1": [
+   1,
+   172,
+   88
+  ],
+  "StatefulPartitionedCall:2": [
+   1,
+   172,
+   88
+  ]
+ },
+ "onnx_vs_tflite_max_abs_diff": {
+  "contour": 5.364418029785156e-07,
+  "note": 4.76837158203125e-07,
+  "onset": 5.364418029785156e-07
+ },
+ "tflite_outputs": {
+  "contour": [
+   1,
+   172,
+   264
+  ],
+  "note": [
+   1,
+   172,
+   88
+  ],
+  "onset": [
+   1,
+   172,
+   88
+  ]
+ },
+ "tflite_signatures": {
+  "serving_default": {
+   "inputs": [
+    "input_2"
+   ],
+   "outputs": [
+    "contour",
+    "note",
+    "onset"
+   ]
+  }
+ }
+}

@@ -1,6 +1,7 @@
 import Foundation
 import XCTest
 @testable import TonePilotCore
+@testable import TonePilotBridge
 
 /// Phase 1 regression fixtures: the import → analyse → arrange output of the current code for
 /// three deterministic songs, stored in normalised form (UUIDs replaced in a fixed order, dates
@@ -77,67 +78,12 @@ enum PipelineFixtures {
     /// The tone loader the iOS app passes (synth patches only here; no SoundFont in tests).
     static let synthLoader: (InstrumentPatch) -> LoadedInstrument? = { p in p.synth.map { LoadedInstrument(name: p.name, synth: $0) } }
 
-    // MARK: Normalisation
+    // MARK: Normalisation (shared with Android via TonePilotBridge.FixtureCheck)
 
-    /// UUIDs in a fixed order: sections by time, arrangements in array order, their layers, then
-    /// melody notes; anything else becomes "uuid:?".
-    static func uuidMap(_ song: Song) -> [String: String] {
-        var map: [String: String] = [:]
-        func add(_ id: UUID?) { if let id, map[id.uuidString] == nil { map[id.uuidString] = "uuid:\(map.count)" } }
-        add(song.id)
-        song.orderedSections.forEach { add($0.id) }
-        song.arrangements.forEach { a in add(a.id); add(a.derivedFrom); a.layers.forEach { add($0.id) } }
-        song.melody?.notes.forEach { add($0.id) }
-        return map
-    }
-
-    static let dropKeys: Set<String> = ["createdAt", "updatedAt", "analysedAt", "lastOpened"]
-
-    static func normalise(_ song: Song) throws -> Any {
-        let enc = JSONEncoder()
-        enc.outputFormatting = [.sortedKeys]
-        let json = try JSONSerialization.jsonObject(with: enc.encode(song))
-        let map = uuidMap(song)
-        let uuidRe = try NSRegularExpression(pattern: "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$")
-        func isUUID(_ s: String) -> Bool { uuidRe.firstMatch(in: s, range: NSRange(s.startIndex..., in: s)) != nil }
-        func fix(_ v: Any) -> Any {
-            if let d = v as? [String: Any] {
-                var out: [String: Any] = [:]
-                for (k, x) in d where !dropKeys.contains(k) { out[isUUID(k) ? (map[k.uppercased()] ?? "uuid:?") : k] = fix(x) }
-                return out
-            }
-            if let a = v as? [Any] { return a.map(fix) }
-            if let s = v as? String, isUUID(s) { return map[s.uppercased()] ?? "uuid:?" }
-            return v
-        }
-        return fix(json)
-    }
-
-    static func data(_ v: Any) throws -> Data { try JSONSerialization.data(withJSONObject: v, options: [.sortedKeys, .prettyPrinted]) }
-
-    /// Structural comparison with a relative numeric tolerance; returns the first difference path.
-    static func diff(_ a: Any, _ b: Any, path: String = "$", tol: Double = 1e-3) -> String? {
-        switch (a, b) {
-        case let (x as [String: Any], y as [String: Any]):
-            let keys = Set(x.keys).union(y.keys).sorted()
-            for k in keys {
-                guard let xv = x[k], let yv = y[k] else { return "\(path).\(k): present in only one" }
-                if let d = diff(xv, yv, path: "\(path).\(k)", tol: tol) { return d }
-            }
-            return nil
-        case let (x as [Any], y as [Any]):
-            guard x.count == y.count else { return "\(path): count \(x.count) vs \(y.count)" }
-            for i in x.indices { if let d = diff(x[i], y[i], path: "\(path)[\(i)]", tol: tol) { return d } }
-            return nil
-        case let (x as NSNumber, y as NSNumber):
-            let dx = x.doubleValue, dy = y.doubleValue
-            return abs(dx - dy) <= tol * max(1, abs(dx), abs(dy)) ? nil : "\(path): \(dx) vs \(dy)"
-        case let (x as String, y as String):
-            return x == y ? nil : "\(path): \"\(x)\" vs \"\(y)\""
-        default:
-            return (a is NSNull && b is NSNull) ? nil : "\(path): \(type(of: a)) vs \(type(of: b))"
-        }
-    }
+    static func uuidMap(_ song: Song) -> [String: String] { FixtureCheck.uuidMap(song) }
+    static func normalise(_ song: Song) throws -> Any { try FixtureCheck.normalise(song) }
+    static func data(_ v: Any) throws -> Data { try FixtureCheck.data(v) }
+    static func diff(_ a: Any, _ b: Any, path: String = "$", tol: Double = 1e-3) -> String? { FixtureCheck.diff(a, b, path: path, tol: tol) }
 
     // MARK: The current (legacy) flow, exactly as AppModel/AppCore run it today
 

@@ -1,0 +1,41 @@
+{
+ "backendNames": {
+  "coreml": {
+   "audio": "input_2",
+   "contour": "Identity",
+   "note": "Identity_1",
+   "onset": "Identity_2"
+  },
+  "litert": {
+   "audio": "input_2",
+   "contour": "contour",
+   "note": "note",
+   "onset": "onset"
+  }
+ },
+ "inputs": {
+  "audio": [
+   1,
+   43844,
+   1
+  ]
+ },
+ "name": "basic_pitch_test",
+ "outputs": {
+  "contour": [
+   1,
+   172,
+   264
+  ],
+  "note": [
+   1,
+   172,
+   88
+  ],
+  "onset": [
+   1,
+   172,
+   88
+  ]
+ }
+}
