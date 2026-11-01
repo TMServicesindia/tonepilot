@@ -96,7 +96,10 @@ Reference outputs: official `nmp.tflite` (LiteRT); ONNX cross-check max |diff| 5
 | Build | Result |
 |---|---|
 | Core tests, Linux (Docker swift:6.0-noble, release) | **195 tests, 0 failures, 8 skipped** (benchmarks without SoundFont, live server) |
-| iPhone full build (`ios-build.yml`) | Run [41291859865](https://github.com/TMServicesindia/tonepilot/actions/runs/41291859865): **every test and gate passed** (macOS core tests 195/0 failures, MP3 export, instrument check 14/19, Core ML contract, licence gate, Indian-set check, iPhone build, speed & crash test 843 s). **Publishing the release failed** with GitHub 403 "Resource not accessible by integration" (the build token was refused permission to create release v0.3.72; earlier builds today published normally). Rerun requested; see §8 |
+| iPhone full build (`ios-build.yml`), attempt 1 (a4ab124) | All tests and gates **passed** (launch 3.29 s, peak 157 MB, stress 843 s); **publish failed**: GitHub 403 "Resource not accessible by integration" |
+| Same build, attempt 2 | **FAILED speed gate: launch 4.55 s** (4.94 / 4.55 / 4.16; budget 4 s); everything else passed |
+| Full build b0eb8ae (Phase 1 + Phase 2 code, not wired into the app) | **FAILED speed gate: launch 4.93 s** (6.24 / 4.57 / 3.97); Core ML contract, tests and stress test (820 s) passed |
+| Control: v0.3.71 code (before Phase 1) on the same runners | Run [41299499585](https://github.com/TMServicesindia/tonepilot/actions/runs/41299499585): **launch 9.28 s** (13.09 / 12.00 / 2.74), failed the same gate. This is the code that launched in 3.47 s this morning, so today's simulator runners are slow. **Phase 1 did not slow the app** (its only start-up change is one settings read). Gate not weakened; the owner decides (§8) |
 | Android build (`android-build.yml`) | Run [41291859834](https://github.com/TMServicesindia/tonepilot/actions/runs/41291859834): **success** |
 
 Speed budgets (Linux release): engine 4.3% of real time; supersaw 5.5%; pattern learning 4.98 s per
@@ -130,9 +133,10 @@ Nightly runs (21:17 UTC = 02:47 IST) keep checking reproducibility.
 3. **All baselines are synthetic** (GeneralUser GS renders); they say nothing about real film audio.
 4. **Demucs weights are Personal only:** a commercial build fails the licence gate today.
 5. Core ML GPU/Neural Engine numbers may use float16; only the CPU path is gated.
-6. **Release publish 403** on run 41291859865 (see §6). If the rerun fails the same way, the likely cause is the repository's Actions setting "Workflow permissions" (Settings → Actions → General); only the owner can check it.
-7. The legacy pipeline flag must be removed in a later phase once the owner is satisfied.
-8. The licence gate enforces recorded statuses; it is not legal advice.
+6. **Launch gate failing on CI runners today** (4.55 s, 4.93 s; the pre-Phase-1 control 9.28 s). No new release has been published since v0.3.71. Options for the owner: re-run the full build later; or change how launch is measured (e.g. median of 5, ignoring the first cold launch). That second option changes a gate, so it is the owner's decision.
+7. **Release publish 403** on run 41291859865 (see §6). If the rerun fails the same way, the likely cause is the repository's Actions setting "Workflow permissions" (Settings → Actions → General); only the owner can check it.
+8. The legacy pipeline flag must be removed in a later phase once the owner is satisfied.
+9. The licence gate enforces recorded statuses; it is not legal advice.
 
 ## 9. Owner actions requested
 

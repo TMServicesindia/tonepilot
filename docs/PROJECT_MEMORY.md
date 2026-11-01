@@ -97,6 +97,7 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 - Rhythm benchmark (36 rendered songs incl. khanda 5, misra 7, adi 8; `bench.yml` macOS job → branch `ci/rhythm-results`): current metre 6/36 (83% wrong-confident); **cycle stage on current beats 31/36, 0% wrong-confident**; Beat This! + cycle 12/36, 3%; Beat This! beat F 0.80 vs current 0.82 (no drums 0.75 vs 0.82); 16–18 s per 4-min song on CI Mac.
 - **Gate failed: Beat This! not adopted.** Cycle stage stays off until real Indian clips (0 so far).
 - `CoreMLBackend` now lives in TonePilotCore (`#if canImport(CoreML)`).
+- **Launch gate failing on CI today:** a4ab124 a2 4.55 s, b0eb8ae 4.93 s, control v0.3.71 9.28 s (passed 3.47 s this morning) → runner slowness. No release since v0.3.71. Owner to decide: re-run later, or change launch measurement (gate change = owner's call).
 
 ## 7. Open owner decisions
 
