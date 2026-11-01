@@ -106,6 +106,20 @@ extension AppModel {
         refreshArpeggioLive()
     }
 
+    /// Speed & crash tests only (the simulator has no keyboard): plays R · 5 · 8 and releases it
+    /// through the real MIDI path, on a background thread like CoreMIDI's.
+    func uiTestPlayChordHand() {
+        guard UITestSeed.enabled, let handler = midi.onEvents else { return }
+        DispatchQueue.global(qos: .userInteractive).async {
+            for note: UInt8 in [52, 59, 64] {
+                handler([.noteOn(channel: 0, note: note, velocity: 100)])
+                Thread.sleep(forTimeInterval: 0.15)
+            }
+            Thread.sleep(forTimeInterval: 0.3)
+            for note: UInt8 in [52, 59, 64] { handler([.noteOff(channel: 0, note: note, velocity: 0)]) }
+        }
+    }
+
     // MARK: Preview
 
     /// Plays (or replaces) the preview of a section's pattern on the song's own chords.

@@ -55,7 +55,7 @@ final class AppModel: ObservableObject {
     /// Section whose pattern live fill-in uses while the song is paused.
     @Published var arpeggioSectionId: UUID?
     /// Live fill-in, driven from the MIDI thread.
-    let liveFill = LiveFill()
+    let liveFill = LiveFill(now: { CACurrentMediaTime() })
     var arpeggioFollowerSection: UUID?
     /// Read on the MIDI thread: forward chord-hand notes to live fill-in.
     let arpeggioLiveFlag = OSAllocatedUnfairLock(initialState: false)

@@ -71,6 +71,11 @@ struct SongArpeggioCard: View {
             }
             .tint(Theme.accent)
             .accessibilityIdentifier("arpeggio.live")
+            if live, UITestSeed.enabled {
+                // Speed & crash tests only: key presses through the real MIDI path.
+                Button("Test: play R · 5 · 8") { model.uiTestPlayChordHand() }
+                    .font(.caption).accessibilityIdentifier("arpeggio.testKeys")
+            }
             if live {
                 HStack(spacing: 8) {
                     yourPart(pattern)

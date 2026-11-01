@@ -106,7 +106,16 @@ final class TonePilotUITests: XCTestCase {
                 let live = element("arpeggio.live")
                 if live.waitForExistence(timeout: 3) {
                     tap(live, "live fill-in on")
-                    tap(live, "live fill-in off")
+                    // Play keys with live fill on (the first note once deadlocked the MIDI thread and froze the app).
+                    let keys = element("arpeggio.testKeys")
+                    if keys.waitForExistence(timeout: 3) {
+                        for k in 1...3 { tap(keys, "play R · 5 · 8 with live fill (\(k))") }
+                        Thread.sleep(forTimeInterval: 1.5)
+                        // Still responsive: the toggle answers right away.
+                        tap(live, thenExpect: live, limit: 3, "live fill-in off after playing")
+                    } else {
+                        tap(live, "live fill-in off")
+                    }
                 }
                 let preview = element("arpeggio.preview")
                 if preview.waitForExistence(timeout: 3) {
