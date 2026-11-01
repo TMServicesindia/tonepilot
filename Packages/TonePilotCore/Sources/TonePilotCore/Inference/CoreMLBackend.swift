@@ -1,23 +1,23 @@
+#if canImport(CoreML)
 import CoreML
 import Foundation
-import TonePilotCore
 
 /// iOS implementation of `InferenceBackend` (Core ML). Inputs and outputs use TonePilot's logical
 /// tensor names; the descriptor maps them to Core ML feature names. Output arrays are read through
 /// their strides, so non-contiguous Core ML layouts come back correctly.
-final class CoreMLBackend: InferenceBackend, @unchecked Sendable {
-    let id = "coreml"
+public final class CoreMLBackend: InferenceBackend, @unchecked Sendable {
+    public let id = "coreml"
     private let lock = NSLock()
     private var models: [String: (MLModel, ModelDescriptor)] = [:]
     private let computeUnits: MLComputeUnits
 
     /// `.cpuOnly` gives full float32 (used by the contract check); `.all` lets Core ML use the
     /// GPU / Neural Engine (production).
-    init(computeUnits: MLComputeUnits = .all) {
+    public init(computeUnits: MLComputeUnits = .all) {
         self.computeUnits = computeUnits
     }
 
-    func load(_ descriptor: ModelDescriptor, from url: URL) throws {
+    public func load(_ descriptor: ModelDescriptor, from url: URL) throws {
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw InferenceError.loadFailed(model: descriptor.name, reason: "file not found: \(url.lastPathComponent)")
         }
@@ -43,9 +43,9 @@ final class CoreMLBackend: InferenceBackend, @unchecked Sendable {
         }
     }
 
-    func isLoaded(_ model: String) -> Bool { lock.withLock { models[model] != nil } }
+    public func isLoaded(_ model: String) -> Bool { lock.withLock { models[model] != nil } }
 
-    func run(_ model: String, inputs: [String: Tensor]) throws -> [String: Tensor] {
+    public func run(_ model: String, inputs: [String: Tensor]) throws -> [String: Tensor] {
         guard let (ml, descriptor) = lock.withLock({ models[model] }) else { throw InferenceError.modelNotLoaded(model) }
         try descriptor.validate(inputs: inputs)
         var features: [String: MLFeatureValue] = [:]
@@ -72,7 +72,7 @@ final class CoreMLBackend: InferenceBackend, @unchecked Sendable {
         return out
     }
 
-    func unload(_ model: String) { lock.withLock { _ = models.removeValue(forKey: model) } }
+    public func unload(_ model: String) { lock.withLock { _ = models.removeValue(forKey: model) } }
 
     /// Reads any float32/float16/double MLMultiArray through its strides into a dense tensor.
     static func tensor(from a: MLMultiArray) throws -> Tensor {
@@ -100,3 +100,4 @@ final class CoreMLBackend: InferenceBackend, @unchecked Sendable {
         return try Tensor(shape: shape, values: values)
     }
 }
+#endif

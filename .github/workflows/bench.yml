@@ -54,3 +54,39 @@ jobs:
         with:
           name: benchmark-results
           path: Packages/TonePilotCore/results*.txt
+
+  rhythm:
+    # Phase 2: current analyzer vs Beat This! + cycle inference on rendered songs with known cycles
+    # (incl. khanda chapu 5, misra chapu 7, adi 8). Beat This! runs through Core ML (macOS).
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+      - name: GeneralUser GS and the converted Beat This! small model (branch ci/beat-this)
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+          git fetch -q origin +ci/beat-this:refs/remotes/origin/ci/beat-this
+          git show origin/ci/beat-this:beat_this/BeatThisSmall.mlpackage.zip > /tmp/bt.zip
+          (cd /tmp && unzip -q bt.zip) && ls -d /tmp/BeatThisSmall.mlpackage
+      - name: Rhythm benchmark
+        working-directory: Packages/TonePilotCore
+        env:
+          TP_SF2: /tmp/GeneralUser-GS.sf2
+          TP_BEAT_THIS_MODEL: /tmp/BeatThisSmall.mlpackage
+        run: |
+          set -o pipefail
+          swift test -c release --filter RhythmBenchmarks 2>&1 | tee rhythm.log
+          grep -E "^RHYTHM (RESULT|SPEED|note)" rhythm.log | while IFS= read -r l; do echo "::notice title=Rhythm::$l"; done
+          ! grep -qE "error:|with [1-9][0-9]* failures?" rhythm.log
+      - name: Push results to branch ci/rhythm-results
+        if: always()
+        run: |
+          [ -f Packages/TonePilotCore/rhythm.log ] || exit 0
+          grep -E "^RHYTHM" Packages/TonePilotCore/rhythm.log > /tmp/rhythm.txt || true
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/rhythm-results && git rm -rqf . && mkdir -p rhythm && cp /tmp/rhythm.txt rhythm/results.txt
+          echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID} · $(date -u +%FT%TZ)" > rhythm/SOURCE.txt
+          git add rhythm && git commit -qm "Rhythm benchmark for ${GITHUB_SHA}" && git push -qf origin ci/rhythm-results

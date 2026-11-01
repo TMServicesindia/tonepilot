@@ -22,3 +22,5 @@ Native/build/
 Native/lame/
 Packages/TonePilotCore/.test-release.log
 Packages/TonePilotCore/.build-docker/
+Packages/TonePilotCore/.gugs.sf2
+Packages/TonePilotCore/.rb.log
