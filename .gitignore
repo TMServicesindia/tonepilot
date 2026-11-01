@@ -27,5 +27,6 @@ Packages/TonePilotCore/.rb.log
 Packages/TonePilotCore/.hb.log
 Packages/TonePilotCore/.ab.log
 Packages/TonePilotCore/.build-docker2/
+# Python bytecode caches (research tools)
 __pycache__/
 *.pyc
