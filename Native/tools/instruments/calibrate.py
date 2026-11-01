@@ -10,7 +10,7 @@ import glob, json, os, re, sys
 from collections import Counter, defaultdict
 import numpy as np
 from common import load_clips, WIN
-from evaluate import (INSTRUMENTS, FAMILIES, FAM_OF, KEYS, SOURCES, load_model, truth_at, solo_truth,
+from evaluate import (INSTRUMENTS, FAMILIES, FAM_OF, KEYS, SOURCES, load_model, truth_at, truth_window, solo_truth,
                       train_heads, head_scores, prf)
 
 TARGET_WRONG = 0.05
@@ -91,7 +91,7 @@ def layered_report(clips, sf, roleset, tw_i, tw_f, win=WIN):
             continue
         st, inst, fam, _ = sf(c["file"]); n_inst = len(c["events"]); present = defaultdict(list)
         for w, s in enumerate(st):
-            mid = s + win / 2; tk = truth_at(c, mid)
+            mid = s + win / 2; tk = truth_window(c, s, win)
             ti = {KEYS[k]["instrument"] for k in tk}; tf = {KEYS[k]["family"] for k in tk}
             pi = {INSTRUMENTS[j] for j in np.where(inst[w] >= tw_i)[0]}; pf = {FAMILIES[j] for j in np.where(fam[w] >= tw_f)[0]}
             for cnt in (wc, by_n[n_inst]):
@@ -121,7 +121,7 @@ def pick_window(clips, sf, win=WIN):
                     continue
                 d = sf(c["file"])
                 for w, s in enumerate(d[0]):
-                    tr = {KEYS[k][keyf] for k in truth_at(c, s + win / 2)}; pr = {labels[j] for j in np.where(d[idx][w] >= t)[0]}
+                    tr = {KEYS[k][keyf] for k in truth_window(c, s, win)}; pr = {labels[j] for j in np.where(d[idx][w] >= t)[0]}
                     c_["tp"] += len(pr & tr); c_["fp"] += len(pr - tr); c_["fn"] += len(tr - pr)
             f1 = prf(c_["tp"], c_["fp"], c_["fn"])[2]
             if f1 > top[0]: top = (f1, t)
@@ -144,7 +144,7 @@ def main(root, outdir, report_path):
                 if role(c) != "train" or c["file"] not in data: continue
                 d = data[c["file"]]
                 for w, s in enumerate(d["starts"]):
-                    tk = truth_at(c, s + win / 2)
+                    tk = truth_window(c, s, win)
                     rows.append((d["emb"][w], {KEYS[k]["instrument"] for k in tk}, {KEYS[k]["family"] for k in tk},
                                  KEYS[tk[0]]["source"] if c["kind"] == "solo" and tk else None))
             sc, heads = train_heads(rows); cache = {}

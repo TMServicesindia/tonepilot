@@ -26,6 +26,17 @@ def truth_at(clip, t):
     return [e["key"] for e in clip["events"] if e["start"] <= t < e["end"]]
 
 
+def truth_window(clip, start, win):
+    """Instrument keys sounding in the window [start, start+win]: events that overlap it by at least
+    half of the shorter of the window and the event (works for 1 s and 10 s windows alike)."""
+    out = []
+    for e in clip["events"]:
+        ov = min(start + win, e["end"]) - max(start, e["start"])
+        if ov > 0 and ov >= 0.5 * min(win, e["end"] - e["start"]):
+            out.append(e["key"])
+    return out
+
+
 def solo_truth(clip):
     k = clip["events"][0]["key"]
     v = KEYS[k]
@@ -74,7 +85,7 @@ def pick_window_thresholds(clips, scores_for):
                     continue
                 d = scores_for(c["file"])
                 for w, s0 in enumerate(d[0]):
-                    tr = {KEYS[k][keyf] for k in truth_at(c, s0 + WIN / 2)}
+                    tr = {KEYS[k][keyf] for k in truth_window(c, s0, WIN)}
                     pr = {labels[j] for j in np.where(d[idx][w] >= t)[0]}
                     tp += len(pr & tr); fp += len(pr - tr); fn += len(tr - pr)
             f1 = prf(tp, fp, fn)[2]
@@ -161,7 +172,7 @@ def evaluate_system(name, clips, scores_for, t_inst, t_fam, has_imitation, tw=No
         present = {}
         for w, s in enumerate(st):
             mid = s + WIN / 2
-            tk = truth_at(c, mid)
+            tk = truth_window(c, s, WIN)
             ti = {KEYS[k]["instrument"] for k in tk}; tf = {KEYS[k]["family"] for k in tk}
             pi = {INSTRUMENTS[j] for j in np.where(inst[w] >= tw_inst)[0]}
             pf = {FAMILIES[j] for j in np.where(fam[w] >= tw_fam)[0]}
@@ -213,7 +224,7 @@ def main(root, outdir, report_path):
                 continue
             d = data[c["file"]]
             for w, s in enumerate(d["starts"]):
-                tk = truth_at(c, s + WIN / 2)
+                tk = truth_window(c, s, WIN)
                 rows.append((d["emb"][w], {KEYS[k]["instrument"] for k in tk}, {KEYS[k]["family"] for k in tk},
                              KEYS[tk[0]]["source"] if c["kind"] == "solo" and tk else None))
         sc, heads = train_heads(rows)

@@ -105,6 +105,7 @@ jobs:
         with: { pattern: "out-*", path: /tmp/out, merge-multiple: true }
       - name: Evaluate A and C
         run: |
+          set -o pipefail
           pip install -q "numpy<2" scipy scikit-learn
           ls /tmp/out
           python Native/tools/instruments/evaluate.py /tmp/iset /tmp/out /tmp/report.md | tee /tmp/eval.log | tail -60

@@ -28,6 +28,8 @@ jobs:
       - name: Calibrate
         run: |
           pip install -q "numpy<2" scipy scikit-learn
+          set -o pipefail
+          python Native/tools/instruments/evaluate.py /tmp/iset /tmp/out /tmp/report.md | tail -20
           python Native/tools/instruments/calibrate.py /tmp/iset /tmp/out /tmp/calibration.md | tail -40
       - name: Push to branch ci/instrument-calibration
         if: always()
@@ -35,6 +37,6 @@ jobs:
           [ -f /tmp/calibration.md ] || exit 0
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           git checkout -q --orphan ci/instrument-calibration && git rm -rqf . && mkdir -p calib
-          cp /tmp/calibration.md /tmp/calibration.json calib/
+          cp /tmp/calibration.md /tmp/calibration.json calib/; cp /tmp/report.md /tmp/report.json calib/ 2>/dev/null || true
           echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID} · bench run ${{ inputs.bench_run_id }}" > calib/SOURCE.txt
           git add calib && git commit -qm "Instrument calibration" && git push -qf origin ci/instrument-calibration
