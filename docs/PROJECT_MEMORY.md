@@ -104,6 +104,8 @@ Chain: **rhythm (beat evidence → separate cycle inference) → harmony (hypoth
 
 - Full iPhone build re-run scheduled for 23:30 IST (scheduled task trig_01A9w7uttFtRtFQmBXdzQjVE; push latest main without [skip ci]).
 - Report: **`docs/TONEPILOT_PHASE3_REPORT.md`**. `Harmony/HarmonyHypotheses.swift`: NNLS notes on a log-frequency spectrum, bass as evidence, triads with optional 7th, key bonus, weak melody top voice, drone rule (Sa–Pa steady, no third; tonic = root of fifth chain), long beats split at 0.6 s, ranked alternatives. 1.37 s per 4-min song.
+- Step 3: 3 timbres per note in NNLS; melody-first strength (≥3 notes below melody); accompaniment-stem mode (20% leakage); held-out 3 (110 BPM, +3 st, untouched): current 46% / mix 81% / **stem 83%**, minor 100%, half-bar 100%, drone 100%, alts 94%. Weak: inversions (clavinet) 15/47, pedal (tremolo strings) 23/47. Reverted: bass-overtone discount (killed roots). 3.12 s/4-min. Not switched on.
+- Owner suggested masstamilan.dev songs for learning → declined (piracy site; standing rule); offered owner recordings / CC BY-CC0 / permission.
 - `HarmonyBenchmarks` (3 sets): current 73/59/66% beat accuracy vs **new 90/89/82%**; minor 50→84/85/70%; half-bar 23→100%; drone 0→100/90/31%; alternatives 82→98/98/92%. Held-out 2 (84 BPM) is the only untouched set: targets **not met** there. Not wired into the app.
 
 ## 7. Open owner decisions

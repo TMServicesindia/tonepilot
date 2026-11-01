@@ -23,7 +23,7 @@ public enum HarmonyHypotheses {
     }
     public struct Config: Sendable {
         public var fftSize = 8192
-        public var maxNotes = 8
+        public var maxNotes = 10
         public var bassRootBonus = 0.25, bassChordToneBonus = 0.1, bassForeignPenalty = 0.05
         public var keyBonus = 0.05
         public var changePenalty = 0.12
@@ -59,52 +59,79 @@ public enum HarmonyHypotheses {
     static let lowNote = 28, highNote = 96, gridLow = 28.0, gridHigh = 120.0, perSemitone = 3
     static var gridCount: Int { Int((gridHigh - gridLow) * Double(perSemitone)) + 1 }
 
-    /// Note dictionary: each note's harmonic series (amplitude 0.6^(h-1)) on the log grid.
-    static let dictionary: [[Double]] = {
-        (lowNote...highNote).map { m in
-            var col = [Double](repeating: 0, count: gridCount)
-            for h in 1...20 {
-                let v = Double(m) + 12 * log2(Double(h))
-                guard v <= gridHigh else { break }
-                let pos = (v - gridLow) * Double(perSemitone)
-                let i = Int(pos), f = pos - Double(i), amp = pow(0.6, Double(h - 1))
-                if i < gridCount { col[i] += amp * (1 - f) }
-                if i + 1 < gridCount { col[i + 1] += amp * f }
+    /// Timbres per note: harmonic amplitude decays (dull, medium, bright). Real instruments differ
+    /// (a bright bass has a strong 3rd harmonic); with one fixed decay the unexplained overtone
+    /// energy turned into ghost notes (e.g. G3 over a C2 bass).
+    static let timbres = [0.4, 0.65, 0.85]
+    static var noteCount: Int { highNote - lowNote + 1 }
+
+    /// Note dictionary on the log grid, one unit-norm atom per (note, timbre): column-major flat
+    /// array `atoms[atom * gridCount + g]`, atom = note * timbres.count + timbre.
+    static let atoms: [Double] = {
+        var out = [Double](repeating: 0, count: noteCount * timbres.count * gridCount)
+        for (ni, m) in (lowNote...highNote).enumerated() {
+            for (ti, decay) in timbres.enumerated() {
+                var col = [Double](repeating: 0, count: gridCount)
+                for h in 1...20 {
+                    let v = Double(m) + 12 * log2(Double(h))
+                    guard v <= gridHigh else { break }
+                    let pos = (v - gridLow) * Double(perSemitone)
+                    let i = Int(pos), f = pos - Double(i), amp = pow(decay, Double(h - 1))
+                    if i < gridCount { col[i] += amp * (1 - f) }
+                    if i + 1 < gridCount { col[i + 1] += amp * f }
+                }
+                let norm = col.reduce(0) { $0 + $1 * $1 }.squareRoot()
+                let base = (ni * timbres.count + ti) * gridCount
+                for g in 0..<gridCount { out[base + g] = col[g] / norm }
             }
-            return col
         }
+        return out
     }()
-    static let gram: [[Double]] = {
-        let d = dictionary
-        return d.indices.map { i in d.indices.map { j in zip(d[i], d[j]).reduce(0) { $0 + $1.0 * $1.1 } } }
+    static let gram: [Double] = {
+        let n = noteCount * timbres.count, g = gridCount, d = atoms
+        var out = [Double](repeating: 0, count: n * n)
+        for i in 0..<n { for j in i..<n {
+            var s = 0.0
+            for k in 0..<g { s += d[i * g + k] * d[j * g + k] }
+            out[i * n + j] = s; out[j * n + i] = s
+        } }
+        return out
     }()
 
     /// Approximate transcription of one spectrum: non-negative least squares (multiplicative
     /// updates) of the log-frequency spectrum on the note dictionary. Overtones are explained by
-    /// the note that makes them instead of becoming extra notes.
+    /// the note that makes them instead of becoming extra notes. Salience = sum over timbres.
     static func notes(spectrum: [Float], sr: Double, fftSize: Int, maxNotes: Int) -> [(midi: Int, salience: Double)] {
-        let binHz = sr / Double(fftSize)
-        var x = [Double](repeating: 0, count: gridCount)
-        for g in 0..<gridCount {
+        let binHz = sr / Double(fftSize), G = gridCount
+        var x = [Double](repeating: 0, count: G)
+        for g in 0..<G {
             let f = 440 * pow(2, (gridLow + Double(g) / Double(perSemitone) - 69) / 12)
             let pos = f / binHz, k = Int(pos), fr = pos - Double(k)
             guard k + 1 < spectrum.count else { continue }
             x[g] = Double(spectrum[k]) * (1 - fr) + Double(spectrum[k + 1]) * fr
         }
-        let d = dictionary, gm = gram, n = d.count
-        let wx = d.map { col in zip(col, x).reduce(0) { $0 + $1.0 * $1.1 } }
+        let n = noteCount * timbres.count
+        var wx = [Double](repeating: 0, count: n)
+        atoms.withUnsafeBufferPointer { d in
+            for i in 0..<n { var s = 0.0; for g in 0..<G { s += d[i * G + g] * x[g] }; wx[i] = s }
+        }
         guard (wx.max() ?? 0) > 0 else { return [] }
         var a = [Double](repeating: 0.1, count: n)
-        for _ in 0..<120 {
-            for i in 0..<n {
-                var den = 1e-12
-                for j in 0..<n { den += gm[i][j] * a[j] }
-                a[i] *= wx[i] / den
+        gram.withUnsafeBufferPointer { gm in
+            for _ in 0..<100 {
+                for i in 0..<n {
+                    var den = 1e-12
+                    let row = i * n
+                    for j in 0..<n { den += gm[row + j] * a[j] }
+                    a[i] *= wx[i] / den
+                }
             }
         }
-        guard let top = a.max(), top > 0 else { return [] }
-        return a.indices.filter { a[$0] >= 0.12 * top }.sorted { a[$0] > a[$1] }.prefix(maxNotes)
-            .map { (midi: lowNote + $0, salience: a[$0]) }
+        let t = timbres.count
+        let sal = (0..<noteCount).map { ni in (0..<t).reduce(0.0) { $0 + a[ni * t + $1] } }
+        guard let top = sal.max(), top > 0 else { return [] }
+        return sal.indices.filter { sal[$0] >= 0.05 * top }.sorted { sal[$0] > sal[$1] }.prefix(maxNotes)
+            .map { (midi: lowNote + $0, salience: sal[$0]) }
     }
 
     // MARK: Analysis
@@ -134,21 +161,24 @@ public enum HarmonyHypotheses {
             let ns = notes(spectrum: spec, sr: sr, fftSize: config.fftSize, maxNotes: config.maxNotes)
             energy[i] = ns.reduce(0) { $0 + $1.salience }
             guard let top = ns.map(\.salience).max(), top > 0 else { continue }
+            // Melody first: a top voice well above at least two other (non-bass) notes. It counts,
+            // but weakly, and note strength is then judged against the accompaniment, so a loud
+            // melody cannot push quiet accompaniment notes below the threshold.
+            let audible = ns.filter { $0.salience >= 0.1 * top && $0.midi >= 40 }.map(\.midi).sorted()
+            let melodyNote = audible.count >= 4 && audible[audible.count - 1] - audible[audible.count - 2] >= 7 ? audible.last : nil
+            let accompaniment = ns.filter { $0.midi != melodyNote }
+            let ref = accompaniment.map(\.salience).max() ?? top
             // Bass = the strongest low note (the lowest can be drum thump or smear); other notes
             // below E2 are not counted as chord tones.
-            let low = ns.filter { $0.midi < 55 && $0.salience >= 0.25 * top }.max { $0.salience < $1.salience }
+            let low = accompaniment.filter { $0.midi < 55 && $0.salience >= 0.25 * ref }.max { $0.salience < $1.salience }
             bass[i] = low.map { $0.midi % 12 }
-            let strong = ns.filter { $0.salience >= 0.2 * top && ($0.midi >= 40 || $0.midi == low?.midi) }
-            // A top voice well above the rest is treated as melody: it counts, but weakly.
-            // (It needs at least two accompaniment notes below it, not counting the bass.)
-            let sortedUp = strong.map(\.midi).filter { $0 != low?.midi }.sorted()
-            let melodyNote = sortedUp.count >= 3 && sortedUp[sortedUp.count - 1] - sortedUp[sortedUp.count - 2] >= 7 ? sortedUp.last : nil
+            let strong = accompaniment.filter { $0.salience >= 0.2 * ref && ($0.midi >= 40 || $0.midi == low?.midi) }
             for n in strong {
                 let pc = n.midi % 12
-                if n.midi != melodyNote { present[i][pc] = true }
-                let w = n.midi == low?.midi ? 0.3 : n.midi == melodyNote ? 0.25 : 1.0
-                upper[i][pc] += w * n.salience
+                present[i][pc] = true
+                upper[i][pc] += (n.midi == low?.midi ? 0.3 : 1.0) * n.salience
             }
+            if let m = melodyNote, let mn = ns.first(where: { $0.midi == m }) { upper[i][m % 12] += 0.25 * min(mn.salience, ref) }
             let s = upper[i].reduce(0, +); if s > 0 { upper[i] = upper[i].map { $0 / s } }
         }
 

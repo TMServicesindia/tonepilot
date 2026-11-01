@@ -57,7 +57,7 @@ final class HarmonyBenchmarks: XCTestCase {
     }()
 
     /// Renders a case: comping on every beat, bass per span, optional drums and a melody line.
-    func song(_ c: Case, bpm: Double = 100, cycles: Int = 4, sr: Double = 22_050, instrument: UInt8? = nil) -> (audio: AudioBuffer, beats: [Double], truth: [String]) {
+    func song(_ c: Case, bpm: Double = 100, cycles: Int = 4, sr: Double = 22_050, instrument: UInt8? = nil, transpose: Int = 0) -> (audio: AudioBuffer, beats: [Double], truth: [String], stem: AudioBuffer) {
         let beat = 60 / bpm, t0 = 0.5
         var spans: [Span] = []
         let perCycle = c.spans.reduce(0) { $0 + $1.beats }
@@ -71,28 +71,37 @@ final class HarmonyBenchmarks: XCTestCase {
         let scale = c.minorKey ? [60, 62, 63, 65, 67, 68, 70, 72] : [60, 62, 64, 65, 67, 69, 71, 72]
         for s in spans {
             let start = t0 + Double(i) * beat
-            bass.append(MelodyNote(start: start, duration: beat * Double(s.beats) * 0.95, midi: s.bass, confidence: 1))
+            bass.append(MelodyNote(start: start, duration: beat * Double(s.beats) * 0.95, midi: s.bass + transpose, confidence: 1))
             for b in 0..<s.beats {
                 let t = start + Double(b) * beat
-                beats.append(t); truth.append(s.label)
-                if c.drone { comp.append(contentsOf: s.pitches.map { MelodyNote(start: t, duration: beat * 0.98, midi: $0, confidence: 1) }) }
-                else { for (k, m) in s.pitches.enumerated() where (b + k) % 2 == 0 || b == 0 { comp.append(MelodyNote(start: t, duration: beat * 0.9, midi: m + 12, confidence: 1)) } }
+                beats.append(t); truth.append(Self.transposed(s.label, transpose))
+                if c.drone { comp.append(contentsOf: s.pitches.map { MelodyNote(start: t, duration: beat * 0.98, midi: $0 + transpose, confidence: 1) }) }
+                else { for (k, m) in s.pitches.enumerated() where (b + k) % 2 == 0 || b == 0 { comp.append(MelodyNote(start: t, duration: beat * 0.9, midi: m + 12 + transpose, confidence: 1)) } }
                 if c.drums { kit.append(MelodyNote(start: t, duration: 0.1, midi: b % 2 == 0 ? 36 : 38, confidence: 1)) }
-                if c.melody { mel.append(MelodyNote(start: t, duration: beat * 0.9, midi: scale[(i + b) * 3 % scale.count] + 12, confidence: 1)) }
+                if c.melody { mel.append(MelodyNote(start: t, duration: beat * 0.9, midi: scale[(i + b) * 3 % scale.count] + 12 + transpose, confidence: 1)) }
             }
             i += s.beats
         }
         var parts = [render(gm(instrument ?? c.inst), comp, seconds, sr), render(gm(c.drone ? 32 : 33), bass, seconds, sr)]
         var gains: [Float] = [0.6, 0.4]
-        if c.drums, let k = FactoryPatches.all.first(where: { $0.id == FactoryPatches.drumKitId }) { parts.append(render(k, kit, seconds, sr)); gains.append(0.7) }
-        if c.melody { parts.append(render(gm(73), mel, seconds, sr)); gains.append(0.5) }
-        return (AudioBuffer(samples: mix(parts, gains), sampleRate: sr), beats, truth)
+        // Accompaniment "stem": what a separator would give, with 20% leakage of melody and drums.
+        var stemGains = gains
+        if c.drums, let k = FactoryPatches.all.first(where: { $0.id == FactoryPatches.drumKitId }) { parts.append(render(k, kit, seconds, sr)); gains.append(0.7); stemGains.append(0.7 * 0.2) }
+        if c.melody { parts.append(render(gm(73), mel, seconds, sr)); gains.append(0.5); stemGains.append(0.5 * 0.2) }
+        return (AudioBuffer(samples: mix(parts, gains), sampleRate: sr), beats, truth, AudioBuffer(samples: mix(parts, stemGains), sampleRate: sr))
+    }
+
+    static func transposed(_ label: String, _ t: Int) -> String {
+        guard t != 0 else { return label }
+        if label.hasPrefix("drone:"), let r = ChordSymbol(String(label.dropFirst(6))) { return "drone:" + NoteName.sharpNames[(r.root + t + 12) % 12] }
+        guard let c = ChordSymbol(label) else { return label }
+        return NoteName.sharpNames[(c.root + t + 12) % 12] + c.quality.rawValue
     }
 
     /// What an estimator says at one beat: label ("C", "Am", "drone:C", "N") and alternatives.
-    typealias Estimator = (_ audio: AudioBuffer) throws -> (_ time: Double) -> (label: String, alternatives: [String])
+    typealias Estimator = (_ mix: AudioBuffer, _ stem: AudioBuffer) throws -> (_ time: Double) -> (label: String, alternatives: [String])
 
-    static func currentAnalyzer(_ audio: AudioBuffer) throws -> (Double) -> (label: String, alternatives: [String]) {
+    static func currentAnalyzer(_ audio: AudioBuffer, _ stem: AudioBuffer) throws -> (Double) -> (label: String, alternatives: [String]) {
         var opt = SongAnalyzer.Options(); opt.extractMelody = false
         let r = try SongAnalyzer.analyze(audio, options: opt)
         return { t in
@@ -102,12 +111,19 @@ final class HarmonyBenchmarks: XCTestCase {
     }
 
     /// Phase 3 hypotheses on the current analyzer's beats.
-    static func hypotheses(_ audio: AudioBuffer) throws -> (Double) -> (label: String, alternatives: [String]) {
+    static func hypotheses(_ audio: AudioBuffer, _ stem: AudioBuffer) throws -> (Double) -> (label: String, alternatives: [String]) {
+        try hypothesesRun(audio, on: audio)
+    }
+    /// Hypotheses on the accompaniment stem (beats still from the mix, as in the app).
+    static func hypothesesOnStem(_ audio: AudioBuffer, _ stem: AudioBuffer) throws -> (Double) -> (label: String, alternatives: [String]) {
+        try hypothesesRun(audio, on: stem)
+    }
+    static func hypothesesRun(_ audio: AudioBuffer, on source: AudioBuffer) throws -> (Double) -> (label: String, alternatives: [String]) {
         var opt = SongAnalyzer.Options(); opt.extractMelody = false
         let r = try SongAnalyzer.analyze(audio, options: opt)
         var beats = r.beats
         if let last = beats.last, last < audio.duration { beats.append(audio.duration) }
-        let spans = HarmonyHypotheses.analyze(audio, beats: beats)
+        let spans = HarmonyHypotheses.analyze(source, beats: beats)
         return { t in
             guard let e = spans.last(where: { $0.time <= t && t < $0.time + $0.duration }) else { return ("N", []) }
             return (e.label, e.alternatives)
@@ -129,16 +145,27 @@ final class HarmonyBenchmarks: XCTestCase {
         }
     }
 
-    /// Held-out variation (never tuned on): 128 BPM and other instruments for the comping.
+    /// Evaluation sets. held-out 1 and 2 were looked at while tuning; held-out 3 (transposed to
+    /// new keys) was added afterwards and is run once, never tuned on.
+    enum Set_: String { case inSample = "in-sample", heldOut1 = "held-out 1 (128 BPM, other instruments)", heldOut2 = "held-out 2 (84 BPM, other instruments)", heldOut3 = "held-out 3 (110 BPM, +3 semitones, other instruments; untouched)" }
     static let heldOut: [UInt8: UInt8] = [0: 4, 48: 16, 24: 0, 4: 0]
-    /// Second held-out set, added after the first was looked at: 84 BPM, other instruments again.
     static let heldOut2: [UInt8: UInt8] = [0: 1, 48: 52, 24: 25, 4: 5]
+    static let heldOut3: [UInt8: UInt8] = [0: 7, 48: 44, 24: 27, 4: 17]
 
-    func evaluate(_ label: String, _ estimator: Estimator, heldOut: Bool = false, heldOut2: Bool = false) throws -> Tally {
+    func song(_ c: Case, set: Set_) -> (audio: AudioBuffer, beats: [Double], truth: [String], stem: AudioBuffer) {
+        switch set {
+        case .inSample: return song(c)
+        case .heldOut1: return song(c, bpm: 128, instrument: Self.heldOut[c.inst] ?? c.inst)
+        case .heldOut2: return song(c, bpm: 84, instrument: Self.heldOut2[c.inst] ?? c.inst)
+        case .heldOut3: return song(c, bpm: 110, instrument: Self.heldOut3[c.inst] ?? c.inst, transpose: 3)
+        }
+    }
+
+    func evaluate(_ label: String, _ estimator: Estimator, set: Set_ = .inSample) throws -> Tally {
         var t = Tally()
         for c in Self.cases {
-            let s = heldOut2 ? song(c, bpm: 84, instrument: Self.heldOut2[c.inst] ?? c.inst) : heldOut ? song(c, bpm: 128, instrument: Self.heldOut[c.inst] ?? c.inst) : song(c)
-            let at = try estimator(s.audio)
+            let s = song(c, set: set)
+            let at = try estimator(s.audio, s.stem)
             var ok = 0
             // Skip the first cycle (warm-up) and the last beat.
             let skip = c.spans.reduce(0) { $0 + $1.beats }
@@ -159,15 +186,12 @@ final class HarmonyBenchmarks: XCTestCase {
     }
 
     func testCurrentAnalyzer() throws {
-        let t = try evaluate("current", Self.currentAnalyzer)
-        print(t.line("current analyzer"))
         let t0 = Date()
-        let h = try evaluate("hypotheses", Self.hypotheses)
-        print(h.line("hypotheses (Phase 3)"))
-        print(try evaluate("held-out current", Self.currentAnalyzer, heldOut: true).line("held-out (128 BPM, other instruments) current analyzer"))
-        print(try evaluate("held-out hypotheses", Self.hypotheses, heldOut: true).line("held-out (128 BPM, other instruments) hypotheses"))
-        print(try evaluate("held-out-2 current", Self.currentAnalyzer, heldOut2: true).line("held-out 2 (84 BPM, other instruments; never looked at) current analyzer"))
-        print(try evaluate("held-out-2 hypotheses", Self.hypotheses, heldOut2: true).line("held-out 2 (84 BPM, other instruments; never looked at) hypotheses"))
+        for set in [Set_.inSample, .heldOut1, .heldOut2, .heldOut3] {
+            print(try evaluate("\(set.rawValue) current", Self.currentAnalyzer, set: set).line("\(set.rawValue) · current analyzer"))
+            print(try evaluate("\(set.rawValue) hypotheses", Self.hypotheses, set: set).line("\(set.rawValue) · hypotheses on mix"))
+            print(try evaluate("\(set.rawValue) stem", Self.hypothesesOnStem, set: set).line("\(set.rawValue) · hypotheses on accompaniment stem"))
+        }
         print(String(format: "HARMONY time for all runs: %.1f s", Date().timeIntervalSince(t0)))
     }
 }
@@ -177,7 +201,8 @@ extension HarmonyBenchmarks {
     func testDebugNotes() throws {
         guard let want = ProcessInfo.processInfo.environment["TP_HARMONY_DEBUG"] else { throw XCTSkip("TP_HARMONY_DEBUG not set") }
         for c in Self.cases where c.name.hasPrefix(want) {
-            let s = ProcessInfo.processInfo.environment["TP_HARMONY_HELDOUT"] == "1" ? song(c, bpm: 128, instrument: Self.heldOut[c.inst] ?? c.inst) : song(c)
+            let ho = ProcessInfo.processInfo.environment["TP_HARMONY_HELDOUT"]
+            let s = song(c, set: ho == "1" ? .heldOut1 : ho == "2" ? .heldOut2 : .inSample)
             let fft = MagnitudeFFT(size: 8192)
             for k in 0..<min(20, s.beats.count - 1) {
                 let spec = HarmonyHypotheses.beatSpectrum(s.audio.samples, sr: s.audio.sampleRate, from: s.beats[k], to: s.beats[k + 1], fft: fft)
@@ -195,7 +220,7 @@ extension HarmonyBenchmarks {
         guard let want = ProcessInfo.processInfo.environment["TP_HARMONY_SPANS"] else { throw XCTSkip("TP_HARMONY_SPANS not set") }
         let held = ProcessInfo.processInfo.environment["TP_HARMONY_HELDOUT"] == "1"
         for c in Self.cases where c.name.hasPrefix(want) {
-            let s = held ? song(c, bpm: 128, instrument: Self.heldOut[c.inst] ?? c.inst) : song(c)
+            let s = song(c, set: held ? .heldOut1 : .inSample)
             let truthSpans = HarmonyHypotheses.analyze(s.audio, beats: s.beats + [s.audio.duration])
             print("HSPANS true beats: " + truthSpans.prefix(12).map { String(format: "%.1f %@", $0.time, $0.label) }.joined(separator: " | "))
             var opt = SongAnalyzer.Options(); opt.extractMelody = false
