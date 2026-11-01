@@ -1,0 +1,22 @@
+name: Indian instrument audio survey (research only, no app build)
+
+# Lists Wikimedia Commons audio candidates for Indian instruments with their licences. Metadata only.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  survey:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 Native/tools/research/indian_audio_survey.py
+      - name: Publish to branch research/indian-audio
+        run: |
+          git config user.name "tonepilot-research"; git config user.email "research@users.noreply.github.com"
+          git checkout -B research/indian-audio
+          git add -f docs/research/indian_audio_candidates.json docs/research/indian_audio_candidates.md
+          git commit -qm "Indian instrument audio survey [skip ci]" && git push -qf origin research/indian-audio
