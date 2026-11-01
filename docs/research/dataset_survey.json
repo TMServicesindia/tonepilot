@@ -1,0 +1,7047 @@
+{
+ "huggingface": [
+  {
+   "id": "Thanushs25/tamil-audio-emotion-classification",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 127,
+   "files": 198,
+   "ext": {
+    "wav": 195,
+    "gitattributes": 1,
+    "md": 1,
+    "pdf": 1
+   },
+   "audio_files": 195,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:audio-classification",
+    "language:ta",
+    "size_categories:1B<n<10B",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "final_data/angry/audio_0.wav",
+    "final_data/angry/audio_1.wav",
+    "final_data/angry/audio_10.wav",
+    "final_data/angry/audio_11.wav"
+   ],
+   "description": "Tamil Speech Emotion Classification Dataset"
+  },
+  {
+   "id": "ylacombe/google-tamil",
+   "license": "cc-by-sa-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 172,
+   "files": 8,
+   "ext": {
+    "parquet": 6,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "task_categories:text-to-speech",
+    "task_categories:text-to-audio",
+    "language:ta",
+    "size_categories:1K<n<10K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "female/train-00000-of-00003-250f70c5a3b5ca05.parquet",
+    "female/train-00001-of-00003-f3bd3e4c0c1a529a.parquet",
+    "female/train-00002-of-00003-e51c93ea611a21e2.parquet",
+    "male/train-00000-of-00003-13dffea321b8d904.parquet"
+   ],
+   "description": "Tamil Speech"
+  },
+  {
+   "id": "Vishal0407/GSM8K_TAMIL",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 117,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:question-answering",
+    "task_categories:text-generation",
+    "task_categories:reinforcement-learning",
+    "language:ta",
+    "size_categories:1K<n<10K"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "gsm8k_tamil.json"
+   ],
+   "description": "GSM8K Tamil - Math Reasoning"
+  },
+  {
+   "id": "mechramc/marunthagam-tamil-triage",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 25,
+   "files": 25,
+   "ext": {
+    "jsonl": 19,
+    "csv": 3,
+    "gitattributes": 1,
+    "md": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:text-classification",
+    "task_categories:text-generation",
+    "language:ta",
+    "language:en",
+    "language:hi",
+    "language:gu",
+    "size_categories:1K<n<10K"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "analysis/derm_contamination_candidates.csv",
+    "analysis/tamil_human_eval_template.csv",
+    "analysis/triage_green_relabel_LABELED.csv",
+    "eval/adversarial_prompts.json"
+   ],
+   "description": "Marunthagam Tamil Triage Dataset"
+  },
+  {
+   "id": "community-datasets/tamilmixsentiment",
+   "license": [
+    "unknown"
+   ],
+   "gated": false,
+   "private": false,
+   "downloads": 686,
+   "files": 5,
+   "ext": {
+    "parquet": 3,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:text-classification",
+    "language:en",
+    "language:ta",
+    "size_categories:10K<n<100K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet",
+    "data/train-00000-of-00001.parquet",
+    "data/validation-00000-of-00001.parquet"
+   ],
+   "description": "Tamilmixsentiment"
+  },
+  {
+   "id": "NLPC-UOM/English-Tamil-Parallel-Corpus",
+   "license": [],
+   "gated": "auto",
+   "private": false,
+   "downloads": 29,
+   "files": 6,
+   "ext": {
+    "txt": 4,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10K<n<100K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "En-Ta-Corpus/En-Ta-English.txt",
+    "En-Ta-Corpus/En-Ta-Tamil.txt",
+    "En-Ta-Glossary/glossary_english.txt",
+    "En-Ta-Glossary/glossary_tamil.txt",
+    "README.md"
+   ],
+   "description": ""
+  },
+  {
+   "id": "NLPC-UOM/Sinhala-Tamil-Aligned-Parallel-Corpus",
+   "license": [
+    "mit"
+   ],
+   "gated": false,
+   "private": false,
+   "downloads": 66,
+   "files": 4,
+   "ext": {
+    "txt": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:si",
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "Sinhala.txt",
+    "Tamil.txt"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Srini99/TamilQA",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 1227,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "TamilQA.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "NLPC-UOM/document_alignment_dataset-Sinhala-Tamil-English",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 189,
+   "files": 17538,
+   "ext": {
+    "json": 17524,
+    "txt": 12,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:sentence-similarity",
+    "language:si",
+    "language:ta",
+    "language:en"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "army/armynews_english_sinhala.txt",
+    "army/armynews_english_tamil.txt",
+    "army/armynews_sinhala_tamil.txt",
+    "army/english/100438.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "NLPC-UOM/sentence_alignment_dataset-Sinhala-Tamil-English",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 976,
+   "files": 21830,
+   "ext": {
+    "si-en": 4,
+    "si-ta": 4,
+    "ta-en": 4,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:sentence-similarity",
+    "task_categories:translation",
+    "language:si",
+    "language:ta",
+    "language:en"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "si-en/army/army.si-en",
+    "si-en/army/english/100624",
+    "si-en/army/english/100724",
+    "si-en/army/english/100885"
+   ],
+   "description": ""
+  },
+  {
+   "id": "NLPC-UOM/Tamil-Sinhala-short-sentence-similarity-deep-learning",
+   "license": [
+    "mit"
+   ],
+   "gated": false,
+   "private": false,
+   "downloads": 42,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "zip": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:ta",
+    "language:si"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "nlpcuom Tamil-Sinhala-short-sentence-similarity-deep-learning main data.zip"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AswiN037/tamil-question-answering-dataset",
+   "license": "afl-3.0",
+   "gated": false,
+   "private": false,
+   "downloads": 764,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "QA_DATASET.csv",
+    "README.md"
+   ],
+   "description": ""
+  },
+  {
+   "id": "parambharat/tamil_asr_corpus",
+   "license": [
+    "cc-by-4.0"
+   ],
+   "gated": false,
+   "private": false,
+   "downloads": 66,
+   "files": 7,
+   "ext": {
+    "jsonl": 2,
+    "gz": 2,
+    "gitattributes": 1,
+    "md": 1,
+    "py": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:automatic-speech-recognition",
+    "language:ta",
+    "size_categories:100K<n<1M"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test.jsonl",
+    "data/test.tar.gz",
+    "data/train.jsonl",
+    "data/train.tar.gz"
+   ],
+   "description": "Tamil ASR Corpus"
+  },
+  {
+   "id": "Achitha/tamildata",
+   "license": [],
+   "gated": "auto",
+   "private": false,
+   "downloads": 12,
+   "files": 8,
+   "ext": {
+    "jsonl": 2,
+    "gz": 2,
+    "gitattributes": 1,
+    "md": 1,
+    "json": 1,
+    "py": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:automatic-speech-recognition",
+    "language:ta"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test.jsonl",
+    "data/test.tar.gz",
+    "data/train.jsonl",
+    "data/train.tar.gz"
+   ],
+   "description": "tamildata"
+  },
+  {
+   "id": "Achitha/simple_tamil",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 51,
+   "files": 7,
+   "ext": {
+    "jsonl": 2,
+    "gz": 2,
+    "gitattributes": 1,
+    "md": 1,
+    "py": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:translation",
+    "language:ta",
+    "language:en",
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test.jsonl",
+    "data/test.tar.gz",
+    "data/train.jsonl",
+    "data/train.tar.gz"
+   ],
+   "description": "simple_tamil"
+  },
+  {
+   "id": "Achitha/tamilown",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Achitha/tamil_eng_data",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 59,
+   "files": 7,
+   "ext": {
+    "jsonl": 2,
+    "gz": 2,
+    "gitattributes": 1,
+    "md": 1,
+    "py": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:translation",
+    "language:ta",
+    "language:en",
+    "size_categories:1K<n<10K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test.jsonl",
+    "data/test.tar.gz",
+    "data/train.jsonl",
+    "data/train.tar.gz"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Abirami/tamilwikipedia",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "README.md"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Abirami/tamilwikipediadataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 562,
+   "files": 196,
+   "ext": {
+    "txt": 191,
+    "tsv": 2,
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:100K<n<1M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "Tamil wiki-data.csv",
+    "tamilstopwords.txt",
+    "train/AA_wiki_00.txt",
+    "train/AA_wiki_01.txt"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Achitha/10th_science_tamil_to_english",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 38,
+   "files": 6,
+   "ext": {
+    "jsonl": 2,
+    "gz": 2,
+    "gitattributes": 1,
+    "py": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "10th_science_tamil_to_english.py",
+    "data/test.jsonl",
+    "data/test.tar.gz",
+    "data/train.jsonl",
+    "data/train.tar.gz"
+   ],
+   "description": ""
+  },
+  {
+   "id": "arulpraveent/Tamil_2_Eng_dataset",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 5,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "README.md"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AnanthZeke/oscar_tamil_2201",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 124,
+   "files": 21,
+   "ext": {
+    "parquet": 19,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:100K<n<1M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00019-61ca54bd047f026f.parquet",
+    "data/train-00001-of-00019-834423bb8a50a47b.parquet",
+    "data/train-00002-of-00019-4c94dc730c83ad63.parquet",
+    "data/train-00003-of-00019-b1a80ca1f199e5ac.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AnanthZeke/oscar_tamil_clean",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 1050,
+   "files": 22,
+   "ext": {
+    "parquet": 20,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1M<n<10M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00020-4305747a91ab059a.parquet",
+    "data/train-00001-of-00020-a99d85ca82ab2531.parquet",
+    "data/train-00002-of-00020-62bd807f3d4b6931.parquet",
+    "data/train-00003-of-00020-773ade3aaba50f3b.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AnanthZeke/tamil_sentences_sample",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 74,
+   "files": 4,
+   "ext": {
+    "parquet": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:sentence-similarity",
+    "task_categories:zero-shot-classification",
+    "language:ta",
+    "size_categories:1M<n<10M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00002-7f0d2e27f746d2f7.parquet",
+    "data/train-00001-of-00002-5af32e99aacb5ba7.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AnanthZeke/tamil_sentences_master_raw",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 622,
+   "files": 23,
+   "ext": {
+    "parquet": 21,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10M<n<100M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00021-c326119d216a407e.parquet",
+    "data/train-00001-of-00021-b351d25e0a771d82.parquet",
+    "data/train-00002-of-00021-032cbdfaf4ab04f0.parquet",
+    "data/train-00003-of-00021-2470f7751e47bcf3.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AnanthZeke/tamil_sentences_master_unique",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 45,
+   "files": 13,
+   "ext": {
+    "parquet": 11,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10M<n<100M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00011-5871b16272478de2.parquet",
+    "data/train-00001-of-00011-3a50817c402febd4.parquet",
+    "data/train-00002-of-00011-3150d3797a79b082.parquet",
+    "data/train-00003-of-00011-fa254dadb82f71de.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "lypspeech/tamil",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "livinNector/tamil_news_dataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 92,
+   "files": 16,
+   "ext": {
+    "parquet": 14,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:ta",
+    "size_categories:1M<n<10M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/dinamalar-00000-of-00006-6c1f6718eaae1ec4.parquet",
+    "data/dinamalar-00001-of-00006-81cb12233e08a635.parquet",
+    "data/dinamalar-00002-of-00006-decd97f192ba3518.parquet",
+    "data/dinamalar-00003-of-00006-f1f52e97962d920c.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Harsit/xnli2.0_tamil",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 14,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "tamil_test.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "draj597/tamil_news_orig_coded2",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 9,
+   "files": 3,
+   "ext": {
+    "csv": 2,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10K<n<100K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "tamil_news_test_coded2.csv",
+    "tamil_news_train_coded2.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Deepakvictor/tanglish-tamil",
+   "license": "openrail",
+   "gated": false,
+   "private": false,
+   "downloads": 96,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:translation",
+    "task_categories:text-classification",
+    "language:ta",
+    "language:en",
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "tamengl.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Nickstrain/Tamil_English_Corpus_data",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 32,
+   "files": 4,
+   "ext": {
+    "txt": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10M<n<100M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/english/en.txt",
+    "ta.txt"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Tngarg/Codemix_tamil_english",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 23,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10K<n<100K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "Tamil_Eng_f.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "TokenBender/Tamil_chat_dataset",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 25,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:ta",
+    "language:en"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "combined_data_no_duplicates_reloaded.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Tngarg/Codemix_tamil_english_train",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 11,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10K<n<100K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001-7594799f2c8bbe37.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Tngarg/Codemix_tamil_english_test",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 9,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001-6696c92558ad42cb.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "abhinand/tamil-alpaca",
+   "license": "gpl-3.0",
+   "gated": false,
+   "private": false,
+   "downloads": 117,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:text-generation",
+    "language:ta",
+    "size_categories:10K<n<100K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001-e96a6e4e7f400cce.parquet"
+   ],
+   "description": "tamil-alpaca"
+  },
+  {
+   "id": "abhinand/tamil-alpaca-orca",
+   "license": "gpl-3.0",
+   "gated": false,
+   "private": false,
+   "downloads": 60,
+   "files": 5,
+   "ext": {
+    "parquet": 3,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:text-generation",
+    "language:ta",
+    "size_categories:100K<n<1M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00003-04b3f666d050bc38.parquet",
+    "data/train-00001-of-00003-4e7144959a6bd02c.parquet",
+    "data/train-00002-of-00003-9d7cb36a79070472.parquet"
+   ],
+   "description": "tamil-alpaca-orca"
+  },
+  {
+   "id": "syafie-nzm/crawl-tamil.goodreturns.in",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 13,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "tamilgoodreturns.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "abhinand/tamil-llama-eval",
+   "license": "gpl",
+   "gated": false,
+   "private": false,
+   "downloads": 26,
+   "files": 4,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:text-generation",
+    "language:ta",
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "Tamil-LLaMA-Eval.csv",
+    "large/train-00000-of-00001.parquet"
+   ],
+   "description": "tamil-llama-eval"
+  },
+  {
+   "id": "Suchinthana/databricks-dolly-15k-tamil",
+   "license": "cc-by-sa-3.0",
+   "gated": false,
+   "private": false,
+   "downloads": 14,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:question-answering",
+    "language:ta",
+    "size_categories:10K<n<100K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001-d9603ab20c8495f5.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "eswardivi/Tamil_MSA_Audio_Text",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 19,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "task_categories:text-classification",
+    "task_categories:audio-classification",
+    "language:ta",
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "eswardivi/Tamil_MSA_Audio_Text_Chunked",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 10,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "edwixxx/tamil_audios",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Patil/tamil-audios",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 380,
+   "files": 79,
+   "ext": {
+    "parquet": 77,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:10K<n<100K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00077.parquet",
+    "data/train-00001-of-00077.parquet",
+    "data/train-00002-of-00077.parquet",
+    "data/train-00003-of-00077.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "ywa0291/tamil_bible_audio",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 7,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "zip": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "TAMDIPN1DA.zip"
+   ],
+   "description": ""
+  },
+  {
+   "id": "cdactvm/save_audio_tamil_numbers",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 9,
+   "files": 46,
+   "ext": {
+    "wav": 42,
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1,
+    "json": 1
+   },
+   "audio_files": 42,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "Record/1620e7a467c90e753e8a/audio.wav",
+    "Record/170b492521130c73f71d/audio.wav",
+    "Record/19c9cb66c3d19a3d0cc9/audio.wav",
+    "Record/19d91bf1ed93bef12c45/audio.wav"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Sri3010/audio-tamil",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 138,
+   "ext": {
+    "wav": 137,
+    "gitattributes": 1
+   },
+   "audio_files": 137,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "Chennai tamil/Chennai (1).wav",
+    "Chennai tamil/Chennai (10).wav",
+    "Chennai tamil/Chennai (11).wav",
+    "Chennai tamil/Chennai (12).wav",
+    "Chennai tamil/Chennai (13).wav"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Bhoomika1109/tamil-bible-audio",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 15,
+   "files": 383,
+   "ext": {
+    "wav": 381,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 381,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "B01___01_Matthew_____TAMDIPN1DA_chunk2.wav",
+    "B01___01_Matthew_____TAMDIPN1DA_chunk4.wav",
+    "B01___01_Matthew_____TAMDIPN1DA_chunk5.wav",
+    "B01___02_Matthew_____TAMDIPN1DA_chunk2.wav",
+    "B01___03_Matthew_____TAMDIPN1DA_chunk2.wav"
+   ],
+   "description": ""
+  },
+  {
+   "id": "SayantanJoker/audio_tts_description_tamil",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 5,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "shivareddy-03/tamil-audio-dataset",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 31,
+   "files": 23,
+   "ext": {
+    "mp3": 20,
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 20,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:audio-classification",
+    "language:ta",
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "Audio1.mp3",
+    "Audio10.mp3",
+    "Audio11.mp3",
+    "Audio12.mp3",
+    "Audio13.mp3"
+   ],
+   "description": "Tamil Language Audio Dataset"
+  },
+  {
+   "id": "svanitha/tamil-audio-dataset",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 15,
+   "files": 23,
+   "ext": {
+    "mp3": 20,
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 20,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:audio-classification",
+    "language:ta",
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "Audio1.mp3",
+    "Audio10.mp3",
+    "Audio11.mp3",
+    "Audio12.mp3",
+    "Audio13.mp3"
+   ],
+   "description": "Tamil Language Audio Dataset"
+  },
+  {
+   "id": "meghana-007/tamil-audio-emotion-classification",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 12,
+   "files": 198,
+   "ext": {
+    "wav": 195,
+    "gitattributes": 1,
+    "md": 1,
+    "pdf": 1
+   },
+   "audio_files": 195,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:audio-classification",
+    "language:ta",
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "final_data/angry/audio_0.wav",
+    "final_data/angry/audio_1.wav",
+    "final_data/angry/audio_10.wav",
+    "final_data/angry/audio_11.wav"
+   ],
+   "description": "Tamil Speech Emotion Classification Dataset"
+  },
+  {
+   "id": "InfoBayAI/Tamil_Call_Center_Audio_Dataset_Dual_Channel",
+   "license": "cc-by-4.0",
+   "gated": "auto",
+   "private": false,
+   "downloads": 34,
+   "files": 11,
+   "ext": {
+    "wav": 9,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 9,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:automatic-speech-recognition",
+    "language:ta",
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "Sample - 01/SPEAKER_00.wav",
+    "Sample - 01/SPEAKER_01.wav",
+    "Sample - 01/SPEAKER_02.wav",
+    "Sample - 02/SPEAKER_00.wav"
+   ],
+   "description": "Call Center Dual Channel Audio Dataset (Tamil)"
+  },
+  {
+   "id": "InfoBayAI/Tamil_Podcast_Audio_Dataset",
+   "license": "cc-by-4.0",
+   "gated": "auto",
+   "private": false,
+   "downloads": 20,
+   "files": 4,
+   "ext": {
+    "flac": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 2,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:automatic-speech-recognition",
+    "language:ta",
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "Tamil/Sample - 01.flac",
+    "Tamil/Sample - 02.flac"
+   ],
+   "description": "Tamil Podcast Automatic Speech Recognition (ASR) Dataset"
+  },
+  {
+   "id": "InfoBayAI/Tamil-Call-Center-Audio-Dataset-Single-Channel",
+   "license": "cc-by-4.0",
+   "gated": "auto",
+   "private": false,
+   "downloads": 36,
+   "files": 5,
+   "ext": {
+    "wav": 3,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 3,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:automatic-speech-recognition",
+    "task_categories:audio-classification",
+    "language:tam",
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "Tamil/Sample - 01.wav",
+    "Tamil/Sample - 02.wav",
+    "Tamil/Sample - 03.wav"
+   ],
+   "description": "Tamil-Call-Center-Audio-Dataset-Single-Channel"
+  },
+  {
+   "id": "InfoBayAI/Tamil_Podcast_Audio_Dataset_Dual_Channel",
+   "license": "cc-by-4.0",
+   "gated": "auto",
+   "private": false,
+   "downloads": 17,
+   "files": 6,
+   "ext": {
+    "flac": 4,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 4,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:automatic-speech-recognition",
+    "task_categories:audio-classification",
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "Sample/Sample - 01/SPEAKER_00.flac",
+    "Sample/Sample - 01/SPEAKER_01.flac",
+    "Sample/Sample - 02/SPEAKER_00.flac",
+    "Sample/Sample - 02/SPEAKER_01.flac"
+   ],
+   "description": "Tamil Podcast Audio Dataset Dual Channel"
+  },
+  {
+   "id": "Shubhangi7/tamil_names_audio",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 12,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "tamil_names_audio.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Shubhangi7/tamil_names_audio_v2",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 12,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "tamil_names_audio_12lang.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "King758/tamil-raw-audio",
+   "license": [],
+   "gated": "manual",
+   "private": false,
+   "downloads": 889,
+   "files": 8713,
+   "ext": {
+    "m4a": 8712,
+    "gitattributes": 1
+   },
+   "audio_files": 8712,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "audios/--7SkvWvjY4.m4a",
+    "audios/-0tsdaZzbVU.m4a",
+    "audios/-0upFQrXFmg.m4a",
+    "audios/-1NN1BoqhV4.m4a",
+    "audios/-1XoyVUldr0.m4a"
+   ],
+   "description": ""
+  },
+  {
+   "id": "saahily/carnatic-music",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 33,
+   "files": 256,
+   "ext": {
+    "parquet": 254,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/batch0001-00000-of-00004.parquet",
+    "data/batch0001-00001-of-00004.parquet",
+    "data/batch0001-00002-of-00004.parquet",
+    "data/batch0001-00003-of-00004.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "sarayusapa/carnatic-ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 43,
+   "files": 7,
+   "ext": {
+    "parquet": 5,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00005.parquet",
+    "data/train-00001-of-00005.parquet",
+    "data/train-00002-of-00005.parquet",
+    "data/train-00003-of-00005.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "kubhase-naveen/carnatic-raga-classsification-dataset-part2",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "monodox/carnatic-malayalam-lyrics",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 5,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "carnatic_malayalam_lyrics.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "monodox/carnatic-gamaka-annotations",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 10,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "carnatic_gamaka_annotations.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "monodox/carnatic-mridangam-strokes",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 17,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "carnatic_mridangam_strokes.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "monodox/carnatic-raga-vocals",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 15,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "carnatic_raga_vocals.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "monodox/carnatic-tala-kriyanga",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 8,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "carnatic_tala_kriyanga.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "34data/v13-carnatic-varnam",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 34,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "zip": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "data_001.zip"
+   ],
+   "description": ""
+  },
+  {
+   "id": "prats1j/carnatic-musicgen",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 12,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "kaumudi-ai/carnatic-ragas-talas",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 18,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "carnatic-ragas-talas.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AIniruddh/fma-indian-music-merged",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 21,
+   "files": 13,
+   "ext": {
+    "parquet": 11,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00011.parquet",
+    "data/train-00001-of-00011.parquet",
+    "data/train-00002-of-00011.parquet",
+    "data/train-00003-of-00011.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "rojin254/PP4-indian-music-csi",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 53,
+   "files": 11900,
+   "ext": {
+    "mp3": 11874,
+    "txt": 10,
+    "pth": 9,
+    "csv": 4,
+    "gitattributes": 1,
+    "json": 1
+   },
+   "audio_files": 11874,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10K<n<100K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "Mazurkas_list",
+    "SHS100K-Sub.txt",
+    "covers80.txt",
+    "coversIndian_augmented_list.txt",
+    "coversIndian_augmented_test.txt"
+   ],
+   "description": ""
+  },
+  {
+   "id": "amitpuri/bollywood-celebs",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 3570,
+   "files": 8575,
+   "ext": {
+    "jpg": 8566,
+    "json": 5,
+    "arrow": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:image-classification",
+    "language:en",
+    "modality:image"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "processed/dataset_dict.json",
+    "processed/train/data-00000-of-00001.arrow",
+    "processed/train/dataset_info.json",
+    "processed/train/state.json"
+   ],
+   "description": " bollywood-celebs"
+  },
+  {
+   "id": "karandomguy/news-article-to-bollywood-song",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 8,
+   "files": 5,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "json": 1,
+    "bin": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "adapter_config.json",
+    "adapter_model.bin",
+    "prompts.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "eswardivi/Bollywood_songs",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 34,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:en",
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001-d6e3eed3e4481fba.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "fahdmirzac/urdu_bollywood_songs_dataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 17,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "dataset.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Vangmayy/bollywood_plots",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 33,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "bollywood_processed.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "HuggMachas/Bollywood_dialogues",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 18,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "HuggMachas/Bollywood_separate_dailogues",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 15,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10K<n<100K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AvyuktBallari/BollywoodActors",
+   "license": "cc-by-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 10,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "bollywood4u/dataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "VashuTheGreat2/bollywood_celeb_faces",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 206,
+   "files": 17330,
+   "ext": {
+    "jpg": 17328,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10K<n<100K",
+    "modality:image"
+   ],
+   "sample_files": [
+    "README.md",
+    "bollywood_celeb_faces/bollywood_celeb_faces/Aamir_Khan/Aamir.100.jpg",
+    "bollywood_celeb_faces/bollywood_celeb_faces/Aamir_Khan/Aamir.101.jpg",
+    "bollywood_celeb_faces/bollywood_celeb_faces/Aamir_Khan/Aamir.103.jpg",
+    "bollywood_celeb_faces/bollywood_celeb_faces/Aamir_Khan/Aamir.105.jpg",
+    "bollywood_celeb_faces/bollywood_celeb_faces/Aamir_Khan/Aamir.106.jpg"
+   ],
+   "description": ""
+  },
+  {
+   "id": "sathyavgc/bollywood-romantic-30s",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 10,
+   "ext": {
+    "parquet": 8,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/clean-00000-of-00001.parquet",
+    "data/other-00000-of-00003.parquet",
+    "data/other-00001-of-00003.parquet",
+    "data/other-00002-of-00003.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "neerajaabhyankar/hindustani-raag-small",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 277,
+   "files": 1968,
+   "ext": {
+    "mp3": 1960,
+    "parquet": 3,
+    "ds_store": 1,
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 1960,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "task_categories:audio-classification",
+    "size_categories:1K<n<10K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".DS_Store",
+    ".gitattributes",
+    "AheerBhairav/test_[p3LfeDd70Ts]_chunk0.mp3",
+    "AheerBhairav/test_[p3LfeDd70Ts]_chunk1.mp3",
+    "AheerBhairav/test_[p3LfeDd70Ts]_chunk2.mp3",
+    "AheerBhairav/train_[9GlMrtTfSD0]_chunk0.mp3"
+   ],
+   "description": "Hindustani Raag Identification (Small)"
+  },
+  {
+   "id": "Codec-SUPERB/mridangam_extract_unit",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 27,
+   "files": 17,
+   "ext": {
+    "parquet": 15,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:100K<n<1M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/academicodec_hifi_16k_320d-00000-of-00001-282eeb8cfc615b6b.parquet",
+    "data/academicodec_hifi_16k_320d_large_uni-00000-of-00001-ff71b2c6287f2f48.parquet",
+    "data/academicodec_hifi_24k_320d-00000-of-00001-27eeda583760a9b3.parquet",
+    "data/audiodec_24k_320d-00000-of-00001-f0233e7883782f0b.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Codec-SUPERB/mridangam_synth",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 91,
+   "files": 24,
+   "ext": {
+    "parquet": 22,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:100K<n<1M",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/academicodec_hifi_16k_320d-00000-of-00001-4d6279ac49147750.parquet",
+    "data/academicodec_hifi_16k_320d_large_uni-00000-of-00001-e68a8a759928f386.parquet",
+    "data/academicodec_hifi_24k_320d-00000-of-00001-0140e40f13c560bb.parquet",
+    "data/audiodec_24k_320d-00000-of-00001-c6f169b10451c28d.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Codec-SUPERB/mridangam_unit",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 50,
+   "files": 21,
+   "ext": {
+    "parquet": 19,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:100K<n<1M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/academicodec_hifi_16k_320d-00000-of-00001-c8ac9208291076f3.parquet",
+    "data/academicodec_hifi_16k_320d_large_uni-00000-of-00001-8e326db8323b832c.parquet",
+    "data/academicodec_hifi_24k_320d-00000-of-00001-b2d69db995f0220d.parquet",
+    "data/audiodec_24k_320d-00000-of-00001-2da6ce3436e42eb2.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsStrokeClassification_MridangamStroke-Fold1",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 33,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsStrokeClassification_MridangamStroke-Fold2",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 26,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsStrokeClassification_MridangamStroke-Fold3",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 22,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsStrokeClassification_MridangamStroke-Fold4",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 22,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsStrokeClassification_MridangamStroke-Fold5",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 24,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsTonicClassification_MridangamTonic-Fold1",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 28,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsTonicClassification_MridangamTonic-Fold2",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 21,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsTonicClassification_MridangamTonic-Fold3",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 21,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsTonicClassification_MridangamTonic-Fold4",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 23,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DynamicSuperb/HEARPercussionInstrumentsTonicClassification_MridangamTonic-Fold5",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 22,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "ltuncay/chime-mridangam",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 81,
+   "files": 19,
+   "ext": {
+    "txt": 7,
+    "json": 6,
+    "jsonl": 2,
+    "gitattributes": 1,
+    "md": 1,
+    "tar": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "modality:text",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/unspecified/shard-000000.tar",
+    "manifest.jsonl",
+    "metadata.parquet",
+    "provenance/benchmark-revision/previous-git-sha1.json"
+   ],
+   "description": "CHIME — Mridangam (prepared candidate)"
+  },
+  {
+   "id": "iabachelis/TablaComposicionAlimentos",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 21,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "xls": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "TABLA COMPOSICIÓN DE LOS ALIMENTOS (2) (1).xls"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Nash-pAnDiTa/quran_dataset_tablawi_clean",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 190,
+   "files": 19,
+   "ext": {
+    "parquet": 17,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "language:ar",
+    "size_categories:1K<n<10K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00017.parquet",
+    "data/train-00001-of-00017.parquet",
+    "data/train-00002-of-00017.parquet",
+    "data/train-00003-of-00017.parquet"
+   ],
+   "description": "quran_qari_akhdar"
+  },
+  {
+   "id": "maqra-project/mohammad-al-tablawi-128kbps",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 173,
+   "files": 6354,
+   "ext": {
+    "mp3": 6350,
+    "gitattributes": 1,
+    "md": 1,
+    "md5": 1,
+    "json": 1
+   },
+   "audio_files": 6350,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:ar",
+    "size_categories:1K<n<10K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "001000.mp3",
+    "001001.mp3",
+    "001002.mp3",
+    "001003.mp3",
+    "001004.mp3"
+   ],
+   "description": "Maqra: Mohammad Al-Tablawi"
+  },
+  {
+   "id": "maqra-project/mohammad-al-tablawi-64kbps",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 203,
+   "files": 6354,
+   "ext": {
+    "mp3": 6350,
+    "gitattributes": 1,
+    "md": 1,
+    "md5": 1,
+    "json": 1
+   },
+   "audio_files": 6350,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:ar",
+    "size_categories:1K<n<10K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "001000.mp3",
+    "001001.mp3",
+    "001002.mp3",
+    "001003.mp3",
+    "001004.mp3"
+   ],
+   "description": "Maqra: Mohammad Al-Tablawi"
+  },
+  {
+   "id": "Emulated-Inc/guitar-tablature-transcription",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 143,
+   "files": 5,
+   "ext": {
+    "zip": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "SHA256SUMS",
+    "annotation.zip",
+    "audio_mono-mic.zip"
+   ],
+   "description": "GuitarSet: annotations and mono microphone audio (file mirror)"
+  },
+  {
+   "id": "ragarwal/arxiv-markdown",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 8442,
+   "files": 871,
+   "ext": {
+    "parquet": 869,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:text-generation",
+    "task_categories:text-retrieval",
+    "language:en",
+    "size_categories:1M<n<10M",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "astro-ph/1996/part-0000.parquet",
+    "astro-ph/1997/part-0000.parquet",
+    "astro-ph/1998/part-0000.parquet",
+    "astro-ph/1999/part-0000.parquet"
+   ],
+   "description": "arXiv Markdown"
+  },
+  {
+   "id": "vibrantlabsai/ragas-webgpt",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 35,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001-d141085e4169f45e.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "vibrantlabsai/ragas-wikiqa",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 142,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001-78b16d7ae6b9b0f1.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "ragarwal/NLI-Mix",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 40,
+   "files": 4,
+   "ext": {
+    "jsonl": 3,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1M<n<10M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "combined-test.jsonl",
+    "combined-train.jsonl",
+    "combined-validation.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "vjain/rag-anxiety",
+   "license": "openrail",
+   "gated": false,
+   "private": false,
+   "downloads": 13,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "anxiety.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "CogwiseAI/ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 25,
+   "files": 5,
+   "ext": {
+    "json": 3,
+    "gitattributes": 1,
+    "arrow": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "baseline/data-00000-of-00001.arrow",
+    "baseline/dataset_info.json",
+    "baseline/state.json",
+    "dataset_dict.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "CogwiseAI/ira_ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 19,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/baseline-00000-of-00001-678c77a65c6aa8d7.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "zaursamadov/ragas_SS",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 11,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "updated_ground_truth_ragas.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "nlplabtdtu/ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "ragas_.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "muellerzr/RAG-accelerate",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 191,
+   "files": 103,
+   "ext": {
+    "md": 47,
+    "py": 46,
+    "npy": 3,
+    "png": 2,
+    "ipynb": 2,
+    "gitattributes": 1,
+    "yml": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:en"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "combined_chunks.npy",
+    "docs/Makefile",
+    "docs/README.md",
+    "docs/source/_toctree.yml"
+   ],
+   "description": ""
+  },
+  {
+   "id": "SebastianBodza/RAG_Aufgaben",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 16,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "text_retrieval_tasks.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "shayorshay/ragas-eval",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 8,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "baseline.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "aurelio-ai/ai-arxiv2-ragas-mixtral",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 30,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "train.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "xPXXX/test_ragas",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 14,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "dataset.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "LUOHANYU/test_ragas",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 4,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:en",
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "LICENSE",
+    "README.md",
+    "dataset_Esconv.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "ramadhani/ragas-subject-test-01",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "dataset.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "nibeditad07/ragasevaluate",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "Mixtral_RAG_EvalSet57.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "darsanaraja/raga2",
+   "license": "cc-by-sa-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 10,
+   "ext": {
+    "csv": 5,
+    "gitattributes": 1,
+    "md": 1,
+    "py": 1,
+    "duckdb": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:question-answering",
+    "language:en",
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "baseline.csv",
+    "corpus.csv",
+    "dev.csv",
+    "fiqa.py"
+   ],
+   "description": ""
+  },
+  {
+   "id": "davo15/test_ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "darsanaraja/raga3",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 1,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "davo15/test_ragas_llama",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 10,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "atitaarora/qdrant_docs_qna_ragas",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 26,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:en",
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "qna_sheet_qdrant_doc_ragas.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Juniplayground/ragas-retreival_top1",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 5,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001-777918921b66f379.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "harpreetsahota/ragas-example-dataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 10,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "ericrisco/ragas-eval-dataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 12,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Ragave/ew",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 1,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "hemachandher/rag_army",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "sql_create_context_v4 (3) (1).json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "RaganaBloodedge/ChineseHengYangDialet",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "README.md"
+   ],
+   "description": ""
+  },
+  {
+   "id": "longcule123/testset_ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "testset_final.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "erbacher/rag-and-roll-hagrid",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 25,
+   "files": 4,
+   "ext": {
+    "parquet": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Iche/WZQTCM-KGQA-RAGAS",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 5,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "wzqya.evaluate ragas.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "qqqqq1/llama3-rag-reranker-ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "llama3-fukellm-ragas.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "onepaneai/answer-relevancy-ragas-dolly",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "onepaneai/faithfullness-ragas-dolly",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 8,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "onepaneai/correctness-ragas-vitaminc",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "onepaneai/answer-relevancy-ragas-vitmainc",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "onepaneai/context-precision-ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 10,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "onepaneai/context-relevancy-ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "onepaneai/answer-semanitc-similairty-ragas",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Iche/WZQ-RAGAS",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 1,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "wzqya.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talaugust/sci-definition",
+   "license": [],
+   "gated": "auto",
+   "private": false,
+   "downloads": 10,
+   "files": 5,
+   "ext": {
+    "csv": 3,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "dev.csv",
+    "test.csv",
+    "train.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "arbml/TALAA",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 9,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "parquet": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "data/train-00000-of-00001-a8d0678329be7f7f.parquet",
+    "dataset_infos.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talanAI/upsert_test",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 4,
+   "ext": {
+    "jpg": 2,
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "images/420420.jpg",
+    "images/69696.jpg",
+    "test_single_upsertt.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talanAI/resumesamples",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 18,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "resumesamples.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talanAI/jobpostingsamples",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "jobpostingsamples.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talalmuzaffar/my-image-captioning-dataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "byt3f3nd/talala",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "zip": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "talala.zip"
+   ],
+   "description": ""
+  },
+  {
+   "id": "ezipe/talar",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 13,
+   "files": 479,
+   "ext": {
+    "pt": 432,
+    "pkl": 28,
+    "json": 7,
+    "txt": 7,
+    "gitattributes": 1,
+    "gitignore": 1,
+    "npy": 1,
+    "npz": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    ".gitignore",
+    "ball.npy",
+    "ball.pt",
+    "ball_buf.pt",
+    "ball_debug.pt"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talaviyabhavik/distillation",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 8,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "distillation-tower.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "ganader-ia-developers/test_el_talar",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 10,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001-b212038571a06c55.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talalcringe/ML-Project",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talalcringe/taxi_fares",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 21,
+   "files": 15,
+   "ext": {
+    "parquet": 13,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:10M<n<100M",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet",
+    "data/train-00000-of-00012.parquet",
+    "data/train-00001-of-00012.parquet",
+    "data/train-00002-of-00012.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talalmuzaffar/empathetic_dataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 7,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talalmuzaffar/empathetic_dataset_1",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talalmuzaffar/empathetic_dataset_2",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talalmuzaffar/empathetic_dataset_with_context",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 1,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talalmuzaffar/empathetic_dataset_with_correct_context",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Benrw/tala-data",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 1,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "strava_events_final_with_50_dc.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "datasets-CNRS/corpus-anr-talad",
+   "license": "cc-by-sa-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 4,
+   "ext": {
+    "xml": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:fra"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "corpus_nominations_annoté_tei.xml",
+    "corpus_nominations_tei.xml"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talahuvo9x/data",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 7,
+   "files": 28,
+   "ext": {
+    "zip": 27,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "10200_Ancient.zip",
+    "13_Power_Upscale.zip",
+    "13_Superpower.zip",
+    "14_Magic.zip",
+    "14_Magic_Upscale.zip"
+   ],
+   "description": ""
+  },
+  {
+   "id": "TalariRahulManiDatta/Grocery-details-extraction",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "README.md"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talalb/my-distiset-301ed53d",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 4,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1,
+    "py": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:text-generation",
+    "task_categories:text-retrieval",
+    "task_categories:question-answering",
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet",
+    "pipeline.py"
+   ],
+   "description": ""
+  },
+  {
+   "id": "hoang1123/talahoangdz",
+   "license": [],
+   "gated": "auto",
+   "private": false,
+   "downloads": 2,
+   "files": 10,
+   "ext": {
+    "zip": 3,
+    "pptx": 2,
+    "webm": 2,
+    "gitattributes": 1,
+    "drawio": 1,
+    "png": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "AlphaCodium.zip",
+    "Chatbot (1).pptx",
+    "Chatbot.pptx",
+    "Luna AI Architecture.drawio",
+    "Luna AI Architecture.drawio (1).png"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talaconquy22/icliniq-Cosine-Test-100",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "MeetWally/talay-1.5-training-data",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 5,
+   "ext": {
+    "parquet": 3,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet",
+    "data/train-00000-of-00001.parquet",
+    "data/validation-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talas/pwm_datasets",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 30,
+   "files": 4,
+   "ext": {
+    "gz": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:100K<n<1M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "navsim.tar.gz",
+    "nuscenes.tar.gz"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Talaksh120/github-issues",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "monodox/kerala-percussion-tala",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "jsonl": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "kerala_percussion_tala.jsonl"
+   ],
+   "description": ""
+  },
+  {
+   "id": "talab-ai/pi5-agricultural-iot-32day",
+   "license": "cc-by-4.0",
+   "gated": false,
+   "private": false,
+   "downloads": 38,
+   "files": 5,
+   "ext": {
+    "sh": 2,
+    "gitattributes": 1,
+    "md": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:time-series-forecasting",
+    "task_categories:other",
+    "language:en",
+    "language:vi",
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "cameras_anonymized.json",
+    "logger_anonymized.sh",
+    "setup_10_cams_anonymized.sh"
+   ],
+   "description": "Pi5 Agricultural IoT — 32-Day Continuous Performance Dataset"
+  },
+  {
+   "id": "archivartaunik/siarzhuk-vitushka-dze-pachuiu-talaku-tudy-nogi-valaku",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 12,
+   "files": 13,
+   "ext": {
+    "mp3": 10,
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 10,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "train/001.mp3",
+    "train/002.mp3",
+    "train/003.mp3",
+    "train/004.mp3"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Hasnaewiiw/ta-latin",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 27,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "nassimjp/talanda-Chunk",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 19,
+   "files": 5,
+   "ext": {
+    "txt": 4,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:100K<n<1M",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "assistant_chunk_4_translated.txt",
+    "translated_chunks/user_chunk_6_translated.txt",
+    "user_chunk_3_translated.txt",
+    "user_chunk_4_translated.txt"
+   ],
+   "description": ""
+  },
+  {
+   "id": "phongdq/TALAS-M-Datasets",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 48,
+   "files": 28,
+   "ext": {
+    "csv": 26,
+    "ds_store": 1,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".DS_Store",
+    ".gitattributes",
+    "multi-data/banking77_test.csv",
+    "multi-data/banking77_validation.csv",
+    "multi-data/banking_train.csv",
+    "multi-data/emotion_test.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "electricsheepafrica/africa-morocco-debit-moyen-journalier-de-la-station-talaint-1993-2024-0053914f",
+   "license": "odbl",
+   "gated": false,
+   "private": false,
+   "downloads": 10,
+   "files": 4,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:tabular-classification",
+    "task_categories:tabular-regression",
+    "language:en",
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet",
+    "metadata/source_snapshot.json"
+   ],
+   "description": "Debit Moyen Journalier De La Station Talaint 1993 2024 | Africa (Morocco Open Data)"
+  },
+  {
+   "id": "electricsheepafrica/africa-morocco-debit-moyen-journalier-de-la-station-talaint-1993-2024-09e04552",
+   "license": "odbl",
+   "gated": false,
+   "private": false,
+   "downloads": 8,
+   "files": 4,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:tabular-classification",
+    "task_categories:tabular-regression",
+    "language:en",
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet",
+    "metadata/source_snapshot.json"
+   ],
+   "description": "Debit Moyen Journalier De La Station Talaint 1993 2024 | Africa (Morocco Open Data)"
+  },
+  {
+   "id": "electricsheepafrica/africa-morocco-debit-moyen-journalier-de-la-station-talaint-1993-2024-102fc76a",
+   "license": "odbl",
+   "gated": false,
+   "private": false,
+   "downloads": 5,
+   "files": 4,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:tabular-classification",
+    "task_categories:tabular-regression",
+    "language:en",
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet",
+    "metadata/source_snapshot.json"
+   ],
+   "description": "Debit Moyen Journalier De La Station Talaint 1993 2024 | Africa (Morocco Open Data)"
+  },
+  {
+   "id": "electricsheepafrica/africa-morocco-debit-moyen-journalier-de-la-station-talaint-1993-2024-124bc24c",
+   "license": "odbl",
+   "gated": false,
+   "private": false,
+   "downloads": 9,
+   "files": 4,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:tabular-classification",
+    "task_categories:tabular-regression",
+    "language:en",
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet",
+    "metadata/source_snapshot.json"
+   ],
+   "description": "Debit Moyen Journalier De La Station Talaint 1993 2024 | Africa (Morocco Open Data)"
+  },
+  {
+   "id": "electricsheepafrica/africa-morocco-debit-moyen-journalier-de-la-station-talaint-1993-2024-133d2815",
+   "license": "odbl",
+   "gated": false,
+   "private": false,
+   "downloads": 8,
+   "files": 4,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1,
+    "json": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "task_categories:tabular-classification",
+    "task_categories:tabular-regression",
+    "language:en",
+    "size_categories:n<1K",
+    "modality:tabular",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet",
+    "metadata/source_snapshot.json"
+   ],
+   "description": "Debit Moyen Journalier De La Station Talaint 1993 2024 | Africa (Morocco Open Data)"
+  },
+  {
+   "id": "veenag/finetune1",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "veenag/OriginalData",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "Film.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "veenag/newDATA",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 4,
+   "files": 2,
+   "ext": {
+    "gitattributes": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "output (21).csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "veenag/finetuning123",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 1,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "arjun-radha-krishnan/recipe-chatbot-veena-dataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 20,
+   "files": 4,
+   "ext": {
+    "parquet": 2,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test-00000-of-00001.parquet",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "shujaAK/veena-hindi-1000-eval",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 8,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "shujaAK/hindi-dairy-dataset-veena",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 24,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Aharneish/dataset-qa-indian-classical-text",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 21,
+   "files": 10,
+   "ext": {
+    "json": 5,
+    "arrow": 2,
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "processed/dataset_dict.json",
+    "processed/train/data-00000-of-00001.arrow",
+    "processed/train/dataset_info.json",
+    "processed/train/state.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AIMLOps-C4-G16/indian_classical_dances",
+   "license": "apache-2.0",
+   "gated": false,
+   "private": false,
+   "downloads": 9,
+   "files": 1387,
+   "ext": {
+    "jpg": 1383,
+    "ds_store": 1,
+    "gitattributes": 1,
+    "md": 1,
+    "txt": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:image"
+   ],
+   "sample_files": [
+    ".DS_Store",
+    ".gitattributes",
+    "README.md",
+    "bharatanatyam/alapadma mudra/0vAAe4UcsuRcMU86.jpg",
+    "bharatanatyam/alapadma mudra/87Gx0ereKFlj9Vh9.jpg",
+    "bharatanatyam/alapadma mudra/BllVJWOXlyh0jwid.jpg"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AIMLOps-C4-G16/indian_classical_dances_resized_sample_bkp",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 151,
+   "ext": {
+    "jpg": 150,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:image"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "bharatanatyam/alapadma mudra/U6DZUG3l2uSl0RI8.jpg",
+    "bharatanatyam/alapadma mudra/Uo7yC0D08nYdKxVS.jpg",
+    "bharatanatyam/alapadma mudra/Vm62NItnIBHpnbJk.jpg",
+    "bharatanatyam/alapadma mudra/pxj1zQstNkWhmkvb.jpg",
+    "bharatanatyam/alapadma mudra/qmg17I8xnS6t7ODe.jpg"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AIMLOps-C4-G16/indian_classical_dances_resized_sampled_resized_sampled",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 151,
+   "ext": {
+    "jpg": 150,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:image"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "bharatanatyam/alapadma mudra/U6DZUG3l2uSl0RI8.jpg",
+    "bharatanatyam/alapadma mudra/Uo7yC0D08nYdKxVS.jpg",
+    "bharatanatyam/alapadma mudra/Vm62NItnIBHpnbJk.jpg",
+    "bharatanatyam/alapadma mudra/pxj1zQstNkWhmkvb.jpg",
+    "bharatanatyam/alapadma mudra/qmg17I8xnS6t7ODe.jpg"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AIMLOps-C4-G16/indian_classical_dances_resized_sampled",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 153,
+   "ext": {
+    "jpg": 150,
+    "txt": 2,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:image"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "bharatanatyam/alapadma mudra/87Gx0ereKFlj9Vh9.jpg",
+    "bharatanatyam/alapadma mudra/T7P2tW6wbxDbqVSb.jpg",
+    "bharatanatyam/kanchipuram silk saree/sMXkRjRC9ljimYgI.jpg",
+    "bharatanatyam/lasya movements/Bnk5yOVXtOCAdjFq.jpg",
+    "bharatanatyam/lasya movements/TZg3dpC5QFTYh77s.jpg"
+   ],
+   "description": ""
+  },
+  {
+   "id": "AIMLOps-C4-G16/indian_classical_dances_resized",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 7,
+   "files": 503,
+   "ext": {
+    "jpg": 500,
+    "txt": 2,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:image"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "bharatanatyam/alapadma mudra/87Gx0ereKFlj9Vh9.jpg",
+    "bharatanatyam/alapadma mudra/BllVJWOXlyh0jwid.jpg",
+    "bharatanatyam/alapadma mudra/MODy4iP4Nfy7G5cr.jpg",
+    "bharatanatyam/alapadma mudra/NVYMiQs1spsx3bEd.jpg",
+    "bharatanatyam/alapadma mudra/T7P2tW6wbxDbqVSb.jpg"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Akashpalli/Telugu_songs_lyrics",
+   "license": "mit",
+   "gated": false,
+   "private": false,
+   "downloads": 34,
+   "files": 3,
+   "ext": {
+    "gitattributes": 1,
+    "md": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "language:en",
+    "language:te",
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "songs_dataset.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Keerthana1011/whisper_hindi_songs",
+   "license": "unknown",
+   "gated": false,
+   "private": false,
+   "downloads": 6,
+   "files": 8,
+   "ext": {
+    "json": 3,
+    "gitattributes": 1,
+    "md": 1,
+    "arrow": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "Audio",
+    "README.md",
+    "data-00000-of-00001.arrow",
+    "data/train-00000-of-00001.parquet",
+    "dataset_dict.json"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Alok011/hindi_movie_song_dataset",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 25,
+   "files": 3,
+   "ext": {
+    "csv": 2,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "hindi_movie_song_dataset.csv",
+    "train.csv"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Lost-legend/Hindi-song",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 5,
+   "files": 4,
+   "ext": {
+    "mp4": 3,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes",
+    "8K Remastered - Mohabbat Ki Nahi Hai ｜ Shahrukh Khan, Twinkle Khanna ｜ Baadshah [2160p].mp4",
+    "Kilimanjaro 4K Video Song ｜｜ Robot ｜｜ Rajinikanth, Aishwarya Rai ｜｜ A.R.Rahman ｜｜ Shankar [2160p].mp4",
+    "Kilimanjaro 8K Ultra HD 60fps 5.1 DTS Video Song ｜ Robo ｜ Rajinikanth ｜ Aishwarya Rai ｜ A R Rahman [2160p].mp4"
+   ],
+   "description": ""
+  },
+  {
+   "id": "saragag/FlBirds",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 78,
+   "files": 3044,
+   "ext": {
+    "jpg": 3041,
+    "txt": 2,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:image",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.dataset.txt",
+    "README.roboflow.txt",
+    "test/European Starling - Invasive/European-starling-Sturnus-vulgaris-13_jpg.rf.9a179b9c2b9d90618a0c83e9107df662.jpg",
+    "test/European Starling - Invasive/European-starling-Sturnus-vulgaris-1_jpg.rf.0129f96b5cf46cd2d5f30bdeea5bb4c9.jpg",
+    "test/European Starling - Invasive/European-starling-Sturnus-vulgaris-1_jpg.rf.1e5c0cd35c7f05da5f0c98b682f530d1.jpg"
+   ],
+   "description": ""
+  },
+  {
+   "id": "saragag/Bird-or-not",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 43,
+   "files": 1005,
+   "ext": {
+    "jpg": 1002,
+    "txt": 2,
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "size_categories:1K<n<10K",
+    "modality:image",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.dataset.txt",
+    "README.roboflow.txt",
+    "test/Bird/AC2_jpg.rf.aa9f70a6750c8b68016e3934afa954c7.jpg",
+    "test/Bird/AGF2_jpg.rf.fba1b69490f0c352855727010a85f66c.jpg",
+    "test/Bird/AGF9_jpg.rf.17c96c4a73629d139c1b8a207bcee486.jpg"
+   ],
+   "description": ""
+  },
+  {
+   "id": "DevPanda004/saraga",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 43,
+   "files": 5,
+   "ext": {
+    "parquet": 3,
+    "gitattributes": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": true,
+   "tags": [
+    "size_categories:n<1K",
+    "modality:audio",
+    "modality:text"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/clean-00000-of-00001.parquet",
+    "data/others-00000-of-00001.parquet",
+    "data/train-00000-of-00001.parquet"
+   ],
+   "description": ""
+  },
+  {
+   "id": "saragadesupriya/Diabetes_Prediction",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 2,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "Tachyeon/saraga-refs-flat",
+   "license": [],
+   "gated": false,
+   "private": false,
+   "downloads": 3,
+   "files": 1,
+   "ext": {
+    "gitattributes": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [],
+   "sample_files": [
+    ".gitattributes"
+   ],
+   "description": ""
+  },
+  {
+   "id": "ltuncay/chime-saraga",
+   "license": "other",
+   "gated": false,
+   "private": false,
+   "downloads": 105,
+   "files": 187,
+   "ext": {
+    "txt": 130,
+    "json": 36,
+    "tar": 14,
+    "jsonl": 2,
+    "csv": 2,
+    "gitattributes": 1,
+    "md": 1,
+    "parquet": 1
+   },
+   "audio_files": 0,
+   "parquet_with_audio_feature": false,
+   "tags": [
+    "modality:text",
+    "modality:audio"
+   ],
+   "sample_files": [
+    ".gitattributes",
+    "README.md",
+    "data/test/shard-000000.tar",
+    "data/test/shard-000001.tar",
+    "data/test/shard-000002.tar",
+    "data/test/shard-000003.tar"
+   ],
+   "description": "CHIME — Saraga (prepared candidate)"
+  }
+ ],
+ "zenodo": [
+  {
+   "id": 21648451,
+   "title": "Sadasiva, a form of Siva",
+   "license": "cc-by-nc-sa-4.0",
+   "access": "open",
+   "files": 21,
+   "ext": {
+    "glb": 10,
+    "png": 5,
+    "json": 3,
+    "xml": 2,
+    "usdz": 1
+   },
+   "audio_files": 0,
+   "size_mb": 129.0,
+   "url": "https://zenodo.org/records/21648451"
+  },
+  {
+   "id": 22729224,
+   "title": "Dataset used in \"The Cultural Value of Music in the Flower Offering at the Fallas of Torrent\"",
+   "license": "cc-by-sa-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "pdf": 1,
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.4,
+   "url": "https://zenodo.org/records/22729224"
+  },
+  {
+   "id": 7278511,
+   "title": "Indian Art Music Raga Recognition Dataset (audio)",
+   "license": "cc-by-4.0",
+   "access": "restricted",
+   "files": 0,
+   "ext": {},
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/7278511"
+  },
+  {
+   "id": 7278506,
+   "title": "Indian Art Music Raga Recognition Dataset (features)",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 3612.5,
+   "url": "https://zenodo.org/records/7278506"
+  },
+  {
+   "id": 11129543,
+   "title": "HEartS Professional Survey: Charting the effects of COVID-19 on working patterns, income, and well-being among arts professionals in China (",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "md": 1,
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 1.2,
+   "url": "https://zenodo.org/records/11129543"
+  },
+  {
+   "id": 6606295,
+   "title": "Tapping to hip-hop: Effects of cognitive load, arousal, and musical meter on time experiences",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/6606295"
+  },
+  {
+   "id": 4542796,
+   "title": "Deep Learning-Based Multimodal Emotion Classification for Music Videos",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 2
+   },
+   "audio_files": 0,
+   "size_mb": 14540.5,
+   "url": "https://zenodo.org/records/4542796"
+  },
+  {
+   "id": 15834374,
+   "title": "Herrstein Rats-Apotheke (ca. 1924/1947)",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "pdf": 1,
+    "tiff": 1
+   },
+   "audio_files": 0,
+   "size_mb": 310.9,
+   "url": "https://zenodo.org/records/15834374"
+  },
+  {
+   "id": 4566713,
+   "title": "HEartS Survey 2019: Charting the health, economic, and social impact of the ARTs",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "xlsx": 2,
+    "pdf": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "size_mb": 2.0,
+   "url": "https://zenodo.org/records/4566713"
+  },
+  {
+   "id": 4557407,
+   "title": "HEartS Professional Survey: Charting the effects of COVID-19 lockdown 1.0 on working patterns, income, and wellbeing among performing arts p",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "xlsx": 1,
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.6,
+   "url": "https://zenodo.org/records/4557407"
+  },
+  {
+   "id": 6566802,
+   "title": "The impact of music and stretched time on pupillary responses and eye movements in slow-motion film scenes",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 3,
+   "ext": {
+    "csv": 1,
+    "xlsx": 1,
+    "txt": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/6566802"
+  },
+  {
+   "id": 21292818,
+   "title": "DEVELOPING INSTRUMENTAL MUSIC SKILLS IN GENERAL EDUCATION SCHOOLS THROUGH INTERACTIVE MUSICAL INTERFACES",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.2,
+   "url": "https://zenodo.org/records/21292818"
+  },
+  {
+   "id": 1284501,
+   "title": "Turkish Makam Music Audio-Score Alignment Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 17.3,
+   "url": "https://zenodo.org/records/1284501"
+  },
+  {
+   "id": 22843509,
+   "title": "MUSIQA TA'LIMIDA RAQAMLI TEXNOLOGIYALARDAN FOYDALANISH ORQALI O'QUVCHILARNING IJODIY  QOBILIYATLARINI RIVOJLANTIRISH",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.9,
+   "url": "https://zenodo.org/records/22843509"
+  },
+  {
+   "id": 17348742,
+   "title": "Open Music Europe Live Music Census Post-Snapshot Venue Survey",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "csv": 1,
+    "sav": 1,
+    "md": 1,
+    "xml": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/17348742"
+  },
+  {
+   "id": 21189537,
+   "title": "JADIDLARNING MA'RIFIY QO'SHIQLARI VA SHE'RIYATI VOSITASIDA KREATIV MUSIQIY TAFAKKURNI SHAKLLANTIRISH TEXNOLOGIYALARI",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/21189537"
+  },
+  {
+   "id": 17340264,
+   "title": "Open Music Europe Live Music Census Audience Survey",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "csv": 1,
+    "sav": 1,
+    "md": 1,
+    "xml": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.4,
+   "url": "https://zenodo.org/records/17340264"
+  },
+  {
+   "id": 23696917,
+   "title": "THE AXIOLOGICAL APPROACH IN MUSIC EDUCATION: DEVELOPING STUDENTS' VALUES THROUGH MUSICAL LEARNING",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.2,
+   "url": "https://zenodo.org/records/23696917"
+  },
+  {
+   "id": 4116247,
+   "title": "Open Database of Spatial Room Impulse Responses at Detmold University of Music",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 1,
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 994.8,
+   "url": "https://zenodo.org/records/4116247"
+  },
+  {
+   "id": 14795902,
+   "title": "Survey Data on Parental Policy Awareness and Economic Status in Children's Piano Education (Dataset 1);Survey Data on Age, Learning Duration",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "xlsx": 2
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/14795902"
+  },
+  {
+   "id": 15155426,
+   "title": "TABLE 1 in An expanded description of Cnemaspis gracilis (Beddome 1870) (Squamata: Gekkonidae) based on recent material",
+   "license": "notspecified",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "html": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/15155426"
+  },
+  {
+   "id": 16631794,
+   "title": "Indian Art Music Melodic Similarity Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 400.5,
+   "url": "https://zenodo.org/records/16631794"
+  },
+  {
+   "id": 5016778,
+   "title": "Data from: Implicit violent imagery processing among fans and non-fans of violent music",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "csv": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/5016778"
+  },
+  {
+   "id": 17348701,
+   "title": "Open Music Europe Live Music Census Pre-Snapshot Venue Survey",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "sav": 1,
+    "md": 1,
+    "csv": 1,
+    "xml": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.2,
+   "url": "https://zenodo.org/records/17348701"
+  },
+  {
+   "id": 10160621,
+   "title": "HEartS Professional Survey: Charting the effects of COVID-19 on working patterns, income, and wellbeing among performing arts professionals ",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "md": 1,
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.9,
+   "url": "https://zenodo.org/records/10160621"
+  },
+  {
+   "id": 3940330,
+   "title": "Carnatic Violin Dataset",
+   "license": null,
+   "access": "restricted",
+   "files": 0,
+   "ext": {},
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/3940330"
+  },
+  {
+   "id": 3733745,
+   "title": "IO Islamic 2934. Sa'îdnâma, History of the Ruler of the Carnatic Sa'âdat-allâhkhân",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "odt": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/3733745"
+  },
+  {
+   "id": 5553925,
+   "title": "Saraga-Carnatic-Melody-Synth",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 24033.2,
+   "url": "https://zenodo.org/records/5553925"
+  },
+  {
+   "id": 1264394,
+   "title": "Carnatic Music Rhythm Dataset",
+   "license": null,
+   "access": "restricted",
+   "files": 0,
+   "ext": {},
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/1264394"
+  },
+  {
+   "id": 7726167,
+   "title": "Carnatic Varnam Dataset",
+   "license": "cc-by-nc-nd-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 247.6,
+   "url": "https://zenodo.org/records/7726167"
+  },
+  {
+   "id": 7388670,
+   "title": "Multitask Carnatic Music Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/7388670"
+  },
+  {
+   "id": 4301737,
+   "title": "Saraga: research datasets of Indian Art Music",
+   "license": "cc-by-nc-sa-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 2
+   },
+   "audio_files": 0,
+   "size_mb": 18485.8,
+   "url": "https://zenodo.org/records/4301737"
+  },
+  {
+   "id": 1266207,
+   "title": "Mridangam Tani-avarthanam dataset",
+   "license": "cc-by-nc-nd-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 300.8,
+   "url": "https://zenodo.org/records/1266207"
+  },
+  {
+   "id": 17405610,
+   "title": "Saraga Audiovisual: a large multimodal open data collection for the analysis of carnatic music",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "zip": 4
+   },
+   "audio_files": 0,
+   "size_mb": 96182.9,
+   "url": "https://zenodo.org/records/17405610"
+  },
+  {
+   "id": 7388673,
+   "title": "Multitask Hindustani Music Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/7388673"
+  },
+  {
+   "id": 10959821,
+   "title": "[IO Islamic 2710] انورنامه",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "odt": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/10959821"
+  },
+  {
+   "id": 3734298,
+   "title": "IO Islamic 3174. Tûzuk-i-Wâlâjâhî, A History of the Carnatic",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "odt": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/3734298"
+  },
+  {
+   "id": 5556140,
+   "title": "Ṣûfism and Ethics [IO Islamic 1886]",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "odt": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/5556140"
+  },
+  {
+   "id": 4068196,
+   "title": "Mridangam Stroke Dataset",
+   "license": "cc-by-nc-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 130.3,
+   "url": "https://zenodo.org/records/4068196"
+  },
+  {
+   "id": 1257114,
+   "title": "Indian Art Music Tonic Datasets",
+   "license": "cc-by-nc-nd-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 462.5,
+   "url": "https://zenodo.org/records/1257114"
+  },
+  {
+   "id": 15828060,
+   "title": "Carnatic Raga Emotion Audio Dataset – RaagaDhvani",
+   "license": "cc-by-4.0",
+   "access": "restricted",
+   "files": 0,
+   "ext": {},
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/15828060"
+  },
+  {
+   "id": 19974158,
+   "title": "INDIAN MUSIC IN GLOBALPERSPECTIVE: INTERNATIONAL RELATIONS, FOREIGN EXCHANGE INCOME, INTERNATIONAL EMPLOYMENT AND CULTURAL EXCHANGE",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.4,
+   "url": "https://zenodo.org/records/19974158"
+  },
+  {
+   "id": 20047580,
+   "title": "The Use of Raga Charukeshi from the Carnatic Music System in the Hindustani Music Tradition",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 1.2,
+   "url": "https://zenodo.org/records/20047580"
+  },
+  {
+   "id": 16411600,
+   "title": "Saraga Audiovisual: Mini",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "zip": 4
+   },
+   "audio_files": 0,
+   "size_mb": 519.0,
+   "url": "https://zenodo.org/records/16411600"
+  },
+  {
+   "id": 22729024,
+   "title": "Inter-comparison of low-cost sensors' measurements for indoor air quality applications",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/22729024"
+  },
+  {
+   "id": 21701916,
+   "title": "ENVESOME Inventory of Existing Cohorts for Exposome and Environmental Health Research",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.4,
+   "url": "https://zenodo.org/records/21701916"
+  },
+  {
+   "id": 23247841,
+   "title": "Indian Raag Dataset: A Multi-Source Metadata/Curated Research Dataset for Hindustani Raag Classification with Swaragram Features",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/23247841"
+  },
+  {
+   "id": 7342372,
+   "title": "Indian Art Music Tonic Datasets (audio)",
+   "license": null,
+   "access": "restricted",
+   "files": 0,
+   "ext": {},
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/7342372"
+  },
+  {
+   "id": 17851882,
+   "title": "Raga Ornamentation Detection (ROD)",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 2424.0,
+   "url": "https://zenodo.org/records/17851882"
+  },
+  {
+   "id": 6817326,
+   "title": "Hindustani Music Nyas Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 1,
+    "txt": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/6817326"
+  },
+  {
+   "id": 19786099,
+   "title": "METHODOLOGICAL FOUNDATIONS FOR THE INTEGRATED STUDY OF BUKHARA MUSICAL CREATIVITY AND COMPOSITIONAL PRACTICE IN THE PEDAGOGY OF UZBEK MUSIC ",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.3,
+   "url": "https://zenodo.org/records/19786099"
+  },
+  {
+   "id": 6584021,
+   "title": "Indian Folk Music Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 16,
+   "ext": {
+    "7z": 15,
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 22791.2,
+   "url": "https://zenodo.org/records/6584021"
+  },
+  {
+   "id": 18985885,
+   "title": "INNOVATIVE METHODS FOR TEACHING BASS GUITAR PERFORMANCE IN MUSIC SCHOOLS",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.2,
+   "url": "https://zenodo.org/records/18985885"
+  },
+  {
+   "id": 6584259,
+   "title": "Indian Semi-Classical Music Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 10,
+   "ext": {
+    "7z": 9,
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 22868.9,
+   "url": "https://zenodo.org/records/6584259"
+  },
+  {
+   "id": 7424861,
+   "title": "Hindustani Classical Music Transcription Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 3,
+   "ext": {
+    "xz": 2,
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 1388.8,
+   "url": "https://zenodo.org/records/7424861"
+  },
+  {
+   "id": 6546501,
+   "title": "Indian Regional Music Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 18,
+   "ext": {
+    "7z": 17,
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 10319.0,
+   "url": "https://zenodo.org/records/6546501"
+  },
+  {
+   "id": 1445775,
+   "title": "The SHAMSA database 1.0 – Sources for the History and Analysis of Music/Dance in South Asia, c. 1700–1900.",
+   "license": "cc-by-nc-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/1445775"
+  },
+  {
+   "id": 19492549,
+   "title": "METHODS FOR DEVELOPING DIVERGENT THINKING IN STUDENTS DURING MUSIC CULTURE LESSONS",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.2,
+   "url": "https://zenodo.org/records/19492549"
+  },
+  {
+   "id": 19544611,
+   "title": "DEVELOPMENT OF STUDENTS' MUSICAL ABILITIES IN THE CONDITIONS OF INCLUSIVE EDUCATION",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.2,
+   "url": "https://zenodo.org/records/19544611"
+  },
+  {
+   "id": 22156529,
+   "title": "MODERN MECHANISMS OF LEGALIZATION AND DEVELOPMENT OF MUSIC AND ARTS EDUCATION IN UZBEKISTAN: NATIONAL AND FOREIGN EXPERIENCE",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.3,
+   "url": "https://zenodo.org/records/22156529"
+  },
+  {
+   "id": 6817380,
+   "title": "Hindustani Music Alankar Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 1,
+    "txt": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/6817380"
+  },
+  {
+   "id": 21586850,
+   "title": "THE ART OF MUSIC AS A MEANS OF EXPRESSION ELEVATING THE HUMAN SPIRITUAL REALM",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.3,
+   "url": "https://zenodo.org/records/21586850"
+  },
+  {
+   "id": 18797705,
+   "title": "THE SIGNIFICANCE AND ROLE OF STUDYING P. I. TCHAIKOVSKY'S \"CHILDREN'S ALBUM\" WITH FIRST-GRADE STUDENTS IN THE SUBJECT \"LISTENING TO MUSIC\" A",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/18797705"
+  },
+  {
+   "id": 19986940,
+   "title": "Indian songs_Tonic_Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 1,
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 1450.8,
+   "url": "https://zenodo.org/records/19986940"
+  },
+  {
+   "id": 5015965,
+   "title": "Data from: Extreme diversity in the songs of Spitsbergen's bowhead whales",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 1,
+    "rtf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 200.4,
+   "url": "https://zenodo.org/records/5015965"
+  },
+  {
+   "id": 5022578,
+   "title": "Data from: A simple explanation for the evolution of complex song syntax in Bengalese finches",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 2
+   },
+   "audio_files": 0,
+   "size_mb": 2320.5,
+   "url": "https://zenodo.org/records/5022578"
+  },
+  {
+   "id": 4961845,
+   "title": "Data from: Transcontinental latitudinal variation in song performance and complexity in House Wrens (Troglodytes aedon)",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/4961845"
+  },
+  {
+   "id": 4992880,
+   "title": "Data from: A test of the eavesdropping avoidance hypothesis as an explanation for the structure of low amplitude aggressive signals in the s",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.3,
+   "url": "https://zenodo.org/records/4992880"
+  },
+  {
+   "id": 4961541,
+   "title": "Data from: Symmetrical discrimination despite weak song differentiation in two Suboscine sister species",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/4961541"
+  },
+  {
+   "id": 7877553,
+   "title": "SMART-electron Poster & Rollup",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "jpg": 2
+   },
+   "audio_files": 0,
+   "size_mb": 0.4,
+   "url": "https://zenodo.org/records/7877553"
+  },
+  {
+   "id": 7877544,
+   "title": "SMART-electron Logo",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 6,
+   "ext": {
+    "jpg": 6
+   },
+   "audio_files": 0,
+   "size_mb": 0.6,
+   "url": "https://zenodo.org/records/7877544"
+  },
+  {
+   "id": 17187648,
+   "title": "Ciciban Corpus: 123 Digitised Slovenian Children's Songs",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 2
+   },
+   "audio_files": 0,
+   "size_mb": 1.0,
+   "url": "https://zenodo.org/records/17187648"
+  },
+  {
+   "id": 19568196,
+   "title": "Qualität statt Quantität: Ein Datensatz 1001 essentieller Songs",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 7,
+   "ext": {
+    "csv": 4,
+    "py": 2,
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 38.4,
+   "url": "https://zenodo.org/records/19568196"
+  },
+  {
+   "id": 14281803,
+   "title": "Applying Topic Modelling to the Folk Song Corpus of the Podillia Region",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "csv": 1,
+    "r": 1
+   },
+   "audio_files": 0,
+   "size_mb": 4.5,
+   "url": "https://zenodo.org/records/14281803"
+  },
+  {
+   "id": 15395651,
+   "title": "Computational Analysis of the Zoo-Lexicon in Podillia Region Folk Songs",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "r": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "size_mb": 4.7,
+   "url": "https://zenodo.org/records/15395651"
+  },
+  {
+   "id": 21291645,
+   "title": "Mieczysław Karłowicz's camera",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 12,
+   "ext": {
+    "glb": 6,
+    "jpeg": 5,
+    "json": 1
+   },
+   "audio_files": 0,
+   "size_mb": 63.6,
+   "url": "https://zenodo.org/records/21291645"
+  },
+  {
+   "id": 4992156,
+   "title": "Data from: Failure to reproduce period-dependent song cycles in Drosophila is due to poor automated pulse-detection and low-intensity courts",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 7,
+   "ext": {
+    "xlsx": 6,
+    "docx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 2.9,
+   "url": "https://zenodo.org/records/4992156"
+  },
+  {
+   "id": 4988687,
+   "title": "Data from: Subarctic singers: Humpback whale (Megaptera novaeangliae) song structure and progression from an Icelandic feeding ground during",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.5,
+   "url": "https://zenodo.org/records/4988687"
+  },
+  {
+   "id": 4944354,
+   "title": "Data from: A superb solo, or a deviant duet? Overlapping songs in superb fairy-wrens",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/4944354"
+  },
+  {
+   "id": 10818002,
+   "title": "Tear film",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 20,
+   "ext": {
+    "avi": 20
+   },
+   "audio_files": 0,
+   "size_mb": 24583.2,
+   "url": "https://zenodo.org/records/10818002"
+  },
+  {
+   "id": 4938006,
+   "title": "Data from: Exploring the hidden landscape of female preferences for complex signals",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "txt": 4
+   },
+   "audio_files": 0,
+   "size_mb": 0.6,
+   "url": "https://zenodo.org/records/4938006"
+  },
+  {
+   "id": 18540278,
+   "title": "PEDAGOGICAL FEATURES OF TEACHING STUDENTS IN TRADITIONAL SINGING",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.2,
+   "url": "https://zenodo.org/records/18540278"
+  },
+  {
+   "id": 5001676,
+   "title": "Data from: The relative response of songbirds to shifts in song amplitude and song minimum frequency",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xls": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/5001676"
+  },
+  {
+   "id": 10306107,
+   "title": "Singing silver-haired bats (Lasionycteris noctivagans)",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 111,
+   "ext": {
+    "wav": 110,
+    "md": 1
+   },
+   "audio_files": 110,
+   "size_mb": 261.7,
+   "url": "https://zenodo.org/records/10306107"
+  },
+  {
+   "id": 5024892,
+   "title": "Data from: Life course analysis of birdsong reveals maturation and senescence of repeatable characteristics",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/5024892"
+  },
+  {
+   "id": 7887672,
+   "title": "Film Circulation dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 29,
+   "ext": {
+    "csv": 17,
+    "r": 8,
+    "png": 4
+   },
+   "audio_files": 0,
+   "size_mb": 143.6,
+   "url": "https://zenodo.org/records/7887672"
+  },
+  {
+   "id": 7412660,
+   "title": "Twitter mental health classification",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "xz": 4
+   },
+   "audio_files": 0,
+   "size_mb": 341.6,
+   "url": "https://zenodo.org/records/7412660"
+  },
+  {
+   "id": 7343370,
+   "title": "last_fm_top_songs_2022",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "csv": 1
+   },
+   "audio_files": 0,
+   "size_mb": 6.7,
+   "url": "https://zenodo.org/records/7343370"
+  },
+  {
+   "id": 10310596,
+   "title": "Mridangam",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 6,
+   "ext": {
+    "jpeg": 5,
+    "glb": 1
+   },
+   "audio_files": 0,
+   "size_mb": 2.6,
+   "url": "https://zenodo.org/records/10310596"
+  },
+  {
+   "id": 1283344,
+   "title": "Turkish Makam Melodic Phrase Dataset",
+   "license": "cc-by-nc-nd-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 22.6,
+   "url": "https://zenodo.org/records/1283344"
+  },
+  {
+   "id": 10157504,
+   "title": "Datasets for Sentiment Analysis",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 8,
+   "ext": {
+    "csv": 8
+   },
+   "audio_files": 0,
+   "size_mb": 21.3,
+   "url": "https://zenodo.org/records/10157504"
+  },
+  {
+   "id": 3247476,
+   "title": "#nowplaying-rs",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "zip": 2
+   },
+   "audio_files": 0,
+   "size_mb": 2683.5,
+   "url": "https://zenodo.org/records/3247476"
+  },
+  {
+   "id": 3248543,
+   "title": "#nowplaying-RS: A New Benchmark Dataset for Building Context-Aware Music Recommender Systems",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 3,
+   "ext": {
+    "zip": 2,
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 1356.9,
+   "url": "https://zenodo.org/records/3248543"
+  },
+  {
+   "id": 20849469,
+   "title": "ChoraleBricks: A Modular Multitrack Dataset for Wind Music Research",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 3,
+   "ext": {
+    "zip": 2,
+    "md": 1
+   },
+   "audio_files": 0,
+   "size_mb": 1283.8,
+   "url": "https://zenodo.org/records/20849469"
+  },
+  {
+   "id": 4527460,
+   "title": "MuseSyn: A dataset for complete automatic piano music transcription research",
+   "license": null,
+   "access": "restricted",
+   "files": 0,
+   "ext": {},
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/4527460"
+  },
+  {
+   "id": 18988771,
+   "title": "Processed Score Graph Dataset for the Score Autoencoder (score-ae)",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "txt": 3,
+    "gz": 1
+   },
+   "audio_files": 0,
+   "size_mb": 1088.3,
+   "url": "https://zenodo.org/records/18988771"
+  },
+  {
+   "id": 17329681,
+   "title": "PDMX As Score Graphs",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 3,
+   "ext": {
+    "csv": 1,
+    "log": 1,
+    "gz": 1
+   },
+   "audio_files": 0,
+   "size_mb": 2866.8,
+   "url": "https://zenodo.org/records/17329681"
+  },
+  {
+   "id": 13120822,
+   "title": "Salsa Dataset",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "zip": 3,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "size_mb": 359.0,
+   "url": "https://zenodo.org/records/13120822"
+  },
+  {
+   "id": 4904639,
+   "title": "MusicOSet: An Enhanced Open Dataset for Music Data Mining",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 5,
+   "ext": {
+    "zip": 4,
+    "sql": 1
+   },
+   "audio_files": 0,
+   "size_mb": 376.7,
+   "url": "https://zenodo.org/records/4904639"
+  },
+  {
+   "id": 14335552,
+   "title": "Cadenza Challenge (CAD2): databases for rebalancing classical music task",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 9,
+   "ext": {
+    "zip": 5,
+    "json": 2,
+    "gz": 1,
+    "txt": 1
+   },
+   "audio_files": 0,
+   "size_mb": 12934.1,
+   "url": "https://zenodo.org/records/14335552"
+  },
+  {
+   "id": 15575778,
+   "title": "SynthSOD aligned scores",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 16.4,
+   "url": "https://zenodo.org/records/15575778"
+  },
+  {
+   "id": 14216358,
+   "title": "Optimization of the thermomechanical behaviour of TRC composites",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 2.0,
+   "url": "https://zenodo.org/records/14216358"
+  },
+  {
+   "id": 15462717,
+   "title": "LOCALISED: Full European Measure Dataset for the Balanced Plan from 07.05.2025",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 3.7,
+   "url": "https://zenodo.org/records/15462717"
+  },
+  {
+   "id": 15752922,
+   "title": "Datasets of Optimization of biocatalytic rhododendrol production from biogenic rhododendrol glycosides",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 22,
+   "ext": {
+    "csv": 22
+   },
+   "audio_files": 0,
+   "size_mb": 0.3,
+   "url": "https://zenodo.org/records/15752922"
+  },
+  {
+   "id": 4957631,
+   "title": "Data from: The herbivorous fish, Aplodactylus punctatus, as a potential facilitator of dispersal of the bottom kelp, Lessonia trabeculata, i",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/4957631"
+  },
+  {
+   "id": 18474714,
+   "title": "Hydrological monitoring dataset of the roadside Biofilter in Compans, France",
+   "license": "cc-by-4.0",
+   "access": "embargoed",
+   "files": 0,
+   "ext": {},
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/18474714"
+  },
+  {
+   "id": 14388107,
+   "title": "VENTURES THRIVE Open Dataset with the beneficiaries of our open calls",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "xlsx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/14388107"
+  },
+  {
+   "id": 21813574,
+   "title": "Ten years after: a review of squidpop assays to test predation in aquatic habitats",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "xlsx": 2
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/21813574"
+  },
+  {
+   "id": 8384356,
+   "title": "Soil composition, phenotypic and genetic data to: Adaptive differentiation on serpentine soil in diploid versus autotetraploid populations o",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "xlsx": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/8384356"
+  },
+  {
+   "id": 1196468,
+   "title": "IN02073 Lumjhya Inscription (translation)",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "pdf": 1,
+    "docx": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.1,
+   "url": "https://zenodo.org/records/1196468"
+  },
+  {
+   "id": 4271722,
+   "title": "Data for 'Ultrafast strain engineering and coherent structural dynamics from resonantly driven optical phonons in LaAlO3'",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.3,
+   "url": "https://zenodo.org/records/4271722"
+  },
+  {
+   "id": 21904267,
+   "title": "SargamBench",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 22,
+   "ext": {
+    "json": 11,
+    "py": 6,
+    "csv": 3,
+    "txt": 1,
+    "md": 1
+   },
+   "audio_files": 0,
+   "size_mb": 2.7,
+   "url": "https://zenodo.org/records/21904267"
+  },
+  {
+   "id": 7110248,
+   "title": "4-way Tabla Stroke Classification with Models Adapted from ADT",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 170.1,
+   "url": "https://zenodo.org/records/7110248"
+  },
+  {
+   "id": 4969418,
+   "title": "Data from: Early detection of encroaching woody Juniperus virginiana and its classification in multi-species forest using UAS imagery and se",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 2219.1,
+   "url": "https://zenodo.org/records/4969418"
+  },
+  {
+   "id": 1453407,
+   "title": "E. coli in handwashing water and hands (Harare, Zimbabwe)",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 2,
+   "ext": {
+    "txt": 1,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/1453407"
+  },
+  {
+   "id": 23110001,
+   "title": "Methodological quality of health research from Saudi Arabia: data and code",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "zip": 1
+   },
+   "audio_files": 0,
+   "size_mb": 1.4,
+   "url": "https://zenodo.org/records/23110001"
+  },
+  {
+   "id": 4979293,
+   "title": "Data from: Comparative genomics of the nonlegume Parasponia reveals insights into evolution of nitrogen-fixing rhizobium symbioses",
+   "license": "cc-zero",
+   "access": "open",
+   "files": 5,
+   "ext": {
+    "zip": 5
+   },
+   "audio_files": 0,
+   "size_mb": 633.3,
+   "url": "https://zenodo.org/records/4979293"
+  },
+  {
+   "id": 22826870,
+   "title": "Mental health assessment of the populations of Ukraine and the canton of Zurich, Switzerland (MAP studies)",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 4,
+   "ext": {
+    "md": 2,
+    "csv": 1,
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.6,
+   "url": "https://zenodo.org/records/22826870"
+  },
+  {
+   "id": 7155254,
+   "title": "Factors associated with child abuse in children and adolescents in a Peruvian public hospital",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 3,
+   "ext": {
+    "pdf": 3
+   },
+   "audio_files": 0,
+   "size_mb": 2.0,
+   "url": "https://zenodo.org/records/7155254"
+  },
+  {
+   "id": 13832248,
+   "title": "Database of indicators of socio-economic development of the Great Altai regions in the post-Soviet period",
+   "license": "cc-by-4.0",
+   "access": "embargoed",
+   "files": 0,
+   "ext": {},
+   "audio_files": 0,
+   "size_mb": 0.0,
+   "url": "https://zenodo.org/records/13832248"
+  },
+  {
+   "id": 7520050,
+   "title": "Corona Immunitas Phases 1 to 4 - Central Database",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 7,
+   "ext": {
+    "csv": 5,
+    "pdf": 2
+   },
+   "audio_files": 0,
+   "size_mb": 1.1,
+   "url": "https://zenodo.org/records/7520050"
+  },
+  {
+   "id": 7520125,
+   "title": "Corona Immunitas Phases 5 and 6 - Central Database",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 3,
+   "ext": {
+    "pdf": 2,
+    "csv": 1
+   },
+   "audio_files": 0,
+   "size_mb": 0.6,
+   "url": "https://zenodo.org/records/7520125"
+  },
+  {
+   "id": 14198519,
+   "title": "Optimization of the thermomechanical behaviour of TRC composites",
+   "license": "cc-by-4.0",
+   "access": "open",
+   "files": 1,
+   "ext": {
+    "pdf": 1
+   },
+   "audio_files": 0,
+   "size_mb": 2.0,
+   "url": "https://zenodo.org/records/14198519"
+  }
+ ],
+ "notes": []
+}
