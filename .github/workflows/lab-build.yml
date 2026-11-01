@@ -8,6 +8,9 @@ on:
       gate2_run_id:
         description: "coreml-gate2 run id (for the converted models)"
         required: true
+      runner:
+        description: "Mac runner image (GitHub capacity varies)"
+        default: "macos-14"
 
 permissions:
   contents: read
@@ -15,7 +18,7 @@ permissions:
 
 jobs:
   lab:
-    runs-on: macos-15
+    runs-on: ${{ inputs.runner }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4

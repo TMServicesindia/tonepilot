@@ -9,6 +9,9 @@ on:
       bench_run_id:
         description: "instrument-bench run id (for its rendered clips)"
         required: true
+      runner:
+        description: "Mac runner image (GitHub capacity varies)"
+        default: "macos-14"
 
 permissions:
   contents: write
@@ -16,7 +19,7 @@ permissions:
 
 jobs:
   gate2:
-    runs-on: macos-15
+    runs-on: ${{ inputs.runner }}
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +33,10 @@ jobs:
           git clone -q --depth 1 https://github.com/fschmid56/EfficientAT /tmp/eat
           echo "EAT_COMMIT=$(git -C /tmp/eat rev-parse HEAD)" >> $GITHUB_ENV
       - name: Convert, optimise, validate, time
+        env:
+          RUNNER_LABEL: "${{ inputs.runner }} ($(sysctl -n machdep.cpu.brand_string 2>/dev/null))"
         run: |
+          export RUNNER_LABEL="${{ inputs.runner }} / $(sysctl -n machdep.cpu.brand_string)"
           set -o pipefail
           python Native/tools/instruments/gate2_coreml.py /tmp/eat /tmp/iset /tmp/g2 2>&1 | tee /tmp/g2.log | grep -E "GATE2|Error|error|Traceback|\|" | tail -40
       - uses: actions/upload-artifact@v4

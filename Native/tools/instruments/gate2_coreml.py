@@ -103,7 +103,7 @@ def convert(prec, flexible):
                       minimum_deployment_target=ct.target.iOS16)
 report = {"model": name, "params": int(sum(p.numel() for p in model.parameters())), "input": f"mel [batch,1,128,{T}] for 1 s at 32 kHz",
           "validation_windows": len(val), "validation_kinds": {k: val_kind.count(k) for k in sorted(set(val_kind))},
-          "label": "Mac CI (macos-15 runner) measurements; NOT iPhone", "variants": {}}
+          "label": f"Mac CI ({os.environ.get('RUNNER_LABEL', 'macOS runner')}) measurements; NOT iPhone", "variants": {}}
 flexible = True
 t0 = time.time()
 try:
@@ -172,7 +172,7 @@ json.dump(report, open(f"{out}/COREML_DEPLOYMENT_RESULTS.json", "w"), indent=1)
 
 # ---------- 4. Markdown ----------
 L = ["# Core ML deployment — Gate 2 results (EfficientAT mn10_as)", "",
-     "**All timings are MAC CI measurements (GitHub macos-15 runner) or estimates from them — NOT iPhone results.**",
+     f"**All timings are MAC CI measurements ({os.environ.get('RUNNER_LABEL', 'macOS runner')}) or estimates from them — NOT iPhone results.**",
      f"Validation windows: {len(val)} ({report['validation_kinds']}). Reference: PyTorch fp32. Family decisions via a logistic head trained on the FluidR3 train bank.", "",
      "| Variant | Size MB | Units | Cold load+1st (ms) | Warm median / p90 / p95 (ms) | Best ms/window | 4-min song est. (s) | Max abs diff | Emb. cosine min | Top-1 agree | Family agree |",
      "|---|---|---|---|---|---|---|---|---|---|---|"]
