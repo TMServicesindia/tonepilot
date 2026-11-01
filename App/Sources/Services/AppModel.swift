@@ -150,6 +150,8 @@ final class AppModel: ObservableObject {
         let out: ToneOutput = kind == .tonePilot ? ToneEngineHost() : SoundEngine(soundFontDirectory: store.soundFontDirectory)
         outputBox = OutputBox(out)
         sectionPlayer = SectionPlayer(player: out.songPlayerNode, engine: out.avEngine)
+        // Phase 1 fallback switch (not shown in the UI): the previous import orchestration.
+        ImportPipelineFlags.useSharedPipeline = !UserDefaults.standard.bool(forKey: "TPLegacyImportPipeline")
         serverSettings = (UserDefaults.standard.data(forKey: "serverSettings")).flatMap { try? JSONDecoder().decode(AnalysisServerSettings.self, from: $0) } ?? AnalysisServerSettings()
 
         do {
@@ -881,14 +883,25 @@ final class AppModel: ObservableObject {
                 }
                 let toneLoader = PartMatcher.loader(bank: bank)
                 if !stems.isEmpty { await stage("Analysing, then matching each part's instrument…", base) }
-                let output = try SongPipeline.run(song: current, audio: audio, stems: stems, melodyOverride: serverMelody, patches: patches, progress: { p in
+                let progress: (Double) -> Bool = { p in
                     if Task.isCancelled { return false }
                     let value = base + (0.95 - base) * p
                     if throttle.shouldSend(value) { Task { @MainActor in self?.analysisProgress[songId] = value } }
                     return true
-                }, instruments: { sections in
+                }
+                let instruments: ([SongSection]) -> [UUID: [String: Double]] = { sections in
                     InstrumentRecognizer.recognize(files: instrumentFiles.isEmpty ? [url] : instrumentFiles, sections: sections)
-                }, toneInstrument: toneLoader)
+                }
+                let output: SongPipeline.Output
+                if ImportPipelineFlags.useSharedPipeline {
+                    output = try SongImportPipeline.run(.init(song: current, audio: audio, stems: stems, melodyOverride: serverMelody,
+                                                              stemInfos: stemInfos, patches: patches),
+                                                        hooks: .init(progress: progress, instruments: instruments, toneInstrument: toneLoader))
+                } else {
+                    // Previous orchestration (fallback during Phase 1).
+                    output = try SongPipeline.run(song: current, audio: audio, stems: stems, melodyOverride: serverMelody, patches: patches,
+                                                  progress: progress, instruments: instruments, toneInstrument: toneLoader)
+                }
                 await MainActor.run {
                     guard let self else { return }
                     var s = output.song
@@ -935,10 +948,18 @@ final class AppModel: ObservableObject {
             do {
                 let current = await MainActor.run { self?.library.song(id: songId) } ?? snapshot
                 let throttle = ProgressThrottle()
-                let output = try SongPipeline.run(song: current, audio: audio, patches: patches) { p in
+                let progress: (Double) -> Bool = { p in
                     if Task.isCancelled { return false }
                     if throttle.shouldSend(p) { Task { @MainActor in self?.analysisProgress[songId] = p } }
                     return true
+                }
+                let output: SongPipeline.Output
+                if ImportPipelineFlags.useSharedPipeline {
+                    output = try SongImportPipeline.run(.init(song: current, audio: audio, listened: true, patches: patches),
+                                                        hooks: .init(progress: progress))
+                } else {
+                    // Previous orchestration (fallback during Phase 1).
+                    output = try SongPipeline.run(song: current, audio: audio, patches: patches, progress: progress)
                 }
                 await MainActor.run {
                     guard let self else { return }

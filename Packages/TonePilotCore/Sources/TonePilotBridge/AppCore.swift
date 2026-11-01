@@ -321,14 +321,22 @@ public final class AppCore: @unchecked Sendable {
         let current = library.song(id: songId)
         stateLock.unlock()
         guard var input = current else { return }
-        if listened, input.switching == nil { input.switching = SwitchingSettings(mode: .assisted, reference: .timer) }
         do {
-            let output = try SongPipeline.run(song: input, audio: audio, patches: patches) { [weak self] p in
+            let progress: (Double) -> Bool = { [weak self] p in
                 guard let self else { return false }
                 self.stateLock.lock(); defer { self.stateLock.unlock() }
                 if self.cancelled.contains(songId) { return false }
                 self.analysisProgress[songId] = 0.05 + 0.95 * p
                 return true
+            }
+            let output: SongPipeline.Output
+            if ImportPipelineFlags.useSharedPipeline {
+                output = try SongImportPipeline.run(.init(song: input, audio: audio, listened: listened, patches: patches),
+                                                    hooks: .init(progress: progress))
+            } else {
+                // Previous orchestration (fallback during Phase 1).
+                if listened, input.switching == nil { input.switching = SwitchingSettings(mode: .assisted, reference: .timer) }
+                output = try SongPipeline.run(song: input, audio: audio, patches: patches, progress: progress)
             }
             stateLock.lock()
             let stillExists = library.song(id: songId) != nil
