@@ -419,7 +419,7 @@ Hierarchy: family → identity → variant (only when acoustically distinguishab
 
 | Experiment | Run | Commit | Status | Jobs | Artifacts | Decision possible? |
 |---|---|---|---|---|---|---|
-| E2: PANNs CNN10 challenger | [41386940981](https://github.com/TMServicesindia/tonepilot/actions/runs/41386940981) | 9bf59ceba83a | **in progress** (embedding step) | embed: running; calibrate: pending | none yet | **No** |
+| E2: PANNs CNN10 challenger | [41386940981](https://github.com/TMServicesindia/tonepilot/actions/runs/41386940981) | 9bf59ceba83a | **completed, success** (after this report was first written) | embed + calibrate done | `out-panns10`; branch `ci/instrument-e2` | **Yes:** CNN10 does not replace C (see INSTRUMENT_PROXY_RESULTS, E2 section) |
 | Launch A/B, same machine | [41386232452](https://github.com/TMServicesindia/tonepilot/actions/runs/41386232452) | 56d78ee4e08c | **completed, success** (after this report was first written) | ab: done | `launch-ab` (JSON + logs) | **Yes:** no regression (see PROJECT_MEMORY §6j) |
 
 Neither run was modified, cancelled or rerun.
