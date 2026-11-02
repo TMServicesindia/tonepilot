@@ -43,6 +43,15 @@ jobs:
           TP_TONE_TARGETS: ${{ inputs.sealed && 'musescore_SEALED=/tmp/MuseScore_General.sf2' || 'same=/tmp/GeneralUser-GS.sf2,timgm=/usr/share/sounds/sf2/TimGM6mb.sf2' }}
           TP_TONE_TRAIN_BANKS: "fluidr3=/usr/share/sounds/sf2/FluidR3_GM.sf2"
         run: swift test -c release --filter ToneTableDump 2>&1 | grep -E "DUMP|error:|Executed" | tail -5
+      - name: Shipping fingerprint on the same targets (baseline; sealed runs only)
+        if: ${{ inputs.sealed }}
+        working-directory: Packages/TonePilotCore
+        env:
+          TP_SF2: /tmp/GeneralUser-GS.sf2
+          TP_SF2_TARGET: /tmp/MuseScore_General.sf2
+        run: |
+          swift test -c release --filter ToneMatchingBenchmarks 2>&1 | grep -E "BENCH" | tee /tmp/tdump/fingerprint_sealed.txt | tail -14
+          grep "BENCH RESULT" /tmp/tdump/fingerprint_sealed.txt | while IFS= read -r l; do echo "::notice title=Fingerprint (sealed)::$l"; done
       - uses: actions/upload-artifact@v4
         with: { name: tdump, path: /tmp/tdump, retention-days: 7 }
 
@@ -74,6 +83,6 @@ jobs:
           [ -f /tmp/e4.md ] || exit 0
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           git checkout -q --orphan ci/tone-e4 && git rm -rqf . && mkdir -p e4
-          cp /tmp/e4.md /tmp/e4.json e4/; cp /tmp/tdump/table.json /tmp/tdump/targets.json /tmp/tdump/train.json e4/ 2>/dev/null || true
+          cp /tmp/e4.md /tmp/e4.json e4/; cp /tmp/tdump/table.json /tmp/tdump/targets.json /tmp/tdump/train.json /tmp/tdump/fingerprint_sealed.txt e4/ 2>/dev/null || true
           echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID}" > e4/SOURCE.txt
           git add e4 && git commit -qm "Tone E-4" && git push -qf origin ci/tone-e4

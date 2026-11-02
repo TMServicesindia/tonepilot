@@ -72,17 +72,98 @@ _CACHE = {}
 EMBEDDERS = {}
 
 
+# ---- Device-parity path: the Swift EfficientATFrontEnd reproduced in numpy, with the harmonic mask
+# applied to the power spectrum (exactly what the app would run), then the model on the mel. ----
+_SR, _NFFT, _WIN, _HOP, _NMELS = 32000, 1024, 800, 320, 128
+
+
+def _mel_bank():
+    def mel(f): return 1127.0 * np.log(1 + f / 700.0)
+    bins, width = _NFFT // 2, _SR / _NFFT
+    lo, hi = mel(0.0), mel(15000.0); delta = (hi - lo) / (_NMELS + 1)
+    m = mel(width * np.arange(bins))
+    bank = np.zeros((_NMELS, bins))
+    for b in range(_NMELS):
+        left = lo + b * delta; center = left + delta; right = center + delta
+        bank[b] = np.maximum(0, np.minimum((m - left) / (center - left), (right - m) / (right - center)))
+    return bank
+
+
+_BANK = None
+
+
+def device_logmel(x, notes=None, width=0.03, max_harm=30):
+    """Swift EfficientATFrontEnd.logMel in numpy (+ optional harmonic power mask)."""
+    global _BANK
+    if _BANK is None:
+        _BANK = _mel_bank()
+    y = x[1:] - 0.97 * x[:-1]
+    pad = _NFFT // 2
+    p = np.concatenate([y[1:pad + 1][::-1], y, y[-pad - 1:-1][::-1]])
+    frames = 1 + len(y) // _HOP
+    w = np.zeros(_NFFT); off = (_NFFT - _WIN) // 2
+    w[off:off + _WIN] = 0.5 - 0.5 * np.cos(2 * np.pi * np.arange(_WIN) / (_WIN - 1))
+    idx = np.arange(_NFFT)[None, :] + _HOP * np.arange(frames)[:, None]
+    X = np.fft.rfft(p[idx] * w, axis=1)[:, : _NFFT // 2]
+    power = (X.real ** 2 + X.imag ** 2)
+    if notes:
+        binhz = _SR / _NFFT
+        freqs = np.arange(_NFFT // 2) * binhz
+        times = np.arange(frames) * _HOP / _SR
+        keep = np.zeros_like(power, dtype=bool)
+        for start, dur, midi in notes:
+            f0 = 440.0 * 2 ** ((midi - 69) / 12)
+            rows = np.where((times >= start) & (times <= start + dur + 0.15))[0]
+            if not len(rows):
+                continue
+            for k in range(1, max_harm + 1):
+                f = k * f0
+                if f > 15000:
+                    break
+                cols = np.abs(freqs - f) <= max(width * f, 1.5 * binhz)
+                keep[np.ix_(rows, np.where(cols)[0])] = True
+        power = np.where(keep, power, 0.0)
+    melp = power @ _BANK.T
+    return ((np.log(melp + 1e-5) + 4.5) / 5).T.astype(np.float32)   # [128, frames]
+
+
+def efficientat_device_embedder(eat):
+    import embed as E
+    import torch
+    model = E.EfficientAT(eat)
+    def f(x, sr, notes=None):
+        y = resample(x, sr, _SR)
+        if len(y) < _SR:
+            y = np.pad(y, (0, _SR - len(y)))
+        mel = device_logmel(y, notes)
+        n = mel.shape[1]
+        starts = list(range(0, max(1, n - 101 + 1), 50)) or [0]
+        wins = []
+        for s0 in starts:
+            w = mel[:, s0:s0 + 101]
+            if w.shape[1] < 101:
+                w = np.pad(w, ((0, 0), (0, 101 - w.shape[1])), constant_values=float((np.log(1e-5) + 4.5) / 5))
+            wins.append(w)
+        with torch.no_grad():
+            _, feats = model.m(torch.from_numpy(np.stack(wins))[:, None])
+        return feats.reshape(len(wins), -1).numpy().mean(0)
+    return f
+
+
 def evaluate(dump, method, embed_fn):
     table = json.load(open(os.path.join(dump, "table.json")))
     targets = json.load(open(os.path.join(dump, "targets.json")))
     base = method.split("+")[0]
-    harmx = "+harmx" in method          # mask targets with the app's EXTRACTED notes (deployable)
+    device = "+harmp" in method        # device-parity: mask in the Swift front-end's power domain
+    harmx = "+harmx" in method or "+harmpx" in method   # targets masked with the app's EXTRACTED notes
     harm = harmx or "+harm" in method
-    key = base + ("+harmx" if harmx else "+harm" if harm else "")
+    key = base + ("+harmpx" if device and harmx else "+harmp" if device else "+harmx" if harmx else "+harm" if harm else "")
     t0 = time.time()
     def emb(r):
         x, sr = read_wav(os.path.join(dump, r["file"]))
         notes = r.get("notes_extracted") if (harmx and "notes_extracted" in r) else r.get("notes")
+        if device:
+            return embed_fn(x, sr, notes)
         if harm and notes:
             x = harmonic_only(x, sr, notes)
         return embed_fn(x, sr)
@@ -145,9 +226,14 @@ def main():
     notes, detail = [], {}
     for m in methods:
         base = m.split("+")[0]
-        if base not in EMBEDDERS:
-            EMBEDDERS[base] = mfcc_embed if base == "mfcc" else model_embedder(base, eat)
-        fn = EMBEDDERS[base]
+        ek = base + ("@device" if "+harmp" in m else "")
+        if ek not in EMBEDDERS:
+            if "+harmp" in m:
+                assert base == "efficientat", "device-parity path is implemented for EfficientAT"
+                EMBEDDERS[ek] = efficientat_device_embedder(eat)
+            else:
+                EMBEDDERS[ek] = mfcc_embed if base == "mfcc" else model_embedder(base, eat)
+        fn = EMBEDDERS[ek]
         rows, secs = evaluate(dump, m, fn)
         L, note = summarise(m, rows, secs)
         lines += L; notes.append(note); detail[m] = rows
