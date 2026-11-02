@@ -293,3 +293,24 @@ Splits:
 - On the sealed TEST it is no better than the current matcher, and it is 2× slower.
 
 **Measured conclusion:** recognisable tones on real songs need **cross-source instrument identity**. On its own cross-bank TEST (trained on FluidR3, tested on unseen GeneralUser), the gated EfficientAT + head C reached **86% selective family accuracy at 72% coverage**, against about 17–25% top-1 family for the fingerprint on cross-bank audio. The next step is to let a confident family decision from C gate the tone search, with the fingerprint choosing only within that family. That requires an owner decision on shipping the research model before its gates (G2.4 device run; ≤ 5% wrong-family not yet met).
+
+---
+
+## Tone E-4: nearest tone by embedding similarity (run 41406558483; DEV banks only; rendered GM audio, not real songs)
+
+Method:
+- the TonePilot library (130 tones × 3 registers, rendered by TonePilot's engine) is compared with each target part (bench lead/backing stems with leakage) by cosine similarity, best register;
+- truth = GM program (exact) / TonePilot family.
+
+| Method | Same bank lead (exact / family / top-3 family) | Same bank backing | **Cross-bank TimGM lead** | **Cross-bank TimGM backing** |
+|---|---|---|---|---|
+| Shipping fingerprint (bench, 2 Nov; full PartMatcher path) | 4 / 7 / — | 2 / 5 / — | 2 / 3 / — | 0 / 1 / — |
+| MFCC (hand features) | 0 / 1 / 2 | 9 / 11 / 12 | 0 / 0 / 0 | 1 / 1 / 1 |
+| **EfficientAT embedding** | **6 / 9 / 9** | 3 / 8 / 9 | **3 / 5 / 5** | **2 / 6 / 6** |
+| PANNs CNN10 embedding | 5 / 7 / 9 | 4 / 6 / 10 | 2 / 5 / 7 | 2 / 2 / 7 |
+
+Embedding time for all 438 clips (CI CPU): EfficientAT 25 s, CNN10 113 s.
+
+**Local follow-up (MFCC, same harness):** harmonic-only part isolation (+harm: STFT mask at the notes' harmonics) raises same-bank lead from 0/1 to **6/7 exact/family**, confirming the leaking backing hurts whole-clip descriptors. LDA on FluidR3 renders did not help MFCC.
+
+**Next (E-5, run 41407645614):** EfficientAT with +harm, +lda (FluidR3 training renders) and both.
