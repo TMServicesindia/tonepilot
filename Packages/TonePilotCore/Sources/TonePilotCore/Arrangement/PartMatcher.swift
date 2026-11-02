@@ -56,6 +56,8 @@ public enum PartMatcher {
     /// Tone recreation T3 (fit attack / fade / release / brightness / vibrato to the part). Off until it
     /// passes its pre-registered DEV gate (tone-fit.yml, independent judges); then switched on here.
     public static let fitsPlaying = false
+    /// Which parts are fitted: melody parts only (DEV run 2: backing gained in 6/16 fits, leads 9/16).
+    public static func fitsPlaying(part: String) -> Bool { fitsPlaying && part != StemInfo.Kind.backing.rawValue }
 
     /// The nearest-sound search (tone research E-4/E-5, sealed-tested): the platform supplies the
     /// part's audio at 32 kHz (the separated stem file, full band) and the embedding model.
@@ -105,7 +107,7 @@ public enum PartMatcher {
     /// also hears the fitted tone at least as close to the part as the unfitted one (an independent check).
     static func fitPlaying(_ m: inout PartMatch, kind: StemInfo.Kind, start: Double, slice: AudioBuffer, notes: [MelodyNote],
                            patch: InstrumentPatch, instrument: (InstrumentPatch) -> LoadedInstrument?, hook: PerceptualHook?) {
-        guard fitsPlaying, let inst = instrument(patch) else { return }
+        guard fitsPlaying(part: kind.rawValue), let inst = instrument(patch) else { return }
         let eq = m.eq
         let verify: ((ToneFitter.Settings) -> Bool)? = hook.map { hook in
             { settings in perceptuallyCloser(settings, kind: kind, start: start, slice: slice, notes: notes, patch: patch, instrument: inst, eq: eq, hook: hook) }

@@ -61,6 +61,18 @@ public enum ToneFitter {
 
     /// Measures `x` (mono) where `notes` play. Needs ≥ 3 usable notes.
     public static func measure(_ x: [Float], sampleRate: Double, notes: [MelodyNote]) -> Character? {
+        measureNotes(x, sampleRate: sampleRate, notes: notes)?.character
+    }
+
+    /// Each aspect per measured note (key = the note's position among the measured notes, the same
+    /// for any audio playing the same `notes`), so the song and a render can be compared note by note.
+    struct PerNote {
+        var attack: [Int: Double] = [:], sustain: [Int: Double] = [:], release: [Int: Double] = [:]
+        var brightness: [Int: Double] = [:], vibrato: [Int: Double] = [:]
+    }
+
+    static func measureNotes(_ x: [Float], sampleRate: Double, notes: [MelodyNote]) -> (character: Character, notes: PerNote)? {
+        var per = PerNote()
         var sr = sampleRate, y = x
         if sr > 30_000 { y = halve(x); sr /= 2 }
         let n = sr > 16_000 ? 1024 : 512
@@ -77,7 +89,7 @@ public enum ToneFitter {
         let onsets = notes.map(\.start).sorted()
         var attacks: [Double] = [], sustains: [Double] = [], releases: [Double] = [], brights: [Double] = []
         var depths: [Double] = [], rates: [Double] = []
-        for note in sorted.prefix(40) {
+        for (ni, note) in sorted.prefix(40).enumerated() {
             let f0 = 440 * pow(2, (Double(note.midi) - 69) / 12)
             let maxK = min(20, Int(sr * 0.45 / f0))
             guard maxK >= 1 else { continue }
@@ -95,6 +107,12 @@ public enum ToneFitter {
                     guard hi >= lo else { continue }
                     var a: Float = 0
                     for b in lo...hi where m[b] > a { a = m[b] }
+                    // Above the floor between harmonics only: leakage and noise spread over that floor, so
+                    // subtracting it removes most of their bias (same treatment for the song and a render).
+                    let gLo = max(1, Int(c - 0.5 * f0 / binHz)), gHi = min(m.count - 1, Int(c + 0.5 * f0 / binHz))
+                    var gap: [Float] = []
+                    for b in gLo...max(gLo, gHi) where b < lo || b > hi { gap.append(m[b]) }
+                    if gap.count >= 2 { gap.sort(); a = max(0, a - gap[gap.count / 2]) }
                     e += Double(a * a); wk += Double(k) * Double(a); w += Double(a)
                     if k <= 4, a > bestA { bestA = a; bestK = k }
                 }
@@ -120,35 +138,51 @@ public enum ToneFitter {
             let lo10 = base + 0.1 * (peak - base), hi90 = base + 0.9 * (peak - base)
             if let a = level.indices.first(where: { $0 >= max(0, startI - 8) && level[$0] >= lo10 }),
                let b = level.indices.first(where: { $0 >= a && level[$0] >= hi90 }) {
-                attacks.append(Double(b - a) * Double(hop) / sr)
+                attacks.append(Double(b - a) * Double(hop) / sr); per.attack[ni] = attacks.last!
             }
             if note.duration >= 0.3 {
                 let late = level.indices.filter { time($0) >= note.start + 0.7 * note.duration && time($0) <= note.start + 0.9 * note.duration }
-                if !late.isEmpty { sustains.append(median(late.map { level[$0] }) / peak) }
+                if !late.isEmpty { sustains.append(median(late.map { level[$0] }) / peak); per.sustain[ni] = sustains.last! }
             }
             // Release: only with a clear gap after the note, and only if the note is still sounding at its end.
             if next - note.end >= 0.25, level[endI] > 0.1 * peak {
                 let stop = level[endI] * 0.1
-                if let r = level.indices.first(where: { $0 > endI && level[$0] < stop }) { releases.append(time(r) - time(endI)) }
-                else if time(level.count - 1) - time(endI) >= 0.2 { releases.append(time(level.count - 1) - time(endI) + 0.1) }
+                if let r = level.indices.first(where: { $0 > endI && level[$0] < stop }) { releases.append(time(r) - time(endI)); per.release[ni] = releases.last! }
+                else if time(level.count - 1) - time(endI) >= 0.2 { releases.append(time(level.count - 1) - time(endI) + 0.1); per.release[ni] = releases.last! }
             }
             let body = (startI...endI).filter { time($0) >= note.start + 0.05 }
             let bw = body.map { level[$0] }.reduce(0, +)
-            if bw > 0 { brights.append(body.map { centroid[$0] * level[$0] }.reduce(0, +) / bw) }
+            if bw > 0 { brights.append(body.map { centroid[$0] * level[$0] }.reduce(0, +) / bw); per.brightness[ni] = brights.last! }
             // Vibrato on held notes: detrended pitch, zero-crossing rate, RMS depth.
             if note.duration >= 0.6 {
                 let idx = (startI...endI).filter { time($0) >= note.start + 0.15 && time($0) <= note.end - 0.05 }
                 let cents = idx.compactMap { pitch[$0].map { 1200 * log2($0 / f0) } }
                 if cents.count >= 40, let (rate, depth) = vibrato(cents, framesPerSecond: sr / Double(hop)) {
-                    depths.append(depth); if depth > 0 { rates.append(rate) }
+                    depths.append(depth); per.vibrato[ni] = depth; if depth > 0 { rates.append(rate) }
                 }
             }
         }
         guard attacks.count >= 3, !brights.isEmpty else { return nil }
         let vib = depths.isEmpty ? 0 : median(depths)
-        return Character(attack: median(attacks), sustain: sustains.isEmpty ? 1 : median(sustains),
-                         release: releases.count >= 2 ? median(releases) : nil, brightness: median(brights),
-                         vibratoDepth: vib, vibratoRate: rates.isEmpty || vib < 1 ? 0 : median(rates), notes: attacks.count)
+        let ch = Character(attack: median(attacks), sustain: sustains.isEmpty ? 1 : median(sustains),
+                           release: releases.count >= 2 ? median(releases) : nil, brightness: median(brights),
+                           vibratoDepth: vib, vibratoRate: rates.isEmpty || vib < 1 ? 0 : median(rates), notes: attacks.count)
+        return (ch, per)
+    }
+
+    /// True when the song and the tone differ on one aspect *consistently*: over the notes both were
+    /// measured on (≥ 3), at least 70 % differ in the same direction and the median difference exceeds
+    /// `threshold`. Leakage changes from note to note; a different way of playing doesn't.
+    static func consistentlyDifferent(_ target: [Int: Double], _ tone: [Int: Double], logRatio: Bool, threshold: Double) -> Bool {
+        let keys = Set(target.keys).intersection(tone.keys)
+        guard keys.count >= 3 else { return false }
+        let d = keys.map { k -> Double in
+            let t = target[k]!, c = tone[k]!
+            return logRatio ? log(max(t, 0.004) / max(c, 0.004)) : t - c
+        }
+        let m = median(d)
+        guard abs(m) > threshold else { return false }
+        return Double(d.filter { ($0 > 0) == (m > 0) && $0 != 0 }.count) >= 0.7 * Double(d.count)
     }
 
     /// How far `a` is from the target `t` (0 = same; ~1 per clearly audible step on one aspect).
@@ -173,13 +207,14 @@ public enum ToneFitter {
         guard let (clip, ns) = ToneMatcher.window(target, notes: snapped, maxSeconds: 6, maxNotes: 14) else { return nil }
         var audio = clip.samples, sr = clip.sampleRate
         if sr > 30_000 { audio = halve(audio); sr /= 2 }
-        guard let t = measure(audio, sampleRate: sr, notes: ns) else { return nil }
+        guard let (t, tn) = measureNotes(audio, sampleRate: sr, notes: ns) else { return nil }
         let seconds = Double(audio.count) / sr
         func character(_ s: Settings) -> Character? {
             measure(ToneMatcher.render(patch, instrument: instrument, notes: ns, seconds: seconds, sampleRate: sr, eq: eq, fit: s).samples,
                     sampleRate: sr, notes: ns)
         }
-        guard let c0 = character(Settings()) else { return nil }
+        guard let (c0, cn) = measureNotes(ToneMatcher.render(patch, instrument: instrument, notes: ns, seconds: seconds, sampleRate: sr, eq: eq).samples,
+                                          sampleRate: sr, notes: ns) else { return nil }
         var best = Settings(), bestC = c0, bestD = distance(c0, t)
         let d0 = bestD
         func consider(_ s: Settings) -> Character? {
@@ -192,9 +227,10 @@ public enum ToneFitter {
         let durations = ns.map(\.duration)
 
         // 1. Envelope (attack, how held notes fade, release): ratio updates, three renders.
-        let attackOff = abs(log(max(c0.attack, 0.008) / max(t.attack, 0.008))) > log(1.4)
-        let sustainOff = abs(c0.sustain - t.sustain) > 0.15
-        let releaseOff = c0.release.flatMap { cr in t.release.map { abs(log(max(cr, 0.03) / max($0, 0.03))) > log(1.5) } } ?? false
+        // Only aspects that differ consistently note by note are fitted (leakage varies between notes).
+        let attackOff = consistentlyDifferent(tn.attack, cn.attack, logRatio: true, threshold: log(1.4))
+        let sustainOff = consistentlyDifferent(tn.sustain, cn.sustain, logRatio: false, threshold: 0.15)
+        let releaseOff = t.release != nil && c0.release != nil && consistentlyDifferent(tn.release, cn.release, logRatio: true, threshold: log(1.5))
         if attackOff || sustainOff || releaseOff {
             // Start from the tone's own envelope (a sampled tone's: the region playing the part's middle
             // note) and change only what was measured to differ, so e.g. a pad keeps its long release.
@@ -215,8 +251,9 @@ public enum ToneFitter {
         // 2. Filter (brightness): a low-pass when the tone is brighter than the part, or the tone's own
         // filter opened when it is darker; cutoff by ratio updates, three renders.
         let base = best
-        let tooBright = bestC.brightness > t.brightness * 1.06
-        let tooDark = bestC.brightness < t.brightness / 1.06 && patch.filter.enabled && patch.filter.cutoff < 18_000
+        let brightnessOff = consistentlyDifferent(tn.brightness, cn.brightness, logRatio: true, threshold: log(1.06))
+        let tooBright = brightnessOff && bestC.brightness > t.brightness
+        let tooDark = brightnessOff && bestC.brightness < t.brightness && patch.filter.enabled && patch.filter.cutoff < 18_000
         if tooBright || tooDark {
             var filter = patch.filter.enabled ? patch.filter : FilterSettings(enabled: true, cutoff: 0, resonance: 0)
             func clamp(_ f: Double) -> Double { max(200, min(18_000, f)) }
@@ -231,7 +268,9 @@ public enum ToneFitter {
         // 3. Vibrato (melody parts): the part's rate, depth by ratio updates; or removed when the part has none.
         if vibrato {
             var ex = patch.expression ?? .poly
-            let wantsVibrato = t.vibratoDepth >= 8 && t.vibratoRate >= 3
+            let held = Array(tn.vibrato.values)
+            let wantsVibrato = t.vibratoDepth >= 8 && t.vibratoRate >= 3 && held.count >= 2
+                && Double(held.filter { $0 >= 8 }.count) >= 0.6 * Double(held.count)
             if wantsVibrato {
                 ex.vibratoRate = max(3, min(9, t.vibratoRate)); ex.vibratoDelay = 0.15
                 ex.vibratoDepth = max(4, min(60, t.vibratoDepth))

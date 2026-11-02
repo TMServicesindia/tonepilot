@@ -49,7 +49,9 @@ final class ToneFitBench: XCTestCase {
                     guard notes.filter({ $0.duration >= 0.12 }).count >= 6 else { continue }
                     let eq = ToneMatcher.bestMatches(target: target, notes: notes, candidates: [patch], instrument: load, limit: 1).first?.eq
                     let t0 = Date()
-                    let fit = ToneFitter.fit(patch: patch, instrument: inst, target: target, notes: notes, eq: eq, vibrato: t.part == "lead")
+                    // As in the app: melody parts only (PartMatcher.fitsPlaying(part:), ignoring its on/off switch).
+                    let fit = t.part == StemInfo.Kind.backing.rawValue ? nil
+                        : ToneFitter.fit(patch: patch, instrument: inst, target: target, notes: notes, eq: eq, vibrato: true)
                     took += Date().timeIntervalSince(t0); fits += 1
                     let id = "\(bankName)_\(variant)_\(t.caseIndex)_\(t.part)"
                     let seconds = Double(t.samples.count) / t.sampleRate
