@@ -1,0 +1,33 @@
+name: Preserve converted Core ML models (research assets)
+
+# Copies the Gate 2 EfficientAT Core ML conversion (MIT model; fp16 = the Gate 2 recommendation:
+# 9.9 MB, 99.5% family-decision agreement) from a coreml-gate2 run's artifact to branch
+# ci/ml-assets, so it does not expire with the 7-day artifact. No app build.
+on:
+  workflow_dispatch:
+    inputs:
+      gate2_run_id:
+        description: "coreml-gate2 run id"
+        default: "41323494255"
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  preserve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: coreml-models, path: /tmp/models, run-id: "${{ inputs.gate2_run_id }}", github-token: "${{ github.token }}" }
+      - name: Push fp16 model to ci/ml-assets
+        run: |
+          ls -la /tmp/models
+          test -d /tmp/models/EfficientAT_mn10_as_fp16.mlpackage
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/ml-assets && git rm -rqf . && mkdir -p ml
+          cp -R /tmp/models/EfficientAT_mn10_as_fp16.mlpackage ml/
+          ( cd ml && find EfficientAT_mn10_as_fp16.mlpackage -type f -exec sha256sum {} \; > SHA256SUMS )
+          printf 'EfficientAT mn10_as (fschmid56/EfficientAT, MIT) converted to Core ML fp16 by coreml-gate2 run %s.\nAudioSet label names: CC BY-SA 4.0.\n' "${{ inputs.gate2_run_id }}" > ml/SOURCE.txt
+          git add ml && git commit -qm "EfficientAT Core ML fp16 (Gate 2 run ${{ inputs.gate2_run_id }})" && git push -qf origin ci/ml-assets
