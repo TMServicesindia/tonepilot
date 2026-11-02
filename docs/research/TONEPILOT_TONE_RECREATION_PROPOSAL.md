@@ -58,20 +58,66 @@ Note: the harmonic-profile feature tried on 2 Nov did not help on its own. These
 - Then render only the top 6 for the existing full check and the EQ/reverb fit.
 - This removes the 2× slowdown measured for the screening prototype (INFERENCE; to be measured).
 
-## 4. Layering: can two simple tones recreate a complex sound?
+## 4. Recreate the nearest sound: fit the chosen tone to the song
+
+**Goal (owner, 2 Nov):** the **nearest sound to the song's own part**. TonePilot recreates it with its own engine; it does not depend on the Casio's built-in tones (those are extra candidates, §4c).
+
+**Step 1. Find the nearest tone:** the perceptual search over the whole library (§3, T1).
+
+**Step 2. Shape that tone towards the part.** TonePilot's engine can change, per layer:
+- attack, decay, sustain, release;
+- low-pass filter cutoff and resonance;
+- 3-band EQ;
+- reverb, chorus and delay sends;
+- octave;
+- vibrato depth and rate;
+- glide.
+
+The fit:
+- The existing matcher already fits EQ and reverb.
+- The proposal extends it to **attack / release, filter brightness and vibrato**, measured on the part's own notes.
+- Each parameter is kept only when the re-rendered tone measurably moves closer to the part (re-measured, as the EQ fit already is).
+
+**Output:** one tone with its fitted settings, saved as the section's tone or the song's main tone. It is played from the Casio over MIDI through TonePilot's engine.
+
+## 4b. Layering: can two tones recreate a complex sound? (restored, owner 2 Nov)
 
 **Search:**
-- From the top 6 single tones (B), try **pairs** (15 pairs) with level ratios {0.3, 0.5, 0.7} and octave offsets {0, +12}: 90 combinations.
-- Score with the same perceptual measure.
-- Report the gain over the best single tone.
+- From the top 6 candidates (B), try **pairs** (15 pairs) with level ratios {0.3, 0.5, 0.7} and octave offsets {0, +12}: 90 combinations.
+- Score with the same perceptual measure, after the fit in §4.
+- Report the gain over the best single fitted tone.
 
 **Guardrails:**
 - A layer is recommended only if it beats the best single tone by a margin set on DEV.
-- At most 2 layers, because that is what a CT-X870IN player can reasonably set up (layer function).
+- At most 2 layers (TonePilot's engine allows 8; 2 keeps it playable and predictable).
 
-**Output as a "CT-X870IN setup":** base tone, layer tone, octave, reverb/chorus, playing technique (e.g. grace notes for gamaka, legato, pedal).
+**Output, the tone setup:**
+- base tone + fitted settings;
+- optional layer tone + level + octave;
+- reverb/chorus;
+- playing technique (e.g. grace notes for gamaka, legato, pedal).
 
-**Data gap:** the **CT-X870IN's own tone list and its layer/split behaviour** are not in the repository. Mapping TonePilot tones to Casio tone numbers needs the owner's manual or tone list. Until then, recommendations are TonePilot tones played from the Casio over MIDI.
+## 4c. Casio CT-X870IN tones as extra candidates (owner, 2 Nov)
+
+**Rule:** TonePilot's own recreation comes first. Casio tones are added to the search so the best result can be a Casio tone when it really is nearer.
+
+**What can be imported:**
+- the **tone list** (numbers, names, categories) from the owner's manual;
+- **recordings of each tone made on the owner's own keyboard**.
+
+The Casio's internal sample data is not extracted (it is Casio's proprietary material and not accessible).
+
+**Capture method (proposal; needs hardware):**
+1. Each Casio tone plays the same standard phrases as the TonePilot tone table (`ToneTableDump`: 8 notes × 3 registers).
+2. The recordings are embedded like every other table entry and tagged `casio:<tone number>`.
+3. Manual route: the owner selects each tone and plays the phrase, recorded through an audio interface.
+4. **Automatic route:** a capture tool sends program changes and the phrase notes over **MIDI out**, and records the Casio's audio output.
+   - This needs a MIDI output path (TonePilot has none today; it was planned as P3.2).
+   - It also needs an audio connection from the Casio's output into the recording device. Hardware check pending.
+
+**In the recommendation:** "Nearest: TonePilot *Bansuri-like Flute* + fitted settings (similarity 0.84)", or "Casio tone *nnn* (0.86)". Shown together when both are close.
+
+**Storage:** owner recordings stay private (not in the public repository). Only the embeddings and tone numbers go into the app's table.
 
 ## 5. "Simple-instrument recreation" evaluation (PianistRam-style; future)
 
@@ -82,8 +128,8 @@ Goal: test whether TonePilot can recommend a *convincing* keyboard sound for a p
 - or volunteer musicians, with written permission.
 
 **Metric:** owner listening ranks.
-- Per target, the owner hears TonePilot's top-3 single tones, the best layer, and today's choice, then ranks them (or rates 0–100, MUSHRA-style, blind order).
-- **Success:** TonePilot's top-1 or best layer is ranked ≥ today's choice in ≥ 70% of targets (proposed gate).
+- Per target, the owner hears TonePilot's top-3 tones (with fitted settings) and today's choice, plus the best layer and the nearest Casio tone, then ranks them (or rates 0–100, MUSHRA-style, blind order).
+- **Success:** TonePilot's top-1 fitted tone is ranked ≥ today's choice in ≥ 70% of targets (proposed gate).
 
 ## 6. Evaluation plan (splits preserved)
 
@@ -99,7 +145,9 @@ Goal: test whether TonePilot can recommend a *convincing* keyboard sound for a p
 **Metrics, always reported separately:**
 - identity: family / exact / abstain;
 - perceptual: descriptor distance, plus owner rank on the listening set;
-- layering gain;
+- fitting gain (similarity before vs after shaping the tone);
+- layering gain (best pair vs best single fitted tone);
+- Casio vs TonePilot: how often a Casio tone is the nearest;
 - time per part (Linux CI, plus iPhone once G2.4 runs).
 
 ## 7. Proposed experiments (for approval; none started)
@@ -108,7 +156,9 @@ Goal: test whether TonePilot can recommend a *convincing* keyboard sound for a p
 |---|---|---|---|
 | T1 | Does a descriptor-table search (no rendering) match the current fingerprint on same-bank DEV, and beat it on cross-bank DEV? | GU + TimGM6mb | Cross-bank family ≥ +3/12 with same-bank not worse |
 | T2 | Which descriptors carry across sources? (one-at-a-time ablation) | Cross-bank DEV | Keep only features that help |
-| T3 | Do two-tone layers beat the best single tone? | DEV + owner listening | Gain > DEV margin in ≥ 30% of targets |
+| T3 | Does fitting attack / release, filter and vibrato to the part move the chosen tone measurably closer? | Cross-bank DEV + owner listening | Similarity gain on DEV in ≥ 50% of targets, no target worse |
+| T3b | Do two-tone layers beat the best single fitted tone? | DEV + owner listening | Gain > DEV margin in ≥ 30% of targets |
+| T6 | With the owner's Casio tones added, how often is a Casio tone nearer than TonePilot's fitted tone? | Owner Casio recordings + DEV targets | Report only |
 | T4 | Agreement / disagreement between A (identity) and B (perceptual): how often, and which one is right? | Cross-bank DEV with known instruments | Report only |
 | T5 | Owner listening test (§5) | Owner recordings | ≥ 70% ranked ≥ today's choice |
 
