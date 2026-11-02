@@ -26,6 +26,11 @@ Status values: **Cleared** (all four records permissive, attribution done, revie
 | Microsoft CLAP (comparison) | MIT | MS-PL (HF), CC BY 3.0 US (Zenodo 8378278) | — | Not stated | Attribution | **SAFE\*** | — |
 | ByteDance piano / YourMT3 (offline reference only) | MIT / Apache-2.0 | MIT (author HF) / Apache-2.0 | — | MAESTRO (CC BY-NC-SA) and others | — | **Benchmark use only, never shipped** | — |
 | LiteRT runtime (Phase 1) | Apache-2.0 | — | — | — | NOTICE | Cleared (after notice added) | Add to attribution file |
+| VSCO 2 Community Edition samples (candidate tones) | — | Samples: **CC0 1.0** (LICENSE file, `sgossner/VSCO-2-CE`, read 2 Nov) | — | Real recordings by Versilian Studios | None required (provenance recorded) | **Cleared** (CC0) | SFZ import/convert; per-instrument download packs |
+| Versilian Community Sample Library, VCSL (candidate tones) | — | Samples: **CC0 1.0** (LICENSE + README "even make commercial software") | — | Real recordings | None required | **Cleared** (CC0) | as above |
+| MuseScore General SoundFont (candidate) | — | **MIT** (MuseScore handbook, Fedora notes) | — | FluidR3 lineage | Keep MIT notice | SAFE\* | Confirm COPYING file |
+| University of Iowa MIS (evaluation) | — | Free; "must not be made available as is (as samples or a sampler instrument)" | — | Real anechoic recordings | — | **Evaluation only, never shipped** | Sealed real-recording TEST |
+| Casio / Yamaha factory tones | — | Proprietary; ROM extractions unlicensed | — | — | — | **Rejected** (never shipped). Owner's own recordings only as private search candidates | — |
 | ONNX Runtime (if used) | MIT | — | — | — | Notice | Cleared (after notice added) | — |
 | `mir_eval` (CI only) | MIT | — | — | — | — | Cleared (not shipped) | — |
 

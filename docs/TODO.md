@@ -64,6 +64,8 @@ Chord/Arpeggio and Tone Maker enhancements are paused until the analyser gates a
 | TR.1 | **Tone recreation proposal** ([`research/TONEPILOT_TONE_RECREATION_PROPOSAL.md`](research/TONEPILOT_TONE_RECREATION_PROPOSAL.md)):<br>• instrument match (A) and perceptual tone match (B) side by side; A never restricts B;<br>• whole-library nearest-sound search (T1);<br>• fit the tone's envelope, filter and vibrato to the part (T3);<br>• two-tone layers (T3b, restored);<br>• Casio tones as extra candidates (T6).<br>TonePilot's own recreation comes first. | 🔨 T1 in progress |
 | TR.2 | **Casio tones as candidates:**<br>• the owner provides the CT-X870IN tone list (manual) and records each tone playing the standard phrases (or an automatic capture tool once MIDI out exists);<br>• recordings stay private; only embeddings go into the table. | 👤 |
 | TR.3 | A new sealed TEST sound bank (verified licence) for the next tone-method decision; FluidR3 used once per method on 2 Nov | ⏳ |
+| TR.4 | **Real-instrument tone library** ([`research/TONEPILOT_TONE_LIBRARY_SOURCES.md`](research/TONEPILOT_TONE_LIBRARY_SOURCES.md)):<br>• VSCO 2 CE + VCSL (both **CC0**, verified): real strings, woodwinds, brass, harp, pianos, mallets;<br>• SFZ import or CI conversion;<br>• per-instrument download packs;<br>• each new tone must beat the GM tone in the bench and the owner's listening check.<br>Casio/Yamaha factory samples are not usable (proprietary). | 📋 proposal |
+| TR.5 | Iowa MIS real recordings as a **sealed real-recording TEST** for tone recreation (evaluation only, never shipped) | ⏳ |
 
 ## R. Product and competitor research (Phase A, 2 Nov) — **proposals awaiting owner review, not approved**
 
