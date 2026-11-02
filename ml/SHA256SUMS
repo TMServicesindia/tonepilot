@@ -1,0 +1,3 @@
+ca65b5673dd0e8153b356de55a4cf4df259a2a1573608e529677737dd64d28c3  EfficientAT_mn10_as_fp16.mlpackage/Manifest.json
+1e43ac92ec3266dbd864601816313e01c9bbf14b461ec1b877bdeab0e1c0fd16  EfficientAT_mn10_as_fp16.mlpackage/Data/com.apple.CoreML/weights/weight.bin
+03671321427b80e7ce348c45adc64b8781287d7347b2dff19a23d643fd7ab2ad  EfficientAT_mn10_as_fp16.mlpackage/Data/com.apple.CoreML/model.mlmodel

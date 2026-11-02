@@ -1,0 +1,2 @@
+EfficientAT mn10_as (fschmid56/EfficientAT a425fdce92572e602a1d5634799bd9f1f2efa806, MIT) → Core ML fp16, input [1,1,128,101]; tonepilot 027e38c2b98844e64adb92e552b07792742a54ac; run 41416938342.
+AudioSet label names: CC BY-SA 4.0.
