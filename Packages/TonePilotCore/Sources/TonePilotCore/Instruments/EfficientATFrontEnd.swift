@@ -40,8 +40,34 @@ public enum EfficientATFrontEnd {
         return (a, Array(row[a...b]))
     }
 
+    /// Bins (per frame) kept by the harmonic mask: those within ±3% (at least ±1.5 bins) of a harmonic
+    /// k·f0 (k ≤ 30, ≤ 15 kHz) of a note sounding at that frame (until 0.15 s after it ends).
+    /// Same rule as `device_logmel` in Native/tools/instruments/tone_t1.py.
+    static func harmonicMask(frames: Int, notes: [MelodyNote], width: Double = 0.03, maxHarmonic: Int = 30) -> [[Bool]] {
+        let half = nFFT / 2, binHz = sampleRate / Double(nFFT)
+        var keep = [[Bool]](repeating: [Bool](repeating: false, count: half), count: frames)
+        for n in notes where (0...127).contains(n.midi) {
+            let f0 = 440 * pow(2, (Double(n.midi) - 69) / 12)
+            let first = max(0, Int((n.start * sampleRate / Double(hop)).rounded(.up)))
+            let last = min(frames - 1, Int(((n.start + n.duration + 0.15) * sampleRate / Double(hop)).rounded(.down)))
+            guard first <= last else { continue }
+            var ranges: [ClosedRange<Int>] = []
+            for k in 1...maxHarmonic {
+                let f = Double(k) * f0
+                if f > fMax { break }
+                let tol = max(width * f, 1.5 * binHz)
+                let lo = max(0, Int(((f - tol) / binHz).rounded(.up))), hi = min(half - 1, Int(((f + tol) / binHz).rounded(.down)))
+                if lo <= hi { ranges.append(lo...hi) }
+            }
+            for t in first...last { for r in ranges { for b in r { keep[t][b] = true } } }
+        }
+        return keep
+    }
+
     /// Log-mel for mono audio at 32 kHz. Returns (frames, values[mel * frames + t]).
-    public static func logMel(_ x: [Float]) -> (frames: Int, values: [Float]) {
+    /// `keepHarmonicsOf`: notes (seconds in `x`) whose harmonics are kept; all other power is zeroed
+    /// before the mel step (part isolation for `PerceptualToneSearch`). nil = the unmodified front-end.
+    public static func logMel(_ x: [Float], keepHarmonicsOf notes: [MelodyNote]? = nil) -> (frames: Int, values: [Float]) {
         guard x.count > 2 else { return (0, []) }
         var y = [Float](repeating: 0, count: x.count - 1)
         for n in 0..<(x.count - 1) { y[n] = x[n + 1] - 0.97 * x[n] }
@@ -55,7 +81,9 @@ public enum EfficientATFrontEnd {
         var out = [Float](repeating: 0, count: nMels * frames)
         let bank = sparseBank
         var power = [Double](repeating: 0, count: half)
+        let mask = notes.map { harmonicMask(frames: frames, notes: $0) }
         func melRow(_ t: Int) {
+            if let mask { for k in 0..<half where !mask[t][k] { power[k] = 0 } }
             for m in 0..<nMels {
                 let band = bank[m]
                 var acc = 0.0

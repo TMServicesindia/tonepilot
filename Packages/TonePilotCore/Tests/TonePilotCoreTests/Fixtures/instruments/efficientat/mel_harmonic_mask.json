@@ -1,0 +1,24 @@
+{
+ "notes": [
+  [
+   0.2,
+   0.6,
+   64
+  ],
+  [
+   0.9,
+   0.5,
+   67
+  ],
+  [
+   1.5,
+   0.8,
+   71.0
+  ]
+ ],
+ "source": "Native/tools/instruments/tone_t1.py device_logmel(audio.f32, notes)",
+ "shape": [
+  128,
+  250
+ ]
+}
