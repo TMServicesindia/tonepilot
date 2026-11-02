@@ -293,6 +293,14 @@ Stop: no production change, no major training, no release before approval.
 - full-build "Nearest-sound search contract" (bundled model + Swift front-end vs PyTorch embedding, cosine > 0.99; tables valid);
 - licence manifest entry (SAFE\*: MIT code/weights, AudioSet data).
 
+**First full build (run 41415425679) failed the new contract, before publishing:**
+- Gate 2's Core ML export was traced on 100-frame windows. The Swift front-end, the tone tables and the sealed TEST all use 101 frames (1 + n/hop).
+- Fix: re-exported with input [1,1,128,101], same settings as Gate 2 (`tone-model.yml`, run 41416938342, branch `ci/tone-model`).
+- Measured on Mac CI: embedding cosine 0.99999 vs PyTorch fp32 on 36 windows; same nearest tone 36/36 with compute units "all".
+- With CPU only, 35/36 against the harmonic table. The one change was an unmasked sawtooth scored against the harmonic table, a pairing the app never uses.
+- Fp16 is 9.86 MB; 7.5 ms per window on the Mac.
+- The app now also turns the search off (fingerprint fallback) if the model's input shape isn't [1,1,128,101].
+
 **Not validated yet:** real film songs; physical iPhone timing (G2.4).
 
 ## 7. Open owner decisions
