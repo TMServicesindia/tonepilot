@@ -1,0 +1,37 @@
+name: Nearest-sound model → Core ML [1,1,128,101] (no app build)
+
+# Re-exports EfficientAT mn10_as (MIT) to Core ML fp16 with the 101-frame input the app sends
+# (Gate 2's export was traced on 100 frames; full build 41415425679 caught the mismatch).
+# Validated against PyTorch fp32 and the bundled tone tables; pushed to branch ci/tone-model.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: macos-14
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Install
+        run: |
+          pip install -q "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2" "numpy<2" scipy "coremltools==8.2"
+          git clone -q https://github.com/fschmid56/EfficientAT /tmp/eat
+          echo "EAT_COMMIT=$(git -C /tmp/eat rev-parse HEAD)" >> $GITHUB_ENV
+      - name: Convert and validate
+        run: |
+          set -o pipefail
+          python Native/tools/instruments/convert_tone_model.py /tmp/eat "$PWD/App/Resources/ML" /tmp/tm 2>&1 | tee /tmp/tm.log | tail -30
+          grep -E "^(RESULT|FAIL)" /tmp/tm.log | while IFS= read -r l; do echo "::notice title=Nearest-sound model::$l"; done
+      - name: Push model + report to branch ci/tone-model
+        run: |
+          mkdir -p /tmp/pub/ml && cp -R /tmp/tm/EfficientAT_mn10_as_fp16.mlpackage /tmp/tm/tone_model_coreml.json /tmp/tm.log /tmp/pub/ml/
+          ( cd /tmp/pub/ml && find EfficientAT_mn10_as_fp16.mlpackage -type f -exec shasum -a 256 {} \; > SHA256SUMS )
+          printf 'EfficientAT mn10_as (fschmid56/EfficientAT %s, MIT) → Core ML fp16, input [1,1,128,101]; tonepilot %s; run %s.\nAudioSet label names: CC BY-SA 4.0.\n' "$EAT_COMMIT" "$GITHUB_SHA" "$GITHUB_RUN_ID" > /tmp/pub/ml/SOURCE.txt
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/tone-model && git rm -rqf . && cp -R /tmp/pub/ml . 
+          git add ml && git commit -qm "Nearest-sound model Core ML fp16 [1,1,128,101] (run $GITHUB_RUN_ID)" && git push -qf origin ci/tone-model
