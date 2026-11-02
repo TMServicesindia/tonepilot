@@ -1,0 +1,110 @@
+# Same-machine launch A/B: builds two versions in ONE job and alternates their launch tests on the
+# same simulator (A, B, A, B, ...), so machine-to-machine variation cancels out. Measurement only:
+# publishes nothing, never changes the gate, and keeps every timing (no outliers removed).
+name: Launch A/B (same machine)
+
+on:
+  workflow_dispatch:
+    inputs:
+      a_ref:
+        description: "Build A (tag, branch or FULL 40-character commit SHA)"
+        default: "v0.3.71"
+      b_ref:
+        description: "Build B (tag, branch or FULL 40-character commit SHA)"
+        default: "main"
+      rounds:
+        description: "Alternating rounds (each round = 5 launches of A, then 5 of B)"
+        default: "3"
+      runner:
+        description: "Runner class"
+        default: "macos-15"
+
+permissions:
+  contents: read
+
+jobs:
+  ab:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: tools }
+      - uses: actions/checkout@v4
+        with: { ref: "${{ inputs.a_ref }}", path: a }
+      - uses: actions/checkout@v4
+        with: { ref: "${{ inputs.b_ref }}", path: b }
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+
+      - name: Build both for testing (same machine, same simulator)
+        run: |
+          brew install xcodegen >/dev/null
+          DEV=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)['devices']
+          phones = [x for k, v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPhone')]
+          pick = [x for x in phones if x['name'] in ('iPhone 16', 'iPhone 15')] or phones
+          print(pick[0]['udid'])")
+          echo "DEV=$DEV" >> "$GITHUB_ENV"
+          for v in a b; do
+            ( cd $v
+              curl -fsSL -o App/Resources/SoundFonts/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+              [ -x Native/fetch-demucs.sh ] && Native/fetch-demucs.sh || true
+              [ -x Native/fetch-lame.sh ] && Native/fetch-lame.sh || true
+              mkdir -p App/Resources/Models
+              # Same launch test in both: 5 launches per round.
+              sed -i '' -E 's/(XCTApplicationLaunchMetric\(\)\], options: \{ let o = XCTMeasureOptions\(\); o.iterationCount = )[0-9]+/\15/' App/UITests/TonePilotUITests.swift
+              xcodegen generate >/dev/null
+              xcodebuild build-for-testing -project TonePilot.xcodeproj -scheme TonePilot -destination "id=$DEV" \
+                -derivedDataPath build-sim > build.log 2>&1 || { tail -30 build.log; exit 1; }
+              echo "built $v: $(git rev-parse --short HEAD)" )
+          done
+
+      - name: Alternate launches A, B, A, B, ...
+        run: |
+          for r in $(seq 1 ${{ inputs.rounds }}); do
+            for v in a b; do
+              run=$(ls $v/build-sim/Build/Products/*.xctestrun | head -1)
+              xcodebuild test-without-building -xctestrun "$run" -destination "id=$DEV" \
+                -only-testing:TonePilotUITests/TonePilotUITests/testLaunchIsQuick > $v-round$r.log 2>&1 || echo "::warning title=$v round $r::test run exited non-zero"
+              python3 tools/.github/scripts/launch_gate.py $v-round$r.log $v-round$r.json "$v round $r" --no-gate
+            done
+          done
+
+      - name: Compare (all timings kept)
+        run: |
+          A_SHA=$(git -C a rev-parse --short HEAD) B_SHA=$(git -C b rev-parse --short HEAD) python3 - <<'PY'
+          import glob, json, os, statistics
+          def load(v):
+              rows = [json.load(open(f)) for f in sorted(glob.glob(f"{v}-round*.json"))]
+              return [x for r in rows if r.get("launch") for x in r["launch"]["values_s"]], rows
+          def p90(xs):
+              s = sorted(xs); k = 0.9 * (len(s) - 1); lo = int(k); hi = min(lo + 1, len(s) - 1)
+              return s[lo] + (s[hi] - s[lo]) * (k - lo)
+          out = {"measured_on": "GitHub Actions iPhone simulator, ONE machine for both builds (NOT a physical iPhone)"}
+          for v, sha in (("a", os.environ["A_SHA"]), ("b", os.environ["B_SHA"])):
+              xs, rows = load(v)
+              out[v] = {"commit": sha, "values_s": xs, "per_round_median_s": [r["launch"]["median_s"] for r in rows if r.get("launch")],
+                        "median_s": statistics.median(xs) if xs else None, "mean_s": statistics.fmean(xs) if xs else None,
+                        "p90_s": p90(xs) if xs else None, "n": len(xs)}
+              if xs:
+                  print(f"::notice title=Launch A/B {v.upper()} ({sha})::median {out[v]['median_s']:.2f} s · mean {out[v]['mean_s']:.2f} s · p90 {out[v]['p90_s']:.2f} s · n={len(xs)} · per-round medians {', '.join(f'{m:.2f}' for m in out[v]['per_round_median_s'])} · values {', '.join(f'{x:.2f}' for x in xs)}")
+          if out["a"]["median_s"] and out["b"]["median_s"]:
+              d = out["b"]["median_s"] - out["a"]["median_s"]
+              wins = sum(1 for ma, mb in zip(out["a"]["per_round_median_s"], out["b"]["per_round_median_s"]) if mb > ma)
+              out["b_minus_a_median_s"] = d
+              print(f"::notice title=Launch A/B difference::B − A median = {d:+.2f} s; B slower in {wins} of {min(len(out['a']['per_round_median_s']), len(out['b']['per_round_median_s']))} rounds")
+          json.dump(out, open("launch-ab.json", "w"), indent=1)
+          PY
+          r=$(ls a-round1.json >/dev/null 2>&1 && python3 -c "import json;print(json.load(open('a-round1.json'))['runner'])")
+          echo "::notice title=Launch A/B runner::$r"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: launch-ab
+          path: |
+            launch-ab.json
+            *-round*.json
+            *-round*.log
