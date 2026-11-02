@@ -131,7 +131,7 @@ public enum PartMatcher {
             ToneMatcher.render(patch, instrument: instrument, notes: ns, seconds: Double(x.count) / sr, sampleRate: sr, eq: eq, fit: s).samples
         }
         guard let t = embed(x), let plain = embed(render(nil)), let fitted = embed(render(settings)) else { return false }
-        return cosine(fitted, t) >= cosine(plain, t)
+        return cosine(fitted, t) > cosine(plain, t)   // a real gain, not a tie (DEV: ties let leakage-driven fits through)
     }
 
     static func cosine(_ a: [Float], _ b: [Float]) -> Double {

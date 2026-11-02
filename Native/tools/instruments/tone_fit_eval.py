@@ -41,7 +41,7 @@ for r in rows:
     c = {k: cnn(x, sr) for k, (x, sr) in clips.items()}
     m = {k: mfcc_embed(x, sr) for k, (x, sr) in clips.items()}
     # The app's check sees only the stem (with leakage).
-    applied = r["fitted"] and cos(e["fitted"], e["target"]) >= cos(e["plain"], e["target"])
+    applied = r["fitted"] and cos(e["fitted"], e["target"]) > cos(e["plain"], e["target"])
     results.append(dict(r, applied=applied,
                         eff_plain=cos(e["plain"], e["target"]), eff_fitted=cos(e["fitted"], e["target"]),
                         cnn_plain=cos(c["plain"], c["clean"]), cnn_fitted=cos(c["fitted"], c["clean"]),

@@ -196,15 +196,17 @@ public enum ToneFitter {
         let sustainOff = abs(c0.sustain - t.sustain) > 0.15
         let releaseOff = c0.release.flatMap { cr in t.release.map { abs(log(max(cr, 0.03) / max($0, 0.03))) > log(1.5) } } ?? false
         if attackOff || sustainOff || releaseOff {
-            var env = patch.synth != nil ? patch.envelope : Envelope(attack: 0.004, decay: 0.3, sustain: 1, release: 0.3)
+            // Start from the tone's own envelope (a sampled tone's: the region playing the part's middle
+            // note) and change only what was measured to differ, so e.g. a pad keeps its long release.
+            var env = ownEnvelope(patch, instrument: instrument, midi: Int(median(ns.map { Double($0.midi) })))
             if attackOff { env.attack = max(0.002, min(1.5, t.attack * 0.8)) }
             if let tr = t.release, releaseOff { env.release = max(0.03, min(4, tr * 0.7)) }
-            env.decay = max(0.1, min(3, median(durations) * 0.5))
+            if sustainOff, t.sustain < c0.sustain { env.decay = max(0.1, min(3, median(durations) * 0.5)) }
             for _ in 0..<3 {
                 guard let c = consider(Settings(envelope: env, filter: best.filter, expression: best.expression)) else { break }
                 if attackOff { env.attack = max(0.002, min(1.5, env.attack * max(0.25, min(4, max(t.attack, 0.004) / max(c.attack, 0.004))))) }
-                if let tr = t.release, let cr = c.release { env.release = max(0.03, min(4, env.release * max(0.25, min(4, tr / max(cr, 0.02))))) }
-                if t.sustain < c.sustain - 0.05 || (env.sustain < 1 && t.sustain > c.sustain + 0.05) {
+                if releaseOff, let tr = t.release, let cr = c.release { env.release = max(0.03, min(4, env.release * max(0.25, min(4, tr / max(cr, 0.02))))) }
+                if sustainOff, t.sustain < c.sustain - 0.05 || (env.sustain < 1 && t.sustain > c.sustain + 0.05) {
                     env.sustain = max(0, min(1, env.sustain * t.sustain / max(c.sustain, 0.05)))
                 }
             }
@@ -253,6 +255,18 @@ public enum ToneFitter {
         }
         return Fit(settings: best, target: t, before: c0, after: bestC, distanceBefore: d0, distanceAfter: bestD, verified: verified,
                    summary: summary(best, target: t))
+    }
+
+    /// The tone's own envelope: a synth's settings, or a sampled tone's region envelope for `midi`
+    /// (velocity 100), with its hold folded into the decay.
+    static func ownEnvelope(_ patch: InstrumentPatch, instrument: LoadedInstrument, midi: Int) -> Envelope {
+        if patch.synth != nil || instrument.regionCount == 0 { return patch.envelope }
+        let note = UInt8(max(0, min(127, midi)))
+        let rs = instrument.regions
+        guard let r = rs.first(where: { $0.matches(note: note, velocity: 100) }) ?? rs.min(by: { abs($0.rootKey - midi) < abs($1.rootKey - midi) })
+        else { return patch.envelope }
+        return Envelope(attack: Double(max(0.001, r.envAttack)), decay: Double(max(0.01, r.envDecay + r.envHold)),
+                        sustain: Double(max(0, min(1, r.envSustain))), release: Double(max(0.005, r.envRelease)))
     }
 
     static func summary(_ s: Settings, target t: Character) -> String {
