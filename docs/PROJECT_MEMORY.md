@@ -203,6 +203,18 @@ Reading:
 - This fits two kinds of host machine behind the same runner label, not a code regression. One 19.17 s single launch shows why the gate uses the median.
 - It doesn't rule out a small regression. The next step is a same-machine A/B: both builds in one job, launches interleaved.
 
+**Same-machine A/B (run 41386232452, 2 Nov):** one M1 virtual machine (macos15 20261028.0489.1, Xcode 16.4), builds launched alternately A, B, A, B, A, B, 5 launches each per round, every timing kept.
+
+| Build | n | Median | Mean | p90 | Round medians |
+|---|---|---|---|---|---|
+| A: v0.3.71 (91a92c5) | 15 | 2.15 s | 2.27 s | 2.40 s | 2.31, 2.15, 2.05 |
+| B: main (56d78ee) | 15 | 1.99 s | 2.45 s | 2.68 s | 2.63, 1.87, 2.08 |
+
+- Outliers kept: B 7.34 s (round 1); A 4.42 s (the first, cold launch).
+- **Conclusion: no launch regression.** B − A median = −0.16 s; B was slower in 2 of 3 rounds by small margins.
+- The earlier 1.3 s gap was machine bimodality, not the code.
+- Main (including developer shadow mode) built for testing on the simulator. This is a compile check, not a full build gate.
+
 ## 6k. Focus reset: Instrument Analyser accuracy first (owner, 2 Nov)
 
 - The owner brought the focus back to the Instrument Analyser for Tamil/Telugu/Hindi film music. CI and release work are only supporting checks.
