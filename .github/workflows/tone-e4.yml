@@ -9,7 +9,11 @@ on:
     inputs:
       methods:
         description: "Comma-separated methods (base[+harm][+lda])"
-        default: "efficientat,efficientat+harm,efficientat+lda,efficientat+harm+lda,panns10+harm"
+        default: "efficientat,efficientat+harm,efficientat+harmx"
+      sealed:
+        description: "SEALED TEST: render targets from MuseScore General (MIT) instead of the DEV banks. Run once per method decision."
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -24,6 +28,11 @@ jobs:
       - name: Banks (GeneralUser GS = library; TimGM6mb = cross-bank DEV)
         run: |
           apt-get update -qq && apt-get install -y -qq curl timgm6mb-soundfont fluid-soundfont-gm > /dev/null
+          if [ "${{ inputs.sealed }}" = "true" ]; then
+            curl -fsSL -o /tmp/MuseScore_General.sf2 https://ftp.osuosl.org/pub/musescore/soundfont/MuseScore_General/MuseScore_General.sf2
+            curl -fsSL https://ftp.osuosl.org/pub/musescore/soundfont/MuseScore_General/MuseScore_General-License.md | head -20 || true
+            sha256sum /tmp/MuseScore_General.sf2
+          fi
           curl -fsSL -o /tmp/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
           ls -la /usr/share/sounds/sf2/ ; sha256sum /tmp/GeneralUser-GS.sf2 /usr/share/sounds/sf2/TimGM6mb.sf2
       - name: Render tone table + targets
@@ -31,7 +40,7 @@ jobs:
         env:
           TP_SF2: /tmp/GeneralUser-GS.sf2
           TP_TONE_DUMP: /tmp/tdump
-          TP_TONE_TARGETS: "same=/tmp/GeneralUser-GS.sf2,timgm=/usr/share/sounds/sf2/TimGM6mb.sf2"
+          TP_TONE_TARGETS: ${{ inputs.sealed && 'musescore_SEALED=/tmp/MuseScore_General.sf2' || 'same=/tmp/GeneralUser-GS.sf2,timgm=/usr/share/sounds/sf2/TimGM6mb.sf2' }}
           TP_TONE_TRAIN_BANKS: "fluidr3=/usr/share/sounds/sf2/FluidR3_GM.sf2"
         run: swift test -c release --filter ToneTableDump 2>&1 | grep -E "DUMP|error:|Executed" | tail -5
       - uses: actions/upload-artifact@v4

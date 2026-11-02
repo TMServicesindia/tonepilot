@@ -117,9 +117,11 @@ final class ToneTableDump: XCTestCase {
                     let file = "targets/\(name)_\(ci)_\(part).wav"
                     try InstrumentSetRender.writeWav(samples, to: out.appendingPathComponent(file), sr: rsr)
                     let mids = notes.map(\.midi).sorted()
+                    // The notes the app would actually have: TonePilot's own melody extractor on the stem.
+                    let extracted = MelodyExtractor.extract(AudioBuffer(samples: samples, sampleRate: rsr), source: .fullMix)?.notes ?? []
                     targets.append(["file": file, "bank": name, "case": c.name, "part": part, "program": Int(prog),
                                     "family": gm(prog).family.rawValue, "median_midi": mids[mids.count / 2],
-                                    "notes": Self.noteList(notes)])
+                                    "notes": Self.noteList(notes), "notes_extracted": Self.noteList(extracted)])
                 }
             }
         }

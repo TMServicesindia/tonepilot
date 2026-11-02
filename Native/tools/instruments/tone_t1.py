@@ -7,7 +7,8 @@ ranking is judged by the target's true GM program ("exact") and TonePilot family
 DEV banks only unless a sealed bank is explicitly passed. Research only (CI / local).
 Usage: tone_t1.py <dump dir> <out.md> <method,...> [--eat <EfficientAT repo>]
 Methods: mfcc | efficientat | panns10 | yamnet | clap, each optionally with "+harm" (harmonic-only
-re-synthesis of the part from its notes, both sides) and/or "+lda" (E-5): a Linear
+re-synthesis of the part from its true notes, both sides) or "+harmx" (targets masked with the notes
+TonePilot's melody extractor produces, as in the app) and/or "+lda" (E-5): a Linear
 Discriminant projection learned on train.json (training banks, labelled by family) plus the library
 table, so variation between sound sources of the same family is suppressed before the cosine."""
 import json, os, sys, time
@@ -75,13 +76,15 @@ def evaluate(dump, method, embed_fn):
     table = json.load(open(os.path.join(dump, "table.json")))
     targets = json.load(open(os.path.join(dump, "targets.json")))
     base = method.split("+")[0]
-    harm = "+harm" in method
-    key = base + ("+harm" if harm else "")
+    harmx = "+harmx" in method          # mask targets with the app's EXTRACTED notes (deployable)
+    harm = harmx or "+harm" in method
+    key = base + ("+harmx" if harmx else "+harm" if harm else "")
     t0 = time.time()
     def emb(r):
         x, sr = read_wav(os.path.join(dump, r["file"]))
-        if harm and r.get("notes"):
-            x = harmonic_only(x, sr, r["notes"])
+        notes = r.get("notes_extracted") if (harmx and "notes_extracted" in r) else r.get("notes")
+        if harm and notes:
+            x = harmonic_only(x, sr, notes)
         return embed_fn(x, sr)
     if key not in _CACHE:
         T0 = np.stack([emb(r) for r in table])
