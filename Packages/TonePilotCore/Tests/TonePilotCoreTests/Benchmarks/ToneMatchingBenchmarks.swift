@@ -4,6 +4,9 @@ import XCTest
 /// Tone-matching bench on rendered multi-instrument songs with known instruments (GeneralUser GS).
 /// Separation is imitated by leaking the other parts into each stem. Run with TP_SF2=<path to
 /// GeneralUser-GS.sf2>; skipped otherwise. Prints the accuracy table.
+/// Cross-bank mode: TP_SF2_TARGET=<another GM bank> renders the songs with that bank while the
+/// candidates stay TonePilot's own tones, so the exact sound is NOT available and the matcher must
+/// find the nearest recognisable one ("exact" = same GM program, "family" = same instrument family).
 final class ToneMatchingBenchmarks: XCTestCase {
     struct Case { let name: String; let lead: UInt8; let backing: UInt8; let low: Int }
     static let cases: [Case] = [
@@ -19,12 +22,16 @@ final class ToneMatchingBenchmarks: XCTestCase {
         guard let path = ProcessInfo.processInfo.environment["TP_SF2"] else { throw XCTSkip("set TP_SF2 to run the bench") }
         let bank = try SoundFontBank(url: URL(fileURLWithPath: path))
         let load = PartMatcher.loader(bank: bank)
+        let targetPath = ProcessInfo.processInfo.environment["TP_SF2_TARGET"]
+        let targetBank = try targetPath.map { try SoundFontBank(url: URL(fileURLWithPath: $0)) }
         let sr = 44_100.0, seconds = 30.0
         func gm(_ p: UInt8) -> InstrumentPatch { FactoryPatches.patch(forProgram: p)! }
         func render(_ p: UInt8, _ notes: [MelodyNote]) -> [Float] {
             let patch = gm(p)
-            return ToneMatcher.render(patch, instrument: load(patch)!, notes: notes, seconds: seconds, sampleRate: sr).samples
+            let inst = targetBank.flatMap { try? LoadedInstrument(bank: $0, bankNumber: 0, program: Int(p), name: patch.name) } ?? load(patch)!
+            return ToneMatcher.render(patch, instrument: inst, notes: notes, seconds: seconds, sampleRate: sr).samples
         }
+        let t0 = Date()
         var leadHits = 0, leadFamily = 0, backingHits = 0, backingFamily = 0
         var rows: [String] = []
         for (ci, c) in Self.cases.enumerated() {
@@ -69,6 +76,7 @@ final class ToneMatchingBenchmarks: XCTestCase {
         }
         rows.forEach { print($0) }
         let n = Self.cases.count
-        print("BENCH RESULT lead: \(leadHits)/\(n) exact sound, \(leadFamily)/\(n) right family; backing: \(backingHits)/\(n) exact, \(backingFamily)/\(n) family")
+        let mode = targetPath.map { "cross-bank target \(URL(fileURLWithPath: $0).lastPathComponent)" } ?? "same bank"
+        print("BENCH RESULT [\(mode)] lead: \(leadHits)/\(n) exact sound, \(leadFamily)/\(n) right family; backing: \(backingHits)/\(n) exact, \(backingFamily)/\(n) family · \(String(format: "%.0f", Date().timeIntervalSince(t0))) s")
     }
 }

@@ -264,3 +264,32 @@ What E2 does not show:
 - anything about iPhone performance.
 
 Short clips remain a shared weakness (every DEV-selected encoder has wrong-family ≥ 19% on 1 s TEST clips), and so does the 5% wrong-family target on TEST.
+
+---
+
+## Tone recreation: where the main-tone matcher fails (2 Nov; core bench, Docker, release build)
+
+Bench: `ToneMatchingBenchmarks`. 12 rendered songs (lead + backing + voice + bass, 20% leakage between stems); candidates are TonePilot's own tones (GeneralUser GS).
+
+Splits:
+- **DEV:** same bank (GeneralUser) and cross-bank (TimGM6mb).
+- **Sealed TEST:** cross-bank FluidR3 GM, run **once** for the old and once for the new code.
+
+"Exact" = same GM program; "family" = same instrument family.
+
+**Diagnosis:**
+1. With clean audio and the whole library, the fingerprint ranks the true sound **1st in 10/12 and 2nd in 2/12** (same bank).
+2. But the tag-based pre-selection (14 candidates; whole families such as piano excluded for leads) **dropped the true sound in 8/12**.
+3. Note extraction is not the bottleneck: extracted notes are mostly on pitch, and true notes give the same cross-bank result.
+4. **Across sound sources the hand-crafted fingerprint does not recognise the instrument.** A different bank's flute or violin scores closer to our brass, worse with backing leakage. A harmonic-profile feature was tried and did not help (removed).
+
+| Matcher | Same bank (lead exact / family; backing exact / family) | Cross-bank DEV TimGM6mb | **Sealed TEST FluidR3** | Time (12 songs) |
+|---|---|---|---|---|
+| Current (shipping) | 4/7; 2/5 | 2/3; 0/1 | **0/3; 0/1** | 185 s |
+| Two-stage whole-library screen (branch `research/tone-shortlist`) | **8/9; 2/7** | 2/2; 0/1 | **1/2; 1/2** | 398 s |
+
+**Decision: not shipped.**
+- It wins only when the song's exact sample is in our library, which is never the case for real songs.
+- On the sealed TEST it is no better than the current matcher, and it is 2× slower.
+
+**Measured conclusion:** recognisable tones on real songs need **cross-source instrument identity**. On its own cross-bank TEST (trained on FluidR3, tested on unseen GeneralUser), the gated EfficientAT + head C reached **86% selective family accuracy at 72% coverage**, against about 17–25% top-1 family for the fingerprint on cross-bank audio. The next step is to let a confident family decision from C gate the tone search, with the fingerprint choosing only within that family. That requires an owner decision on shipping the research model before its gates (G2.4 device run; ≤ 5% wrong-family not yet met).

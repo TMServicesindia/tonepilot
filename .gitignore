@@ -31,3 +31,4 @@ Packages/TonePilotCore/.build-docker2/
 # Python bytecode caches (research tools)
 __pycache__/
 *.pyc
+Packages/TonePilotCore/.*.sf2
