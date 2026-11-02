@@ -40,6 +40,9 @@ final class PerceptualToneService: @unchecked Sendable {
             let config = MLModelConfiguration()
             config.computeUnits = .all
             let m = try MLModel(contentsOf: compiled, configuration: config)
+            // The model must take exactly the windows the front-end makes ([1, 1, 128, 101]).
+            let shape = m.modelDescription.inputDescriptionsByName["mel"]?.multiArrayConstraint?.shape.map(\.intValue)
+            guard shape == [1, 1, EfficientATFrontEnd.nMels, PerceptualToneSearch.windowFrames] else { failed = true; return nil }
             let decoder = JSONDecoder()
             let ht = try decoder.decode(PerceptualToneSearch.ToneTable.self, from: Data(contentsOf: h))
             let pt = try decoder.decode(PerceptualToneSearch.ToneTable.self, from: Data(contentsOf: p))
