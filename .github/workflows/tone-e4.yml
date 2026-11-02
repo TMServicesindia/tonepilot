@@ -77,10 +77,25 @@ jobs:
           S=$GITHUB_WORKSPACE/Native/tools/instruments
           cd /tmp/eat && python $S/tone_t1.py /tmp/tdump /tmp/e4.md ${{ inputs.methods }} --eat /tmp/eat 2>&1 | tee /tmp/e4.log | grep -E "^\||Error|error" | tail -40
           grep "^| " /tmp/e4.md | grep -v "Method" | while IFS= read -r l; do echo "::notice title=E-4::$l"; done
+      - name: Export the app's tone tables (DEV runs only; library renders, no targets)
+        if: ${{ !inputs.sealed }}
+        run: |
+          S=$GITHUB_WORKSPACE/Native/tools/instruments
+          cd /tmp/eat && python $S/tone_t1.py /tmp/tdump --export-tables /tmp/tables --eat /tmp/eat 2>&1 | grep -E "EXPORT|Error|error"
+          ls -la /tmp/tables
+      - name: Push tables to branch ci/tone-tables
+        if: ${{ !inputs.sealed }}
+        run: |
+          cd $GITHUB_WORKSPACE
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/tone-tables && git rm -rqf . && mkdir -p tables
+          cp /tmp/tables/*.json tables/; echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID}" > tables/SOURCE.txt
+          git add tables && git commit -qm "Tone tables" && git push -qf origin ci/tone-tables
       - name: Push to branch ci/tone-e4
         if: always()
         run: |
           [ -f /tmp/e4.md ] || exit 0
+          cd $GITHUB_WORKSPACE && git checkout -q main 2>/dev/null || true
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           git checkout -q --orphan ci/tone-e4 && git rm -rqf . && mkdir -p e4
           cp /tmp/e4.md /tmp/e4.json e4/; cp /tmp/tdump/table.json /tmp/tdump/targets.json /tmp/tdump/train.json /tmp/tdump/fingerprint_sealed.txt e4/ 2>/dev/null || true

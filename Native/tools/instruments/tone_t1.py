@@ -218,7 +218,29 @@ def summarise(method, rows, secs):
     return out, f"{method}: embedding time {secs:.0f} s for all clips"
 
 
+def export_tables(dump, eat, out_dir):
+    """The app's tone tables (PerceptualToneSearch.ToneTable JSON): every library tone × register,
+    embedded with the device-parity path: 'harmonic' (masked with the tone's own phrase notes; used for
+    lead / melody parts) and 'plain' (unmasked; used for backing / pads)."""
+    table = json.load(open(os.path.join(dump, "table.json")))
+    f = efficientat_device_embedder(eat)
+    os.makedirs(out_dir, exist_ok=True)
+    for name, masked in (("harmonic", True), ("plain", False)):
+        entries = []
+        for r in table:
+            x, sr = read_wav(os.path.join(dump, r["file"]))
+            e = f(x, sr, r["notes"] if masked else None)
+            entries.append({"patch": r["patch"], "register": r["register"], "embedding": [round(float(v), 5) for v in e]})
+        doc = {"version": 1, "model": f"efficientat_mn10_as/device-frontend/{name}", "embeddingDim": len(entries[0]["embedding"]), "entries": entries}
+        json.dump(doc, open(os.path.join(out_dir, f"tone_table_{name}.json"), "w"), separators=(",", ":"))
+        print(f"EXPORT tone_table_{name}.json: {len(entries)} entries, dim {doc['embeddingDim']}", flush=True)
+
+
 def main():
+    if "--export-tables" in sys.argv:
+        eat = sys.argv[sys.argv.index("--eat") + 1]
+        export_tables(sys.argv[1], eat, sys.argv[sys.argv.index("--export-tables") + 1])
+        return
     dump, out_md, methods = sys.argv[1], sys.argv[2], sys.argv[3].split(",")
     eat = sys.argv[sys.argv.index("--eat") + 1] if "--eat" in sys.argv else None
     lines = ["# T1: tone search by embedding similarity (research; rendered GM banks, NOT real songs)", "",
