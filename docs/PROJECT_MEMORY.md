@@ -260,6 +260,18 @@ Stop: no production change, no major training, no release before approval.
 - The two-stage screening matcher is not shipped (no sealed-TEST gain, 2× slower); it is on branch `research/tone-shortlist`.
 - Proposal (research only): `docs/research/TONEPILOT_TONE_RECREATION_PROPOSAL.md`. No build until the T1–T5 experiments are approved and measured.
 
+## 6p. Tone references built automatically, no manual recording (owner, 2 Nov)
+
+- Plan: `docs/benchmark/OPEN_SOURCE_TONE_REFERENCE_EXPANSION_PLAN.md`.
+- Verified licences:
+  - FluidR3 MIT; MuseScore General MIT;
+  - NSynth, TinySOL, Slakh CC BY 4.0;
+  - Meta Open Sound, VSCO 2 CE, VCSL CC0;
+  - Iowa MIS evaluation-only;
+  - Casio/Yamaha factory samples rejected.
+- Design: references serve two roles: playable candidates, and learning a cross-source similarity. More references alone don't fix the hand fingerprint (measured).
+- Smallest next experiment: E-4 (frozen embedding cosine vs the fingerprint on cross-bank DEV).
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
