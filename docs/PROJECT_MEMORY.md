@@ -217,6 +217,13 @@ Key findings:
 
 Stop: no production change, no major training, no release before approval.
 
+## 6l. Sound palette addendum + E2 (owner, 2 Nov)
+
+- The owner widened the target to the full **2000–2026 film sound palette**: guitars and effects, synth families, processed vocals, sound design.
+- The analyser output becomes six independent dimensions: identity, source type, character, likely processing, role, timing. It never names a plugin or synth model.
+- Report: `docs/TONEPILOT_SOUND_PALETTE_RESEARCH.md`.
+- **E2 (owner: "go ahead"):** PANNs CNN10 encoder in `embed.py`; workflow `instrument-e2.yml` reuses bench run 41328362434's clips and outputs, so the comparison uses an identical protocol. Results go to branch `ci/instrument-e2`.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

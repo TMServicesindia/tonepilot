@@ -55,6 +55,9 @@ Chord/Arpeggio and Tone Maker enhancements are paused until the analyser gates a
 | IA.6 | Taxonomy v3 (voice family, Western percussion split, banjo/tuba/arpeggiator, difficult pairs, per-class status); `taxonomy.json` unchanged until approved | 👤 approve |
 | IA.7 | Annotation schema extension (role, `instrument_id`/`family_id`, `audibility` direct/inferred/uncertain, multi-annotator, disputed, provenance) | 👤 approve |
 | IA.8 | Gates: none measurable on real Indian audio today (NOT EVALUABLE); no class is Tier 1 | ✅ recorded |
+| IA.9 | **Sound-palette addendum** ([`TONEPILOT_SOUND_PALETTE_RESEARCH.md`](TONEPILOT_SOUND_PALETTE_RESEARCH.md)): six output dimensions:<br>• identity;<br>• source type;<br>• character;<br>• likely processing;<br>• role;<br>• timing.<br>Sound design is a non-instrument family. Composer evidence matrix (first pass: thin; Kolaveri Di is the strongest per-song record). Sound Character Dataset audit:<br>• NSynth qualities CC BY 4.0;<br>• E-GMD CC BY 4.0;<br>• IDMT effects is NC-ND (rejected);<br>• self-applied effects on permissive dry audio give exact labels. | ✅ researched; 👤 approve |
+| IA.10 | Benchmarks S1 (NSynth character head) and S2 (self-applied processing head) are runnable now on CPU | ⏳ awaiting approval |
+| IA.11 | E2 CNN10 (run 41386940981; reuses bench v4's clips; same splits and heads) | 🔨 running |
 
 ## R. Product and competitor research (Phase A, 2 Nov) — **proposals awaiting owner review, not approved**
 
