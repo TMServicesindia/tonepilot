@@ -1,0 +1,2 @@
+EfficientAT mn10_as (fschmid56/EfficientAT, MIT) converted to Core ML fp16 by coreml-gate2 run 41323494255.
+AudioSet label names: CC BY-SA 4.0.
