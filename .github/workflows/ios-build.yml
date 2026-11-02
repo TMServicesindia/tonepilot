@@ -232,7 +232,7 @@ jobs:
 
       # Every launch measurement is appended to ci/launch-history (pass or fail), so trends and slow runners stay visible.
       - name: Record launch history
-        if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
           [ -f launch-gate.json ] || exit 0
           git fetch -q origin ci/launch-history 2>/dev/null && git show FETCH_HEAD:history.jsonl > history.jsonl 2>/dev/null || : > history.jsonl
@@ -275,7 +275,7 @@ jobs:
 
       # v0.3.1–v0.3.5 were published by a faulty check without the app executable; remove them.
       - name: Remove broken early releases
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -284,7 +284,8 @@ jobs:
       # Every successful build of main becomes a release, so this link always has the newest app:
       # https://github.com/<owner>/<repo>/releases/latest/download/TonePilot.ipa
       - name: Publish release download
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        # Manual full builds of main publish too (same gate; used when push builds can't get a macos-15 runner).
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v0.3.{0}', github.run_number) }}
@@ -294,5 +295,5 @@ jobs:
           body: |
             Installable iPhone build of TonePilot (unsigned .ipa, includes GeneralUser GS sounds).
             Install with SideStore or Sideloadly using your Apple ID — see docs/INSTALL_ON_IPHONE.md.
-            Built from ${{ github.sha }}.
+            Built from ${{ github.sha }} on ${{ inputs.runner || 'macos-15' }}; passed the full speed & crash gate.
           files: TonePilot.ipa
