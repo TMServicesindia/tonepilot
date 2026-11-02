@@ -21,6 +21,8 @@ Status values: **Cleared** (all four records permissive, attribution done, revie
 | All-In-One (comparison) | MIT ([repo](https://github.com/mir-aidj/all-in-one)) | `all-fold*.pth` 1.4 MB each, MIT on author's HF (`taejunkim/allinone`) | NATTEN (licence to record), Demucs (see above) | Harmonix Set annotations | MIT notice | **SAFE\*** (blocked in practice by Demucs dependency) | Check NATTEN licence |
 | LAION-CLAP music (comparison) | Apache-2.0 / CC0 | `laion/larger_clap_music` `pytorch_model.bin` (776 MB) Apache-2.0; `lukewys/laion_clap` CC0-1.0 | transformers (Apache-2.0) | LAION-Audio-630k + music data; LAION: dataset not releasable "due to copyright reasons" | Apache NOTICE | **SAFE\*** | Data review before commercial |
 | PANNs (comparison) | MIT | Zenodo 3987831, **CC BY 4.0** | — | AudioSet (YouTube audio; labels CC BY 4.0) | Attribution | **SAFE\*** | — |
+| EfficientAT mn10_as (research candidate) | MIT (secondary sources; upstream LICENSE to re-check) | `mn10_as` pretrained (repo releases) | PyTorch (conversion only) | AudioSet (YouTube audio); label names CC BY-SA 4.0 | MIT notice + ontology attribution | **SAFE\*** | Re-check upstream LICENSE; record the checkpoint hash |
+| BEATs (research challenger) | Unknown (microsoft/unilm LICENSE to check) | Unknown | PyTorch | AudioSet | — | **Unverified** | Licence check before any use |
 | Microsoft CLAP (comparison) | MIT | MS-PL (HF), CC BY 3.0 US (Zenodo 8378278) | — | Not stated | Attribution | **SAFE\*** | — |
 | ByteDance piano / YourMT3 (offline reference only) | MIT / Apache-2.0 | MIT (author HF) / Apache-2.0 | — | MAESTRO (CC BY-NC-SA) and others | — | **Benchmark use only, never shipped** | — |
 | LiteRT runtime (Phase 1) | Apache-2.0 | — | — | — | NOTICE | Cleared (after notice added) | Add to attribution file |
@@ -43,6 +45,17 @@ Status values: **Cleared** (all four records permissive, attribution done, revie
 | Mridangam stroke | CC BY-NC 4.0 | No | — | Rejected |
 | ccmusic-database sets | CC BY-NC-ND 4.0 | No | — | Rejected |
 | MAESTRO | CC BY-NC-SA 4.0 | Benchmark reference only | — | Rejected for training |
+| **Sanidha** (GT, ISMIR 2024) | CC BY 4.0 (homepage + paper, 2 Nov) | Train + evaluate (session-disjoint) | Required | SAFE\* (confirm per file; access via GT guest VPN) |
+| Saraga 1.5 (Zenodo 4301737) | **NC:** CC BY-NC 4.0 (paper) vs CC BY-NC-SA 4.0 (OpenAIRE/mirdata), contradictory | **Not for commercial training**; internal evaluation pending owner/legal view | Required | Rejected for training · evaluation **Unverified** |
+| Saraga Audiovisual (Zenodo 17405610) | CC BY 4.0 listed for the record/paper; audio files **unknown** | Pending file-level check | Required | Unverified |
+| FSD50K | Per clip: CC0 / CC-BY / CC-BY-NC / Sampling+; curated set CC BY, "contact authors" for commercial | CC0 + CC-BY clips only | Per clip | SAFE\* subset only |
+| MedleyDB | Non-commercial (release announcement); subsets CC BY-NC-SA 4.0 | Not for training | — | Rejected for training |
+| IRMAS | CC BY-NC-SA 3.0 (mirdata) | No | — | Rejected |
+| Tabla Solo (CompMusic) | Restricted: copyrighted audio, non-commercial research, no redistribution | No | — | Rejected |
+| Four-Way Tabla | CC BY 3.0 (mirdata; confirm) | Train + evaluate after confirmation | Required | Unverified |
+| Mridangam Tani-avarthanam | Unknown | No (until terms are known) | — | Unverified |
+| HamNava | Article CC BY 4.0; **dataset terms unknown** (owner's brief says non-commercial) | No (until terms are known) | — | Unverified |
+| AudioSet | Labels CC BY 4.0, ontology CC BY-SA 4.0; audio = YouTube (not distributed) | Ontology reference only; **never download audio** | Required (labels/ontology) | Rejected for audio |
 
 ## 3. Rejected models (verified non-commercial or unverified)
 

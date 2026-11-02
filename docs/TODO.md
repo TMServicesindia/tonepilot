@@ -35,6 +35,27 @@ Rules that apply to every item:
 **In parallel, always:** critical bug fixes, stability, security, regression (section 1).
 **Next milestone:** a reliable instrument benchmark on actual instruments in Tamil, Telugu and Hindi music.
 
+## IA. Instrument Analyser accuracy-first plan (owner, 2 Nov) — **TOP PRIORITY; research done, awaiting approval**
+
+Docs:
+- [`TONEPILOT_INSTRUMENT_DATASET_RESEARCH.md`](TONEPILOT_INSTRUMENT_DATASET_RESEARCH.md)
+- [`TONEPILOT_INSTRUMENT_MODEL_COMPARISON.md`](TONEPILOT_INSTRUMENT_MODEL_COMPARISON.md)
+- [`TONEPILOT_INSTRUMENT_ACCURACY_ROADMAP.md`](TONEPILOT_INSTRUMENT_ACCURACY_ROADMAP.md)
+- [`benchmark/TAXONOMY_V3_PROPOSAL.md`](benchmark/TAXONOMY_V3_PROPOSAL.md)
+
+Chord/Arpeggio and Tone Maker enhancements are paused until the analyser gates are agreed.
+
+| # | Item | Status |
+|---|---|---|
+| IA.1 | **Sanidha** (CC BY 4.0, Carnatic multitrack: violin, mridangam, ghatam, tanpura, voice; minimal bleed): the access request needs a GT guest VPN account, so draft the email | 👤 approve the draft (not sent) |
+| IA.2 | Saraga Audiovisual: verify the file-level licence (CC BY 4.0 listed for the record) | ⏳ |
+| IA.3 | Saraga 1.5 is NC (BY-NC vs BY-NC-SA contradictory): no commercial training; internal evaluation needs the owner/legal view or MTG permission | 👤 |
+| IA.4 | E2: PANNs **CNN10** (5.2 M params; never tested — our "PANNs" was CNN14) on the existing bench | ⏳ within approved research scope |
+| IA.5 | E1: first **real Indian-domain** numbers (Sanidha, session-disjoint; stem-derived activity labels, human spot-checked) | ⏳ after IA.1 |
+| IA.6 | Taxonomy v3 (voice family, Western percussion split, banjo/tuba/arpeggiator, difficult pairs, per-class status); `taxonomy.json` unchanged until approved | 👤 approve |
+| IA.7 | Annotation schema extension (role, `instrument_id`/`family_id`, `audibility` direct/inferred/uncertain, multi-annotator, disputed, provenance) | 👤 approve |
+| IA.8 | Gates: none measurable on real Indian audio today (NOT EVALUABLE); no class is Tier 1 | ✅ recorded |
+
 ## R. Product and competitor research (Phase A, 2 Nov) — **proposals awaiting owner review, not approved**
 
 Documents:

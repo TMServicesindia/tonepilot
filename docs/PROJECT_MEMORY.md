@@ -203,6 +203,20 @@ Reading:
 - This fits two kinds of host machine behind the same runner label, not a code regression. One 19.17 s single launch shows why the gate uses the median.
 - It doesn't rule out a small regression. The next step is a same-machine A/B: both builds in one job, launches interleaved.
 
+## 6k. Focus reset: Instrument Analyser accuracy first (owner, 2 Nov)
+
+- The owner brought the focus back to the Instrument Analyser for Tamil/Telugu/Hindi film music. CI and release work are only supporting checks.
+- Two separate systems: **Instrument Analyser** (what plays, and when) and **Tone Maker** (which sound recreates it).
+- Research and audit delivered: dataset research, model comparison, accuracy roadmap, taxonomy v3 proposal, licensing checklist rows.
+
+Key findings:
+- **Sanidha** is the only verified permissive (CC BY 4.0) real Indian multitrack source.
+- **Saraga 1.5** is non-commercial.
+- Our "PANNs" was CNN14; **CNN10** (equal size to EfficientAT) has never been tested.
+- No gate is measurable on real Indian audio yet.
+
+Stop: no production change, no major training, no release before approval.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
