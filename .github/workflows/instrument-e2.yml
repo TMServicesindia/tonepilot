@@ -1,0 +1,79 @@
+name: Instrument E2 — PANNs CNN10 challenger (research only, no app build)
+
+# Pre-declared experiment E2 (docs/TONEPILOT_INSTRUMENT_ACCURACY_ROADMAP.md): PANNs CNN10 (5.2 M params,
+# same size class as EfficientAT mn10) on the SAME rendered dataset, splits, windows and heads as an
+# existing instrument-bench run. DEV selects; TEST is reported once. SYNTHETIC proxy + NSynth only.
+on:
+  workflow_dispatch:
+    inputs:
+      bench_run_id:
+        description: "instrument-bench run id whose clips and model outputs to reuse"
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  embed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: iset, path: /tmp/iset, run-id: "${{ inputs.bench_run_id }}", github-token: "${{ github.token }}" }
+      - name: Embed with CNN10
+        run: |
+          set -o pipefail
+          pip install -q "numpy<2" scipy
+          pip install -q --index-url https://download.pytorch.org/whl/cpu "torch==2.2.2" "torchaudio==2.2.2"
+          pip install -q panns-inference==0.1.1 librosa
+          python Native/tools/instruments/embed.py /tmp/iset panns10 /tmp/out 2>&1 | tee /tmp/embed.log | grep -E "EMBED|CNN10|Error|error" | tail -20
+          grep -E "EMBED done|CNN10 checkpoint" /tmp/embed.log | while IFS= read -r l; do echo "::notice title=panns10::$l"; done
+      - uses: actions/upload-artifact@v4
+        with: { name: out-panns10, path: /tmp/out, retention-days: 7 }
+
+  calibrate:
+    needs: embed
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: iset, path: /tmp/iset, run-id: "${{ inputs.bench_run_id }}", github-token: "${{ github.token }}" }
+      - uses: actions/download-artifact@v4
+        with: { pattern: "out-*", path: /tmp/out, merge-multiple: true, run-id: "${{ inputs.bench_run_id }}", github-token: "${{ github.token }}" }
+      - uses: actions/download-artifact@v4
+        with: { name: out-panns10, path: /tmp/out }
+      - name: Evaluate and calibrate (all models, identical protocol)
+        run: |
+          set -o pipefail
+          pip install -q "numpy<2" scipy scikit-learn
+          ls /tmp/out
+          python Native/tools/instruments/evaluate.py /tmp/iset /tmp/out /tmp/report.md | tail -20
+          python Native/tools/instruments/calibrate.py /tmp/iset /tmp/out /tmp/calibration.md | tail -60
+          python3 - <<'PY'
+          import json
+          rows = json.load(open("/tmp/calibration.json"))
+          for r in rows:
+              s = r["system"]
+              if not s.startswith("C ·"): continue
+              t, ns = r["test"]["original"], r["test_nsynth"]
+              print(f"::notice title=E2 {s}::DEV cov {r['dev']['coverage']:.0%} wrong {r['dev']['wrong_family']:.1%} (target met: {r['target_reached_on_dev']}) · "
+                    f"TEST clean cov {t['coverage']:.0%} wrong {t['wrong_family']:.0%} sel {t['selective_family_acc'] or 0:.0%} · "
+                    f"NSynth cov {ns['coverage']:.0%} wrong {ns['wrong_family']:.0%} sel {ns['selective_family_acc'] or 0:.0%}")
+          PY
+      - name: Push to branch ci/instrument-e2
+        if: always()
+        run: |
+          [ -f /tmp/calibration.md ] || exit 0
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/instrument-e2 && git rm -rqf . && mkdir -p e2
+          cp /tmp/calibration.md /tmp/calibration.json /tmp/report.md /tmp/report.json e2/ 2>/dev/null || true
+          cp /tmp/out/panns10.json e2/ 2>/dev/null || true
+          echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID} · bench run ${{ inputs.bench_run_id }}" > e2/SOURCE.txt
+          git add e2 && git commit -qm "Instrument E2 (CNN10)" && git push -qf origin ci/instrument-e2
