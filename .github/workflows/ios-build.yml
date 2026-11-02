@@ -107,6 +107,26 @@ jobs:
           [ $code = 0 ] || tail -20 inference.log | while IFS= read -r l; do echo "::error title=Inference contract (exit $code)::$l"; done
           exit $code
 
+      - name: Nearest-sound search contract (bundled EfficientAT Core ML + tone tables)
+        # The app's exact pipeline (Swift front-end → bundled Core ML model) must reproduce PyTorch's
+        # embedding for the Gate 2 fixture (cosine > 0.99), and both bundled tone tables must load.
+        run: |
+          set -uo pipefail
+          mkdir -p build-perceptual && cd build-perceptual
+          if ! swiftc -O -target "$(uname -m)-apple-macos14" $(find ../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') \
+               ../Native/tools/perceptual_check/main.swift -o perceptual_check > compile.log 2>&1; then
+            grep -E "error:" compile.log | sort -u | head -10 | while IFS= read -r l; do echo "::error title=Nearest-sound check didn't compile::$l"; done
+            exit 1
+          fi
+          code=0
+          ./perceptual_check ../App/Resources/ML/EfficientAT_mn10_as_fp16.mlpackage \
+            ../Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/instruments/efficientat \
+            ../App/Resources/ML/tone_table_harmonic.json ../App/Resources/ML/tone_table_plain.json > perceptual.log 2>&1 || code=$?
+          cat perceptual.log
+          grep -E "^RESULT" perceptual.log | while IFS= read -r l; do echo "::notice title=Nearest-sound contract::$l"; done
+          [ $code = 0 ] || grep -E "^FAIL" perceptual.log | while IFS= read -r l; do echo "::error title=Nearest-sound contract::$l"; done
+          exit $code
+
       - name: Licence gate (personal build) and Indian set manifest
         run: |
           python3 Native/tools/licences/check_manifest.py docs/LICENSES/manifest.json --self-test

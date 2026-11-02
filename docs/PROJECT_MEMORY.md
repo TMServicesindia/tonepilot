@@ -272,6 +272,29 @@ Stop: no production change, no major training, no release before approval.
 - Design: references serve two roles: playable candidates, and learning a cross-source similarity. More references alone don't fix the hand fingerprint (measured).
 - Smallest next experiment: E-4 (frozen embedding cosine vs the fingerprint on cross-bank DEV).
 
+## 6q. Nearest-sound tone search: built into the app (2 Nov; owner: "complete all phases, give me the best build")
+
+**Phases completed, each gated by measurement:**
+1. **E-4:** frozen embeddings beat the fingerprint cross-bank (DEV).
+2. **E-5:** + harmonic isolation of the part from its notes (DEV best). LDA rejected.
+3. **Device parity:** a numpy copy of the Swift front-end (2.2e-5) with a power-domain mask; the Swift mask matches Python to 8.5e-6.
+4. **Sealed TEST (MuseScore General, run once):** right family, lead 1→6/12, backing 1→9/12; shipping fingerprint 1/12 and 1/12.
+
+**In the app:**
+- `PerceptualToneService` loads the bundled EfficientAT Core ML fp16 (`App/Resources/ML`, compiled on first use) and the precomputed tone tables (`tone_table_harmonic/plain.json`, from CI).
+- The separated parts are re-decoded at 32 kHz.
+- Lead parts are masked with the extracted notes; backing is plain.
+- The fingerprint fits EQ/reverb to the chosen tone.
+- **Per-section lead sounds** (`Song.sectionLeadMatches`: pallavi, charanam, interludes) feed the right hand, and therefore the main tone.
+- Fallback: if the model or tables can't load, the app uses the previous fingerprint matcher.
+
+**Gates added:**
+- core tests + speed budget (0.28 s per 24 s part without Core ML);
+- full-build "Nearest-sound search contract" (bundled model + Swift front-end vs PyTorch embedding, cosine > 0.99; tables valid);
+- licence manifest entry (SAFE\*: MIT code/weights, AudioSet data).
+
+**Not validated yet:** real film songs; physical iPhone timing (G2.4).
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

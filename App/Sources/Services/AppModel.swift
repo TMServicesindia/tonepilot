@@ -835,6 +835,7 @@ final class AppModel: ObservableObject {
                 var stemInfos: [StemInfo] = []
                 var serverMelody: MelodyTrack?
                 var progressBase = 0.0
+                var stemFiles: [StemInfo.Kind: URL] = [:]   // separated parts' files (nearest-sound search reads them at 32 kHz)
                 if let client {
                     do {
                         await stage("Uploading to your analysis server…", 0.02)
@@ -848,6 +849,7 @@ final class AppModel: ObservableObject {
                             guard let kind = StemInfo.Kind(rawValue: stem.kind) else { continue }
                             let file = try await client.downloadStem(stem, to: stemDir)
                             stems[kind] = try AudioFileDecoder.decodeMono(url: file)
+                            stemFiles[kind] = file
                             stemInfos.append(StemInfo(kind: kind, fileName: file.lastPathComponent, model: stem.model))
                         }
                         serverMelody = result.melody
@@ -864,6 +866,7 @@ final class AppModel: ObservableObject {
                 // Instruments are recognised on the separated instrument parts (no singer on top), else the mix.
                 let instrumentKinds: Set<StemInfo.Kind> = [.lead, .backing, .other, .piano, .guitar]
                 let instrumentFiles = local.compactMap { t in SongStudio.stemKind(t.id).flatMap { instrumentKinds.contains($0) ? t.url : nil } }
+                for t in local { if let kind = SongStudio.stemKind(t.id), stemFiles[kind] == nil { stemFiles[kind] = t.url } }
                 if stems.isEmpty {
                     let parts = local.compactMap { t in SongStudio.stemKind(t.id).map { ($0, t.url) } }
                     if !parts.isEmpty { await stage("Reading the separated parts…", 0.02) }
@@ -896,15 +899,18 @@ final class AppModel: ObservableObject {
                     DeveloperShadowMode.compareIfEnabled(files: files, sections: sections, production: result)
                     return result
                 }
+                // Whole-library nearest-sound search for the separated parts (nil → fingerprint matcher, as before).
+                let perceptual = stems.isEmpty ? nil : PerceptualToneService.shared.hook(stemFiles: stemFiles)
                 let output: SongPipeline.Output
                 if ImportPipelineFlags.useSharedPipeline {
                     output = try SongImportPipeline.run(.init(song: current, audio: audio, stems: stems, melodyOverride: serverMelody,
                                                               stemInfos: stemInfos, patches: patches),
-                                                        hooks: .init(progress: progress, instruments: instruments, toneInstrument: toneLoader))
+                                                        hooks: .init(progress: progress, instruments: instruments, toneInstrument: toneLoader,
+                                                                     perceptual: perceptual))
                 } else {
                     // Previous orchestration (fallback during Phase 1).
                     output = try SongPipeline.run(song: current, audio: audio, stems: stems, melodyOverride: serverMelody, patches: patches,
-                                                  progress: progress, instruments: instruments, toneInstrument: toneLoader)
+                                                  progress: progress, instruments: instruments, toneInstrument: toneLoader, perceptual: perceptual)
                 }
                 await MainActor.run {
                     guard let self else { return }
