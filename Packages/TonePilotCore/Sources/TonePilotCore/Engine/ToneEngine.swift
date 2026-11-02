@@ -513,7 +513,7 @@ public final class ToneEngine: @unchecked Sendable {
                 let t = Float(v.framesPlayed) / sr
                 let fade = v.vibDelay > 0 ? min(1, max(0, (t - v.vibDelay) / 0.4)) : 1
                 vib = sinf(v.vibPhase) * (v.vibDepth * fade + hs.modDepth)
-                v.vibPhase += 2 * .pi * max(v.vibRate, 5) * Float(len) / sr
+                v.vibPhase += 2 * .pi * (v.vibRate > 0.4 ? v.vibRate : 5) * Float(len) / sr   // the tone's own rate; 5 Hz for the mod wheel alone
                 if v.vibPhase > 2 * .pi { v.vibPhase -= 2 * .pi }
             }
             v.glideCents *= powf(v.glideCoef, Float(len))

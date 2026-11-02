@@ -165,13 +165,14 @@ public enum ToneMatcher {
 
     /// The notes played on `patch`, dry (no reverb/chorus/delay), mono.
     public static func render(_ patch: InstrumentPatch, instrument: LoadedInstrument, notes: [MelodyNote], seconds: Double,
-                              sampleRate: Double, eq: EQSettings? = nil) -> AudioBuffer {
+                              sampleRate: Double, eq: EQSettings? = nil, fit: ToneFitter.Settings? = nil) -> AudioBuffer {
         let engine = ToneEngine(sampleRate: sampleRate)
         var master = EngineMasterConfig()
         master.gain = 1; master.reverbLevel = 0; master.chorusLevel = 0; master.delayLevel = 0
         engine.send(.setMaster(master))
         var layer = Layer(patchId: patch.id, volume: 1)
         if let eq { var fx = patch.effects; fx.eq = eq; layer.effectsOverride = fx }
+        if let fit { fit.apply(to: &layer) }
         var config = EngineLayerConfig.make(layer: layer, patch: patch, instrument: instrument, handle: 1, headroomGain: 0.5)
         config.sendReverb = 0; config.sendChorus = 0; config.sendDelay = 0
         config.mono = false   // one voice per note: the target's notes may overlap

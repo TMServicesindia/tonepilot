@@ -50,6 +50,8 @@ struct SongStudioView: View {
     let songId: UUID
     @State private var pickingToneFor: SectionRef?
     @State private var editingTone: ToneEditTarget?
+    /// The tone editor opens full height (its layers are its main content); it can be pulled down to half.
+    @State private var toneDetent: PresentationDetent = .large
     @State private var guideFor: UUID?
     @State private var editingSection: SongSection?
     @State private var showDetails = false
@@ -98,7 +100,8 @@ struct SongStudioView: View {
             .sheet(item: $editingTone) { target in
                 NavigationStack { ArrangementEditorView(songId: songId, arrangementId: target.id, onDone: { editingTone = nil }) }
                     .environmentObject(model)
-                    .presentationDetents([.medium, .large])
+                    .presentationDetents([.medium, .large], selection: $toneDetent)
+                    .onAppear { toneDetent = .large }
             }
             .sheet(item: $editingSection) { section in
                 SectionEditorSheet(songId: songId, section: section).environmentObject(model)

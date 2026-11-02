@@ -77,8 +77,17 @@ final class TonePilotUITests: XCTestCase {
                     // Tone editor: open the main tone, a layer and its effects, move Drive.
                     let edit = element("tone.editMain")
                     if edit.waitForExistence(timeout: 3) {
-                        tap(edit, thenExpect: element("layer.header"), limit: 5, "open the main tone editor")
-                        tap(element("layer.header"), "expand a layer")
+                        // Responded = the editor is up (its Done button); the layer row may then need a scroll
+                        // (lists build rows near the screen only — iOS 17 doesn't report rows below the fold).
+                        tap(edit, thenExpect: element("tone.done"), limit: 5, "open the main tone editor")
+                        let header = element("layer.header")
+                        var scrolls = 0
+                        while !(header.exists && header.isHittable) && scrolls < 3 { app.swipeUp(); scrolls += 1 }
+                        if !header.waitForExistence(timeout: 3) {
+                            XCTContext.runActivity(named: "Tone editor element tree") { a in a.add(XCTAttachment(string: app.debugDescription)) }
+                            print("TONE EDITOR TREE\n" + app.debugDescription.split(separator: "\n").prefix(80).joined(separator: "\n"))
+                        }
+                        tap(header, "expand a layer")
                         let effects = app.buttons["Effects & EQ"].firstMatch
                         if effects.waitForExistence(timeout: 3) {
                             tap(effects, "open effects")

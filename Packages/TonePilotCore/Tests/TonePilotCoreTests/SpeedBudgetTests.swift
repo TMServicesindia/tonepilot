@@ -98,6 +98,27 @@ final class SpeedBudgetTests: XCTestCase {
         XCTAssertLessThan(took, 8, "tone matching took \(took) s")
     }
 
+    /// Fitting the chosen tone's envelope / filter / vibrato to one part (tone recreation T3): a
+    /// 24-second section at 44.1 kHz with other parts leaking in. The app fits up to ~12 parts and
+    /// section leads per song, in the background after the analysis.
+    func testToneFittingIsQuick() throws {
+        try budgetsApply()
+        guard var p = FactoryPatches.all.first(where: { $0.synth?.waveform == .saw && $0.family != .bass }) else { throw XCTSkip("no saw synth") }
+        p.expression = ExpressionSettings(vibratoDepth: 0)
+        let inst = LoadedInstrument(name: p.name, synth: p.synth!)
+        let notes: [MelodyNote] = (0..<30).map { MelodyNote(start: 0.3 + Double($0) * 0.78, duration: [0.5, 0.7, 0.35][$0 % 3], midi: 62 + ($0 * 5) % 12, confidence: 0.9) }
+        var ex = ExpressionSettings(vibratoDepth: 22, vibratoRate: 5.8, vibratoDelay: 0.1)
+        ex.mono = false
+        let truth = ToneFitter.Settings(envelope: Envelope(attack: 0.09, decay: 0.4, sustain: 0.7, release: 0.4),
+                                        filter: FilterSettings(enabled: true, cutoff: 2200), expression: ex)
+        let target = ToneMatcher.render(p, instrument: inst, notes: notes, seconds: 24, sampleRate: 44_100, fit: truth)
+        var fit: ToneFitter.Fit?
+        let took = seconds { fit = ToneFitter.fit(patch: p, instrument: inst, target: target, notes: notes) }
+        print("SPEED tone fitting: \(String(format: "%.2f", took)) s for one 24 s part (distance \(String(format: "%.2f", fit?.distanceBefore ?? -1)) → \(String(format: "%.2f", fit?.distanceAfter ?? -1)))")
+        XCTAssertNotNil(fit)
+        XCTAssertLessThan(took, 3, "tone fitting took \(took) s")
+    }
+
     func testPatternLearningIsQuick() throws {
         try budgetsApply()
         let pattern: [(Int, ArpeggioPattern.Degree)] = [(0, .root), (3, .fifth), (6, .octave), (8, .third), (11, .fifth), (14, .octave)]

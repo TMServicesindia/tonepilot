@@ -18,6 +18,11 @@ public struct PartMatch: Codable, Hashable, Sendable {
     public var method: String?
     /// Cosine similarity of the perceptual search (−1...1); nil for the fingerprint path.
     public var perceptualScore: Double?
+    /// How the tone is played, fitted to the part (envelope / filter / vibrato; tone recreation T3).
+    /// nil = the tone's own settings (nothing measured closer, or an old match).
+    public var fit: ToneFitter.Settings?
+    /// Plain-language description of `fit`.
+    public var fitSummary: String?
 
     public init(part: String, patchId: UUID, name: String, similarity: Double, eq: EQSettings, reverbMix: Double, section: String,
                 method: String? = nil, perceptualScore: Double? = nil) {
@@ -32,6 +37,9 @@ public struct PartMatch: Codable, Hashable, Sendable {
     /// or a fingerprint match above `PartMatcher.trusted`.
     public var isTrusted: Bool { isPerceptual || similarity >= PartMatcher.trusted }
 
+    /// Applies the fitted envelope / filter / vibrato (if any) to a layer playing this match.
+    public func applyFit(to layer: inout Layer) { fit?.apply(to: &layer) }
+
     /// The matched tone with its fitted EQ and reverb, as a layer's effects.
     public func effects(base: EffectSettings) -> EffectSettings {
         var fx = base
@@ -45,6 +53,9 @@ public enum PartMatcher {
     /// Below this the match isn't trusted over the arranger's own choice.
     public static let trusted = 0.62
     public static let perceptualMethod = "perceptual"
+    /// Tone recreation T3 (fit attack / fade / release / brightness / vibrato to the part). Off until it
+    /// passes its pre-registered DEV gate (tone-fit.yml, independent judges); then switched on here.
+    public static let fitsPlaying = false
 
     /// The nearest-sound search (tone research E-4/E-5, sealed-tested): the platform supplies the
     /// part's audio at 32 kHz (the separated stem file, full band) and the embedding model.
@@ -77,12 +88,56 @@ public enum PartMatcher {
         let allowed = Set(patches.filter { $0.family != .percussion }.map(\.id))
         guard let top = PerceptualToneSearch.rank(e, table: table, allowed: allowed).first,
               let patch = patches.first(where: { $0.id == top.patch }) else { return nil }
+        var m: PartMatch
         if let fit = ToneMatcher.bestMatches(target: slice, notes: notes, candidates: [patch], instrument: instrument, limit: 1).first {
-            return PartMatch(part: kind.rawValue, patchId: patch.id, name: patch.name, similarity: fit.similarity, eq: fit.eq,
-                             reverbMix: fit.reverbMix, section: sectionLabel, method: perceptualMethod, perceptualScore: top.score)
+            m = PartMatch(part: kind.rawValue, patchId: patch.id, name: patch.name, similarity: fit.similarity, eq: fit.eq,
+                          reverbMix: fit.reverbMix, section: sectionLabel, method: perceptualMethod, perceptualScore: top.score)
+        } else {
+            m = PartMatch(part: kind.rawValue, patchId: patch.id, name: patch.name, similarity: 0, eq: EQSettings(),
+                          reverbMix: patch.effects.reverbMix, section: sectionLabel, method: perceptualMethod, perceptualScore: top.score)
         }
-        return PartMatch(part: kind.rawValue, patchId: patch.id, name: patch.name, similarity: 0, eq: EQSettings(),
-                         reverbMix: patch.effects.reverbMix, section: sectionLabel, method: perceptualMethod, perceptualScore: top.score)
+        fitPlaying(&m, kind: kind, start: start, slice: slice, notes: notes, patch: patch, instrument: instrument, hook: hook)
+        return m
+    }
+
+    /// Fits how the matched tone plays (attack, fade, release, brightness, vibrato) to the part —
+    /// tone recreation T3. With the nearest-sound model available, the fit is kept only if the model
+    /// also hears the fitted tone at least as close to the part as the unfitted one (an independent check).
+    static func fitPlaying(_ m: inout PartMatch, kind: StemInfo.Kind, start: Double, slice: AudioBuffer, notes: [MelodyNote],
+                           patch: InstrumentPatch, instrument: (InstrumentPatch) -> LoadedInstrument?, hook: PerceptualHook?) {
+        guard fitsPlaying, let inst = instrument(patch) else { return }
+        let eq = m.eq
+        let verify: ((ToneFitter.Settings) -> Bool)? = hook.map { hook in
+            { settings in perceptuallyCloser(settings, kind: kind, start: start, slice: slice, notes: notes, patch: patch, instrument: inst, eq: eq, hook: hook) }
+        }
+        guard let fit = ToneFitter.fit(patch: patch, instrument: inst, target: slice, notes: notes, eq: eq,
+                                       vibrato: kind != .backing, verify: verify), !fit.settings.isEmpty else { return }
+        m.fit = fit.settings
+        m.fitSummary = fit.summary
+    }
+
+    /// The nearest-sound model's verdict on a fit: over the part's busiest ≤ 10 s, is the fitted tone
+    /// at least as close to the part as the tone with its own settings? (Same masking as the search.)
+    static func perceptuallyCloser(_ settings: ToneFitter.Settings, kind: StemInfo.Kind, start: Double, slice: AudioBuffer, notes: [MelodyNote],
+                                   patch: InstrumentPatch, instrument: LoadedInstrument, eq: EQSettings, hook: PerceptualHook) -> Bool {
+        let sr = EfficientATFrontEnd.sampleRate
+        guard let (clip, ns) = ToneMatcher.window(slice, notes: notes, maxSeconds: 10, maxNotes: 24), let firstShifted = ns.first,
+              let firstOriginal = notes.first(where: { $0.id == firstShifted.id }) else { return false }
+        let offset = firstOriginal.start - firstShifted.start   // where the window starts in `slice`
+        guard let x = hook.audio32k(kind, start + offset, start + offset + clip.duration), x.count > Int(sr) else { return false }
+        let masked = kind != .backing
+        func embed(_ y: [Float]) -> [Float]? { try? PerceptualToneSearch.embedding(samples: y, notes: masked ? ns : nil, embed: hook.embed) }
+        func render(_ s: ToneFitter.Settings?) -> [Float] {
+            ToneMatcher.render(patch, instrument: instrument, notes: ns, seconds: Double(x.count) / sr, sampleRate: sr, eq: eq, fit: s).samples
+        }
+        guard let t = embed(x), let plain = embed(render(nil)), let fitted = embed(render(settings)) else { return false }
+        return cosine(fitted, t) >= cosine(plain, t)
+    }
+
+    static func cosine(_ a: [Float], _ b: [Float]) -> Double {
+        var d = 0.0, na = 0.0, nb = 0.0
+        for i in 0..<min(a.count, b.count) { d += Double(a[i]) * Double(b[i]); na += Double(a[i] * a[i]); nb += Double(b[i] * b[i]) }
+        return na > 0 && nb > 0 ? d / (na.squareRoot() * nb.squareRoot()) : -1
     }
 
     /// The lead part's nearest tone for each distinct section (pallavi, charanam, interludes…):
@@ -186,8 +241,13 @@ public enum PartMatcher {
                 }
                 let list = candidates(for: kind, patches: patches, heard: heard)
                 if let best = ToneMatcher.bestMatches(target: slice, notes: track.notes, candidates: list, instrument: instrument).first {
-                    out[kind.rawValue] = PartMatch(part: kind.rawValue, patchId: best.patchId, name: best.name, similarity: best.similarity,
-                                                   eq: best.eq, reverbMix: best.reverbMix, section: section.label)
+                    var m = PartMatch(part: kind.rawValue, patchId: best.patchId, name: best.name, similarity: best.similarity,
+                                      eq: best.eq, reverbMix: best.reverbMix, section: section.label)
+                    if m.isTrusted, let patch = patches.first(where: { $0.id == best.patchId }) {
+                        fitPlaying(&m, kind: kind, start: section.startTime, slice: slice, notes: track.notes, patch: patch,
+                                   instrument: instrument, hook: nil)
+                    }
+                    out[kind.rawValue] = m
                 }
                 break
             }

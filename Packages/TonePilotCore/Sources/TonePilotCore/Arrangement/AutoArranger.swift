@@ -375,6 +375,7 @@ public enum AutoArranger {
             if let m = leadMatch, m.isTrusted, let patch = available[m.patchId] {
                 lead.patchId = m.patchId
                 lead.effectsOverride = m.effects(base: patch.effects)
+                m.applyFit(to: &lead)
                 if m.isPerceptual {
                     why.append("Right hand: \(m.name) — the nearest sound to the song's lead in \(m.section), searched across the whole tone library "
                                + "(EQ and reverb fitted); intensity \(level3.rawValue).")
@@ -382,6 +383,7 @@ public enum AutoArranger {
                     why.append("Right hand: \(m.name) — matched to the song's lead instruments (\(Int((m.similarity * 100).rounded()))% tone match, "
                                + "EQ and reverb fitted); intensity \(level3.rawValue).")
                 }
+                if let fitWhy = m.fitSummary { why.append(fitWhy) }
             } else {
                 why.append("Right hand: \(best.name) — \(best.reason)\(isInstrumental ? " (instrumental motif)" : "")"
                            + "\(heard.map { "; heard: \($0.key) \(Int($0.value * 100))%" } ?? ""); intensity \(level3.rawValue).")
@@ -425,8 +427,10 @@ public enum AutoArranger {
            let patch = available[m.patchId] {
             left.patchId = m.patchId
             left.effectsOverride = m.effects(base: patch.effects)
+            m.applyFit(to: &left)
             leftWhy = m.isPerceptual ? "\(m.name), the nearest sound to the song's \(m.part) part (whole tone library)"
                                      : "\(m.name), matched to the song's \(m.part) part (\(Int((m.similarity * 100).rounded()))% tone match)"
+            if let f = m.fitSummary { leftWhy += " — " + f.trimmingCharacters(in: CharacterSet(charactersIn: ".")) }
         }
         layers.append(left)
         why.append("Left hand: \(leftWhy).")
