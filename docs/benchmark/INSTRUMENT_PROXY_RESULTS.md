@@ -167,10 +167,12 @@ The EfficientAT lead holds (on NSynth: EfficientAT 87% selective at 50% coverage
 
 Findings:
 1. **Imitation tones in training help the family decision a lot**: imitation wrong-family went from 49% to 22%, and the clean set's wrong-family went from 17% to 10%.
-2. **The source-type head still never says "imitation"** on TEST:
-   - EfficientAT: imitation → acoustic 28/28.
-   - Electronic is mostly right (26/33).
-   - So "synth imitating an Indian instrument" cannot yet be told apart from the real instrument. This needs real recordings of both (licensed), not more synthesis.
+2. **Source type (CORRECTED 2 Nov).** An earlier version said the head never answers "imitation" (28/28 → acoustic). That was wrong: it came from a log line cut at 250 characters. The full v4 result for EfficientAT + head C on the 60 TEST imitation clips:
+   - 31 classified as imitation;
+   - 28 as acoustic;
+   - 1 as electronic.
+
+   About half of imitations are recognised, so the distinction is weak, not absent. Real acoustic/imitation pairs are still the lever.
 3. **Short-clip thresholds did not reach the target on DEV.** The head is confidently wrong on single 1 s windows: even at a 0.99 threshold, DEV wrong-family stays above 5%. Thresholds alone cannot fix this. The v4b calibration run tests a stronger-regularised head and a "heads must agree" rule, selected on DEV only.
 4. Layered mixtures (EfficientAT + head):
    - window instrument F1 0.34, family F1 0.50;
@@ -206,3 +208,59 @@ Findings:
 3. A stricter DEV rule, "meet the target on DEV overall and on DEV short clips", would pick C-agree. That rule was thought of *after* seeing TEST, so it is not adopted here. It needs confirming on data not yet looked at; the first real annotated DEV/TEST set is the right place.
 4. Stronger regularisation (C-reg) changes little. Overconfidence comes from the domain gap between sound banks, not overfitting within one.
 5. No variant reaches ≤5% wrong-family on every TEST condition. The remaining lever is the same as v3 concluded: **licensed real recordings** for training, DEV and TEST.
+
+---
+
+## E2: PANNs CNN10 challenger (run 41386940981, commit 9bf59ce; reuses bench run 41328362434)
+
+Pre-declared protocol (`docs/TONEPILOT_INSTRUMENT_ACCURACY_ROADMAP.md`):
+- same clips, splits, 1 s windows and heads for every encoder;
+- DEV selects; TEST is reported once.
+
+Everything here is SYNTHETIC proxy + NSynth, not film-music accuracy.
+
+**CNN10 facts:**
+- weights from Zenodo 3987831, SHA-256 `5240bdc47444e331bbeb54fd741d2b3f933a4526e84b0c17bf3593df94b13962`;
+- all weights loaded, 0 unexpected keys;
+- 6.30 M parameters as counted, including the frozen spectrogram front-end (5.2 M published);
+- 2.0 s CPU per audio minute, against EfficientAT 0.44 s (EfficientAT is 4.5× faster on CI CPU);
+- licence: code MIT, weights CC BY 4.0.
+
+**Primary metric (DEV coverage at wrong-family ≤ 5%), with TEST shown for reference:**
+
+| Encoder (DEV-selected variant) | DEV coverage | TEST clean (cov / wrong / selective) | TEST 1 s | NSynth-test (cov / wrong / selective) | Layered window F1 (instrument / family) | Onset error median / p90 |
+|---|---|---|---|---|---|---|
+| **EfficientAT (C), official** | **73%** | 72% / 10% / 86% | 95% / 25% | **50% / 7% / 87%** | **0.35 / 0.50** | 0.5 s / 7.0 s |
+| PANNs CNN10 (C-reg) | 60% | 75% / 18% / 76% | 100% / 31% | 24% / 3% / 85% | 0.28 / 0.49 | 0.5 s / 8.7 s |
+| PANNs CNN14 (C-reg) | 62% | 81% / 19% / 76% | 100% / 30% | 31% / 5% / 85% | 0.31 / 0.53 | 0.5 s / 8.0 s |
+| YAMNet (C) | 56% | 55% / 11% / 80% | 56% / 19% | 25% / 4% | 0.22 / 0.46 | 1.0 s / 12.2 s |
+
+**Plain C head, all encoders, TEST clean:**
+- CNN10: 59% / 9% / 85%;
+- EfficientAT: 72% / 10% / 86%.
+
+**Coverage curve (TEST clean; family accuracy of the most confident share):**
+
+| Encoder | 70% | 50% | 30% |
+|---|---|---|---|
+| EfficientAT C | 82% | 87% | 94% |
+| CNN10 C | 81% | 86% | 91% |
+
+**Source type (TEST, C heads; imitation clips n = 60):**
+- EfficientAT: 31 imitation / 28 acoustic / 1 electronic;
+- CNN10: 31 imitation / 25 acoustic / 4 electronic;
+- CNN14: 38 / 19 / 3.
+
+**Decision under the pre-declared rule: CNN10 does not replace C.**
+- It loses the primary metric: DEV coverage 60% against 73%.
+- It loses two guards:
+  - NSynth coverage 24% against 50% (lower wrong-family, 3% against 7%, but at half the coverage);
+  - layered instrument F1 0.28 against 0.35.
+- On TEST it does not beat C on the clean or short sets, and it is 4.5× slower on CPU.
+- **EfficientAT + head C stays the official candidate.**
+
+What E2 does not show:
+- whether the ranking holds on real Indian audio (E1, Sanidha, pending access);
+- anything about iPhone performance.
+
+Short clips remain a shared weakness (every DEV-selected encoder has wrong-family ≥ 19% on 1 s TEST clips), and so does the 5% wrong-family target on TEST.

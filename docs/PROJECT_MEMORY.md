@@ -243,6 +243,16 @@ Stop: no production change, no major training, no release before approval.
 - Report: `docs/benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md`. Inventory: `docs/benchmark/sound_palette_inventory.json` (165 terms).
 - The coverage gap is real Indian recordings; there is an owner recording programme with priorities and a specification.
 
+## 6n. E2 result + a correction (2 Nov)
+
+**E2 (run 41386940981):** PANNs CNN10 does not replace EfficientAT + head C.
+- DEV coverage 60% vs 73%; NSynth coverage 24% vs 50%; layered F1 0.28 vs 0.35; 4.5× slower.
+- C stays official. All synthetic/NSynth.
+
+**Correction:** the v4 claim "the source head never says imitation (28/28)" was wrong; it was read from a log line cut at 250 characters.
+- The true v4 figure is 31 imitation / 28 acoustic / 1 electronic of 60 imitation clips.
+- Fixed in INSTRUMENT_PROXY_RESULTS, MODEL_COMPARISON and TODO.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

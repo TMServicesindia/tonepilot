@@ -36,7 +36,7 @@ All from `docs/benchmark/INSTRUMENT_PROXY_RESULTS.md`. TEST = GeneralUser GS ren
 | v4 1 s clips | 95% / 25% / 73% | Confidently wrong on short clips |
 | v4 imitation tones | 78% / 22% / 72% | |
 | v4 NSynth-test | 50% / 7% / 87% | |
-| v4 source type | imitation → acoustic 28/28 | The source head never says "imitation" |
+| v4 source type (corrected 2 Nov) | imitation: 31 imitation / 28 acoustic / 1 electronic (of 60) | Weak distinction, about half recognised. The earlier "never says imitation" came from a truncated log line |
 | v4 layered (window instrument F1 / family F1; onset error median / p90) | 0.34 / 0.50; 0.5 s / 7.0 s | 46/70 events detected |
 | v4b C-agree (not adopted) | NSynth 24% / 9% / 61%; 1 s clips 60% / 7% / 88% | Worse on real notes; DEV rule keeps C |
 
@@ -96,3 +96,18 @@ Other models (v4, TEST clean; MEASURED-SYN):
 2. **Next challenger: PANNs CNN10** (same size class as EfficientAT, permissive weights, never tested). Run it as an add-on to the existing bench matrix, which is a small change.
 3. **BEATs:** licence check first; frozen embeddings only; it doesn't block anything.
 4. **First data experiment:** Sanidha session-disjoint evaluation of the existing frozen encoders (C, CNN10, YAMNet), with stem-derived activity labels after a human spot-check (see the roadmap, E1).
+
+## 7. E2 result (2 Nov, run 41386940981; synthetic proxy + NSynth)
+
+**PANNs CNN10 did not beat EfficientAT + head C** under the pre-declared protocol:
+
+| Metric | CNN10 | EfficientAT + C |
+|---|---|---|
+| DEV coverage at ≤ 5% wrong-family | 60% | **73%** |
+| NSynth-test coverage | 24% | **50%** |
+| Layered instrument F1 | 0.28 | **0.35** |
+| CPU time per audio minute | 2.0 s | **0.44 s** |
+
+**C stays official.** Details: `benchmark/INSTRUMENT_PROXY_RESULTS.md` (E2 section).
+
+**Next challenger:** BEATs (after a licence check), or E1 on real Indian audio. A model challenge on synthetic data alone is now of low value.
