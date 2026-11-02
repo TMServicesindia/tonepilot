@@ -314,3 +314,29 @@ Embedding time for all 438 clips (CI CPU): EfficientAT 25 s, CNN10 113 s.
 **Local follow-up (MFCC, same harness):** harmonic-only part isolation (+harm: STFT mask at the notes' harmonics) raises same-bank lead from 0/1 to **6/7 exact/family**, confirming the leaking backing hurts whole-clip descriptors. LDA on FluidR3 renders did not help MFCC.
 
 **Next (E-5, run 41407645614):** EfficientAT with +harm, +lda (FluidR3 training renders) and both.
+
+---
+
+## Tone E-5 + sealed TEST (2 Nov): perceptual nearest-tone search, decided on DEV, confirmed once on a sealed bank
+
+**DEV (cross-bank TimGM6mb; device-parity front-end = the Swift code; lead exact / family / top-3; backing same):**
+
+| Method | Lead | Backing |
+|---|---|---|
+| EfficientAT, no mask | 3 / 5 / 5 | **2 / 6 / 6** |
+| EfficientAT + harmonic mask, true notes | 5 / 8 / 8 | 1 / 2 / 8 |
+| **EfficientAT + harmonic mask, app-extracted notes** (deployable) | **5 / 6 / 8** | 0 / 1 / 8 |
+| + LDA (FluidR3 training renders) | 2–3 / 4–5 | 0 / 0. **Rejected** |
+| CNN10 + mask | 1 / 5 / 7 | 0 / 2 / 7 |
+
+**DEV decision:** lead / melody parts masked with extracted notes; backing / pads unmasked.
+
+**Sealed TEST (MuseScore General, MIT; never used in tuning; run once, run 41409643632):**
+
+| System | Lead exact / family / top-3 | Backing exact / family / top-3 |
+|---|---|---|
+| Shipping fingerprint (same targets) | 0 / 1 / — | 0 / 1 / — |
+| **Deployed rule (lead masked, backing plain)** | **3 / 6 / 6** | **3 / 9 / 11** |
+| (for reference, not used to choose) masked backing | — | 5 / 9 / 9 |
+
+**Result:** right instrument family for the lead 1/12 → 6/12, and for the backing 1/12 → 9/12, on a bank the method never saw. Rendered GM audio, not real film songs; real-song validation is still pending.
