@@ -125,6 +125,41 @@ Implications:
 2. **They are the first owner/musician recording targets**, together with the Tamil folk percussion set above. Volunteer musicians and written permission, using the existing letter template.
 3. Casio imitations of all of them are useful **only** as `imitation` source examples.
 
+## 1c. Owner-supplied deep-dive (2 Nov): **OWNER-SUPPLIED, unverified**; same rules as §1b
+
+### 1c.1 New claims and what each means for the analyser
+
+| Composer (claim) | New sources | Implication for TonePilot |
+|---|---|---|
+| Ilaiyaraaja: "unusual conversations" (guitar ↔ veena, trumpet ↔ flute call-and-response); melodically dynamic basslines; polyrhythms; constant harmonium | — | Annotate **interplay** between events (`responds_to`), not only overlap. The bass role must allow melodic movement. Polyrhythm belongs to rhythm analysis, not to instrument labels |
+| Santhosh Narayanan: *Sarpatta Parambarai* drums with **animal-skin vs fibre heads**; gaana musicians; mridangam with rap | — | Drum-head material is a **character variant** of the same identity. It is likely beyond what can be told apart in a mix (INFERENCE), so record it but don't promise it |
+| Ghibran: *Uttama Villain* **avoided** tabla, ghatam, dholak and used **Balinese/Indonesian** instruments; *Vathikuchi* avoided flute, veena, acoustic guitar, sax, using heavy bass, low strings, trumpet, trombone | Gamelan family: metallophones, gongs (**new candidates**) | **Documented absence is valuable ground truth.** Annotations need an explicit `absent` list (unlabelled ≠ absent). "Both Indian and exotic" timbres are where the model must abstain |
+| Yuvan: *Avan Ivan* **without synths or Auto-Tune** | — | Add **pitch correction** as a processing label (the effect, never the product name) |
+| Harris Jayaraj: synth + bass guitar + drums + R&B; "haunting" guitar lines | — | Character and role (interlude lead guitar) |
+| Anirudh: within-song **switch from Western drums to Tamil folk rhythm**; electronic scratches; bass drops | Turntable scratch (sound design) | Temporal **handover inside a section**; the scratch is sound design |
+| Nadeem–Shravan: **bansuri, sitar, shehnai** in almost all songs | — | All three are unsupported Indian priority sources, which reinforces the recording priority (§1b.4) |
+| Amit Trivedi: Chennai String Orchestra; piano + acoustic guitar + bass guitar | — | A test case for real orchestra vs sampled strings (source type) |
+| Vishal–Shekhar: **dhol tasha**, Indian reeds, woodwinds | Dhol tasha (new candidate, ensemble) | — |
+| Sushin Shyam: **melodica** | — | Already a v3 candidate |
+| Rex Vijayan: **dilruba, sarod, hang drum, electric violin**, oud | Dilruba, sarod, hang drum, electric violin (**new candidates**) | New **difficult pairs**: sarod ↔ sitar ↔ veena (parent: Indian plucked lute); dilruba ↔ esraj ↔ sarangi (parent: Indian bowed) |
+| A. R. Rahman: **Kurzweil K2000, Korg M1, Auto-Tune** | — | Hardware/product names map to source type = electronic plus a processing label. **The model never outputs a product name** (it can't be known from a mix) |
+
+### 1c.2 The owner's structured fields: where each one goes
+
+| Owner field | Where it lives | Allowed use | Not allowed |
+|---|---|---|---|
+| Primary composer | **Song-level metadata** (catalogue) | Per-composer reporting; **composer-held-out test split** (does the model generalise beyond the composers it was trained on?) | Model input, prior or threshold (it would leak "composer → instrument") |
+| Core / folk / regional instruments | **Event-level annotation** (identity) per song, from listening + credits | Ground truth after human verification | Copying a composer profile into a song's labels |
+| Electronic / processed elements | Event-level **source type, character, processing** | Ground truth after verification | Product names (K2000, M1, DX7) as labels |
+| Orchestral elements | Event-level identity (ensemble ids) + source type (real vs sampled) | — | — |
+| Signature production technique | Event relations (`responds_to`, `handover_from`) + notes | Analysis and reporting | A label the model must predict |
+| Rhythmic foundation | Rhythm analysis chain + percussion events | — | — |
+| Genre context, era | Song-level metadata | Stratified reporting; split design | Model input |
+
+**Annotation schema additions** (extends the roadmap §3 proposal; not applied yet):
+- song level: `composer`, `industry`, `year`, `genre_context`, `credits_source`, `absent`;
+- event level: `responds_to`, `handover_from`.
+
 ## 2. The analyser's output: six independent dimensions
 
 | Dimension | Values (examples) | Head type | Notes |
