@@ -1,0 +1,65 @@
+name: Tone E-4 — embedding similarity vs fingerprint (research only, no app build)
+
+# Smallest experiment of docs/benchmark/OPEN_SOURCE_TONE_REFERENCE_EXPANSION_PLAN.md: does a frozen
+# audio-embedding similarity find the nearest TonePilot tone across sound sources better than the
+# shipping fingerprint? DEV banks only (GeneralUser = same bank, TimGM6mb = cross-bank). The sealed
+# TEST banks are NOT used here. Rendered GM audio, not real songs.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    container: swift:6.0-noble
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Banks (GeneralUser GS = library; TimGM6mb = cross-bank DEV)
+        run: |
+          apt-get update -qq && apt-get install -y -qq curl timgm6mb-soundfont > /dev/null
+          curl -fsSL -o /tmp/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+          ls -la /usr/share/sounds/sf2/ ; sha256sum /tmp/GeneralUser-GS.sf2 /usr/share/sounds/sf2/TimGM6mb.sf2
+      - name: Render tone table + targets
+        working-directory: Packages/TonePilotCore
+        env:
+          TP_SF2: /tmp/GeneralUser-GS.sf2
+          TP_TONE_DUMP: /tmp/tdump
+          TP_TONE_TARGETS: "same=/tmp/GeneralUser-GS.sf2,timgm=/usr/share/sounds/sf2/TimGM6mb.sf2"
+        run: swift test -c release --filter ToneTableDump 2>&1 | grep -E "DUMP|error:|Executed" | tail -5
+      - uses: actions/upload-artifact@v4
+        with: { name: tdump, path: /tmp/tdump, retention-days: 7 }
+
+  score:
+    needs: dump
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: tdump, path: /tmp/tdump }
+      - name: Install
+        run: |
+          pip install -q "numpy<2" scipy librosa
+          pip install -q --index-url https://download.pytorch.org/whl/cpu "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2"
+          pip install -q panns-inference==0.1.1
+          git clone -q --depth 1 https://github.com/fschmid56/EfficientAT /tmp/eat
+      - name: Score (MFCC, EfficientAT, PANNs CNN10)
+        run: |
+          set -o pipefail
+          S=$GITHUB_WORKSPACE/Native/tools/instruments
+          cd /tmp/eat && python $S/tone_t1.py /tmp/tdump /tmp/e4.md mfcc,efficientat,panns10 --eat /tmp/eat 2>&1 | tee /tmp/e4.log | grep -E "^\||Error|error" | tail -40
+          grep "^| " /tmp/e4.md | grep -v "Method" | while IFS= read -r l; do echo "::notice title=E-4::$l"; done
+      - name: Push to branch ci/tone-e4
+        if: always()
+        run: |
+          [ -f /tmp/e4.md ] || exit 0
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/tone-e4 && git rm -rqf . && mkdir -p e4
+          cp /tmp/e4.md /tmp/e4.json e4/; cp /tmp/tdump/table.json /tmp/tdump/targets.json e4/
+          echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID}" > e4/SOURCE.txt
+          git add e4 && git commit -qm "Tone E-4" && git push -qf origin ci/tone-e4
