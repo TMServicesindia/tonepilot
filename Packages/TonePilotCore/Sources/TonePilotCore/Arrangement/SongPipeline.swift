@@ -21,7 +21,8 @@ public enum SongPipeline {
                            melodyOverride: MelodyTrack? = nil, patches: [InstrumentPatch],
                            progress: ((Double) -> Bool)? = nil,
                            instruments: (([SongSection]) -> [UUID: [String: Double]])? = nil,
-                           toneInstrument: ((InstrumentPatch) -> LoadedInstrument?)? = nil) throws -> Output {
+                           toneInstrument: ((InstrumentPatch) -> LoadedInstrument?)? = nil,
+                           perceptual: PartMatcher.PerceptualHook? = nil) throws -> Output {
         var options = SongAnalyzer.Options()
         options.stems = stems
         options.extractMelody = melodyOverride == nil
@@ -43,10 +44,16 @@ public enum SongPipeline {
         }
         // Reverse-engineer each instrument part: the nearest tone, EQ and reverb, measured.
         if let toneInstrument, !stems.isEmpty {
-            let matches = PartMatcher.match(song: song, parts: stems, patches: patches, instrument: toneInstrument) { p in
-                progress?(analysisShare + (0.95 - analysisShare) * p) ?? true
+            let matches = PartMatcher.match(song: song, parts: stems, patches: patches, instrument: toneInstrument, perceptual: perceptual) { p in
+                progress?(analysisShare + (0.95 - analysisShare) * p * (perceptual == nil ? 1 : 0.7)) ?? true
             }
             if !matches.isEmpty { song.partMatches = matches }
+            // Each distinct section's own lead sound (pallavi, charanam, interludes…).
+            if let perceptual {
+                let leads = PartMatcher.matchSectionLeads(song: song, parts: stems, patches: patches, instrument: toneInstrument, perceptual: perceptual)
+                song.sectionLeadMatches = leads.isEmpty ? nil : leads
+                _ = progress?(0.95)
+            }
         }
         let arranged = AutoArranger.arrange(song, timbres: result.timbres, patches: patches)
         _ = progress?(1)

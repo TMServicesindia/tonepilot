@@ -54,3 +54,25 @@ final class PerceptualToneSearchTests: XCTestCase {
         XCTAssertEqual(Double(e![0]), Double(calls + 1) / 2, accuracy: 1e-6)
     }
 }
+
+/// Speed budget: the perceptual search's own work for one 24 s part (masked front-end + windowing +
+/// ranking against a full-size table: 130 tones × 3 registers × 960 dims), stand-in model. The Core ML
+/// call itself is measured on device (TonePilot Lab) and was ≈ 4 ms per window on Mac CI. Release only.
+final class PerceptualToneSearchSpeedTests: XCTestCase {
+    func testPerceptualSearchForOnePartIsQuick() throws {
+        #if DEBUG
+        throw XCTSkip("speed budgets are checked in release builds (swift test -c release)")
+        #endif
+        let sr = EfficientATFrontEnd.sampleRate
+        let x = (0..<Int(24 * sr)).map { Float(sin(Double($0) * 0.05)) * 0.3 }
+        let notes = (0..<40).map { MelodyNote(start: 0.3 + Double($0) * 0.55, duration: 0.45, midi: 60 + ($0 * 5) % 12, confidence: 1) }
+        let entries = (0..<390).map { i in PerceptualToneSearch.ToneTable.Entry(patch: UUID(), register: i % 3, embedding: (0..<960).map { Float(($0 + i) % 11) * 0.1 }) }
+        let table = PerceptualToneSearch.ToneTable(version: 1, model: "speed", embeddingDim: 960, entries: entries)
+        let t0 = Date()
+        let e = PerceptualToneSearch.embedding(samples: x, notes: notes) { _ in [Float](repeating: 0.5, count: 960) }
+        let ranked = PerceptualToneSearch.rank(e!, table: table)
+        let dt = Date().timeIntervalSince(t0)
+        print(String(format: "SPEED perceptual tone search (front-end + mask + rank, no Core ML): %.2f s for a 24 s part, %d tones", dt, ranked.count))
+        XCTAssertLessThan(dt, 3)
+    }
+}

@@ -369,12 +369,19 @@ public enum AutoArranger {
             var lead = Layer(patchId: best.patchId, volume: volume, octave: leadOctave,
                              keyRange: rightRange, role: isInstrumental ? .motif : (fromVocals ? .vocalMelody : .lead))
             let heard = evidence.instruments.filter { $0.key != "voice" }.max { ($0.value, $1.key) < ($1.value, $0.key) }
-            // The song's own lead instrument, measured (Tone match), wins over the rules.
-            if let m = song.partMatches?["lead"] ?? song.partMatches?["other"], m.similarity >= PartMatcher.trusted, let patch = available[m.patchId] {
+            // The song's own lead instrument, measured, wins over the rules: this section's own lead
+            // first (pallavi, charanam and interludes can differ), then the song's lead part.
+            let leadMatch = song.sectionLeadMatches?[section.id.uuidString] ?? song.partMatches?["lead"] ?? song.partMatches?["other"]
+            if let m = leadMatch, m.isTrusted, let patch = available[m.patchId] {
                 lead.patchId = m.patchId
                 lead.effectsOverride = m.effects(base: patch.effects)
-                why.append("Right hand: \(m.name) — matched to the song's lead instruments (\(Int((m.similarity * 100).rounded()))% tone match, "
-                           + "EQ and reverb fitted); intensity \(level3.rawValue).")
+                if m.isPerceptual {
+                    why.append("Right hand: \(m.name) — the nearest sound to the song's lead in \(m.section), searched across the whole tone library "
+                               + "(EQ and reverb fitted); intensity \(level3.rawValue).")
+                } else {
+                    why.append("Right hand: \(m.name) — matched to the song's lead instruments (\(Int((m.similarity * 100).rounded()))% tone match, "
+                               + "EQ and reverb fitted); intensity \(level3.rawValue).")
+                }
             } else {
                 why.append("Right hand: \(best.name) — \(best.reason)\(isInstrumental ? " (instrumental motif)" : "")"
                            + "\(heard.map { "; heard: \($0.key) \(Int($0.value * 100))%" } ?? ""); intensity \(level3.rawValue).")
@@ -412,11 +419,14 @@ public enum AutoArranger {
         }
         var left = Layer(patchId: leftPatch, volume: 0.6, pan: -0.1, keyRange: leftRange, role: padLevel > keysLevel + 0.1 ? .pad : .harmony)
         // The song's own accompaniment instrument (backing / piano / guitar part), measured.
-        let accompaniment = ["backing", "piano", "guitar"].compactMap { song.partMatches?[$0] }.filter { $0.similarity >= PartMatcher.trusted }
-        if let m = accompaniment.max(by: { $0.similarity < $1.similarity }), let patch = available[m.patchId] {
+        let accompaniment = ["backing", "piano", "guitar"].compactMap { song.partMatches?[$0] }.filter(\.isTrusted)
+        // Perceptual picks first (measured better across sound sources), then by match strength.
+        if let m = accompaniment.max(by: { ($0.isPerceptual ? 1 : 0, $0.perceptualScore ?? $0.similarity) < ($1.isPerceptual ? 1 : 0, $1.perceptualScore ?? $1.similarity) }),
+           let patch = available[m.patchId] {
             left.patchId = m.patchId
             left.effectsOverride = m.effects(base: patch.effects)
-            leftWhy = "\(m.name), matched to the song's \(m.part) part (\(Int((m.similarity * 100).rounded()))% tone match)"
+            leftWhy = m.isPerceptual ? "\(m.name), the nearest sound to the song's \(m.part) part (whole tone library)"
+                                     : "\(m.name), matched to the song's \(m.part) part (\(Int((m.similarity * 100).rounded()))% tone match)"
         }
         layers.append(left)
         why.append("Left hand: \(leftWhy).")

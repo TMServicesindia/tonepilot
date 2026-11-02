@@ -41,13 +41,17 @@ public enum SongImportPipeline {
         public var progress: ((Double) -> Bool)?
         public var instruments: (([SongSection]) -> [UUID: [String: Double]])?
         public var toneInstrument: ((InstrumentPatch) -> LoadedInstrument?)?
+        /// Whole-library nearest-sound search for the separated parts (nil = fingerprint matcher only).
+        public var perceptual: PartMatcher.PerceptualHook?
 
         public init(progress: ((Double) -> Bool)? = nil,
                     instruments: (([SongSection]) -> [UUID: [String: Double]])? = nil,
-                    toneInstrument: ((InstrumentPatch) -> LoadedInstrument?)? = nil) {
+                    toneInstrument: ((InstrumentPatch) -> LoadedInstrument?)? = nil,
+                    perceptual: PartMatcher.PerceptualHook? = nil) {
             self.progress = progress
             self.instruments = instruments
             self.toneInstrument = toneInstrument
+            self.perceptual = perceptual
         }
     }
 
@@ -57,7 +61,7 @@ public enum SongImportPipeline {
         var output = try SongPipeline.run(song: input, audio: request.audio, stems: request.stems,
                                           melodyOverride: request.melodyOverride, patches: request.patches,
                                           progress: hooks.progress, instruments: hooks.instruments,
-                                          toneInstrument: hooks.toneInstrument)
+                                          toneInstrument: hooks.toneInstrument, perceptual: hooks.perceptual)
         if !request.stemInfos.isEmpty { output.song.stems = request.stemInfos }
         return output
     }
