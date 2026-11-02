@@ -6,7 +6,10 @@ For each target, every library tone is scored by cosine similarity (best registe
 ranking is judged by the target's true GM program ("exact") and TonePilot family ("family").
 DEV banks only unless a sealed bank is explicitly passed. Research only (CI / local).
 Usage: tone_t1.py <dump dir> <out.md> <method,...> [--eat <EfficientAT repo>]
-Methods: mfcc | efficientat | panns10 | yamnet | clap"""
+Methods: mfcc | efficientat | panns10 | yamnet | clap, each optionally with "+harm" (harmonic-only
+re-synthesis of the part from its notes, both sides) and/or "+lda" (E-5): a Linear
+Discriminant projection learned on train.json (training banks, labelled by family) plus the library
+table, so variation between sound sources of the same family is suppressed before the cosine."""
 import json, os, sys, time
 from collections import defaultdict
 import numpy as np
@@ -14,6 +17,30 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from common import read_wav, resample, windows
+
+
+def harmonic_only(x, sr, notes, width=0.03, max_harm=30):
+    """Keeps only the STFT bins at each sounding note's harmonics (k·f0 ± 3%), then inverts:
+    a cleaned copy of one part from a leaky stem (notes = [[start, dur, midi], ...]). Applied the same
+    way to targets and candidates."""
+    import librosa
+    n_fft, hop = 2048, 512
+    S = librosa.stft(x, n_fft=n_fft, hop_length=hop)
+    freqs = librosa.fft_frequencies(sr=sr, n_fft=n_fft)
+    mask = np.zeros(S.shape, np.float32)
+    times = librosa.frames_to_time(np.arange(S.shape[1]), sr=sr, hop_length=hop)
+    for start, dur, midi in notes:
+        f0 = 440.0 * 2 ** ((midi - 69) / 12)
+        cols = np.where((times >= start) & (times <= start + dur + 0.15))[0]
+        if not len(cols):
+            continue
+        for k in range(1, max_harm + 1):
+            f = k * f0
+            if f > sr / 2 * 0.95:
+                break
+            rows = np.where(np.abs(freqs - f) <= max(width * f, 1.5 * sr / n_fft))[0]
+            mask[np.ix_(rows, cols)] = 1.0
+    return librosa.istft(S * mask, hop_length=hop, length=len(x)).astype(np.float32)
 
 
 def mfcc_embed(x, sr):
@@ -40,16 +67,42 @@ def model_embedder(name, eat):
     return f
 
 
+_CACHE = {}
+EMBEDDERS = {}
+
+
 def evaluate(dump, method, embed_fn):
     table = json.load(open(os.path.join(dump, "table.json")))
     targets = json.load(open(os.path.join(dump, "targets.json")))
+    base = method.split("+")[0]
+    harm = "+harm" in method
+    key = base + ("+harm" if harm else "")
     t0 = time.time()
-    T = np.stack([embed_fn(*read_wav(os.path.join(dump, r["file"]))) for r in table])
-    G = np.stack([embed_fn(*read_wav(os.path.join(dump, r["file"]))) for r in targets])
+    def emb(r):
+        x, sr = read_wav(os.path.join(dump, r["file"]))
+        if harm and r.get("notes"):
+            x = harmonic_only(x, sr, r["notes"])
+        return embed_fn(x, sr)
+    if key not in _CACHE:
+        T0 = np.stack([emb(r) for r in table])
+        G0 = np.stack([emb(r) for r in targets])
+        tp = os.path.join(dump, "train.json")
+        train = json.load(open(tp)) if os.path.exists(tp) else []
+        R0 = np.stack([emb(r) for r in train]) if train else None
+        _CACHE[key] = (T0, G0, R0, train)
+    T, G, R, train = [x.copy() if isinstance(x, np.ndarray) else x for x in _CACHE[key]]
     secs = time.time() - t0
-    if method == "mfcc":   # z-score each dimension on the library (hand features have mixed scales)
+    if base == "mfcc":   # z-score each dimension on the library (hand features have mixed scales)
         mu, sd = T.mean(0), T.std(0) + 1e-6
         T, G = (T - mu) / sd, (G - mu) / sd
+        R = (R - mu) / sd if R is not None else None
+    if method.endswith("+lda"):
+        from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+        if R is None:
+            raise SystemExit("+lda needs train.json (TP_TONE_TRAIN_BANKS)")
+        X = np.concatenate([R, T]); y = [r["family"] for r in train] + [r["family"] for r in table]
+        lda = LinearDiscriminantAnalysis(solver="eigen", shrinkage="auto").fit(X, y)
+        T, G = lda.transform(T), lda.transform(G)
     T /= np.linalg.norm(T, axis=1, keepdims=True) + 1e-9
     G /= np.linalg.norm(G, axis=1, keepdims=True) + 1e-9
     sims = G @ T.T
@@ -88,7 +141,10 @@ def main():
              "| Method | Target bank | Part | Top-1 exact | Top-1 family | Top-3 family |", "|---|---|---|---|---|---|"]
     notes, detail = [], {}
     for m in methods:
-        fn = mfcc_embed if m == "mfcc" else model_embedder(m, eat)
+        base = m.split("+")[0]
+        if base not in EMBEDDERS:
+            EMBEDDERS[base] = mfcc_embed if base == "mfcc" else model_embedder(base, eat)
+        fn = EMBEDDERS[base]
         rows, secs = evaluate(dump, m, fn)
         L, note = summarise(m, rows, secs)
         lines += L; notes.append(note); detail[m] = rows

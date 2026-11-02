@@ -22,6 +22,8 @@ final class ToneTableDump: XCTestCase {
         return out
     }
 
+    static func noteList(_ notes: [MelodyNote]) -> [[Double]] { notes.map { [$0.start, $0.duration, Double($0.midi)] } }
+
     func testDumpToneTableAndTargets() throws {
         let env = ProcessInfo.processInfo.environment
         guard let dump = env["TP_TONE_DUMP"], let path = env["TP_SF2"] else { throw XCTSkip("set TP_TONE_DUMP and TP_SF2") }
@@ -42,11 +44,37 @@ final class ToneTableDump: XCTestCase {
                 let file = "table/\(i)_\(reg).wav"
                 try InstrumentSetRender.writeWav(audio.samples, to: out.appendingPathComponent(file), sr: Self.sr)
                 table.append(["file": file, "patch": patch.id.uuidString, "name": patch.name, "family": patch.family.rawValue,
-                              "program": patch.soundFont.map { Int($0.program) } ?? -1, "soundfont": patch.soundFont != nil, "register": reg])
+                              "program": patch.soundFont.map { Int($0.program) } ?? -1, "soundfont": patch.soundFont != nil, "register": reg,
+                              "notes": Self.noteList(notes)])
             }
         }
         try JSONSerialization.data(withJSONObject: table, options: .prettyPrinted).write(to: out.appendingPathComponent("table.json"))
         print("DUMP table: \(table.count) clips from \(library.count) tones")
+
+        // 1b. Training references (E-5): every melodic GM program from each training bank, same phrases,
+        // labelled by TonePilot family. Never used as candidates or targets.
+        var train: [[String: Any]] = []
+        let trainBanks: [(String, String)] = (env["TP_TONE_TRAIN_BANKS"] ?? "").split(separator: ",").compactMap {
+            let kv = $0.split(separator: "=", maxSplits: 1); return kv.count == 2 ? (String(kv[0]), String(kv[1])) : nil
+        }
+        if !trainBanks.isEmpty { try FileManager.default.createDirectory(at: out.appendingPathComponent("train"), withIntermediateDirectories: true) }
+        for (name, bankPath) in trainBanks {
+            let tb = try SoundFontBank(url: URL(fileURLWithPath: bankPath))
+            for program in 0..<112 {   // melodic GM programs (112+ are ethnic percussion / sound effects)
+                guard let ref = FactoryPatches.patch(forProgram: UInt8(program)), ref.family != .percussion,
+                      let inst = try? LoadedInstrument(bank: tb, bankNumber: 0, program: program, name: ref.name) else { continue }
+                for reg in Self.registers {
+                    let notes = Self.phrase(base: reg)
+                    let audio = ToneMatcher.render(ref, instrument: inst, notes: notes, seconds: (notes.last?.end ?? 5) + 0.6, sampleRate: Self.sr)
+                    let file = "train/\(name)_\(program)_\(reg).wav"
+                    try InstrumentSetRender.writeWav(audio.samples, to: out.appendingPathComponent(file), sr: Self.sr)
+                    train.append(["file": file, "bank": name, "program": program, "family": ref.family.rawValue, "register": reg,
+                                  "notes": Self.noteList(notes)])
+                }
+            }
+        }
+        try JSONSerialization.data(withJSONObject: train, options: .prettyPrinted).write(to: out.appendingPathComponent("train.json"))
+        print("DUMP train: \(train.count) clips from \(trainBanks.count) bank(s)")
 
         // 2. Targets: the bench songs, rendered from each target bank (same notes and leakage as the bench).
         var targets: [[String: Any]] = []
@@ -90,7 +118,8 @@ final class ToneTableDump: XCTestCase {
                     try InstrumentSetRender.writeWav(samples, to: out.appendingPathComponent(file), sr: rsr)
                     let mids = notes.map(\.midi).sorted()
                     targets.append(["file": file, "bank": name, "case": c.name, "part": part, "program": Int(prog),
-                                    "family": gm(prog).family.rawValue, "median_midi": mids[mids.count / 2]])
+                                    "family": gm(prog).family.rawValue, "median_midi": mids[mids.count / 2],
+                                    "notes": Self.noteList(notes)])
                 }
             }
         }

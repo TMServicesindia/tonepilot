@@ -1,4 +1,4 @@
-name: Tone E-4 — embedding similarity vs fingerprint (research only, no app build)
+name: Tone E-4/E-5 — embedding similarity (+harmonic isolation, +LDA) vs fingerprint (research only, no app build)
 
 # Smallest experiment of docs/benchmark/OPEN_SOURCE_TONE_REFERENCE_EXPANSION_PLAN.md: does a frozen
 # audio-embedding similarity find the nearest TonePilot tone across sound sources better than the
@@ -6,6 +6,10 @@ name: Tone E-4 — embedding similarity vs fingerprint (research only, no app bu
 # TEST banks are NOT used here. Rendered GM audio, not real songs.
 on:
   workflow_dispatch:
+    inputs:
+      methods:
+        description: "Comma-separated methods (base[+harm][+lda])"
+        default: "efficientat,efficientat+harm,efficientat+lda,efficientat+harm+lda,panns10+harm"
 
 permissions:
   contents: write
@@ -19,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Banks (GeneralUser GS = library; TimGM6mb = cross-bank DEV)
         run: |
-          apt-get update -qq && apt-get install -y -qq curl timgm6mb-soundfont > /dev/null
+          apt-get update -qq && apt-get install -y -qq curl timgm6mb-soundfont fluid-soundfont-gm > /dev/null
           curl -fsSL -o /tmp/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
           ls -la /usr/share/sounds/sf2/ ; sha256sum /tmp/GeneralUser-GS.sf2 /usr/share/sounds/sf2/TimGM6mb.sf2
       - name: Render tone table + targets
@@ -28,6 +32,7 @@ jobs:
           TP_SF2: /tmp/GeneralUser-GS.sf2
           TP_TONE_DUMP: /tmp/tdump
           TP_TONE_TARGETS: "same=/tmp/GeneralUser-GS.sf2,timgm=/usr/share/sounds/sf2/TimGM6mb.sf2"
+          TP_TONE_TRAIN_BANKS: "fluidr3=/usr/share/sounds/sf2/FluidR3_GM.sf2"
         run: swift test -c release --filter ToneTableDump 2>&1 | grep -E "DUMP|error:|Executed" | tail -5
       - uses: actions/upload-artifact@v4
         with: { name: tdump, path: /tmp/tdump, retention-days: 7 }
@@ -52,7 +57,7 @@ jobs:
         run: |
           set -o pipefail
           S=$GITHUB_WORKSPACE/Native/tools/instruments
-          cd /tmp/eat && python $S/tone_t1.py /tmp/tdump /tmp/e4.md mfcc,efficientat,panns10 --eat /tmp/eat 2>&1 | tee /tmp/e4.log | grep -E "^\||Error|error" | tail -40
+          cd /tmp/eat && python $S/tone_t1.py /tmp/tdump /tmp/e4.md ${{ inputs.methods }} --eat /tmp/eat 2>&1 | tee /tmp/e4.log | grep -E "^\||Error|error" | tail -40
           grep "^| " /tmp/e4.md | grep -v "Method" | while IFS= read -r l; do echo "::notice title=E-4::$l"; done
       - name: Push to branch ci/tone-e4
         if: always()
@@ -60,6 +65,6 @@ jobs:
           [ -f /tmp/e4.md ] || exit 0
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           git checkout -q --orphan ci/tone-e4 && git rm -rqf . && mkdir -p e4
-          cp /tmp/e4.md /tmp/e4.json e4/; cp /tmp/tdump/table.json /tmp/tdump/targets.json e4/
+          cp /tmp/e4.md /tmp/e4.json e4/; cp /tmp/tdump/table.json /tmp/tdump/targets.json /tmp/tdump/train.json e4/ 2>/dev/null || true
           echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID}" > e4/SOURCE.txt
           git add e4 && git commit -qm "Tone E-4" && git push -qf origin ci/tone-e4
