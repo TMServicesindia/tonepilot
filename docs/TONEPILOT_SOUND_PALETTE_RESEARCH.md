@@ -38,6 +38,93 @@ Addendum to [`TONEPILOT_INSTRUMENT_ACCURACY_ROADMAP.md`](TONEPILOT_INSTRUMENT_AC
 
 **Next:** album liner credits (session-musician credits on the streaming services' credits pages) and musician interviews, recorded per song with a URL. Listening-based hypotheses go in a separate column and **never count as ground truth**.
 
+## 1b. Owner-supplied composer palette (2 Nov): **OWNER-SUPPLIED, unverified; no sources attached**
+
+The owner supplied per-composer palettes for 6 + 25 music directors across Tamil, Hindi, Telugu, Malayalam and Kannada film. **How they are used:**
+- **Yes:** as a **coverage checklist**, deciding which sounds the taxonomy and the data collection must cover, and in what priority.
+- **No:** as labels or as a prior. A composer's name never makes the analyser predict an instrument, and a song's ground truth always comes from listening plus credits.
+- **Promotion to DOCUMENTED** happens per claim, only when a source (interview, liner or session credit) is found and linked in §1.
+
+### 1b.1 Six primary composers (owner summary)
+
+| Composer | Core / signature sources | Electronic / production | Processing, roles and character mentioned |
+|---|---|---|---|
+| A. R. Rahman | veena, nadaswaram, bansuri/flute, tabla, shehnai, sitar, mridangam; orchestral strings, cello, harp; flamenco guitar, accordion/harmonium, piano; rock bass (Guy Pratt) | synths, keyboards, **harpejji** | "Syncretic" layering of different idioms |
+| Yuvan Shankar Raja | guitar, violin, synth, piano, many Indian folk drums (*Avan Ivan*) | drum machines, "skittering" synths | Simple melody over dense synth/folk beds |
+| Harris Jayaraj | guitar (incl. "Carnatic-styled" guitar), piano, strings, flute, **saxophone**; classical humming | synth programming, polished layering | Sax/guitar **interlude leads**; strings building to a crescendo |
+| G. V. Prakash Kumar | **mridangam** (trained), guitar, keys/piano, mandolin, electric guitar, **Greek baglama, oud, bouzouki, saz**; tabla, flute, sitar, dhol | "mild" synths, drums | Global plucked strings with Indian percussion |
+| Anirudh Ravichander | nadaswaram, thavil, urumee, shehnai, veena, saxophone; distorted electric guitar, acoustic guitar plucks | EDM, trap, hip-hop beats, synths, **808 bass**, bass drops | Traditional leads **with distortion over electronic beats**; dark ambient + synth-pop |
+| Vidyasagar | **santoor, vibraphone**, harmonium, keyboard, piano, guitar, violin, flute, strings | keyboard | Melody-forward preludes ("guitar–violin–flute"); "shimmering" character |
+
+### 1b.2 Further composers (owner summary, condensed)
+
+| Industry | Composer | Sources named (beyond common guitar, keys, drums, strings) | Production / character named |
+|---|---|---|---|
+| Hindi | R. D. Burman | santoor, vibraphone, mouth organ, banjo, tambourine, dafli, castanet, conga, sax, trumpet | electric organ, synth; jazz trumpet, groovy guitar |
+| Hindi | Bappi Lahiri | tabla, dholak, bongos, sax | **Moog synth, drum machines**, disco strings, horn sections, syncopated bass |
+| Hindi | Shankar–Ehsaan–Loy | live band; tabla, dholak, dhol, mandolin, shehnai, sarangi, flute | layered keyboard harmonies; rock/blues guitar, jazz keys |
+| Hindi | Pritam | accordion, **bagpipes, hulusi, ney, qanun**, sitar, glockenspiel, tabla, mandolin, **bulbul tarang** | modern orchestration / programming |
+| Hindi | Amit Trivedi | sitar, **esraj**, sarangi, **iktara**, dholak, clarinet, oboe, mandolin, harmonica, harmonium | keyboard sequences, techno elements; "rustic, organic" |
+| Hindi | Vishal–Shekhar | dhol, banjo, tambourine, trumpet | **heavily distorted electric guitars** (processing, not an instrument) |
+| Hindi | Himesh Reshammiya | tabla, dholak, sarangi, sitar, bongos, harmonium, violin | programming; soft-rock backdrop |
+| Hindi | Mithoon | **piano** (defining), acoustic guitar, live strings, tabla, ghatam, **ghungroo** | ambient synths, loops; minimalist |
+| Hindi/Bengali | Jeet Gannguli | guitar, tabla, flute, violin, **khomok**, kanjira | Bengali folk rhythm |
+| Tamil | Ilaiyaraaja | veena, **venu**, nadaswaram, dholak, mridangam, tabla, sax, flute, orchestra | **Yamaha DX7, Roland Jupiter-8, E-mu drumulator, MIDI** (character / source type only; the model never names hardware) |
+| Tamil | Santhosh Narayanan | **pambai, thudumbu, urumi, parai, thara, thappattai**, thavil, kanjira, nagaswaram, trumpet | "raw, authentic"; occasional electronics |
+| Tamil | Sean Roldan | acoustic/electric guitar, harmonium, violin, flute, thavil, mridangam, sax | indie grooves, guitar riffs |
+| Tamil | Ghibran | strings, piano, **Balinese/Indonesian instruments** | synth bass; jazz–folk fusion |
+| Tamil | D. Imman | nadaswaram, trumpet, sarangi, dhol, tabla; **harpejji, Continuum fingerboard** | some projects all-live, no electronics |
+| Tamil | Sam C. S. | banjo, mandolin, ethnic sounds, **six-foot bamboo instrument**; 72-piece orchestra, full brass | dark, intense orchestral |
+| Tamil/Telugu | Vishal Chandrashekhar | 140 musicians on native instruments (*Sita Ramam*) | German electronic instruments; swing + EDM |
+| Tamil | Justin Prabhakaran | keyboard, guitar | layered programming; church-influenced harmony |
+| Tamil | Nivas K. Prasanna | piano, keyboard, bass guitar | clean modern production |
+| Tamil | Karthik Raja | piano, guitar, string ensembles, dholak, tabla, violin | synth beats, reverbs |
+| Telugu | Mani Sharma | keyboard, synth, piano, mandolin, harmonium, guitar, drums, tabla | "total mass effect" |
+| Telugu | Devi Sri Prasad | shehnai, mandolin, harmonium, violin ensembles, guitar | electric pads, drums |
+| Telugu | M. M. Keeravani | harmonium, violin, cello, flute, guitar | classical ragas over Western arrangement |
+| Telugu | S. Thaman | drums, rhythm pads, trumpet, **Kinnera veena** | heavy guitar riffs, rhythm programming |
+| Malayalam | Sushin Shyam | **tar, saz, kamancheh**, veena, acoustic guitar, trumpet, flugelhorn, sax, trombone | EDM, atmospheric |
+| Malayalam | Rex Vijayan | guitar, synth, ukulele, mandolin, horns, **chendamelam** | alt-rock, techno |
+| Kannada | Arjun Janya | piano, guitar, string orchestra, operatic female voice, dhol, **tumbi** | echoing synths |
+| Kannada | V. Harikrishna | harmonium, keyboard, guitar, **pump organ** | vocal-driven |
+
+### 1b.3 What this changes in the taxonomy proposal (candidates only; data status as in §7)
+
+Sources named here that are **not in v2 or the v3 proposal yet** (add as candidate ids, status `unsupported` until data exists):
+
+| Group | New candidate sources |
+|---|---|
+| Indian / South Asian winds and strings | venu (alias of bansuri/kuzhal family), esraj, iktara, tumbi, bulbul tarang (Indian banjo), Kinnera veena, pump organ (alias of harmonium) |
+| Tamil folk percussion | pambai, thudumbu, urumi/urumee, parai, thara, thappattai |
+| Kerala / Bengali / other percussion | chenda (chendamelam ensemble), khomok, ghungroo, dafli |
+| World plucked / bowed | oud, bouzouki, saz/baglama, tar, kamancheh, qanun |
+| World winds | ney, hulusi, bagpipes, mouth organ (alias of harmonica) |
+| Electronic instruments (identity) | harpejji, Continuum fingerboard (both electronic), 808 bass (character of synth bass / kick) |
+| Percussion (Western/Latin) | castanet |
+
+**Not identities, so they map to other dimensions:**
+
+| Named in the brief | Dimension |
+|---|---|
+| "Distorted electric guitar" | processing |
+| "Shimmering" | character |
+| "Skittering synths" | character + role |
+| "Bass drops", "808" | character / role |
+| "Moog, DX7, Jupiter-8, drumulator" | source type = electronic. **Never output a hardware name** |
+| "Operatic voice", "classical humming" | voice family + character |
+| "Interlude lead" | role |
+
+### 1b.4 Data-collection priority from coverage (INFERENCE)
+
+These are the sources named by the most composers in the owner's lists. They are counted as mentions, not usage frequency:
+- strings/violin, guitar (acoustic/electric), piano/keys, synths/pads, flute;
+- tabla, harmonium, dholak/dhol, mandolin, saxophone, nadaswaram/shehnai, thavil, sitar, santoor, trumpet/brass.
+
+Implications:
+1. Most of the **Indian** items in this list have **no permissive real data yet** (§7 and the dataset research §3): harmonium, nadaswaram, shehnai, thavil, sitar, santoor, sarangi, bansuri.
+2. **They are the first owner/musician recording targets**, together with the Tamil folk percussion set above. Volunteer musicians and written permission, using the existing letter template.
+3. Casio imitations of all of them are useful **only** as `imitation` source examples.
+
 ## 2. The analyser's output: six independent dimensions
 
 | Dimension | Values (examples) | Head type | Notes |
