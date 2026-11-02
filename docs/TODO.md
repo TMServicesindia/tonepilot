@@ -61,6 +61,9 @@ Chord/Arpeggio and Tone Maker enhancements are paused until the analyser gates a
 | IA.12 | **Sound-palette coverage and data plan** ([`benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md`](benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md)). 165 terms audited:<br>• 41 existing ids;<br>• 12 aliases + 1 variant;<br>• 11 kept from v3;<br>• **24 new identities (all unsupported)**;<br>• 19 needs-review;<br>• 57 moved to other dimensions.<br>5 claims promoted to documented (secondary); 3 claims not found. | ✅ researched; 👤 approve |
 | IA.13 | **Owner recording programme:**<br>• harmonium → bansuri → shehnai/nadaswaram → sitar → santoor → sarangi → dhol/thavil/kanjira → Tamil folk drums;<br>• ≥ 3 performers each before training;<br>• Casio imitation pairs, labelled `imitation`. | 👤 |
 | IA.14 | v2 id `kuzhal` is ambiguous (Tamil flute vs Kerala double reed) | 👤 decide |
+| TR.1 | **Tone recreation proposal** ([`research/TONEPILOT_TONE_RECREATION_PROPOSAL.md`](research/TONEPILOT_TONE_RECREATION_PROPOSAL.md)):<br>• instrument match (A) and perceptual tone match (B) shown side by side; A never restricts B;<br>• whole-library search via a precomputed descriptor table;<br>• two-tone layer search, output as a "CT-X870IN setup";<br>• owner listening test (PianistRam-style category, lawful recordings only). | 📋 proposal; 👤 approve T1–T5 |
+| TR.2 | CT-X870IN tone list and layer/split behaviour needed for Casio-side setups | 👤 provide manual/tone list |
+| TR.3 | A new sealed TEST sound bank (verified licence) for the next tone-method decision; FluidR3 used once per method on 2 Nov | ⏳ |
 
 ## R. Product and competitor research (Phase A, 2 Nov) — **proposals awaiting owner review, not approved**
 

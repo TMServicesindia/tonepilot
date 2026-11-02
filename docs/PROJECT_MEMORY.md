@@ -253,6 +253,13 @@ Stop: no production change, no major training, no release before approval.
 - The true v4 figure is 31 imitation / 28 acoustic / 1 electronic of 60 imitation clips.
 - Fixed in INSTRUMENT_PROXY_RESULTS, MODEL_COMPARISON and TODO.
 
+## 6o. Tone recreation direction (owner, 2 Nov)
+
+- The owner separated **instrument identity** (what is playing) from **perceptual tone match** (which tone sounds closest).
+- Identity must never restrict the tone search. The goal is to recreate the sound on the CT-X870IN.
+- The two-stage screening matcher is not shipped (no sealed-TEST gain, 2× slower); it is on branch `research/tone-shortlist`.
+- Proposal (research only): `docs/research/TONEPILOT_TONE_RECREATION_PROPOSAL.md`. No build until the T1–T5 experiments are approved and measured.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
