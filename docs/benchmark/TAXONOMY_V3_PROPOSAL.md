@@ -40,3 +40,48 @@ No class is validated on real Indian audio yet, so **none is "supported"**.
 - tabla ↔ mridangam ↔ dholak (parent: Indian hand drum);
 - acoustic violin ↔ synth strings (source);
 - real flute ↔ flute-like synth (source).
+
+## v3.1 recommendations from the sound-palette audit (2 Nov) — proposals only; `taxonomy.json` unchanged
+
+Full detail, with the 165-term inventory: [`SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md`](SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md).
+
+### Parent classes for abstention on difficult pairs
+
+| Parent class | Members |
+|---|---|
+| Indian double reed | nadaswaram, shehnai |
+| Bowed strings | violin, sarangi, esraj/dilruba, kamancheh, ravanahatha |
+| Plucked lute (Indian-like) | sitar, sarod, veena, processed-guitar imitations |
+| Struck/plucked zither | santoor, qanun, bulbul tarang |
+| Free-reed keyboard | harmonium, accordion, pump organ |
+| Paired-course lute | mandolin, bouzouki, Greek baglama |
+| Tamil frame drum | parai, thappattai |
+| Indian folk drum | urumi, pambai, thudumbu, chenda, … |
+
+### New candidate identities (all **unsupported**: no lawful real data)
+
+| Group | Candidates |
+|---|---|
+| Indian | esraj/dilruba, sarod, tumbi, bulbul tarang, pakhawaj, urumi, pambai, thudumbu, parai, chenda, ravanahatha |
+| Small percussion | ghungroo, castanet |
+| World | oud, bouzouki, saz/bağlama (Turkish), tar, kamancheh, qanun, ney, hulusi, bagpipes (family-only), hang drum |
+| Electric | harpejji |
+
+### Aliases and variants
+
+- venu: variant of bamboo flute, alongside bansuri;
+- nagaswaram → nadaswaram;
+- kanjeera → kanjira;
+- mouth organ → harmonica;
+- dholki → dholak;
+- electric violin: violin with source type electric.
+
+### Needs review (19 terms; not forced into an identity)
+
+- **Existing v2 id `kuzhal` is ambiguous** (Tamil bamboo flute vs Kerala double reed). Rename or split it.
+- thappattai, thara, khomok, iktara, Kinnera veena, pump organ, Greek baglama, dafli, tasha, swarlin;
+- Balinese instruments, the six-foot bamboo instrument, the Continuum fingerboard (source type, not identity).
+
+### Not identities
+
+Hardware and product names, genres, effects, ensembles and techniques map to the other dimensions: source type, character, processing, role, sound design, relations, or song metadata.

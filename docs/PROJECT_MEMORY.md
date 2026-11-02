@@ -224,6 +224,13 @@ Stop: no production change, no major training, no release before approval.
 - Report: `docs/TONEPILOT_SOUND_PALETTE_RESEARCH.md`.
 - **E2 (owner: "go ahead"):** PANNs CNN10 encoder in `embed.py`; workflow `instrument-e2.yml` reuses bench run 41328362434's clips and outputs, so the comparison uses an identical protocol. Results go to branch `ci/instrument-e2`.
 
+## 6m. Sound-palette coverage and data plan (2 Nov)
+
+- **Owner reaffirmed:** the 31-composer palettes are coverage guidance only, never labels, priors or ground truth. A claim is promoted only with a linked source.
+- No winner is reported before E2 completes.
+- Report: `docs/benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md`. Inventory: `docs/benchmark/sound_palette_inventory.json` (165 terms).
+- The coverage gap is real Indian recordings; there is an owner recording programme with priorities and a specification.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

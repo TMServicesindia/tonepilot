@@ -143,6 +143,29 @@ All splits are disjoint by recording, session and performer. No windows from one
   - That fits within free CI if split across jobs; the quotas are not unlimited, so jobs must be resumable.
 - **Fine-tuning:** frozen embeddings + heads (as today) is feasible on CPU. **Full fine-tuning of EfficientAT or BEATs is not feasible** on free CPU runners. It would need a free Colab/Kaggle GPU session (quota-limited); deferred until frozen heads plateau.
 
+## 6b. Practical recording plan (2 Nov)
+
+The data gap is **real Indian instruments**, not class names.
+
+**Priority order, specification, consent, metadata and QC:** [`benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md`](benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md) §6. The priority instruments are:
+- harmonium, bansuri/venu;
+- shehnai/nadaswaram, sitar, santoor, sarangi;
+- dhol, thavil, kanjira;
+- the Tamil folk drums;
+- Casio imitation pairs.
+
+**Minimum per class:**
+- before training: ≥ 3 performers, ≥ 2 physical instruments, ≥ 15 minutes, 1 performer held out;
+- before promotion to supported: ≥ 5 performers.
+
+**Sound-character sources confirmed in this pass:**
+- E-GMD (CC BY 4.0, Magenta), electronic drum kits;
+- NSynth note qualities.
+
+**Rejected:** IDMT-SMT-Audio-Effects (CC BY-NC-ND 4.0, per mirdata).
+
+**Unknown:** EGDB, EGFxSet, VocalSet.
+
 ## 7. Source register (accessed 2 Nov 2026 via web search; direct fetch blocked)
 
 | Item | Source |

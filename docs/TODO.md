@@ -58,6 +58,9 @@ Chord/Arpeggio and Tone Maker enhancements are paused until the analyser gates a
 | IA.9 | **Sound-palette addendum** ([`TONEPILOT_SOUND_PALETTE_RESEARCH.md`](TONEPILOT_SOUND_PALETTE_RESEARCH.md)): six output dimensions:<br>• identity;<br>• source type;<br>• character;<br>• likely processing;<br>• role;<br>• timing.<br>Sound design is a non-instrument family. Composer evidence matrix (first pass: thin; Kolaveri Di is the strongest per-song record). Sound Character Dataset audit:<br>• NSynth qualities CC BY 4.0;<br>• E-GMD CC BY 4.0;<br>• IDMT effects is NC-ND (rejected);<br>• self-applied effects on permissive dry audio give exact labels. | ✅ researched; 👤 approve |
 | IA.10 | Benchmarks S1 (NSynth character head) and S2 (self-applied processing head) are runnable now on CPU | ⏳ awaiting approval |
 | IA.11 | E2 CNN10 (run 41386940981; reuses bench v4's clips; same splits and heads) | 🔨 running |
+| IA.12 | **Sound-palette coverage and data plan** ([`benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md`](benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md)). 165 terms audited:<br>• 41 existing ids;<br>• 12 aliases + 1 variant;<br>• 11 kept from v3;<br>• **24 new identities (all unsupported)**;<br>• 19 needs-review;<br>• 57 moved to other dimensions.<br>5 claims promoted to documented (secondary); 3 claims not found. | ✅ researched; 👤 approve |
+| IA.13 | **Owner recording programme:**<br>• harmonium → bansuri → shehnai/nadaswaram → sitar → santoor → sarangi → dhol/thavil/kanjira → Tamil folk drums;<br>• ≥ 3 performers each before training;<br>• Casio imitation pairs, labelled `imitation`. | 👤 |
+| IA.14 | v2 id `kuzhal` is ambiguous (Tamil flute vs Kerala double reed) | 👤 decide |
 
 ## R. Product and competitor research (Phase A, 2 Nov) — **proposals awaiting owner review, not approved**
 

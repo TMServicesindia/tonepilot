@@ -38,6 +38,24 @@ Addendum to [`TONEPILOT_INSTRUMENT_ACCURACY_ROADMAP.md`](TONEPILOT_INSTRUMENT_AC
 
 **Next:** album liner credits (session-musician credits on the streaming services' credits pages) and musician interviews, recorded per song with a URL. Listening-based hypotheses go in a separate column and **never count as ground truth**.
 
+### 1.1 Promotions found on 2 Nov (song-level, `DOCUMENTED_SECONDARY`)
+
+Full table with links: [`benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md`](benchmark/SOUND_PALETTE_COVERAGE_AND_DATA_PLAN.md) §3.
+
+| Composer | Song / album | Claim | Source |
+|---|---|---|---|
+| Ghibran | *Uttama Villain* | Tabla, ghatam, dholak **not** used; Bali instruments | https://en.wikipedia.org/wiki/Uttama_Villain_(soundtrack) |
+| Santhosh Narayanan | *Sarpatta Parambarai* | 1970s skin-headed instruments; gaana musicians | https://en.wikipedia.org/wiki/Sarpatta_Parambarai_(soundtrack) |
+| Pritam | *Kalank*, "Tabaah Ho Gaye" | Qanun (Tamer Pınarbaşı), glockenspiel, pakhawaj | https://thegreatbollywoodparty.com/2019/04/17/music-review-kalank-2019/ |
+
+Searched and `NOT_FOUND`:
+- the *Vathikuchi* avoidance;
+- the *Madrasapattinam* oboe and santoor;
+- *Kalank* bagpipes, hulusi, ney and bulbul tarang;
+- saxophone on *Vaaranam Aayiram*.
+
+**Normalised inventory of all 165 terms in §1, §1b and §1c:** [`benchmark/sound_palette_inventory.json`](benchmark/sound_palette_inventory.json) and the coverage report §2. The owner-supplied entries below are kept unchanged.
+
 ## 1b. Owner-supplied composer palette (2 Nov): **OWNER-SUPPLIED, unverified; no sources attached**
 
 The owner supplied per-composer palettes for 6 + 25 music directors across Tamil, Hindi, Telugu, Malayalam and Kannada film. **How they are used:**
