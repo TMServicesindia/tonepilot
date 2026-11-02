@@ -1,0 +1,3024 @@
+[
+ {
+  "system": "A-argmax \u00b7 clap",
+  "thresholds": [
+   0,
+   0
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.966996699669967,
+   "selective_family_acc": 0.033003300330033,
+   "selective_exact_acc": 0.013201320132013201,
+   "exact_overall": 0.013201320132013201,
+   "instrument_level_share": 1.0
+  },
+  "target_reached_on_dev": null,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9305555555555556,
+    "selective_family_acc": 0.06944444444444445,
+    "selective_exact_acc": 0.027777777777777776,
+    "exact_overall": 0.027777777777777776,
+    "instrument_level_share": 1.0
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9305555555555556,
+    "selective_family_acc": 0.06944444444444445,
+    "selective_exact_acc": 0.027777777777777776,
+    "exact_overall": 0.027777777777777776,
+    "instrument_level_share": 1.0
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9305555555555556,
+    "selective_family_acc": 0.06944444444444445,
+    "selective_exact_acc": 0.027777777777777776,
+    "exact_overall": 0.027777777777777776,
+    "instrument_level_share": 1.0
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9305555555555556,
+    "selective_family_acc": 0.06944444444444445,
+    "selective_exact_acc": 0.027777777777777776,
+    "exact_overall": 0.027777777777777776,
+    "instrument_level_share": 1.0
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.8,
+    "selective_family_acc": 0.2,
+    "selective_exact_acc": 0.05,
+    "exact_overall": 0.05,
+    "instrument_level_share": 1.0
+   }
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 1.0,
+   "selective_family_acc": 0.0,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 1.0
+  },
+  "coverage_curve_test": {
+   "100%": 0.125,
+   "90%": 0.13402061855670103,
+   "80%": 0.1329479768786127,
+   "70%": 0.152317880794702,
+   "60%": 0.08461538461538462,
+   "50%": 0.08333333333333333,
+   "30%": 0.12307692307692308
+  }
+ },
+ {
+  "system": "A \u00b7 clap",
+  "thresholds": [
+   0.05,
+   0.13
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.0,
+   "unknown": 1.0,
+   "wrong_family": 0.0,
+   "selective_family_acc": null,
+   "selective_exact_acc": null,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.0,
+    "unknown": 1.0,
+    "wrong_family": 0.0,
+    "selective_family_acc": null,
+    "selective_exact_acc": null,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.0
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.0,
+    "unknown": 1.0,
+    "wrong_family": 0.0,
+    "selective_family_acc": null,
+    "selective_exact_acc": null,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.0
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.0,
+    "unknown": 1.0,
+    "wrong_family": 0.0,
+    "selective_family_acc": null,
+    "selective_exact_acc": null,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.0
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.0,
+    "unknown": 1.0,
+    "wrong_family": 0.0,
+    "selective_family_acc": null,
+    "selective_exact_acc": null,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.0
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.0,
+    "unknown": 1.0,
+    "wrong_family": 0.0,
+    "selective_family_acc": null,
+    "selective_exact_acc": null,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.0
+   }
+  },
+  "short_thresholds": [
+   0.05,
+   0.13
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.125,
+   "90%": 0.13402061855670103,
+   "80%": 0.1329479768786127,
+   "70%": 0.152317880794702,
+   "60%": 0.08461538461538462,
+   "50%": 0.08333333333333333,
+   "30%": 0.12307692307692308
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.0,
+   "unknown": 1.0,
+   "wrong_family": 0.0,
+   "selective_family_acc": null,
+   "selective_exact_acc": null,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.0,
+   "unknown": 1.0,
+   "wrong_family": 0.0,
+   "selective_family_acc": null,
+   "selective_exact_acc": null,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "window_family_prf": [
+    0.20864197530864198,
+    0.8767833981841764,
+    0.33707304911493396
+   ],
+   "events_detected": "0/70",
+   "onset_err_median": null,
+   "onset_err_p90": null,
+   "offset_err_median": null,
+   "offset_err_p90": null,
+   "window_instrument_f1_by_count": {
+    "2": 0.0,
+    "3": 0.0,
+    "4": 0.0
+   }
+  },
+  "window_thresholds": [
+   0.05,
+   0.05
+  ]
+ },
+ {
+  "system": "C \u00b7 clap + head",
+  "thresholds": [
+   0.97,
+   0.93
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.12211221122112212,
+   "unknown": 0.8778877887788779,
+   "wrong_family": 0.0462046204620462,
+   "selective_family_acc": 0.6216216216216216,
+   "selective_exact_acc": 0.5185185185185185,
+   "exact_overall": 0.0231023102310231,
+   "instrument_level_share": 0.04455445544554455
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.037037037037037035,
+    "unknown": 0.962962962962963,
+    "wrong_family": 0.018518518518518517,
+    "selective_family_acc": 0.5,
+    "selective_exact_acc": 0.16666666666666666,
+    "exact_overall": 0.004629629629629629,
+    "instrument_level_share": 0.027777777777777776
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.2037037037037037,
+    "unknown": 0.7962962962962963,
+    "wrong_family": 0.125,
+    "selective_family_acc": 0.38636363636363635,
+    "selective_exact_acc": 0.17391304347826086,
+    "exact_overall": 0.018518518518518517,
+    "instrument_level_share": 0.10648148148148148
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.3101851851851852,
+    "unknown": 0.6898148148148149,
+    "wrong_family": 0.16203703703703703,
+    "selective_family_acc": 0.47761194029850745,
+    "selective_exact_acc": 0.35135135135135137,
+    "exact_overall": 0.06018518518518518,
+    "instrument_level_share": 0.1712962962962963
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.06944444444444445,
+    "unknown": 0.9305555555555556,
+    "wrong_family": 0.041666666666666664,
+    "selective_family_acc": 0.4,
+    "selective_exact_acc": 0.3333333333333333,
+    "exact_overall": 0.013888888888888888,
+    "instrument_level_share": 0.041666666666666664
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.14166666666666666,
+    "unknown": 0.8583333333333334,
+    "wrong_family": 0.09583333333333334,
+    "selective_family_acc": 0.3235294117647059,
+    "selective_exact_acc": 0.23809523809523808,
+    "exact_overall": 0.020833333333333332,
+    "instrument_level_share": 0.0875
+   }
+  },
+  "short_thresholds": [
+   0.63,
+   0.87
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.2222222222222222,
+   "90%": 0.22164948453608246,
+   "80%": 0.23121387283236994,
+   "70%": 0.25165562913907286,
+   "60%": 0.25384615384615383,
+   "50%": 0.2777777777777778,
+   "30%": 0.35384615384615387
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.12578616352201258,
+   "unknown": 0.8742138364779874,
+   "wrong_family": 0.07232704402515723,
+   "selective_family_acc": 0.425,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.018867924528301886
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.11949685534591195,
+   "unknown": 0.8805031446540881,
+   "wrong_family": 0.0660377358490566,
+   "selective_family_acc": 0.4473684210526316,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.018867924528301886
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 74,
+   "acoustic -> electronic": 3,
+   "acoustic -> imitation": 46,
+   "electronic -> acoustic": 12,
+   "electronic -> electronic": 5,
+   "electronic -> imitation": 16,
+   "imitation -> acoustic": 25,
+   "imitation -> electronic": 1,
+   "imitation -> imitation": 34
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.1080797481636936,
+    0.13054499366286437,
+    0.1182548794489093
+   ],
+   "window_family_prf": [
+    0.24452338661930137,
+    0.5356679636835279,
+    0.3357723577235772
+   ],
+   "events_detected": "14/70",
+   "onset_err_median": 3.0,
+   "onset_err_p90": 5.0,
+   "offset_err_median": 2.0,
+   "offset_err_p90": 6.0,
+   "window_instrument_f1_by_count": {
+    "2": 0.11681415929203541,
+    "3": 0.09106239460370995,
+    "4": 0.14726027397260272
+   }
+  },
+  "window_thresholds": [
+   0.65,
+   0.3
+  ]
+ },
+ {
+  "system": "C-reg \u00b7 clap + head (C=0.02)",
+  "thresholds": [
+   0.69,
+   0.49
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.10726072607260725,
+   "unknown": 0.8927392739273927,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.5384615384615384,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0016501650165016502
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.0,
+    "unknown": 1.0,
+    "wrong_family": 0.0,
+    "selective_family_acc": null,
+    "selective_exact_acc": null,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.0
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.032407407407407406,
+    "unknown": 0.9675925925925926,
+    "wrong_family": 0.032407407407407406,
+    "selective_family_acc": 0.0,
+    "selective_exact_acc": 0.0,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.004629629629629629
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.1388888888888889,
+    "unknown": 0.8611111111111112,
+    "wrong_family": 0.09722222222222222,
+    "selective_family_acc": 0.3,
+    "selective_exact_acc": 0.0,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.004629629629629629
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.013888888888888888,
+    "unknown": 0.9861111111111112,
+    "wrong_family": 0.009259259259259259,
+    "selective_family_acc": 0.3333333333333333,
+    "selective_exact_acc": null,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.0
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.05,
+    "unknown": 0.95,
+    "wrong_family": 0.0375,
+    "selective_family_acc": 0.25,
+    "selective_exact_acc": null,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.0
+   }
+  },
+  "short_thresholds": [
+   0.05,
+   0.31
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.14351851851851852,
+   "90%": 0.14432989690721648,
+   "80%": 0.15028901734104047,
+   "70%": 0.16556291390728478,
+   "60%": 0.17692307692307693,
+   "50%": 0.19444444444444445,
+   "30%": 0.27692307692307694
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.12578616352201258,
+   "unknown": 0.8742138364779874,
+   "wrong_family": 0.07232704402515723,
+   "selective_family_acc": 0.425,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.006289308176100629
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.14465408805031446,
+   "unknown": 0.8553459119496856,
+   "wrong_family": 0.08176100628930817,
+   "selective_family_acc": 0.43478260869565216,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0031446540880503146
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 114,
+   "acoustic -> imitation": 9,
+   "electronic -> acoustic": 29,
+   "electronic -> imitation": 4,
+   "imitation -> acoustic": 49,
+   "imitation -> imitation": 11
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.10897435897435898,
+    0.08618504435994931,
+    0.09624911535739562
+   ],
+   "window_family_prf": [
+    0.2965174129353234,
+    0.3865110246433204,
+    0.3355855855855856
+   ],
+   "events_detected": "10/70",
+   "onset_err_median": 1.0,
+   "onset_err_p90": 4.199999999999999,
+   "offset_err_median": 2.0,
+   "offset_err_p90": 5.1,
+   "window_instrument_f1_by_count": {
+    "2": 0.01948051948051948,
+    "3": 0.084,
+    "4": 0.14545454545454548
+   }
+  },
+  "window_thresholds": [
+   0.2,
+   0.2
+  ]
+ },
+ {
+  "system": "C-agree \u00b7 clap + head",
+  "thresholds": [
+   0.53,
+   0.87
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.15676567656765678,
+   "unknown": 0.8432343234323432,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.6842105263157895,
+   "selective_exact_acc": 0.47435897435897434,
+   "exact_overall": 0.06105610561056106,
+   "instrument_level_share": 0.12871287128712872
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.25462962962962965,
+    "unknown": 0.7453703703703703,
+    "wrong_family": 0.16203703703703703,
+    "selective_family_acc": 0.36363636363636365,
+    "selective_exact_acc": 0.2545454545454545,
+    "exact_overall": 0.06481481481481481,
+    "instrument_level_share": 0.25462962962962965
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.2824074074074074,
+    "unknown": 0.7175925925925926,
+    "wrong_family": 0.1388888888888889,
+    "selective_family_acc": 0.5081967213114754,
+    "selective_exact_acc": 0.38181818181818183,
+    "exact_overall": 0.09722222222222222,
+    "instrument_level_share": 0.25462962962962965
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.2916666666666667,
+    "unknown": 0.7083333333333333,
+    "wrong_family": 0.14814814814814814,
+    "selective_family_acc": 0.49206349206349204,
+    "selective_exact_acc": 0.375,
+    "exact_overall": 0.09722222222222222,
+    "instrument_level_share": 0.25925925925925924
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.06018518518518518,
+    "unknown": 0.9398148148148148,
+    "wrong_family": 0.027777777777777776,
+    "selective_family_acc": 0.5384615384615384,
+    "selective_exact_acc": 0.5,
+    "exact_overall": 0.009259259259259259,
+    "instrument_level_share": 0.018518518518518517
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.24583333333333332,
+    "unknown": 0.7541666666666667,
+    "wrong_family": 0.15,
+    "selective_family_acc": 0.3898305084745763,
+    "selective_exact_acc": 0.30357142857142855,
+    "exact_overall": 0.07083333333333333,
+    "instrument_level_share": 0.23333333333333334
+   }
+  },
+  "short_thresholds": [
+   0.53,
+   0.77
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.12962962962962962,
+   "90%": 0.14432989690721648,
+   "80%": 0.16184971098265896,
+   "70%": 0.18543046357615894,
+   "60%": 0.2153846153846154,
+   "50%": 0.25925925925925924,
+   "30%": 0.35384615384615387
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.06289308176100629,
+   "unknown": 0.9371069182389937,
+   "wrong_family": 0.040880503144654086,
+   "selective_family_acc": 0.35,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.050314465408805034
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.06289308176100629,
+   "unknown": 0.9371069182389937,
+   "wrong_family": 0.025157232704402517,
+   "selective_family_acc": 0.6,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.031446540880503145
+  }
+ },
+ {
+  "system": "A-argmax \u00b7 efficientat",
+  "thresholds": [
+   0,
+   0
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.8151815181518152,
+   "selective_family_acc": 0.1848184818481848,
+   "selective_exact_acc": 0.006600660066006601,
+   "exact_overall": 0.006600660066006601,
+   "instrument_level_share": 1.0
+  },
+  "target_reached_on_dev": null,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9027777777777778,
+    "selective_family_acc": 0.09722222222222222,
+    "selective_exact_acc": 0.013888888888888888,
+    "exact_overall": 0.013888888888888888,
+    "instrument_level_share": 1.0
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9027777777777778,
+    "selective_family_acc": 0.09722222222222222,
+    "selective_exact_acc": 0.013888888888888888,
+    "exact_overall": 0.013888888888888888,
+    "instrument_level_share": 1.0
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9027777777777778,
+    "selective_family_acc": 0.09722222222222222,
+    "selective_exact_acc": 0.013888888888888888,
+    "exact_overall": 0.013888888888888888,
+    "instrument_level_share": 1.0
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9027777777777778,
+    "selective_family_acc": 0.09722222222222222,
+    "selective_exact_acc": 0.013888888888888888,
+    "exact_overall": 0.013888888888888888,
+    "instrument_level_share": 1.0
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.95,
+    "selective_family_acc": 0.05,
+    "selective_exact_acc": 0.0,
+    "exact_overall": 0.0,
+    "instrument_level_share": 1.0
+   }
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.7358490566037735,
+   "selective_family_acc": 0.2641509433962264,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 1.0
+  },
+  "coverage_curve_test": {
+   "100%": 0.013888888888888888,
+   "90%": 0.015463917525773196,
+   "80%": 0.017341040462427744,
+   "70%": 0.019867549668874173,
+   "60%": 0.023076923076923078,
+   "50%": 0.027777777777777776,
+   "30%": 0.046153846153846156
+  }
+ },
+ {
+  "system": "A \u00b7 efficientat",
+  "thresholds": [
+   0.05,
+   0.05
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.8151815181518152,
+   "selective_family_acc": 0.1848184818481848,
+   "selective_exact_acc": 0.006600660066006601,
+   "exact_overall": 0.006600660066006601,
+   "instrument_level_share": 1.0
+  },
+  "target_reached_on_dev": false,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9027777777777778,
+    "selective_family_acc": 0.09722222222222222,
+    "selective_exact_acc": 0.013888888888888888,
+    "exact_overall": 0.013888888888888888,
+    "instrument_level_share": 1.0
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9027777777777778,
+    "selective_family_acc": 0.09722222222222222,
+    "selective_exact_acc": 0.013888888888888888,
+    "exact_overall": 0.013888888888888888,
+    "instrument_level_share": 1.0
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9027777777777778,
+    "selective_family_acc": 0.09722222222222222,
+    "selective_exact_acc": 0.013888888888888888,
+    "exact_overall": 0.013888888888888888,
+    "instrument_level_share": 1.0
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.9027777777777778,
+    "selective_family_acc": 0.09722222222222222,
+    "selective_exact_acc": 0.013888888888888888,
+    "exact_overall": 0.013888888888888888,
+    "instrument_level_share": 1.0
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.95,
+    "selective_family_acc": 0.05,
+    "selective_exact_acc": 0.0,
+    "exact_overall": 0.0,
+    "instrument_level_share": 1.0
+   }
+  },
+  "short_thresholds": [
+   0.05,
+   0.05
+  ],
+  "short_target_reached_on_dev": false,
+  "coverage_curve_test": {
+   "100%": 0.013888888888888888,
+   "90%": 0.015463917525773196,
+   "80%": 0.017341040462427744,
+   "70%": 0.019867549668874173,
+   "60%": 0.023076923076923078,
+   "50%": 0.027777777777777776,
+   "30%": 0.046153846153846156
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.7358490566037735,
+   "selective_family_acc": 0.2641509433962264,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 1.0
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.7358490566037735,
+   "selective_family_acc": 0.2641509433962264,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 1.0
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.03641084093211753,
+    0.522489777373921,
+    0.0680775492082285
+   ],
+   "window_family_prf": [
+    0.15103159252095422,
+    0.870817843866171,
+    0.25741758241758245
+   ],
+   "events_detected": "33/70",
+   "onset_err_median": 0.0,
+   "onset_err_p90": 1.5,
+   "offset_err_median": 0.0,
+   "offset_err_p90": 1.5,
+   "window_instrument_f1_by_count": {
+    "2": 0.06330635467585545,
+    "3": 0.07005409240046111,
+    "4": 0.0717918037690697
+   }
+  },
+  "window_thresholds": [
+   0.05,
+   0.05
+  ]
+ },
+ {
+  "system": "C \u00b7 efficientat + head",
+  "thresholds": [
+   0.67,
+   0.77
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.7260726072607261,
+   "unknown": 0.2739273927392739,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.9318181818181818,
+   "selective_exact_acc": 0.9044117647058824,
+   "exact_overall": 0.40594059405940597,
+   "instrument_level_share": 0.44884488448844884
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.7175925925925926,
+    "unknown": 0.28240740740740744,
+    "wrong_family": 0.10185185185185185,
+    "selective_family_acc": 0.8580645161290322,
+    "selective_exact_acc": 0.8020833333333334,
+    "exact_overall": 0.35648148148148145,
+    "instrument_level_share": 0.4444444444444444
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.7314814814814815,
+    "unknown": 0.2685185185185185,
+    "wrong_family": 0.12037037037037036,
+    "selective_family_acc": 0.8354430379746836,
+    "selective_exact_acc": 0.8105263157894737,
+    "exact_overall": 0.35648148148148145,
+    "instrument_level_share": 0.4398148148148148
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.6898148148148148,
+    "unknown": 0.31018518518518523,
+    "wrong_family": 0.10185185185185185,
+    "selective_family_acc": 0.8523489932885906,
+    "selective_exact_acc": 0.7840909090909091,
+    "exact_overall": 0.3194444444444444,
+    "instrument_level_share": 0.4074074074074074
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.9490740740740741,
+    "unknown": 0.05092592592592593,
+    "wrong_family": 0.25,
+    "selective_family_acc": 0.7365853658536585,
+    "selective_exact_acc": 0.6260162601626016,
+    "exact_overall": 0.35648148148148145,
+    "instrument_level_share": 0.5694444444444444
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.7708333333333334,
+    "unknown": 0.22916666666666663,
+    "wrong_family": 0.21666666666666667,
+    "selective_family_acc": 0.7189189189189189,
+    "selective_exact_acc": 0.7863247863247863,
+    "exact_overall": 0.38333333333333336,
+    "instrument_level_share": 0.4875
+   }
+  },
+  "short_thresholds": [
+   0.87,
+   0.81
+  ],
+  "short_target_reached_on_dev": false,
+  "coverage_curve_test": {
+   "100%": 0.7222222222222222,
+   "90%": 0.7835051546391752,
+   "80%": 0.8208092485549133,
+   "70%": 0.8211920529801324,
+   "60%": 0.8692307692307693,
+   "50%": 0.8703703703703703,
+   "30%": 0.9384615384615385
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.4968553459119497,
+   "unknown": 0.5031446540880503,
+   "wrong_family": 0.0660377358490566,
+   "selective_family_acc": 0.8670886075949367,
+   "selective_exact_acc": null,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.4811320754716981,
+   "unknown": 0.5188679245283019,
+   "wrong_family": 0.05345911949685535,
+   "selective_family_acc": 0.8888888888888888,
+   "selective_exact_acc": null,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 116,
+   "acoustic -> electronic": 1,
+   "acoustic -> imitation": 6,
+   "electronic -> acoustic": 4,
+   "electronic -> electronic": 26,
+   "electronic -> imitation": 3,
+   "imitation -> acoustic": 28,
+   "imitation -> electronic": 1,
+   "imitation -> imitation": 31
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.3968804159445407,
+    0.3121308496138119,
+    0.349440488301119
+   ],
+   "window_family_prf": [
+    0.4601941747572815,
+    0.5506505576208178,
+    0.5013750793314999
+   ],
+   "events_detected": "46/70",
+   "onset_err_median": 0.5,
+   "onset_err_p90": 7.0,
+   "offset_err_median": 0.5,
+   "offset_err_p90": 2.75,
+   "window_instrument_f1_by_count": {
+    "2": 0.3485617597292724,
+    "3": 0.32842105263157895,
+    "4": 0.3728301886792453
+   }
+  },
+  "window_thresholds": [
+   0.3,
+   0.45
+  ]
+ },
+ {
+  "system": "C-reg \u00b7 efficientat + head (C=0.02)",
+  "thresholds": [
+   0.35,
+   0.51
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.7161716171617162,
+   "unknown": 0.2838283828382838,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.9308755760368663,
+   "selective_exact_acc": 0.8913043478260869,
+   "exact_overall": 0.40594059405940597,
+   "instrument_level_share": 0.45544554455445546
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.7777777777777778,
+    "unknown": 0.2222222222222222,
+    "wrong_family": 0.12962962962962962,
+    "selective_family_acc": 0.8333333333333334,
+    "selective_exact_acc": 0.8080808080808081,
+    "exact_overall": 0.37037037037037035,
+    "instrument_level_share": 0.4583333333333333
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.7685185185185185,
+    "unknown": 0.2314814814814815,
+    "wrong_family": 0.11574074074074074,
+    "selective_family_acc": 0.8493975903614458,
+    "selective_exact_acc": 0.7857142857142857,
+    "exact_overall": 0.35648148148148145,
+    "instrument_level_share": 0.4537037037037037
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.7361111111111112,
+    "unknown": 0.26388888888888884,
+    "wrong_family": 0.16666666666666666,
+    "selective_family_acc": 0.7735849056603774,
+    "selective_exact_acc": 0.711340206185567,
+    "exact_overall": 0.3194444444444444,
+    "instrument_level_share": 0.44907407407407407
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.9953703703703703,
+    "unknown": 0.00462962962962965,
+    "wrong_family": 0.28703703703703703,
+    "selective_family_acc": 0.7116279069767442,
+    "selective_exact_acc": 0.8285714285714286,
+    "exact_overall": 0.13425925925925927,
+    "instrument_level_share": 0.16203703703703703
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.7791666666666667,
+    "unknown": 0.22083333333333333,
+    "wrong_family": 0.22916666666666666,
+    "selective_family_acc": 0.7058823529411765,
+    "selective_exact_acc": 0.8058252427184466,
+    "exact_overall": 0.3458333333333333,
+    "instrument_level_share": 0.42916666666666664
+   }
+  },
+  "short_thresholds": [
+   0.91,
+   0.05
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.7546296296296297,
+   "90%": 0.8041237113402062,
+   "80%": 0.8323699421965318,
+   "70%": 0.8410596026490066,
+   "60%": 0.8769230769230769,
+   "50%": 0.8981481481481481,
+   "30%": 0.9230769230769231
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.4559748427672956,
+   "unknown": 0.5440251572327044,
+   "wrong_family": 0.0440251572327044,
+   "selective_family_acc": 0.903448275862069,
+   "selective_exact_acc": null,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.46855345911949686,
+   "unknown": 0.5314465408805031,
+   "wrong_family": 0.05660377358490566,
+   "selective_family_acc": 0.8791946308724832,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.006289308176100629
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 115,
+   "acoustic -> electronic": 1,
+   "acoustic -> imitation": 7,
+   "electronic -> acoustic": 5,
+   "electronic -> electronic": 26,
+   "electronic -> imitation": 2,
+   "imitation -> acoustic": 24,
+   "imitation -> electronic": 1,
+   "imitation -> imitation": 35
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.43914956011730205,
+    0.27214902317128575,
+    0.3360448807854137
+   ],
+   "window_family_prf": [
+    0.5260685767966181,
+    0.5204460966542751,
+    0.5232422331231021
+   ],
+   "events_detected": "41/70",
+   "onset_err_median": 0.5,
+   "onset_err_p90": 4.0,
+   "offset_err_median": 0.5,
+   "offset_err_p90": 7.5,
+   "window_instrument_f1_by_count": {
+    "2": 0.33177132146204313,
+    "3": 0.35501147666411625,
+    "4": 0.31905961376994124
+   }
+  },
+  "window_thresholds": [
+   0.2,
+   0.3
+  ]
+ },
+ {
+  "system": "C-agree \u00b7 efficientat + head",
+  "thresholds": [
+   0.05,
+   0.05
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.5495049504950495,
+   "unknown": 0.45049504950495045,
+   "wrong_family": 0.0429042904290429,
+   "selective_family_acc": 0.9219219219219219,
+   "selective_exact_acc": 0.8480565371024735,
+   "exact_overall": 0.39603960396039606,
+   "instrument_level_share": 0.466996699669967
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.6990740740740741,
+    "unknown": 0.30092592592592593,
+    "wrong_family": 0.06481481481481481,
+    "selective_family_acc": 0.9072847682119205,
+    "selective_exact_acc": 0.7027027027027027,
+    "exact_overall": 0.48148148148148145,
+    "instrument_level_share": 0.6851851851851852
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.6666666666666666,
+    "unknown": 0.33333333333333337,
+    "wrong_family": 0.06944444444444445,
+    "selective_family_acc": 0.8958333333333334,
+    "selective_exact_acc": 0.6597222222222222,
+    "exact_overall": 0.4398148148148148,
+    "instrument_level_share": 0.6666666666666666
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.625,
+    "unknown": 0.375,
+    "wrong_family": 0.06018518518518518,
+    "selective_family_acc": 0.9037037037037037,
+    "selective_exact_acc": 0.6592592592592592,
+    "exact_overall": 0.41203703703703703,
+    "instrument_level_share": 0.625
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.6018518518518519,
+    "unknown": 0.39814814814814814,
+    "wrong_family": 0.06944444444444445,
+    "selective_family_acc": 0.8846153846153846,
+    "selective_exact_acc": 0.6220472440944882,
+    "exact_overall": 0.36574074074074076,
+    "instrument_level_share": 0.5879629629629629
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.6416666666666667,
+    "unknown": 0.3583333333333333,
+    "wrong_family": 0.11666666666666667,
+    "selective_family_acc": 0.8181818181818182,
+    "selective_exact_acc": 0.673202614379085,
+    "exact_overall": 0.42916666666666664,
+    "instrument_level_share": 0.6375
+   }
+  },
+  "short_thresholds": [
+   0.05,
+   0.05
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.6388888888888888,
+   "90%": 0.711340206185567,
+   "80%": 0.7976878612716763,
+   "70%": 0.9072847682119205,
+   "60%": 0.9384615384615385,
+   "50%": 0.9444444444444444,
+   "30%": 0.9538461538461539
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.2358490566037736,
+   "unknown": 0.7641509433962264,
+   "wrong_family": 0.09119496855345911,
+   "selective_family_acc": 0.6133333333333333,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.1320754716981132
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.22012578616352202,
+   "unknown": 0.779874213836478,
+   "wrong_family": 0.06289308176100629,
+   "selective_family_acc": 0.7142857142857143,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.06289308176100629
+  }
+ },
+ {
+  "system": "A-argmax \u00b7 panns",
+  "thresholds": [
+   0,
+   0
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.5808580858085809,
+   "selective_family_acc": 0.41914191419141916,
+   "selective_exact_acc": 0.12046204620462046,
+   "exact_overall": 0.12046204620462046,
+   "instrument_level_share": 1.0
+  },
+  "target_reached_on_dev": null,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5277777777777778,
+    "selective_family_acc": 0.4722222222222222,
+    "selective_exact_acc": 0.25925925925925924,
+    "exact_overall": 0.25925925925925924,
+    "instrument_level_share": 1.0
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.49537037037037035,
+    "selective_family_acc": 0.5046296296296297,
+    "selective_exact_acc": 0.2638888888888889,
+    "exact_overall": 0.2638888888888889,
+    "instrument_level_share": 1.0
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5601851851851852,
+    "selective_family_acc": 0.4398148148148148,
+    "selective_exact_acc": 0.22685185185185186,
+    "exact_overall": 0.22685185185185186,
+    "instrument_level_share": 1.0
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5370370370370371,
+    "selective_family_acc": 0.46296296296296297,
+    "selective_exact_acc": 0.24074074074074073,
+    "exact_overall": 0.24074074074074073,
+    "instrument_level_share": 1.0
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.7666666666666667,
+    "selective_family_acc": 0.23333333333333334,
+    "selective_exact_acc": 0.0,
+    "exact_overall": 0.0,
+    "instrument_level_share": 1.0
+   }
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.7264150943396226,
+   "selective_family_acc": 0.27358490566037735,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 1.0
+  },
+  "coverage_curve_test": {
+   "100%": 0.5185185185185185,
+   "90%": 0.5463917525773195,
+   "80%": 0.5780346820809249,
+   "70%": 0.5827814569536424,
+   "60%": 0.5923076923076923,
+   "50%": 0.6018518518518519,
+   "30%": 0.6307692307692307
+  }
+ },
+ {
+  "system": "A \u00b7 panns",
+  "thresholds": [
+   0.45,
+   0.71
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.21947194719471946,
+   "unknown": 0.7805280528052805,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.7744360902255639,
+   "selective_exact_acc": 0.4198473282442748,
+   "exact_overall": 0.09075907590759076,
+   "instrument_level_share": 0.21617161716171618
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.3055555555555556,
+    "unknown": 0.6944444444444444,
+    "wrong_family": 0.10648148148148148,
+    "selective_family_acc": 0.6515151515151515,
+    "selective_exact_acc": 0.421875,
+    "exact_overall": 0.125,
+    "instrument_level_share": 0.2962962962962963
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.375,
+    "unknown": 0.625,
+    "wrong_family": 0.12962962962962962,
+    "selective_family_acc": 0.654320987654321,
+    "selective_exact_acc": 0.45569620253164556,
+    "exact_overall": 0.16666666666666666,
+    "instrument_level_share": 0.36574074074074076
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.3194444444444444,
+    "unknown": 0.6805555555555556,
+    "wrong_family": 0.1111111111111111,
+    "selective_family_acc": 0.6521739130434783,
+    "selective_exact_acc": 0.38235294117647056,
+    "exact_overall": 0.12037037037037036,
+    "instrument_level_share": 0.3148148148148148
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.3333333333333333,
+    "unknown": 0.6666666666666667,
+    "wrong_family": 0.1111111111111111,
+    "selective_family_acc": 0.6666666666666666,
+    "selective_exact_acc": 0.390625,
+    "exact_overall": 0.11574074074074074,
+    "instrument_level_share": 0.2962962962962963
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.3416666666666667,
+    "unknown": 0.6583333333333333,
+    "wrong_family": 0.2,
+    "selective_family_acc": 0.4146341463414634,
+    "selective_exact_acc": 0.0,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.325
+   }
+  },
+  "short_thresholds": [
+   0.63,
+   0.83
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.5185185185185185,
+   "90%": 0.5463917525773195,
+   "80%": 0.5780346820809249,
+   "70%": 0.5827814569536424,
+   "60%": 0.5923076923076923,
+   "50%": 0.6018518518518519,
+   "30%": 0.6307692307692307
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.009433962264150943,
+   "unknown": 0.9905660377358491,
+   "wrong_family": 0.006289308176100629,
+   "selective_family_acc": 0.3333333333333333,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.009433962264150943
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.009433962264150943,
+   "unknown": 0.9905660377358491,
+   "wrong_family": 0.009433962264150943,
+   "selective_family_acc": 0.0,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.009433962264150943
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.1944223107569721,
+    0.11085870059064062,
+    0.1412037037037037
+   ],
+   "window_family_prf": [
+    0.3633744855967078,
+    0.4103159851301115,
+    0.385421213443911
+   ],
+   "events_detected": "19/70",
+   "onset_err_median": 1.0,
+   "onset_err_p90": 12.0,
+   "offset_err_median": 0.5,
+   "offset_err_p90": 12.1,
+   "window_instrument_f1_by_count": {
+    "2": 0.13847675568743817,
+    "3": 0.16695352839931155,
+    "4": 0.12003117692907249
+   }
+  },
+  "window_thresholds": [
+   0.15,
+   0.05
+  ]
+ },
+ {
+  "system": "C \u00b7 panns + head",
+  "thresholds": [
+   0.39,
+   0.87
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.599009900990099,
+   "unknown": 0.400990099009901,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.9173553719008265,
+   "selective_exact_acc": 0.8215488215488216,
+   "exact_overall": 0.40264026402640263,
+   "instrument_level_share": 0.4900990099009901
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.8564814814814815,
+    "unknown": 0.1435185185185185,
+    "wrong_family": 0.2638888888888889,
+    "selective_family_acc": 0.6918918918918919,
+    "selective_exact_acc": 0.5536723163841808,
+    "exact_overall": 0.4537037037037037,
+    "instrument_level_share": 0.8194444444444444
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.8287037037037037,
+    "unknown": 0.17129629629629628,
+    "wrong_family": 0.23148148148148148,
+    "selective_family_acc": 0.7206703910614525,
+    "selective_exact_acc": 0.5664739884393064,
+    "exact_overall": 0.4537037037037037,
+    "instrument_level_share": 0.8009259259259259
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.7777777777777778,
+    "unknown": 0.2222222222222222,
+    "wrong_family": 0.19444444444444445,
+    "selective_family_acc": 0.75,
+    "selective_exact_acc": 0.5786163522012578,
+    "exact_overall": 0.42592592592592593,
+    "instrument_level_share": 0.7361111111111112
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.37037037037037035,
+    "selective_family_acc": 0.6296296296296297,
+    "selective_exact_acc": 0.4519774011299435,
+    "exact_overall": 0.37037037037037035,
+    "instrument_level_share": 0.8194444444444444
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.875,
+    "unknown": 0.125,
+    "wrong_family": 0.24166666666666667,
+    "selective_family_acc": 0.7238095238095238,
+    "selective_exact_acc": 0.5865384615384616,
+    "exact_overall": 0.5083333333333333,
+    "instrument_level_share": 0.8666666666666667
+   }
+  },
+  "short_thresholds": [
+   0.61,
+   0.05
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.7407407407407407,
+   "90%": 0.7835051546391752,
+   "80%": 0.791907514450867,
+   "70%": 0.7880794701986755,
+   "60%": 0.823076923076923,
+   "50%": 0.8611111111111112,
+   "30%": 0.9076923076923077
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.24528301886792453,
+   "unknown": 0.7547169811320755,
+   "wrong_family": 0.050314465408805034,
+   "selective_family_acc": 0.7948717948717948,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.040880503144654086
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.24213836477987422,
+   "unknown": 0.7578616352201257,
+   "wrong_family": 0.050314465408805034,
+   "selective_family_acc": 0.7922077922077922,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.03459119496855346
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 105,
+   "acoustic -> electronic": 4,
+   "acoustic -> imitation": 14,
+   "electronic -> acoustic": 2,
+   "electronic -> electronic": 24,
+   "electronic -> imitation": 7,
+   "imitation -> acoustic": 19,
+   "imitation -> electronic": 3,
+   "imitation -> imitation": 38
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.2865671641791045,
+    0.30531576556110857,
+    0.29564452265728114
+   ],
+   "window_family_prf": [
+    0.4769299023957409,
+    0.4995353159851301,
+    0.4879709487063096
+   ],
+   "events_detected": "45/70",
+   "onset_err_median": 0.5,
+   "onset_err_p90": 7.800000000000001,
+   "offset_err_median": 0.5,
+   "offset_err_p90": 10.400000000000006,
+   "window_instrument_f1_by_count": {
+    "2": 0.3294460641399417,
+    "3": 0.30458715596330277,
+    "4": 0.2560103963612736
+   }
+  },
+  "window_thresholds": [
+   0.35,
+   0.6
+  ]
+ },
+ {
+  "system": "C-reg \u00b7 panns + head (C=0.02)",
+  "thresholds": [
+   0.19,
+   0.59
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.6237623762376238,
+   "unknown": 0.37623762376237624,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.9206349206349206,
+   "selective_exact_acc": 0.8456140350877193,
+   "exact_overall": 0.3976897689768977,
+   "instrument_level_share": 0.47029702970297027
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.8101851851851852,
+    "unknown": 0.18981481481481477,
+    "wrong_family": 0.19444444444444445,
+    "selective_family_acc": 0.76,
+    "selective_exact_acc": 0.6234567901234568,
+    "exact_overall": 0.4675925925925926,
+    "instrument_level_share": 0.75
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.8240740740740741,
+    "unknown": 0.17592592592592593,
+    "wrong_family": 0.1574074074074074,
+    "selective_family_acc": 0.8089887640449438,
+    "selective_exact_acc": 0.6745562130177515,
+    "exact_overall": 0.5277777777777778,
+    "instrument_level_share": 0.7824074074074074
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.7638888888888888,
+    "unknown": 0.23611111111111116,
+    "wrong_family": 0.18055555555555555,
+    "selective_family_acc": 0.7636363636363637,
+    "selective_exact_acc": 0.6190476190476191,
+    "exact_overall": 0.4212962962962963,
+    "instrument_level_share": 0.6805555555555556
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.30092592592592593,
+    "selective_family_acc": 0.6990740740740741,
+    "selective_exact_acc": 0.627906976744186,
+    "exact_overall": 0.25,
+    "instrument_level_share": 0.39814814814814814
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.8333333333333334,
+    "unknown": 0.16666666666666663,
+    "wrong_family": 0.24583333333333332,
+    "selective_family_acc": 0.705,
+    "selective_exact_acc": 0.5760869565217391,
+    "exact_overall": 0.44166666666666665,
+    "instrument_level_share": 0.7666666666666667
+   }
+  },
+  "short_thresholds": [
+   0.59,
+   0.05
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.7824074074074074,
+   "90%": 0.7938144329896907,
+   "80%": 0.8092485549132948,
+   "70%": 0.8211920529801324,
+   "60%": 0.8384615384615385,
+   "50%": 0.8518518518518519,
+   "30%": 0.9230769230769231
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.3081761006289308,
+   "unknown": 0.6918238993710693,
+   "wrong_family": 0.04716981132075472,
+   "selective_family_acc": 0.8469387755102041,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.018867924528301886
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.3018867924528302,
+   "unknown": 0.6981132075471699,
+   "wrong_family": 0.050314465408805034,
+   "selective_family_acc": 0.8333333333333334,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.012578616352201259
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 105,
+   "acoustic -> electronic": 4,
+   "acoustic -> imitation": 14,
+   "electronic -> acoustic": 4,
+   "electronic -> electronic": 24,
+   "electronic -> imitation": 5,
+   "imitation -> acoustic": 16,
+   "imitation -> electronic": 1,
+   "imitation -> imitation": 43
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.37335834896810505,
+    0.271240345297592,
+    0.3142105263157895
+   ],
+   "window_family_prf": [
+    0.5252989880404784,
+    0.5306691449814126,
+    0.5279704114655571
+   ],
+   "events_detected": "41/70",
+   "onset_err_median": 0.5,
+   "onset_err_p90": 8.0,
+   "offset_err_median": 0.5,
+   "offset_err_p90": 12.0,
+   "window_instrument_f1_by_count": {
+    "2": 0.3704318936877076,
+    "3": 0.3125948406676783,
+    "4": 0.2629107981220657
+   }
+  },
+  "window_thresholds": [
+   0.2,
+   0.25
+  ]
+ },
+ {
+  "system": "C-agree \u00b7 panns + head",
+  "thresholds": [
+   0.33,
+   0.59
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.528052805280528,
+   "unknown": 0.471947194719472,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.90625,
+   "selective_exact_acc": 0.8419117647058824,
+   "exact_overall": 0.3778877887788779,
+   "instrument_level_share": 0.44884488448844884
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.6944444444444444,
+    "unknown": 0.3055555555555556,
+    "wrong_family": 0.1111111111111111,
+    "selective_family_acc": 0.84,
+    "selective_exact_acc": 0.6428571428571429,
+    "exact_overall": 0.4166666666666667,
+    "instrument_level_share": 0.6481481481481481
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.6712962962962963,
+    "unknown": 0.3287037037037037,
+    "wrong_family": 0.10185185185185185,
+    "selective_family_acc": 0.8482758620689655,
+    "selective_exact_acc": 0.6742424242424242,
+    "exact_overall": 0.41203703703703703,
+    "instrument_level_share": 0.6111111111111112
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.6296296296296297,
+    "unknown": 0.37037037037037035,
+    "wrong_family": 0.10185185185185185,
+    "selective_family_acc": 0.8382352941176471,
+    "selective_exact_acc": 0.7079646017699115,
+    "exact_overall": 0.37037037037037035,
+    "instrument_level_share": 0.5231481481481481
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.6064814814814815,
+    "unknown": 0.3935185185185185,
+    "wrong_family": 0.09722222222222222,
+    "selective_family_acc": 0.8396946564885496,
+    "selective_exact_acc": 0.59375,
+    "exact_overall": 0.35185185185185186,
+    "instrument_level_share": 0.5925925925925926
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.7083333333333334,
+    "unknown": 0.29166666666666663,
+    "wrong_family": 0.15416666666666667,
+    "selective_family_acc": 0.7823529411764706,
+    "selective_exact_acc": 0.6380368098159509,
+    "exact_overall": 0.43333333333333335,
+    "instrument_level_share": 0.6791666666666667
+   }
+  },
+  "short_thresholds": [
+   0.05,
+   0.05
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.5972222222222222,
+   "90%": 0.6649484536082474,
+   "80%": 0.7341040462427746,
+   "70%": 0.8410596026490066,
+   "60%": 0.8538461538461538,
+   "50%": 0.8611111111111112,
+   "30%": 0.9538461538461539
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.22327044025157233,
+   "unknown": 0.7767295597484276,
+   "wrong_family": 0.0880503144654088,
+   "selective_family_acc": 0.6056338028169014,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.040880503144654086
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.1761006289308176,
+   "unknown": 0.8238993710691824,
+   "wrong_family": 0.06918238993710692,
+   "selective_family_acc": 0.6071428571428571,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.02830188679245283
+  }
+ },
+ {
+  "system": "A-argmax \u00b7 panns10",
+  "thresholds": [
+   0,
+   0
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.6353135313531353,
+   "selective_family_acc": 0.36468646864686466,
+   "selective_exact_acc": 0.09900990099009901,
+   "exact_overall": 0.09900990099009901,
+   "instrument_level_share": 1.0
+  },
+  "target_reached_on_dev": null,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5277777777777778,
+    "selective_family_acc": 0.4722222222222222,
+    "selective_exact_acc": 0.20833333333333334,
+    "exact_overall": 0.20833333333333334,
+    "instrument_level_share": 1.0
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5324074074074074,
+    "selective_family_acc": 0.4675925925925926,
+    "selective_exact_acc": 0.2037037037037037,
+    "exact_overall": 0.2037037037037037,
+    "instrument_level_share": 1.0
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5879629629629629,
+    "selective_family_acc": 0.41203703703703703,
+    "selective_exact_acc": 0.17592592592592593,
+    "exact_overall": 0.17592592592592593,
+    "instrument_level_share": 1.0
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5185185185185185,
+    "selective_family_acc": 0.48148148148148145,
+    "selective_exact_acc": 0.22685185185185186,
+    "exact_overall": 0.22685185185185186,
+    "instrument_level_share": 1.0
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.8166666666666667,
+    "selective_family_acc": 0.18333333333333332,
+    "selective_exact_acc": 0.004166666666666667,
+    "exact_overall": 0.004166666666666667,
+    "instrument_level_share": 1.0
+   }
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.7484276729559748,
+   "selective_family_acc": 0.25157232704402516,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 1.0
+  },
+  "coverage_curve_test": {
+   "100%": 0.5324074074074074,
+   "90%": 0.5412371134020618,
+   "80%": 0.5606936416184971,
+   "70%": 0.5960264900662252,
+   "60%": 0.6461538461538462,
+   "50%": 0.6759259259259259,
+   "30%": 0.7230769230769231
+  }
+ },
+ {
+  "system": "A \u00b7 panns10",
+  "thresholds": [
+   0.29,
+   0.49
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.21122112211221122,
+   "unknown": 0.7887788778877888,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.765625,
+   "selective_exact_acc": 0.4180327868852459,
+   "exact_overall": 0.08415841584158416,
+   "instrument_level_share": 0.20132013201320131
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.25462962962962965,
+    "unknown": 0.7453703703703703,
+    "wrong_family": 0.05555555555555555,
+    "selective_family_acc": 0.7818181818181819,
+    "selective_exact_acc": 0.46296296296296297,
+    "exact_overall": 0.11574074074074074,
+    "instrument_level_share": 0.25
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.28703703703703703,
+    "unknown": 0.712962962962963,
+    "wrong_family": 0.05555555555555555,
+    "selective_family_acc": 0.8064516129032258,
+    "selective_exact_acc": 0.47540983606557374,
+    "exact_overall": 0.13425925925925927,
+    "instrument_level_share": 0.2824074074074074
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.30092592592592593,
+    "unknown": 0.6990740740740741,
+    "wrong_family": 0.1111111111111111,
+    "selective_family_acc": 0.6307692307692307,
+    "selective_exact_acc": 0.36923076923076925,
+    "exact_overall": 0.1111111111111111,
+    "instrument_level_share": 0.30092592592592593
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.2175925925925926,
+    "unknown": 0.7824074074074074,
+    "wrong_family": 0.041666666666666664,
+    "selective_family_acc": 0.8085106382978723,
+    "selective_exact_acc": 0.5531914893617021,
+    "exact_overall": 0.12037037037037036,
+    "instrument_level_share": 0.2175925925925926
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.21666666666666667,
+    "unknown": 0.7833333333333333,
+    "wrong_family": 0.1375,
+    "selective_family_acc": 0.36538461538461536,
+    "selective_exact_acc": 0.0,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.20833333333333334
+   }
+  },
+  "short_thresholds": [
+   0.47,
+   0.61
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.5324074074074074,
+   "90%": 0.5412371134020618,
+   "80%": 0.5606936416184971,
+   "70%": 0.5960264900662252,
+   "60%": 0.6461538461538462,
+   "50%": 0.6759259259259259,
+   "30%": 0.7230769230769231
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.0220125786163522,
+   "unknown": 0.9779874213836478,
+   "wrong_family": 0.012578616352201259,
+   "selective_family_acc": 0.42857142857142855,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.012578616352201259
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.0220125786163522,
+   "unknown": 0.9779874213836478,
+   "wrong_family": 0.009433962264150943,
+   "selective_family_acc": 0.5714285714285714,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.012578616352201259
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.12654614652711704,
+    0.12085415720127216,
+    0.12363467348361608
+   ],
+   "window_family_prf": [
+    0.33926805143422356,
+    0.3187732342007435,
+    0.3287014853857211
+   ],
+   "events_detected": "20/70",
+   "onset_err_median": 1.5,
+   "onset_err_p90": 11.900000000000006,
+   "offset_err_median": 0.5,
+   "offset_err_p90": 12.05,
+   "window_instrument_f1_by_count": {
+    "2": 0.11508771929824561,
+    "3": 0.1455604075691412,
+    "4": 0.11170212765957446
+   }
+  },
+  "window_thresholds": [
+   0.05,
+   0.05
+  ]
+ },
+ {
+  "system": "C \u00b7 panns10 + head",
+  "thresholds": [
+   0.77,
+   0.87
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.5841584158415841,
+   "unknown": 0.4158415841584159,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.9152542372881356,
+   "selective_exact_acc": 0.8631178707224335,
+   "exact_overall": 0.37458745874587457,
+   "instrument_level_share": 0.43399339933993397
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.5925925925925926,
+    "unknown": 0.40740740740740744,
+    "wrong_family": 0.08796296296296297,
+    "selective_family_acc": 0.8515625,
+    "selective_exact_acc": 0.7333333333333333,
+    "exact_overall": 0.25462962962962965,
+    "instrument_level_share": 0.3472222222222222
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.6296296296296297,
+    "unknown": 0.37037037037037035,
+    "wrong_family": 0.12037037037037036,
+    "selective_family_acc": 0.8088235294117647,
+    "selective_exact_acc": 0.7777777777777778,
+    "exact_overall": 0.2916666666666667,
+    "instrument_level_share": 0.375
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.5,
+    "unknown": 0.5,
+    "wrong_family": 0.10648148148148148,
+    "selective_family_acc": 0.7870370370370371,
+    "selective_exact_acc": 0.7142857142857143,
+    "exact_overall": 0.23148148148148148,
+    "instrument_level_share": 0.32407407407407407
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.3055555555555556,
+    "selective_family_acc": 0.6944444444444444,
+    "selective_exact_acc": 0.7083333333333334,
+    "exact_overall": 0.3148148148148148,
+    "instrument_level_share": 0.4444444444444444
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.65,
+    "unknown": 0.35,
+    "wrong_family": 0.19583333333333333,
+    "selective_family_acc": 0.6987179487179487,
+    "selective_exact_acc": 0.6886792452830188,
+    "exact_overall": 0.30416666666666664,
+    "instrument_level_share": 0.44166666666666665
+   }
+  },
+  "short_thresholds": [
+   0.98,
+   0.05
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.6805555555555556,
+   "90%": 0.7216494845360825,
+   "80%": 0.7514450867052023,
+   "70%": 0.8079470198675497,
+   "60%": 0.8384615384615385,
+   "50%": 0.8611111111111112,
+   "30%": 0.9076923076923077
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.22327044025157233,
+   "unknown": 0.7767295597484276,
+   "wrong_family": 0.03773584905660377,
+   "selective_family_acc": 0.8309859154929577,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.012578616352201259
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.24528301886792453,
+   "unknown": 0.7547169811320755,
+   "wrong_family": 0.05345911949685535,
+   "selective_family_acc": 0.782051282051282,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.009433962264150943
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 105,
+   "acoustic -> electronic": 6,
+   "acoustic -> imitation": 12,
+   "electronic -> acoustic": 5,
+   "electronic -> electronic": 27,
+   "electronic -> imitation": 1,
+   "imitation -> acoustic": 25,
+   "imitation -> electronic": 4,
+   "imitation -> imitation": 31
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.3275971956660293,
+    0.2335302135393003,
+    0.27267904509283825
+   ],
+   "window_family_prf": [
+    0.4461966604823748,
+    0.44702602230483274,
+    0.44661095636026
+   ],
+   "events_detected": "38/70",
+   "onset_err_median": 0.5,
+   "onset_err_p90": 8.900000000000013,
+   "offset_err_median": 1.0,
+   "offset_err_p90": 9.200000000000017,
+   "window_instrument_f1_by_count": {
+    "2": 0.3408304498269896,
+    "3": 0.1937925813777441,
+    "4": 0.29234338747099764
+   }
+  },
+  "window_thresholds": [
+   0.75,
+   0.7
+  ]
+ },
+ {
+  "system": "C-reg \u00b7 panns10 + head (C=0.02)",
+  "thresholds": [
+   0.25,
+   0.57
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.6039603960396039,
+   "unknown": 0.39603960396039606,
+   "wrong_family": 0.04785478547854786,
+   "selective_family_acc": 0.9207650273224044,
+   "selective_exact_acc": 0.8469750889679716,
+   "exact_overall": 0.3927392739273927,
+   "instrument_level_share": 0.4636963696369637
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.7453703703703703,
+    "unknown": 0.25462962962962965,
+    "wrong_family": 0.17592592592592593,
+    "selective_family_acc": 0.7639751552795031,
+    "selective_exact_acc": 0.5474452554744526,
+    "exact_overall": 0.3472222222222222,
+    "instrument_level_share": 0.6342592592592593
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.75,
+    "unknown": 0.25,
+    "wrong_family": 0.16203703703703703,
+    "selective_family_acc": 0.7839506172839507,
+    "selective_exact_acc": 0.6496350364963503,
+    "exact_overall": 0.41203703703703703,
+    "instrument_level_share": 0.6342592592592593
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.7037037037037037,
+    "unknown": 0.2962962962962963,
+    "wrong_family": 0.16666666666666666,
+    "selective_family_acc": 0.7631578947368421,
+    "selective_exact_acc": 0.6356589147286822,
+    "exact_overall": 0.37962962962962965,
+    "instrument_level_share": 0.5972222222222222
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.3055555555555556,
+    "selective_family_acc": 0.6944444444444444,
+    "selective_exact_acc": 0.4950980392156863,
+    "exact_overall": 0.4675925925925926,
+    "instrument_level_share": 0.9444444444444444
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.7333333333333333,
+    "unknown": 0.2666666666666667,
+    "wrong_family": 0.22083333333333333,
+    "selective_family_acc": 0.6988636363636364,
+    "selective_exact_acc": 0.6326530612244898,
+    "exact_overall": 0.3875,
+    "instrument_level_share": 0.6125
+   }
+  },
+  "short_thresholds": [
+   0.05,
+   0.05
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.6990740740740741,
+   "90%": 0.7422680412371134,
+   "80%": 0.7630057803468208,
+   "70%": 0.7880794701986755,
+   "60%": 0.8384615384615385,
+   "50%": 0.8703703703703703,
+   "30%": 0.8923076923076924
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.2358490566037736,
+   "unknown": 0.7641509433962264,
+   "wrong_family": 0.03459119496855346,
+   "selective_family_acc": 0.8533333333333334,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.015723270440251572
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.2578616352201258,
+   "unknown": 0.7421383647798743,
+   "wrong_family": 0.04716981132075472,
+   "selective_family_acc": 0.8170731707317073,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.012578616352201259
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 107,
+   "acoustic -> electronic": 4,
+   "acoustic -> imitation": 12,
+   "electronic -> acoustic": 3,
+   "electronic -> electronic": 28,
+   "electronic -> imitation": 2,
+   "imitation -> acoustic": 27,
+   "imitation -> electronic": 5,
+   "imitation -> imitation": 28
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.3234946871310508,
+    0.2489777373920945,
+    0.2813863928112965
+   ],
+   "window_family_prf": [
+    0.48050770625566636,
+    0.49256505576208176,
+    0.48646167966957315
+   ],
+   "events_detected": "38/70",
+   "onset_err_median": 0.5,
+   "onset_err_p90": 8.700000000000017,
+   "offset_err_median": 0.75,
+   "offset_err_p90": 9.200000000000017,
+   "window_instrument_f1_by_count": {
+    "2": 0.3266022827041265,
+    "3": 0.2712348322626695,
+    "4": 0.25387453874538746
+   }
+  },
+  "window_thresholds": [
+   0.2,
+   0.25
+  ]
+ },
+ {
+  "system": "C-agree \u00b7 panns10 + head",
+  "thresholds": [
+   0.29,
+   0.71
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.5066006600660066,
+   "unknown": 0.49339933993399343,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.9022801302931596,
+   "selective_exact_acc": 0.833976833976834,
+   "exact_overall": 0.3564356435643564,
+   "instrument_level_share": 0.4273927392739274
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.6157407407407407,
+    "unknown": 0.3842592592592593,
+    "wrong_family": 0.10185185185185185,
+    "selective_family_acc": 0.8345864661654135,
+    "selective_exact_acc": 0.648,
+    "exact_overall": 0.375,
+    "instrument_level_share": 0.5787037037037037
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.5879629629629629,
+    "unknown": 0.4120370370370371,
+    "wrong_family": 0.08796296296296297,
+    "selective_family_acc": 0.8503937007874016,
+    "selective_exact_acc": 0.6747967479674797,
+    "exact_overall": 0.38425925925925924,
+    "instrument_level_share": 0.5694444444444444
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.5787037037037037,
+    "unknown": 0.4212962962962963,
+    "wrong_family": 0.12962962962962962,
+    "selective_family_acc": 0.776,
+    "selective_exact_acc": 0.6324786324786325,
+    "exact_overall": 0.3425925925925926,
+    "instrument_level_share": 0.5416666666666666
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.5833333333333334,
+    "unknown": 0.41666666666666663,
+    "wrong_family": 0.10648148148148148,
+    "selective_family_acc": 0.8174603174603174,
+    "selective_exact_acc": 0.6065573770491803,
+    "exact_overall": 0.3425925925925926,
+    "instrument_level_share": 0.5648148148148148
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.5708333333333333,
+    "unknown": 0.4291666666666667,
+    "wrong_family": 0.1625,
+    "selective_family_acc": 0.7153284671532847,
+    "selective_exact_acc": 0.5546875,
+    "exact_overall": 0.29583333333333334,
+    "instrument_level_share": 0.5333333333333333
+   }
+  },
+  "short_thresholds": [
+   0.05,
+   0.05
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.5370370370370371,
+   "90%": 0.5979381443298969,
+   "80%": 0.6705202312138728,
+   "70%": 0.7483443708609272,
+   "60%": 0.8461538461538461,
+   "50%": 0.8796296296296297,
+   "30%": 0.9076923076923077
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.1761006289308176,
+   "unknown": 0.8238993710691824,
+   "wrong_family": 0.06289308176100629,
+   "selective_family_acc": 0.6428571428571429,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.025157232704402517
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.1792452830188679,
+   "unknown": 0.8207547169811321,
+   "wrong_family": 0.07232704402515723,
+   "selective_family_acc": 0.5964912280701754,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.02830188679245283
+  }
+ },
+ {
+  "system": "A-argmax \u00b7 yamnet",
+  "thresholds": [
+   0,
+   0
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.5297029702970297,
+   "selective_family_acc": 0.47029702970297027,
+   "selective_exact_acc": 0.1188118811881188,
+   "exact_overall": 0.1188118811881188,
+   "instrument_level_share": 1.0
+  },
+  "target_reached_on_dev": null,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5231481481481481,
+    "selective_family_acc": 0.47685185185185186,
+    "selective_exact_acc": 0.25925925925925924,
+    "exact_overall": 0.25925925925925924,
+    "instrument_level_share": 1.0
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.49074074074074076,
+    "selective_family_acc": 0.5092592592592593,
+    "selective_exact_acc": 0.27314814814814814,
+    "exact_overall": 0.27314814814814814,
+    "instrument_level_share": 1.0
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5648148148148148,
+    "selective_family_acc": 0.4351851851851852,
+    "selective_exact_acc": 0.24074074074074073,
+    "exact_overall": 0.24074074074074073,
+    "instrument_level_share": 1.0
+   },
+   "short": {
+    "n": 216,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.5185185185185185,
+    "selective_family_acc": 0.48148148148148145,
+    "selective_exact_acc": 0.25925925925925924,
+    "exact_overall": 0.25925925925925924,
+    "instrument_level_share": 1.0
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 1.0,
+    "unknown": 0.0,
+    "wrong_family": 0.8458333333333333,
+    "selective_family_acc": 0.15416666666666667,
+    "selective_exact_acc": 0.0,
+    "exact_overall": 0.0,
+    "instrument_level_share": 1.0
+   }
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 1.0,
+   "unknown": 0.0,
+   "wrong_family": 0.5974842767295597,
+   "selective_family_acc": 0.4025157232704403,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 1.0
+  },
+  "coverage_curve_test": {
+   "100%": 0.5092592592592593,
+   "90%": 0.5360824742268041,
+   "80%": 0.5664739884393064,
+   "70%": 0.609271523178808,
+   "60%": 0.6615384615384615,
+   "50%": 0.6944444444444444,
+   "30%": 0.8153846153846154
+  }
+ },
+ {
+  "system": "A \u00b7 yamnet",
+  "thresholds": [
+   0.19,
+   0.31
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.21287128712871287,
+   "unknown": 0.7871287128712872,
+   "wrong_family": 0.0462046204620462,
+   "selective_family_acc": 0.7829457364341085,
+   "selective_exact_acc": 0.3008130081300813,
+   "exact_overall": 0.06105610561056106,
+   "instrument_level_share": 0.20297029702970298
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.26851851851851855,
+    "unknown": 0.7314814814814814,
+    "wrong_family": 0.05555555555555555,
+    "selective_family_acc": 0.7931034482758621,
+    "selective_exact_acc": 0.509090909090909,
+    "exact_overall": 0.12962962962962962,
+    "instrument_level_share": 0.25462962962962965
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.3333333333333333,
+    "unknown": 0.6666666666666667,
+    "wrong_family": 0.06018518518518518,
+    "selective_family_acc": 0.8194444444444444,
+    "selective_exact_acc": 0.5384615384615384,
+    "exact_overall": 0.16203703703703703,
+    "instrument_level_share": 0.30092592592592593
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.25,
+    "unknown": 0.75,
+    "wrong_family": 0.06018518518518518,
+    "selective_family_acc": 0.7592592592592593,
+    "selective_exact_acc": 0.5227272727272727,
+    "exact_overall": 0.10648148148148148,
+    "instrument_level_share": 0.2037037037037037
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.18981481481481483,
+    "unknown": 0.8101851851851851,
+    "wrong_family": 0.046296296296296294,
+    "selective_family_acc": 0.7560975609756098,
+    "selective_exact_acc": 0.5151515151515151,
+    "exact_overall": 0.0787037037037037,
+    "instrument_level_share": 0.1527777777777778
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.15416666666666667,
+    "unknown": 0.8458333333333333,
+    "wrong_family": 0.10416666666666667,
+    "selective_family_acc": 0.32432432432432434,
+    "selective_exact_acc": 0.0,
+    "exact_overall": 0.0,
+    "instrument_level_share": 0.14166666666666666
+   }
+  },
+  "short_thresholds": [
+   0.43,
+   0.43
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.5092592592592593,
+   "90%": 0.5360824742268041,
+   "80%": 0.5664739884393064,
+   "70%": 0.609271523178808,
+   "60%": 0.6615384615384615,
+   "50%": 0.6944444444444444,
+   "30%": 0.8153846153846154
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.08490566037735849,
+   "unknown": 0.9150943396226415,
+   "wrong_family": 0.03773584905660377,
+   "selective_family_acc": 0.5555555555555556,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.07232704402515723
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.08176100628930817,
+   "unknown": 0.9182389937106918,
+   "wrong_family": 0.031446540880503145,
+   "selective_family_acc": 0.6153846153846154,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.08176100628930817
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.2875457875457875,
+    0.07133121308496138,
+    0.11430651619949034
+   ],
+   "window_family_prf": [
+    0.325497287522604,
+    0.16728624535315986,
+    0.22099447513812157
+   ],
+   "events_detected": "13/70",
+   "onset_err_median": 2.0,
+   "onset_err_p90": 11.9,
+   "offset_err_median": 0.5,
+   "offset_err_p90": 11.200000000000003,
+   "window_instrument_f1_by_count": {
+    "2": 0.14921780986762936,
+    "3": 0.13217768147345613,
+    "4": 0.06847935548841894
+   }
+  },
+  "window_thresholds": [
+   0.05,
+   0.05
+  ]
+ },
+ {
+  "system": "C \u00b7 yamnet + head",
+  "thresholds": [
+   0.71,
+   0.87
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.5577557755775577,
+   "unknown": 0.44224422442244227,
+   "wrong_family": 0.04785478547854786,
+   "selective_family_acc": 0.9142011834319527,
+   "selective_exact_acc": 0.8340248962655602,
+   "exact_overall": 0.3316831683168317,
+   "instrument_level_share": 0.3976897689768977
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.5462962962962963,
+    "unknown": 0.4537037037037037,
+    "wrong_family": 0.1111111111111111,
+    "selective_family_acc": 0.7966101694915254,
+    "selective_exact_acc": 0.6533333333333333,
+    "exact_overall": 0.22685185185185186,
+    "instrument_level_share": 0.3472222222222222
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.6111111111111112,
+    "unknown": 0.38888888888888884,
+    "wrong_family": 0.10648148148148148,
+    "selective_family_acc": 0.8257575757575758,
+    "selective_exact_acc": 0.7432432432432432,
+    "exact_overall": 0.25462962962962965,
+    "instrument_level_share": 0.3425925925925926
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.49074074074074076,
+    "unknown": 0.5092592592592593,
+    "wrong_family": 0.08796296296296297,
+    "selective_family_acc": 0.8207547169811321,
+    "selective_exact_acc": 0.7272727272727273,
+    "exact_overall": 0.2222222222222222,
+    "instrument_level_share": 0.3055555555555556
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.5555555555555556,
+    "unknown": 0.4444444444444444,
+    "wrong_family": 0.18518518518518517,
+    "selective_family_acc": 0.6666666666666666,
+    "selective_exact_acc": 0.5915492957746479,
+    "exact_overall": 0.19444444444444445,
+    "instrument_level_share": 0.3287037037037037
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.6333333333333333,
+    "unknown": 0.3666666666666667,
+    "wrong_family": 0.2125,
+    "selective_family_acc": 0.6644736842105263,
+    "selective_exact_acc": 0.6194690265486725,
+    "exact_overall": 0.2916666666666667,
+    "instrument_level_share": 0.4708333333333333
+   }
+  },
+  "short_thresholds": [
+   0.995,
+   0.99
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.7453703703703703,
+   "90%": 0.7938144329896907,
+   "80%": 0.8092485549132948,
+   "70%": 0.8410596026490066,
+   "60%": 0.8538461538461538,
+   "50%": 0.8703703703703703,
+   "30%": 0.8923076923076924
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.24528301886792453,
+   "unknown": 0.7547169811320755,
+   "wrong_family": 0.0440251572327044,
+   "selective_family_acc": 0.8205128205128205,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0220125786163522
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.24213836477987422,
+   "unknown": 0.7578616352201257,
+   "wrong_family": 0.025157232704402517,
+   "selective_family_acc": 0.8961038961038961,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.012578616352201259
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 112,
+   "acoustic -> electronic": 2,
+   "acoustic -> imitation": 9,
+   "electronic -> acoustic": 7,
+   "electronic -> electronic": 23,
+   "electronic -> imitation": 3,
+   "imitation -> acoustic": 25,
+   "imitation -> electronic": 1,
+   "imitation -> imitation": 34
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.31203931203931207,
+    0.17310313493866425,
+    0.22267679719462305
+   ],
+   "window_family_prf": [
+    0.43322341302555645,
+    0.48838289962825276,
+    0.45915246832678025
+   ],
+   "events_detected": "39/70",
+   "onset_err_median": 1.0,
+   "onset_err_p90": 12.200000000000003,
+   "offset_err_median": 1.0,
+   "offset_err_p90": 8.900000000000013,
+   "window_instrument_f1_by_count": {
+    "2": 0.2302439024390244,
+    "3": 0.22632020117351215,
+    "4": 0.21262458471760798
+   }
+  },
+  "window_thresholds": [
+   0.95,
+   0.75
+  ]
+ },
+ {
+  "system": "C-reg \u00b7 yamnet + head (C=0.02)",
+  "thresholds": [
+   0.27,
+   0.59
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.5495049504950495,
+   "unknown": 0.45049504950495045,
+   "wrong_family": 0.04785478547854786,
+   "selective_family_acc": 0.9129129129129129,
+   "selective_exact_acc": 0.8207171314741036,
+   "exact_overall": 0.33993399339933994,
+   "instrument_level_share": 0.4141914191419142
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.5879629629629629,
+    "unknown": 0.4120370370370371,
+    "wrong_family": 0.125,
+    "selective_family_acc": 0.7874015748031497,
+    "selective_exact_acc": 0.6086956521739131,
+    "exact_overall": 0.25925925925925924,
+    "instrument_level_share": 0.42592592592592593
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.5972222222222222,
+    "unknown": 0.4027777777777778,
+    "wrong_family": 0.10648148148148148,
+    "selective_family_acc": 0.8217054263565892,
+    "selective_exact_acc": 0.648936170212766,
+    "exact_overall": 0.2824074074074074,
+    "instrument_level_share": 0.4351851851851852
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.5046296296296297,
+    "unknown": 0.49537037037037035,
+    "wrong_family": 0.11574074074074074,
+    "selective_family_acc": 0.7706422018348624,
+    "selective_exact_acc": 0.631578947368421,
+    "exact_overall": 0.2222222222222222,
+    "instrument_level_share": 0.35185185185185186
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.7870370370370371,
+    "unknown": 0.2129629629629629,
+    "wrong_family": 0.22685185185185186,
+    "selective_family_acc": 0.711764705882353,
+    "selective_exact_acc": 0.6226415094339622,
+    "exact_overall": 0.3055555555555556,
+    "instrument_level_share": 0.49074074074074076
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.4583333333333333,
+    "unknown": 0.5416666666666667,
+    "wrong_family": 0.2,
+    "selective_family_acc": 0.5636363636363636,
+    "selective_exact_acc": 0.4714285714285714,
+    "exact_overall": 0.1375,
+    "instrument_level_share": 0.2916666666666667
+   }
+  },
+  "short_thresholds": [
+   0.27,
+   0.49
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.7268518518518519,
+   "90%": 0.7731958762886598,
+   "80%": 0.7976878612716763,
+   "70%": 0.8145695364238411,
+   "60%": 0.8384615384615385,
+   "50%": 0.8333333333333334,
+   "30%": 0.9076923076923077
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.24842767295597484,
+   "unknown": 0.7515723270440251,
+   "wrong_family": 0.050314465408805034,
+   "selective_family_acc": 0.7974683544303798,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.040880503144654086
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.24528301886792453,
+   "unknown": 0.7547169811320755,
+   "wrong_family": 0.040880503144654086,
+   "selective_family_acc": 0.8333333333333334,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.0220125786163522
+  },
+  "source_confusion_test": {
+   "acoustic -> acoustic": 110,
+   "acoustic -> electronic": 1,
+   "acoustic -> imitation": 12,
+   "electronic -> acoustic": 7,
+   "electronic -> electronic": 21,
+   "electronic -> imitation": 5,
+   "imitation -> acoustic": 26,
+   "imitation -> electronic": 2,
+   "imitation -> imitation": 32
+  },
+  "layered_test": {
+   "window_instrument_prf": [
+    0.31385423506237686,
+    0.21717401181281235,
+    0.2567132116004296
+   ],
+   "window_family_prf": [
+    0.49906015037593987,
+    0.49349442379182157,
+    0.49626168224299066
+   ],
+   "events_detected": "39/70",
+   "onset_err_median": 1.0,
+   "onset_err_p90": 5.200000000000003,
+   "offset_err_median": 1.0,
+   "offset_err_p90": 12.100000000000001,
+   "window_instrument_f1_by_count": {
+    "2": 0.2828828828828829,
+    "3": 0.24442736356648737,
+    "4": 0.24676313785224674
+   }
+  },
+  "window_thresholds": [
+   0.25,
+   0.3
+  ]
+ },
+ {
+  "system": "C-agree \u00b7 yamnet + head",
+  "thresholds": [
+   0.15,
+   0.81
+  ],
+  "dev": {
+   "n": 606,
+   "coverage": 0.4768976897689769,
+   "unknown": 0.523102310231023,
+   "wrong_family": 0.04950495049504951,
+   "selective_family_acc": 0.8961937716262975,
+   "selective_exact_acc": 0.7340823970037453,
+   "exact_overall": 0.3234323432343234,
+   "instrument_level_share": 0.4405940594059406
+  },
+  "target_reached_on_dev": true,
+  "test": {
+   "original": {
+    "n": 216,
+    "coverage": 0.6527777777777778,
+    "unknown": 0.3472222222222222,
+    "wrong_family": 0.0787037037037037,
+    "selective_family_acc": 0.8794326241134752,
+    "selective_exact_acc": 0.6762589928057554,
+    "exact_overall": 0.4351851851851852,
+    "instrument_level_share": 0.6435185185185185
+   },
+   "reverb": {
+    "n": 216,
+    "coverage": 0.6435185185185185,
+    "unknown": 0.3564814814814815,
+    "wrong_family": 0.08796296296296297,
+    "selective_family_acc": 0.8633093525179856,
+    "selective_exact_acc": 0.6666666666666666,
+    "exact_overall": 0.42592592592592593,
+    "instrument_level_share": 0.6388888888888888
+   },
+   "compressed": {
+    "n": 216,
+    "coverage": 0.6203703703703703,
+    "unknown": 0.37962962962962965,
+    "wrong_family": 0.12962962962962962,
+    "selective_family_acc": 0.7910447761194029,
+    "selective_exact_acc": 0.5970149253731343,
+    "exact_overall": 0.37037037037037035,
+    "instrument_level_share": 0.6203703703703703
+   },
+   "short": {
+    "n": 216,
+    "coverage": 0.5787037037037037,
+    "unknown": 0.4212962962962963,
+    "wrong_family": 0.10185185185185185,
+    "selective_family_acc": 0.824,
+    "selective_exact_acc": 0.6565656565656566,
+    "exact_overall": 0.30092592592592593,
+    "instrument_level_share": 0.4583333333333333
+   },
+   "imitation": {
+    "n": 240,
+    "coverage": 0.6333333333333333,
+    "unknown": 0.3666666666666667,
+    "wrong_family": 0.16666666666666666,
+    "selective_family_acc": 0.7368421052631579,
+    "selective_exact_acc": 0.5369127516778524,
+    "exact_overall": 0.3333333333333333,
+    "instrument_level_share": 0.6208333333333333
+   }
+  },
+  "short_thresholds": [
+   0.71,
+   0.73
+  ],
+  "short_target_reached_on_dev": true,
+  "coverage_curve_test": {
+   "100%": 0.5787037037037037,
+   "90%": 0.6443298969072165,
+   "80%": 0.7225433526011561,
+   "70%": 0.8211920529801324,
+   "60%": 0.8923076923076924,
+   "50%": 0.9166666666666666,
+   "30%": 0.9384615384615385
+  },
+  "test_nsynth": {
+   "n": 318,
+   "coverage": 0.2358490566037736,
+   "unknown": 0.7641509433962264,
+   "wrong_family": 0.08176100628930817,
+   "selective_family_acc": 0.6533333333333333,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.1918238993710692
+  },
+  "dev_nsynth_only": {
+   "n": 318,
+   "coverage": 0.17295597484276728,
+   "unknown": 0.8270440251572327,
+   "wrong_family": 0.06289308176100629,
+   "selective_family_acc": 0.6363636363636364,
+   "selective_exact_acc": 0.0,
+   "exact_overall": 0.0,
+   "instrument_level_share": 0.10377358490566038
+  }
+ }
+]

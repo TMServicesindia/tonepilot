@@ -1,0 +1,2396 @@
+{
+ "reports": [
+  {
+   "system": "A \u00b7 clap",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 216,
+     "wrong_family": 0,
+     "source": 60
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 156,
+     "wrong_family": 0,
+     "source": 0
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 216,
+     "wrong_family": 0,
+     "source": 60
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 156,
+     "wrong_family": 0,
+     "source": 0
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 216,
+     "wrong_family": 0,
+     "source": 60
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 156,
+     "wrong_family": 0,
+     "source": 0
+    },
+    "short": {
+     "n": 216,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 216,
+     "wrong_family": 0,
+     "source": 60
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 156,
+     "wrong_family": 0,
+     "source": 0
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 60,
+     "wrong_family": 0,
+     "source": 60
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 60,
+     "wrong_family": 0,
+     "source": 60
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 60,
+     "wrong_family": 0,
+     "source": 60
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 60,
+     "wrong_family": 0,
+     "source": 60
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Bells": {
+     "n": 27,
+     "family": 0,
+     "exact": 0
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Strings": {
+     "n": 30,
+     "family": 0,
+     "exact": 0
+    },
+    "Bass": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 0,
+     "exact": 0
+    },
+    "Other": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 0,
+     "exact": 0
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 0,
+     "exact": 0
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    }
+   },
+   "family_confusion": {
+    "Bass -> unknown": 3,
+    "Bells -> unknown": 27,
+    "Electronic -> unknown": 27,
+    "Indian plucked -> unknown": 15,
+    "Indian winds -> unknown": 24,
+    "Keys -> unknown": 21,
+    "Other -> unknown": 21,
+    "Other percussion -> unknown": 3,
+    "Other plucked -> unknown": 21,
+    "Other winds -> unknown": 9,
+    "Strings -> unknown": 30,
+    "Western winds -> unknown": 15
+   },
+   "layered_window_instrument_prf": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "layered_window_family_prf": [
+    0.20864197530864198,
+    0.8767833981841764,
+    0.33707304911493396
+   ],
+   "layered_track_instrument_prf": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "timing_error_s": null,
+   "timing_events_found": 0,
+   "thresholds": [
+    0.05,
+    0.15,
+    0.05,
+    0.05
+   ],
+   "imitation_source_possible": true
+  },
+  {
+   "system": "C \u00b7 clap + head",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 33,
+     "answered_exact": 175,
+     "family": 53,
+     "unknown": 35,
+     "wrong_family": 128,
+     "source": 129
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 21,
+     "answered_exact": 125,
+     "family": 36,
+     "unknown": 25,
+     "wrong_family": 95,
+     "source": 103
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 52,
+     "answered_exact": 174,
+     "family": 79,
+     "unknown": 18,
+     "wrong_family": 119,
+     "source": 131
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 41,
+     "answered_exact": 126,
+     "family": 61,
+     "unknown": 14,
+     "wrong_family": 81,
+     "source": 110
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 50,
+     "answered_exact": 162,
+     "family": 73,
+     "unknown": 24,
+     "wrong_family": 119,
+     "source": 133
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 37,
+     "answered_exact": 114,
+     "family": 55,
+     "unknown": 18,
+     "wrong_family": 83,
+     "source": 109
+    },
+    "short": {
+     "n": 216,
+     "exact": 29,
+     "answered_exact": 142,
+     "family": 52,
+     "unknown": 67,
+     "wrong_family": 97,
+     "source": 123
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 18,
+     "answered_exact": 106,
+     "family": 38,
+     "unknown": 46,
+     "wrong_family": 72,
+     "source": 110
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 12,
+     "answered_exact": 50,
+     "family": 17,
+     "unknown": 10,
+     "wrong_family": 33,
+     "source": 26
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 11,
+     "answered_exact": 48,
+     "family": 18,
+     "unknown": 4,
+     "wrong_family": 38,
+     "source": 21
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 13,
+     "answered_exact": 48,
+     "family": 18,
+     "unknown": 6,
+     "wrong_family": 36,
+     "source": 24
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 11,
+     "answered_exact": 36,
+     "family": 14,
+     "unknown": 21,
+     "wrong_family": 25,
+     "source": 13
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 1,
+     "exact": 0
+    },
+    "Bells": {
+     "n": 27,
+     "family": 22,
+     "exact": 9
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Strings": {
+     "n": 30,
+     "family": 3,
+     "exact": 3
+    },
+    "Bass": {
+     "n": 3,
+     "family": 2,
+     "exact": 2
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 4,
+     "exact": 4
+    },
+    "Other": {
+     "n": 21,
+     "family": 1,
+     "exact": 0
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 2,
+     "exact": 2
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 2,
+     "exact": 2
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 4,
+     "exact": 3
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 9,
+     "exact": 5
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 3,
+     "exact": 3
+    }
+   },
+   "family_confusion": {
+    "Bass -> Bass": 2,
+    "Bass -> unknown": 1,
+    "Bells -> Bells": 22,
+    "Bells -> Indian plucked": 3,
+    "Bells -> Keys": 1,
+    "Bells -> Western winds": 1,
+    "Electronic -> Bells": 5,
+    "Electronic -> Electronic": 4,
+    "Electronic -> Indian plucked": 9,
+    "Electronic -> Indian winds": 1,
+    "Electronic -> Keys": 1,
+    "Electronic -> Other plucked": 2,
+    "Electronic -> Other winds": 3,
+    "Electronic -> Strings": 1,
+    "Electronic -> unknown": 1,
+    "Indian plucked -> Bells": 8,
+    "Indian plucked -> Indian plucked": 4,
+    "Indian plucked -> unknown": 3,
+    "Indian winds -> Bells": 1,
+    "Indian winds -> Indian plucked": 2,
+    "Indian winds -> Indian winds": 9,
+    "Indian winds -> Keys": 1,
+    "Indian winds -> Other": 6,
+    "Indian winds -> Other winds": 2,
+    "Indian winds -> Strings": 1,
+    "Indian winds -> unknown": 2,
+    "Keys -> Bells": 8,
+    "Keys -> Indian plucked": 2,
+    "Keys -> Indian winds": 2,
+    "Keys -> Keys": 1,
+    "Keys -> Other plucked": 1,
+    "Keys -> unknown": 7,
+    "Other -> Bells": 4,
+    "Other -> Indian plucked": 4,
+    "Other -> Indian winds": 6,
+    "Other -> Other": 1,
+    "Other -> unknown": 6,
+    "Other percussion -> Other percussion": 3,
+    "Other plucked -> Bells": 13,
+    "Other plucked -> Indian plucked": 2,
+    "Other plucked -> Keys": 4,
+    "Other plucked -> Strings": 1,
+    "Other plucked -> unknown": 1,
+    "Other winds -> Bells": 2,
+    "Other winds -> Indian plucked": 1,
+    "Other winds -> Other winds": 2,
+    "Other winds -> Strings": 1,
+    "Other winds -> unknown": 3,
+    "Strings -> Bass": 1,
+    "Strings -> Bells": 7,
+    "Strings -> Electronic": 3,
+    "Strings -> Indian plucked": 5,
+    "Strings -> Keys": 1,
+    "Strings -> Other winds": 2,
+    "Strings -> Strings": 3,
+    "Strings -> unknown": 8,
+    "Western winds -> Bells": 7,
+    "Western winds -> Indian plucked": 3,
+    "Western winds -> Western winds": 2,
+    "Western winds -> unknown": 3
+   },
+   "layered_window_instrument_prf": [
+    0.11407407407407408,
+    0.09759188846641319,
+    0.1051912568306011
+   ],
+   "layered_window_family_prf": [
+    0.25824175824175827,
+    0.1828793774319066,
+    0.214123006833713
+   ],
+   "layered_track_instrument_prf": [
+    0.13953488372093023,
+    0.17142857142857143,
+    0.15384615384615385
+   ],
+   "timing_error_s": 4.0,
+   "timing_events_found": 15,
+   "thresholds": [
+    0.55,
+    0.65,
+    0.8,
+    0.7
+   ],
+   "imitation_source_possible": true
+  },
+  {
+   "system": "A \u00b7 efficientat",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 3,
+     "answered_exact": 216,
+     "family": 21,
+     "unknown": 0,
+     "wrong_family": 195,
+     "source": 123
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 3,
+     "answered_exact": 156,
+     "family": 18,
+     "unknown": 0,
+     "wrong_family": 138,
+     "source": 123
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 3,
+     "answered_exact": 216,
+     "family": 21,
+     "unknown": 0,
+     "wrong_family": 195,
+     "source": 123
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 3,
+     "answered_exact": 156,
+     "family": 18,
+     "unknown": 0,
+     "wrong_family": 138,
+     "source": 123
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 3,
+     "answered_exact": 216,
+     "family": 21,
+     "unknown": 0,
+     "wrong_family": 195,
+     "source": 123
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 3,
+     "answered_exact": 156,
+     "family": 18,
+     "unknown": 0,
+     "wrong_family": 138,
+     "source": 123
+    },
+    "short": {
+     "n": 216,
+     "exact": 3,
+     "answered_exact": 216,
+     "family": 21,
+     "unknown": 0,
+     "wrong_family": 195,
+     "source": 123
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 3,
+     "answered_exact": 156,
+     "family": 18,
+     "unknown": 0,
+     "wrong_family": 138,
+     "source": 123
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 60,
+     "family": 3,
+     "unknown": 0,
+     "wrong_family": 57,
+     "source": 0
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 60,
+     "family": 3,
+     "unknown": 0,
+     "wrong_family": 57,
+     "source": 0
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 60,
+     "family": 3,
+     "unknown": 0,
+     "wrong_family": 57,
+     "source": 0
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 60,
+     "family": 3,
+     "unknown": 0,
+     "wrong_family": 57,
+     "source": 0
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 21,
+     "exact": 3
+    },
+    "Bells": {
+     "n": 27,
+     "family": 0,
+     "exact": 0
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Strings": {
+     "n": 30,
+     "family": 0,
+     "exact": 0
+    },
+    "Bass": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 0,
+     "exact": 0
+    },
+    "Other": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 0,
+     "exact": 0
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 0,
+     "exact": 0
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    }
+   },
+   "family_confusion": {
+    "Bass -> Keys": 3,
+    "Bells -> Keys": 27,
+    "Electronic -> Keys": 27,
+    "Indian plucked -> Keys": 15,
+    "Indian winds -> Keys": 24,
+    "Keys -> Keys": 21,
+    "Other -> Keys": 21,
+    "Other percussion -> Keys": 3,
+    "Other plucked -> Keys": 21,
+    "Other winds -> Keys": 9,
+    "Strings -> Keys": 30,
+    "Western winds -> Keys": 15
+   },
+   "layered_window_instrument_prf": [
+    0.03641084093211753,
+    0.522489777373921,
+    0.0680775492082285
+   ],
+   "layered_window_family_prf": [
+    0.15103159252095422,
+    0.870817843866171,
+    0.25741758241758245
+   ],
+   "layered_track_instrument_prf": [
+    0.049107142857142856,
+    0.4714285714285714,
+    0.0889487870619946
+   ],
+   "timing_error_s": 1.5,
+   "timing_events_found": 33,
+   "thresholds": [
+    0.05,
+    0.05,
+    0.05,
+    0.05
+   ],
+   "imitation_source_possible": false
+  },
+  {
+   "system": "C \u00b7 efficientat + head",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 127,
+     "answered_exact": 216,
+     "family": 163,
+     "unknown": 0,
+     "wrong_family": 53,
+     "source": 174
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 94,
+     "answered_exact": 156,
+     "family": 122,
+     "unknown": 0,
+     "wrong_family": 34,
+     "source": 139
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 137,
+     "answered_exact": 216,
+     "family": 165,
+     "unknown": 0,
+     "wrong_family": 51,
+     "source": 173
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 101,
+     "answered_exact": 156,
+     "family": 121,
+     "unknown": 0,
+     "wrong_family": 35,
+     "source": 138
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 120,
+     "answered_exact": 213,
+     "family": 155,
+     "unknown": 0,
+     "wrong_family": 61,
+     "source": 175
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 85,
+     "answered_exact": 153,
+     "family": 111,
+     "unknown": 0,
+     "wrong_family": 45,
+     "source": 139
+    },
+    "short": {
+     "n": 216,
+     "exact": 110,
+     "answered_exact": 205,
+     "family": 148,
+     "unknown": 3,
+     "wrong_family": 65,
+     "source": 164
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 78,
+     "answered_exact": 148,
+     "family": 110,
+     "unknown": 2,
+     "wrong_family": 44,
+     "source": 127
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 33,
+     "answered_exact": 60,
+     "family": 41,
+     "unknown": 0,
+     "wrong_family": 19,
+     "source": 35
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 36,
+     "answered_exact": 60,
+     "family": 44,
+     "unknown": 0,
+     "wrong_family": 16,
+     "source": 35
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 35,
+     "answered_exact": 60,
+     "family": 44,
+     "unknown": 0,
+     "wrong_family": 16,
+     "source": 36
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 32,
+     "answered_exact": 57,
+     "family": 38,
+     "unknown": 1,
+     "wrong_family": 21,
+     "source": 37
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 17,
+     "exact": 11
+    },
+    "Bells": {
+     "n": 27,
+     "family": 22,
+     "exact": 18
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 19,
+     "exact": 12
+    },
+    "Strings": {
+     "n": 30,
+     "family": 28,
+     "exact": 25
+    },
+    "Bass": {
+     "n": 3,
+     "family": 2,
+     "exact": 2
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 21,
+     "exact": 15
+    },
+    "Other": {
+     "n": 21,
+     "family": 14,
+     "exact": 11
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 9,
+     "exact": 8
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 10,
+     "exact": 9
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 18,
+     "exact": 13
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 3,
+     "exact": 3
+    }
+   },
+   "family_confusion": {
+    "Bass -> Bass": 2,
+    "Bass -> Strings": 1,
+    "Bells -> Bells": 22,
+    "Bells -> Other plucked": 5,
+    "Electronic -> Electronic": 21,
+    "Electronic -> Indian plucked": 1,
+    "Electronic -> Indian winds": 1,
+    "Electronic -> Strings": 4,
+    "Indian plucked -> Indian plucked": 10,
+    "Indian plucked -> Other plucked": 5,
+    "Indian winds -> Electronic": 1,
+    "Indian winds -> Indian winds": 18,
+    "Indian winds -> Western winds": 5,
+    "Keys -> Keys": 17,
+    "Keys -> Other plucked": 1,
+    "Keys -> Other winds": 3,
+    "Other -> Electronic": 1,
+    "Other -> Keys": 6,
+    "Other -> Other": 14,
+    "Other percussion -> Other percussion": 3,
+    "Other plucked -> Other": 1,
+    "Other plucked -> Other plucked": 19,
+    "Other plucked -> Western winds": 1,
+    "Other winds -> Electronic": 3,
+    "Other winds -> Keys": 1,
+    "Other winds -> Strings": 3,
+    "Other winds -> Western winds": 2,
+    "Strings -> Bells": 2,
+    "Strings -> Strings": 28,
+    "Western winds -> Bells": 1,
+    "Western winds -> Electronic": 1,
+    "Western winds -> Indian winds": 1,
+    "Western winds -> Other": 1,
+    "Western winds -> Other winds": 2,
+    "Western winds -> Western winds": 9
+   },
+   "layered_window_instrument_prf": [
+    0.4573170731707317,
+    0.2044525215810995,
+    0.282574568288854
+   ],
+   "layered_window_family_prf": [
+    0.5897577092511013,
+    0.49767657992565056,
+    0.5398185483870968
+   ],
+   "layered_track_instrument_prf": [
+    0.38461538461538464,
+    0.5,
+    0.4347826086956522
+   ],
+   "timing_error_s": 3.25,
+   "timing_events_found": 42,
+   "thresholds": [
+    0.05,
+    0.05,
+    0.85,
+    0.7
+   ],
+   "imitation_source_possible": true
+  },
+  {
+   "system": "A \u00b7 panns",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 7,
+     "answered_exact": 11,
+     "family": 11,
+     "unknown": 205,
+     "wrong_family": 0,
+     "source": 130
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 7,
+     "answered_exact": 7,
+     "family": 7,
+     "unknown": 149,
+     "wrong_family": 0,
+     "source": 130
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 11,
+     "answered_exact": 21,
+     "family": 15,
+     "unknown": 195,
+     "wrong_family": 6,
+     "source": 130
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 11,
+     "answered_exact": 14,
+     "family": 11,
+     "unknown": 142,
+     "wrong_family": 3,
+     "source": 130
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 8,
+     "answered_exact": 13,
+     "family": 12,
+     "unknown": 203,
+     "wrong_family": 1,
+     "source": 121
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 8,
+     "answered_exact": 11,
+     "family": 10,
+     "unknown": 145,
+     "wrong_family": 1,
+     "source": 121
+    },
+    "short": {
+     "n": 216,
+     "exact": 22,
+     "answered_exact": 49,
+     "family": 37,
+     "unknown": 163,
+     "wrong_family": 16,
+     "source": 126
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 22,
+     "answered_exact": 39,
+     "family": 30,
+     "unknown": 116,
+     "wrong_family": 10,
+     "source": 126
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 4,
+     "family": 4,
+     "unknown": 56,
+     "wrong_family": 0,
+     "source": 0
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 7,
+     "family": 4,
+     "unknown": 53,
+     "wrong_family": 3,
+     "source": 0
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 2,
+     "family": 2,
+     "unknown": 58,
+     "wrong_family": 0,
+     "source": 0
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 10,
+     "family": 7,
+     "unknown": 47,
+     "wrong_family": 6,
+     "source": 0
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Bells": {
+     "n": 27,
+     "family": 0,
+     "exact": 0
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Strings": {
+     "n": 30,
+     "family": 9,
+     "exact": 6
+    },
+    "Bass": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 0,
+     "exact": 0
+    },
+    "Other": {
+     "n": 21,
+     "family": 1,
+     "exact": 0
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 1,
+     "exact": 1
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 0,
+     "exact": 0
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    }
+   },
+   "family_confusion": {
+    "Bass -> unknown": 3,
+    "Bells -> unknown": 27,
+    "Electronic -> unknown": 27,
+    "Indian plucked -> unknown": 15,
+    "Indian winds -> unknown": 24,
+    "Keys -> unknown": 21,
+    "Other -> Other": 1,
+    "Other -> unknown": 20,
+    "Other percussion -> unknown": 3,
+    "Other plucked -> unknown": 21,
+    "Other winds -> unknown": 9,
+    "Strings -> Strings": 9,
+    "Strings -> unknown": 21,
+    "Western winds -> Western winds": 1,
+    "Western winds -> unknown": 14
+   },
+   "layered_window_instrument_prf": [
+    0.1663674446439258,
+    0.1263062244434348,
+    0.14359504132231407
+   ],
+   "layered_window_family_prf": [
+    0.3633744855967078,
+    0.4103159851301115,
+    0.385421213443911
+   ],
+   "layered_track_instrument_prf": [
+    0.19090909090909092,
+    0.3,
+    0.23333333333333334
+   ],
+   "timing_error_s": 5.0,
+   "timing_events_found": 21,
+   "thresholds": [
+    0.7,
+    0.85,
+    0.1,
+    0.05
+   ],
+   "imitation_source_possible": false
+  },
+  {
+   "system": "C \u00b7 panns + head",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 117,
+     "answered_exact": 216,
+     "family": 152,
+     "unknown": 0,
+     "wrong_family": 64,
+     "source": 170
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 82,
+     "answered_exact": 156,
+     "family": 109,
+     "unknown": 0,
+     "wrong_family": 47,
+     "source": 130
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 120,
+     "answered_exact": 216,
+     "family": 153,
+     "unknown": 0,
+     "wrong_family": 63,
+     "source": 167
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 85,
+     "answered_exact": 156,
+     "family": 109,
+     "unknown": 0,
+     "wrong_family": 47,
+     "source": 127
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 116,
+     "answered_exact": 216,
+     "family": 149,
+     "unknown": 0,
+     "wrong_family": 67,
+     "source": 154
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 73,
+     "answered_exact": 156,
+     "family": 103,
+     "unknown": 0,
+     "wrong_family": 53,
+     "source": 117
+    },
+    "short": {
+     "n": 216,
+     "exact": 106,
+     "answered_exact": 215,
+     "family": 148,
+     "unknown": 0,
+     "wrong_family": 68,
+     "source": 156
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 72,
+     "answered_exact": 155,
+     "family": 108,
+     "unknown": 0,
+     "wrong_family": 48,
+     "source": 116
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 35,
+     "answered_exact": 60,
+     "family": 43,
+     "unknown": 0,
+     "wrong_family": 17,
+     "source": 40
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 35,
+     "answered_exact": 60,
+     "family": 44,
+     "unknown": 0,
+     "wrong_family": 16,
+     "source": 40
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 43,
+     "answered_exact": 60,
+     "family": 46,
+     "unknown": 0,
+     "wrong_family": 14,
+     "source": 37
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 34,
+     "answered_exact": 60,
+     "family": 40,
+     "unknown": 0,
+     "wrong_family": 20,
+     "source": 40
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 12,
+     "exact": 10
+    },
+    "Bells": {
+     "n": 27,
+     "family": 22,
+     "exact": 15
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 8,
+     "exact": 5
+    },
+    "Strings": {
+     "n": 30,
+     "family": 25,
+     "exact": 21
+    },
+    "Bass": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 24,
+     "exact": 16
+    },
+    "Other": {
+     "n": 21,
+     "family": 17,
+     "exact": 12
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 8,
+     "exact": 8
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 3,
+     "exact": 3
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 13,
+     "exact": 10
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 17,
+     "exact": 14
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 3,
+     "exact": 3
+    }
+   },
+   "family_confusion": {
+    "Bass -> Keys": 2,
+    "Bass -> Strings": 1,
+    "Bells -> Bells": 22,
+    "Bells -> Keys": 1,
+    "Bells -> Other plucked": 3,
+    "Bells -> Strings": 1,
+    "Electronic -> Electronic": 24,
+    "Electronic -> Indian winds": 1,
+    "Electronic -> Other": 2,
+    "Indian plucked -> Indian plucked": 13,
+    "Indian plucked -> Strings": 2,
+    "Indian winds -> Indian winds": 17,
+    "Indian winds -> Other winds": 2,
+    "Indian winds -> Strings": 1,
+    "Indian winds -> Western winds": 4,
+    "Keys -> Bells": 4,
+    "Keys -> Indian plucked": 1,
+    "Keys -> Indian winds": 1,
+    "Keys -> Keys": 12,
+    "Keys -> Other plucked": 1,
+    "Keys -> Western winds": 2,
+    "Other -> Electronic": 2,
+    "Other -> Indian winds": 1,
+    "Other -> Other": 17,
+    "Other -> Strings": 1,
+    "Other percussion -> Other percussion": 3,
+    "Other plucked -> Bells": 5,
+    "Other plucked -> Indian plucked": 1,
+    "Other plucked -> Indian winds": 2,
+    "Other plucked -> Keys": 5,
+    "Other plucked -> Other plucked": 8,
+    "Other winds -> Indian winds": 1,
+    "Other winds -> Other winds": 3,
+    "Other winds -> Western winds": 5,
+    "Strings -> Bells": 3,
+    "Strings -> Electronic": 2,
+    "Strings -> Strings": 25,
+    "Western winds -> Bells": 1,
+    "Western winds -> Indian winds": 1,
+    "Western winds -> Keys": 2,
+    "Western winds -> Other winds": 3,
+    "Western winds -> Western winds": 8
+   },
+   "layered_window_instrument_prf": [
+    0.3387815750371471,
+    0.20717855520218081,
+    0.2571186918522695
+   ],
+   "layered_window_family_prf": [
+    0.5424721734036321,
+    0.43029739776951675,
+    0.4799170769629438
+   ],
+   "layered_track_instrument_prf": [
+    0.31496062992125984,
+    0.5714285714285714,
+    0.40609137055837563
+   ],
+   "timing_error_s": 8.0,
+   "timing_events_found": 48,
+   "thresholds": [
+    0.05,
+    0.05,
+    0.85,
+    0.7
+   ],
+   "imitation_source_possible": true
+  },
+  {
+   "system": "A \u00b7 panns10",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 2,
+     "answered_exact": 3,
+     "family": 22,
+     "unknown": 192,
+     "wrong_family": 2,
+     "source": 144
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 2,
+     "answered_exact": 2,
+     "family": 20,
+     "unknown": 134,
+     "wrong_family": 2,
+     "source": 144
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 6,
+     "answered_exact": 9,
+     "family": 32,
+     "unknown": 184,
+     "wrong_family": 0,
+     "source": 138
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 6,
+     "answered_exact": 7,
+     "family": 30,
+     "unknown": 126,
+     "wrong_family": 0,
+     "source": 138
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 2,
+     "answered_exact": 3,
+     "family": 19,
+     "unknown": 190,
+     "wrong_family": 7,
+     "source": 136
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 2,
+     "answered_exact": 3,
+     "family": 16,
+     "unknown": 135,
+     "wrong_family": 5,
+     "source": 136
+    },
+    "short": {
+     "n": 216,
+     "exact": 10,
+     "answered_exact": 15,
+     "family": 37,
+     "unknown": 171,
+     "wrong_family": 8,
+     "source": 139
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 10,
+     "answered_exact": 13,
+     "family": 34,
+     "unknown": 117,
+     "wrong_family": 5,
+     "source": 139
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 1,
+     "family": 2,
+     "unknown": 58,
+     "wrong_family": 0,
+     "source": 0
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 2,
+     "family": 2,
+     "unknown": 58,
+     "wrong_family": 0,
+     "source": 0
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 3,
+     "unknown": 55,
+     "wrong_family": 2,
+     "source": 0
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 2,
+     "family": 3,
+     "unknown": 54,
+     "wrong_family": 3,
+     "source": 0
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 4,
+     "exact": 0
+    },
+    "Bells": {
+     "n": 27,
+     "family": 3,
+     "exact": 0
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 2,
+     "exact": 0
+    },
+    "Strings": {
+     "n": 30,
+     "family": 7,
+     "exact": 2
+    },
+    "Bass": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 1,
+     "exact": 0
+    },
+    "Other": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 2,
+     "exact": 0
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 0,
+     "exact": 0
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 3,
+     "exact": 0
+    }
+   },
+   "family_confusion": {
+    "Bass -> Other plucked": 2,
+    "Bass -> unknown": 1,
+    "Bells -> Bells": 3,
+    "Bells -> unknown": 24,
+    "Electronic -> Electronic": 1,
+    "Electronic -> unknown": 26,
+    "Indian plucked -> unknown": 15,
+    "Indian winds -> unknown": 24,
+    "Keys -> Keys": 4,
+    "Keys -> unknown": 17,
+    "Other -> unknown": 21,
+    "Other percussion -> Other percussion": 3,
+    "Other plucked -> Other plucked": 2,
+    "Other plucked -> unknown": 19,
+    "Other winds -> unknown": 9,
+    "Strings -> Strings": 7,
+    "Strings -> unknown": 23,
+    "Western winds -> Western winds": 2,
+    "Western winds -> unknown": 13
+   },
+   "layered_window_instrument_prf": [
+    0.12654614652711704,
+    0.12085415720127216,
+    0.12363467348361608
+   ],
+   "layered_window_family_prf": [
+    0.33926805143422356,
+    0.3187732342007435,
+    0.3287014853857211
+   ],
+   "layered_track_instrument_prf": [
+    0.14685314685314685,
+    0.3,
+    0.1971830985915493
+   ],
+   "timing_error_s": 8.0,
+   "timing_events_found": 22,
+   "thresholds": [
+    0.7,
+    0.5,
+    0.05,
+    0.05
+   ],
+   "imitation_source_possible": false
+  },
+  {
+   "system": "C \u00b7 panns10 + head",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 115,
+     "answered_exact": 216,
+     "family": 145,
+     "unknown": 0,
+     "wrong_family": 71,
+     "source": 169
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 90,
+     "answered_exact": 156,
+     "family": 109,
+     "unknown": 0,
+     "wrong_family": 47,
+     "source": 138
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 114,
+     "answered_exact": 216,
+     "family": 146,
+     "unknown": 0,
+     "wrong_family": 70,
+     "source": 176
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 88,
+     "answered_exact": 156,
+     "family": 107,
+     "unknown": 0,
+     "wrong_family": 49,
+     "source": 140
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 102,
+     "answered_exact": 216,
+     "family": 130,
+     "unknown": 0,
+     "wrong_family": 86,
+     "source": 167
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 70,
+     "answered_exact": 156,
+     "family": 93,
+     "unknown": 0,
+     "wrong_family": 63,
+     "source": 133
+    },
+    "short": {
+     "n": 216,
+     "exact": 107,
+     "answered_exact": 212,
+     "family": 145,
+     "unknown": 0,
+     "wrong_family": 71,
+     "source": 156
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 81,
+     "answered_exact": 153,
+     "family": 109,
+     "unknown": 0,
+     "wrong_family": 47,
+     "source": 122
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 25,
+     "answered_exact": 60,
+     "family": 36,
+     "unknown": 0,
+     "wrong_family": 24,
+     "source": 31
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 26,
+     "answered_exact": 60,
+     "family": 39,
+     "unknown": 0,
+     "wrong_family": 21,
+     "source": 36
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 32,
+     "answered_exact": 60,
+     "family": 37,
+     "unknown": 0,
+     "wrong_family": 23,
+     "source": 34
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 26,
+     "answered_exact": 59,
+     "family": 36,
+     "unknown": 0,
+     "wrong_family": 24,
+     "source": 34
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 13,
+     "exact": 12
+    },
+    "Bells": {
+     "n": 27,
+     "family": 21,
+     "exact": 16
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 10,
+     "exact": 10
+    },
+    "Strings": {
+     "n": 30,
+     "family": 22,
+     "exact": 17
+    },
+    "Bass": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 22,
+     "exact": 15
+    },
+    "Other": {
+     "n": 21,
+     "family": 16,
+     "exact": 12
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 9,
+     "exact": 7
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 15,
+     "exact": 11
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 14,
+     "exact": 12
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 3,
+     "exact": 3
+    }
+   },
+   "family_confusion": {
+    "Bass -> Other plucked": 1,
+    "Bass -> Strings": 2,
+    "Bells -> Bells": 21,
+    "Bells -> Indian plucked": 1,
+    "Bells -> Other": 1,
+    "Bells -> Other plucked": 3,
+    "Bells -> Strings": 1,
+    "Electronic -> Bells": 3,
+    "Electronic -> Electronic": 22,
+    "Electronic -> Strings": 2,
+    "Indian plucked -> Indian plucked": 15,
+    "Indian winds -> Bells": 1,
+    "Indian winds -> Electronic": 1,
+    "Indian winds -> Indian plucked": 1,
+    "Indian winds -> Indian winds": 14,
+    "Indian winds -> Strings": 1,
+    "Indian winds -> Western winds": 6,
+    "Keys -> Bells": 1,
+    "Keys -> Indian winds": 1,
+    "Keys -> Keys": 13,
+    "Keys -> Other": 1,
+    "Keys -> Other plucked": 1,
+    "Keys -> Western winds": 4,
+    "Other -> Electronic": 2,
+    "Other -> Indian winds": 1,
+    "Other -> Other": 16,
+    "Other -> Strings": 1,
+    "Other -> Western winds": 1,
+    "Other percussion -> Other percussion": 3,
+    "Other plucked -> Bass": 1,
+    "Other plucked -> Bells": 3,
+    "Other plucked -> Indian plucked": 1,
+    "Other plucked -> Indian winds": 2,
+    "Other plucked -> Keys": 3,
+    "Other plucked -> Other plucked": 10,
+    "Other plucked -> Other winds": 1,
+    "Other winds -> Indian winds": 3,
+    "Other winds -> Other": 1,
+    "Other winds -> Strings": 2,
+    "Other winds -> Western winds": 3,
+    "Strings -> Bass": 1,
+    "Strings -> Bells": 1,
+    "Strings -> Electronic": 2,
+    "Strings -> Indian plucked": 1,
+    "Strings -> Indian winds": 1,
+    "Strings -> Other winds": 2,
+    "Strings -> Strings": 22,
+    "Western winds -> Indian winds": 2,
+    "Western winds -> Keys": 2,
+    "Western winds -> Other": 1,
+    "Western winds -> Other winds": 1,
+    "Western winds -> Western winds": 9
+   },
+   "layered_window_instrument_prf": [
+    0.3643724696356275,
+    0.2044525215810995,
+    0.2619324796274738
+   ],
+   "layered_window_family_prf": [
+    0.5414634146341464,
+    0.4642193308550186,
+    0.49987490617963476
+   ],
+   "layered_track_instrument_prf": [
+    0.2803030303030303,
+    0.5285714285714286,
+    0.36633663366336633
+   ],
+   "timing_error_s": 6.5,
+   "timing_events_found": 46,
+   "thresholds": [
+    0.05,
+    0.05,
+    0.85,
+    0.7
+   ],
+   "imitation_source_possible": true
+  },
+  {
+   "system": "A \u00b7 yamnet",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 20,
+     "unknown": 189,
+     "wrong_family": 7,
+     "source": 137
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 18,
+     "unknown": 134,
+     "wrong_family": 4,
+     "source": 137
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 37,
+     "unknown": 175,
+     "wrong_family": 4,
+     "source": 136
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 34,
+     "unknown": 121,
+     "wrong_family": 1,
+     "source": 136
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 19,
+     "unknown": 192,
+     "wrong_family": 5,
+     "source": 132
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 19,
+     "unknown": 134,
+     "wrong_family": 3,
+     "source": 132
+    },
+    "short": {
+     "n": 216,
+     "exact": 3,
+     "answered_exact": 6,
+     "family": 43,
+     "unknown": 159,
+     "wrong_family": 14,
+     "source": 130
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 3,
+     "answered_exact": 4,
+     "family": 40,
+     "unknown": 108,
+     "wrong_family": 8,
+     "source": 130
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 2,
+     "unknown": 55,
+     "wrong_family": 3,
+     "source": 0
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 3,
+     "unknown": 54,
+     "wrong_family": 3,
+     "source": 0
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 0,
+     "family": 0,
+     "unknown": 58,
+     "wrong_family": 2,
+     "source": 0
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 0,
+     "answered_exact": 2,
+     "family": 3,
+     "unknown": 51,
+     "wrong_family": 6,
+     "source": 0
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Bells": {
+     "n": 27,
+     "family": 5,
+     "exact": 0
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 0,
+     "exact": 0
+    },
+    "Strings": {
+     "n": 30,
+     "family": 8,
+     "exact": 0
+    },
+    "Bass": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 0,
+     "exact": 0
+    },
+    "Other": {
+     "n": 21,
+     "family": 1,
+     "exact": 0
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 6,
+     "exact": 0
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 0,
+     "exact": 0
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 0,
+     "exact": 0
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    }
+   },
+   "family_confusion": {
+    "Bass -> unknown": 3,
+    "Bells -> Bells": 5,
+    "Bells -> unknown": 22,
+    "Electronic -> unknown": 27,
+    "Indian plucked -> unknown": 15,
+    "Indian winds -> Western winds": 3,
+    "Indian winds -> unknown": 21,
+    "Keys -> unknown": 21,
+    "Other -> Electronic": 1,
+    "Other -> Other": 1,
+    "Other -> unknown": 19,
+    "Other percussion -> unknown": 3,
+    "Other plucked -> unknown": 21,
+    "Other winds -> Western winds": 3,
+    "Other winds -> unknown": 6,
+    "Strings -> Strings": 8,
+    "Strings -> unknown": 22,
+    "Western winds -> Western winds": 6,
+    "Western winds -> unknown": 9
+   },
+   "layered_window_instrument_prf": [
+    0.2875457875457875,
+    0.07133121308496138,
+    0.11430651619949034
+   ],
+   "layered_window_family_prf": [
+    0.325497287522604,
+    0.16728624535315986,
+    0.22099447513812157
+   ],
+   "layered_track_instrument_prf": [
+    0.22033898305084745,
+    0.18571428571428572,
+    0.20155038759689922
+   ],
+   "timing_error_s": 11.5,
+   "timing_events_found": 19,
+   "thresholds": [
+    0.8,
+    0.35,
+    0.05,
+    0.05
+   ],
+   "imitation_source_possible": false
+  },
+  {
+   "system": "C \u00b7 yamnet + head",
+   "solo": {
+    "original": {
+     "n": 216,
+     "exact": 113,
+     "answered_exact": 216,
+     "family": 141,
+     "unknown": 0,
+     "wrong_family": 75,
+     "source": 176
+    },
+    "original:real": {
+     "n": 156,
+     "exact": 82,
+     "answered_exact": 156,
+     "family": 101,
+     "unknown": 0,
+     "wrong_family": 55,
+     "source": 142
+    },
+    "reverb": {
+     "n": 216,
+     "exact": 123,
+     "answered_exact": 216,
+     "family": 162,
+     "unknown": 0,
+     "wrong_family": 54,
+     "source": 174
+    },
+    "reverb:real": {
+     "n": 156,
+     "exact": 89,
+     "answered_exact": 156,
+     "family": 114,
+     "unknown": 0,
+     "wrong_family": 42,
+     "source": 140
+    },
+    "compressed": {
+     "n": 216,
+     "exact": 117,
+     "answered_exact": 216,
+     "family": 144,
+     "unknown": 0,
+     "wrong_family": 72,
+     "source": 165
+    },
+    "compressed:real": {
+     "n": 156,
+     "exact": 89,
+     "answered_exact": 156,
+     "family": 108,
+     "unknown": 0,
+     "wrong_family": 48,
+     "source": 133
+    },
+    "short": {
+     "n": 216,
+     "exact": 108,
+     "answered_exact": 213,
+     "family": 145,
+     "unknown": 0,
+     "wrong_family": 71,
+     "source": 158
+    },
+    "short:real": {
+     "n": 156,
+     "exact": 81,
+     "answered_exact": 155,
+     "family": 108,
+     "unknown": 0,
+     "wrong_family": 48,
+     "source": 127
+    },
+    "original:imitation": {
+     "n": 60,
+     "exact": 31,
+     "answered_exact": 60,
+     "family": 40,
+     "unknown": 0,
+     "wrong_family": 20,
+     "source": 34
+    },
+    "reverb:imitation": {
+     "n": 60,
+     "exact": 34,
+     "answered_exact": 60,
+     "family": 48,
+     "unknown": 0,
+     "wrong_family": 12,
+     "source": 34
+    },
+    "compressed:imitation": {
+     "n": 60,
+     "exact": 28,
+     "answered_exact": 60,
+     "family": 36,
+     "unknown": 0,
+     "wrong_family": 24,
+     "source": 32
+    },
+    "short:imitation": {
+     "n": 60,
+     "exact": 27,
+     "answered_exact": 58,
+     "family": 37,
+     "unknown": 0,
+     "wrong_family": 23,
+     "source": 31
+    }
+   },
+   "per_family": {
+    "Keys": {
+     "n": 21,
+     "family": 12,
+     "exact": 9
+    },
+    "Bells": {
+     "n": 27,
+     "family": 21,
+     "exact": 17
+    },
+    "Other plucked": {
+     "n": 21,
+     "family": 12,
+     "exact": 9
+    },
+    "Strings": {
+     "n": 30,
+     "family": 23,
+     "exact": 21
+    },
+    "Bass": {
+     "n": 3,
+     "family": 0,
+     "exact": 0
+    },
+    "Electronic": {
+     "n": 27,
+     "family": 17,
+     "exact": 12
+    },
+    "Other": {
+     "n": 21,
+     "family": 16,
+     "exact": 13
+    },
+    "Western winds": {
+     "n": 15,
+     "family": 8,
+     "exact": 5
+    },
+    "Other winds": {
+     "n": 9,
+     "family": 3,
+     "exact": 2
+    },
+    "Indian plucked": {
+     "n": 15,
+     "family": 10,
+     "exact": 8
+    },
+    "Indian winds": {
+     "n": 24,
+     "family": 16,
+     "exact": 14
+    },
+    "Other percussion": {
+     "n": 3,
+     "family": 3,
+     "exact": 3
+    }
+   },
+   "family_confusion": {
+    "Bass -> Strings": 3,
+    "Bells -> Bells": 21,
+    "Bells -> Indian plucked": 3,
+    "Bells -> Indian winds": 1,
+    "Bells -> Other plucked": 2,
+    "Electronic -> Bells": 1,
+    "Electronic -> Electronic": 17,
+    "Electronic -> Indian plucked": 2,
+    "Electronic -> Indian winds": 2,
+    "Electronic -> Keys": 2,
+    "Electronic -> Other": 1,
+    "Electronic -> Strings": 2,
+    "Indian plucked -> Indian plucked": 10,
+    "Indian plucked -> Indian winds": 2,
+    "Indian plucked -> Other": 1,
+    "Indian plucked -> Other plucked": 1,
+    "Indian plucked -> Strings": 1,
+    "Indian winds -> Indian plucked": 1,
+    "Indian winds -> Indian winds": 16,
+    "Indian winds -> Other": 2,
+    "Indian winds -> Other winds": 1,
+    "Indian winds -> Western winds": 4,
+    "Keys -> Bells": 2,
+    "Keys -> Indian plucked": 2,
+    "Keys -> Indian winds": 2,
+    "Keys -> Keys": 12,
+    "Keys -> Other plucked": 2,
+    "Keys -> Other winds": 1,
+    "Other -> Electronic": 2,
+    "Other -> Indian winds": 1,
+    "Other -> Other": 16,
+    "Other -> Other winds": 2,
+    "Other percussion -> Other percussion": 3,
+    "Other plucked -> Bells": 3,
+    "Other plucked -> Indian plucked": 4,
+    "Other plucked -> Keys": 2,
+    "Other plucked -> Other plucked": 12,
+    "Other winds -> Indian winds": 3,
+    "Other winds -> Other winds": 3,
+    "Other winds -> Western winds": 3,
+    "Strings -> Bells": 3,
+    "Strings -> Indian plucked": 4,
+    "Strings -> Strings": 23,
+    "Western winds -> Indian plucked": 3,
+    "Western winds -> Indian winds": 1,
+    "Western winds -> Other winds": 3,
+    "Western winds -> Western winds": 8
+   },
+   "layered_window_instrument_prf": [
+    0.2629198966408269,
+    0.18491594729668331,
+    0.21712456655108026
+   ],
+   "layered_window_family_prf": [
+    0.4787334593572779,
+    0.47072490706319703,
+    0.47469540768509844
+   ],
+   "layered_track_instrument_prf": [
+    0.23668639053254437,
+    0.5714285714285714,
+    0.33472803347280333
+   ],
+   "timing_error_s": 3.5,
+   "timing_events_found": 49,
+   "thresholds": [
+    0.05,
+    0.05,
+    0.85,
+    0.7
+   ],
+   "imitation_source_possible": true
+  }
+ ],
+ "models": {
+  "clap": {
+   "model": "clap",
+   "params": 68611864,
+   "load_s": 8.6,
+   "audio_s": 18312.0,
+   "infer_s": 1623.3,
+   "s_per_audio_min": 5.32,
+   "window_s": 10.0,
+   "source_classes": [
+    "acoustic",
+    "electronic",
+    "imitation"
+   ]
+  },
+  "efficientat": {
+   "model": "efficientat",
+   "params": 4876831,
+   "load_s": 2.8,
+   "audio_s": 18312.0,
+   "infer_s": 133.2,
+   "s_per_audio_min": 0.44,
+   "window_s": 1.0,
+   "source_classes": [
+    "acoustic",
+    "electronic"
+   ]
+  },
+  "panns": {
+   "model": "panns",
+   "params": 81837071,
+   "load_s": 442.4,
+   "audio_s": 18312.0,
+   "infer_s": 765.2,
+   "s_per_audio_min": 2.51,
+   "window_s": 1.0,
+   "source_classes": [
+    "acoustic",
+    "electronic"
+   ]
+  },
+  "panns10": {
+   "model": "panns10",
+   "params": 6302735,
+   "weights_sha256": "5240bdc47444e331bbeb54fd741d2b3f933a4526e84b0c17bf3593df94b13962",
+   "load_s": 52.3,
+   "audio_s": 18312.0,
+   "infer_s": 609.1,
+   "s_per_audio_min": 2.0,
+   "window_s": 1.0,
+   "source_classes": [
+    "acoustic",
+    "electronic"
+   ]
+  },
+  "yamnet": {
+   "model": "yamnet",
+   "params": null,
+   "load_s": 5.8,
+   "audio_s": 18312.0,
+   "infer_s": 191.7,
+   "s_per_audio_min": 0.63,
+   "window_s": 1.0,
+   "source_classes": [
+    "acoustic",
+    "electronic"
+   ]
+  }
+ }
+}

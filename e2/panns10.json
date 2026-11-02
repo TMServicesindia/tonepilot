@@ -1,0 +1,14 @@
+{
+ "model": "panns10",
+ "params": 6302735,
+ "weights_sha256": "5240bdc47444e331bbeb54fd741d2b3f933a4526e84b0c17bf3593df94b13962",
+ "load_s": 52.3,
+ "audio_s": 18312.0,
+ "infer_s": 609.1,
+ "s_per_audio_min": 2.0,
+ "window_s": 1.0,
+ "source_classes": [
+  "acoustic",
+  "electronic"
+ ]
+}
