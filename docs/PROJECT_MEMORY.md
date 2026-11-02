@@ -303,6 +303,22 @@ Stop: no production change, no major training, no release before approval.
 
 **Not validated yet:** real film songs; physical iPhone timing (G2.4).
 
+## 6r. Tone fit T3 + first passing full build with the nearest-sound search (2 Nov, owner: "start the tone fine-tuning while the build waits")
+
+**Tone fit T3:**
+- `ToneFitter` built and unit-tested.
+- Pre-registered DEV gate (independent judges CNN10 + MFCC against the part alone): **FAIL** in runs 41434478851 and 41438106229.
+- It helps performed leads; it doesn't help as-is parts.
+- Kept off (`PartMatcher.fitsPlaying = false`). Details: `benchmark/INSTRUMENT_PROXY_RESULTS.md`.
+
+**Full builds:**
+- The tone editor froze in the stress test on iOS 17. Cause: a half-height sheet with its rows below the fold. Fix: the editor opens full height, and the test waits for the editor itself.
+- Full build 41434482796 (macos-14, iOS 17.4) **passed every gate**:
+  - launch median 1.52 s;
+  - peak memory ~140 MB;
+  - tone fitting budget 0.58 s.
+- macos-15 runners were unavailable five times on 2 Nov. Manual full builds of `main` (runner input) now publish too, with the same gate.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

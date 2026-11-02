@@ -340,3 +340,41 @@ Embedding time for all 438 clips (CI CPU): EfficientAT 25 s, CNN10 113 s.
 | (for reference, not used to choose) masked backing | — | 5 / 9 / 9 |
 
 **Result:** right instrument family for the lead 1/12 → 6/12, and for the backing 1/12 → 9/12, on a bank the method never saw. Rendered GM audio, not real film songs; real-song validation is still pending.
+
+## Tone fit T3 (2 Nov): envelope / filter / vibrato fitted to the part — FAILED its gate twice, kept off
+
+`ToneFitter` measures the part's attack, fade, release, brightness and vibrato on its own harmonics, then adjusts the chosen tone's overrides by render-and-measure. The app keeps a fit only if the nearest-sound model (EfficientAT) hears it closer.
+
+**How it was judged:**
+- independent judges: PANNs CNN10 cosine and MFCC distance, both measured against the part alone (no leakage);
+- DEV banks: GeneralUser (same bank) and TimGM6mb (cross-bank);
+- two variants: "asis" and "performed" (parts shaped with seeded envelope / filter / vibrato);
+- rendered GM audio, not real songs;
+- pre-registered gate: CNN10 better in ≥ 50 % of applied fits, none worse by > 0.01.
+
+**Unit tests (known settings, with leakage) recover them closely:**
+- attack 114 vs 120 ms;
+- release 0.55 vs 0.50 s;
+- filter 2.0 vs 1.8 kHz;
+- vibrato 25 cents at 5.6 Hz vs 25 cents at 5.5 Hz.
+
+**Speed:** 0.58 s per 24 s part (Mac CI release; budget 3 s).
+
+| Run | Applied fits | CNN10 better | Worse (< −0.01) | MFCC closer | Ungated: better / worse | Gate |
+|---|---|---|---|---|---|---|
+| 1 (41434478851) | 23/96 | 12/23 | 1 (−0.052, pad lost its release to a default) | 18/23 | 18/63 · 25 | FAIL |
+| 2 (41438106229): own envelope as start, strict check | 32/96 | 15/32 | 1 (−0.013) | 17/32 | 20/59 · 14 | FAIL |
+
+**What it shows:**
+- On "performed" leads the fit helps: run 2 had CNN10 better 8/11 and MFCC closer 9/11.
+- On "asis" parts (the bank's own sound, so ideally no change) it adds nothing or slightly hurts.
+- Unchecked fits are clearly harmful, so the app check is essential.
+
+**Likely cause:** leakage shifts the stem's measurements one way, and the render has no leakage.
+
+**Next ideas (DEV):**
+- measure the render with matching leakage added;
+- fit only components with large, consistent per-note differences;
+- fit only melody parts.
+
+`PartMatcher.fitsPlaying = false`.
