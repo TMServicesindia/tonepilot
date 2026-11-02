@@ -254,14 +254,49 @@ public enum ToneMatcher {
 
     /// Ranks `candidates` against `target` (the part's audio) playing `notes`; best first, at most
     /// `limit`. `instrument` loads a candidate (nil = skip it).
+    ///
+    /// Two stages, so the whole tone library can be searched: every candidate is first heard on a
+    /// short snippet (≤ 4 s, ≤ 8 notes) with the same fingerprint, and only the best `shortlist`
+    /// are compared on the full window. (The bench showed the fingerprint ranks the true sound first
+    /// when it is compared at all; a tag-based pre-selection was dropping it.)
     public static func bestMatches(target: AudioBuffer, notes: [MelodyNote], candidates: [InstrumentPatch],
-                                   instrument: (InstrumentPatch) -> LoadedInstrument?, limit: Int = 3) -> [Match] {
+                                   instrument: (InstrumentPatch) -> LoadedInstrument?, limit: Int = 3, shortlist: Int = 10) -> [Match] {
         guard let (slice, rough) = window(target, notes: notes) else { return [] }
         let shifted = snapped(rough, to: slice)
         guard let goal = fingerprint(slice, notes: shifted) else { return [] }
         let seconds = slice.duration
+        var pool = candidates
+        if pool.count > shortlist, let (quick, quickRough) = window(target, notes: notes, maxSeconds: 4, maxNotes: 8) {
+            let quickNotes = snapped(quickRough, to: quick)
+            if let quickGoal = fingerprint(quick, notes: quickNotes) {
+                // Tones built on the same sample are screened once (one snippet per sound source);
+                // every variant of the best sources goes on to the full comparison.
+                func source(_ p: InstrumentPatch) -> String {
+                    if let sf = p.soundFont { return "sf:\(sf.fileName):\(sf.bankMSB):\(sf.bankLSB):\(sf.program)" }
+                    return "id:\(p.id.uuidString)"
+                }
+                var groups: [String: [InstrumentPatch]] = [:], order: [String] = []
+                for p in pool {
+                    let k = source(p)
+                    if groups[k] == nil { order.append(k) }
+                    groups[k, default: []].append(p)
+                }
+                var ranked: [(String, Double)] = []
+                for k in order {
+                    guard let patch = groups[k]?.first, let inst = instrument(patch) else { continue }
+                    let dry = render(patch, instrument: inst, notes: quickNotes, seconds: quick.duration, sampleRate: quick.sampleRate)
+                    guard let fp = fingerprint(dry, notes: quickNotes) else { continue }
+                    ranked.append((k, compare(quickGoal, fp).similarity))
+                }
+                var next: [InstrumentPatch] = []
+                for (k, _) in ranked.sorted(by: { $0.1 > $1.1 }) where next.count < shortlist {
+                    next += (groups[k] ?? []).prefix(shortlist + 4 - next.count)
+                }
+                pool = next
+            }
+        }
         var scored: [(InstrumentPatch, LoadedInstrument, Double, EQSettings)] = []
-        for patch in candidates {
+        for patch in pool {
             guard let inst = instrument(patch) else { continue }
             let dry = render(patch, instrument: inst, notes: shifted, seconds: seconds, sampleRate: slice.sampleRate)
             guard let fp = fingerprint(dry, notes: shifted) else { continue }

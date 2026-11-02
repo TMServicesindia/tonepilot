@@ -38,14 +38,16 @@ public enum PartMatcher {
         return (melodic + [.piano, .guitar]).filter { available.contains($0) }
     }
 
-    /// Candidate tones for a part, the instruments heard in the song first.
-    static func candidates(for kind: StemInfo.Kind, patches: [InstrumentPatch], heard: [String: Double], limit: Int = 14) -> [InstrumentPatch] {
+    /// Candidate tones for a part, the instruments heard in the song first. The whole melodic
+    /// library is a candidate: `ToneMatcher` screens all of them by ear before the full comparison
+    /// (excluding families up front dropped the true sound in 8 of 12 bench songs; e.g. a piano lead
+    /// could never be matched to a piano).
+    static func candidates(for kind: StemInfo.Kind, patches: [InstrumentPatch], heard: [String: Double], limit: Int = 400) -> [InstrumentPatch] {
         let families: Set<InstrumentFamily>
         switch kind {
-        case .piano: families = [.piano, .electricPiano, .organ, .mallet, .bell]
-        case .guitar: families = [.guitar, .ethnic, .pluck]
-        case .backing: families = [.strings, .synthStrings, .pad, .brass, .organ, .choir, .piano, .electricPiano, .pluck, .reed]
-        default: families = [.flute, .strings, .brass, .reed, .synthLead, .ethnic, .guitar, .organ, .choir, .pluck, .bell]
+        case .piano: families = [.piano, .electricPiano, .organ, .mallet, .bell, .pluck, .synthLead, .pad]
+        case .guitar: families = [.guitar, .ethnic, .pluck, .piano, .electricPiano, .mallet, .strings]
+        default: families = Set(InstrumentFamily.allCases).subtracting([.percussion, .bass])
         }
         let usable = patches.filter { families.contains($0.family) && !($0.tags ?? []).contains("accompaniment-only") && $0.family != .percussion }
         func familyKey(_ f: InstrumentFamily) -> [String] {
