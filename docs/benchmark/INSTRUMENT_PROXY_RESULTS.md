@@ -341,7 +341,7 @@ Embedding time for all 438 clips (CI CPU): EfficientAT 25 s, CNN10 113 s.
 
 **Result:** right instrument family for the lead 1/12 → 6/12, and for the backing 1/12 → 9/12, on a bank the method never saw. Rendered GM audio, not real film songs; real-song validation is still pending.
 
-## Tone fit T3 (2 Nov): envelope / filter / vibrato fitted to the part — FAILED its gate twice, kept off
+## Tone fit T3 (2 Nov): envelope / filter / vibrato fitted to the part — gate failed twice, PASSED on run 3, switched on
 
 `ToneFitter` measures the part's attack, fade, release, brightness and vibrato on its own harmonics, then adjusts the chosen tone's overrides by render-and-measure. The app keeps a fit only if the nearest-sound model (EfficientAT) hears it closer.
 
@@ -364,6 +364,7 @@ Embedding time for all 438 clips (CI CPU): EfficientAT 25 s, CNN10 113 s.
 |---|---|---|---|---|---|---|
 | 1 (41434478851) | 23/96 | 12/23 | 1 (−0.052, pad lost its release to a default) | 18/23 | 18/63 · 25 | FAIL |
 | 2 (41438106229): own envelope as start, strict check | 32/96 | 15/32 | 1 (−0.013) | 17/32 | 20/59 · 14 | FAIL |
+| 3 (41497516817): harmonics above the inter-harmonic floor, note-by-note consistency, melody parts only | 17/96 | **10/17** | **0** (worst −0.009) | 10/17 | 15/27 · 3 | **PASS** |
 
 **What it shows:**
 - On "performed" leads the fit helps: run 2 had CNN10 better 8/11 and MFCC closer 9/11.
@@ -377,4 +378,12 @@ Embedding time for all 438 clips (CI CPU): EfficientAT 25 s, CNN10 113 s.
 - fit only components with large, consistent per-note differences;
 - fit only melody parts.
 
-`PartMatcher.fitsPlaying = false`.
+**After run 3:**
+- Performed leads: CNN10 better 9/11.
+- As-is leads (bank's own sound): 1/6 better, none beyond the −0.01 limit.
+
+`PartMatcher.fitsPlaying = true` (melody parts only).
+
+**Caveats:**
+- The gate passed on the third attempt on the same DEV banks, so this is weaker evidence than a fresh sealed test.
+- Still needed: a new sealed bank (TR.3) and the owner's listening test on real songs.

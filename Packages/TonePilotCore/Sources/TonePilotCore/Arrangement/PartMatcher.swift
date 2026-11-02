@@ -54,8 +54,9 @@ public enum PartMatcher {
     public static let trusted = 0.62
     public static let perceptualMethod = "perceptual"
     /// Tone recreation T3 (fit attack / fade / release / brightness / vibrato to the part). Off until it
-    /// passes its pre-registered DEV gate (tone-fit.yml, independent judges); then switched on here.
-    public static let fitsPlaying = false
+    /// passes its pre-registered DEV gate (tone-fit.yml, independent judges). ON since DEV run 41497516817:
+    /// CNN10 better in 10/17 applied fits, none worse (melody parts; not yet checked on real songs).
+    public static let fitsPlaying = true
     /// Which parts are fitted: melody parts only (DEV run 2: backing gained in 6/16 fits, leads 9/16).
     public static func fitsPlaying(part: String) -> Bool { fitsPlaying && part != StemInfo.Kind.backing.rawValue }
 

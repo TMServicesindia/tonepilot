@@ -309,7 +309,14 @@ Stop: no production change, no major training, no release before approval.
 - `ToneFitter` built and unit-tested.
 - Pre-registered DEV gate (independent judges CNN10 + MFCC against the part alone): **FAIL** in runs 41434478851 and 41438106229.
 - It helps performed leads; it doesn't help as-is parts.
-- Kept off (`PartMatcher.fitsPlaying = false`). Details: `benchmark/INSTRUMENT_PROXY_RESULTS.md`.
+- Kept off after runs 1–2.
+- Owner then: "Go ahead with the tone fit fixes". Fixes:
+  - leakage-robust measurement;
+  - note-by-note consistency;
+  - melody parts only.
+- Run 41497516817 **PASSED**: 10/17 better, 0 worse. Switched on (`PartMatcher.fitsPlaying = true`).
+- This was the third attempt on the same DEV banks; still to confirm on a new sealed bank and by the owner's listening test.
+- Details: `benchmark/INSTRUMENT_PROXY_RESULTS.md`.
 
 **Full builds:**
 - The tone editor froze in the stress test on iOS 17. Cause: a half-height sheet with its rows below the fold. Fix: the editor opens full height, and the test waits for the editor itself.
