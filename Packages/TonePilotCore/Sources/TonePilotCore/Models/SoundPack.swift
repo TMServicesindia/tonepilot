@@ -21,6 +21,9 @@ public struct SoundPack: Codable, Hashable, Sendable {
         public var family: String
         public var envelope: Envelope
         public var zones: [SampleZone]
+        /// Preset playing style (vibrato, glide, mono) and filter, e.g. "Arabic-style Strings"; nil = plain.
+        public var expression: ExpressionSettings?
+        public var filter: FilterSettings?
     }
 
     public struct File: Codable, Hashable, Sendable {
@@ -78,10 +81,10 @@ public struct SoundPack: Codable, Hashable, Sendable {
     public var patches: [InstrumentPatch] {
         tones.map { t in
             InstrumentPatch(id: t.id, name: t.name, family: InstrumentFamily(rawValue: t.family) ?? .other, sourceType: .licensedSample,
-                            sampleZones: t.zones, envelope: t.envelope,
+                            sampleZones: t.zones, envelope: t.envelope, filter: t.filter ?? FilterSettings(),
                             license: LicenseInfo(name: source.license, url: source.library, redistributable: true,
                                                  notes: "Sound pack \(id) v\(version)"),
-                            tags: ["sound-pack", id])
+                            expression: t.expression, tags: ["sound-pack", id])
         }
     }
 }

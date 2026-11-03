@@ -83,6 +83,8 @@ final class AppModel: ObservableObject {
     @Published var soundPackProgress: [String: Double] = [:]
     @Published var soundPackError: String?
     @Published var installedSoundPacks: [String] = []
+    /// Installed version of each pack (an "Update" shows when the published one is newer).
+    @Published var installedSoundPackVersions: [String: Int] = [:]
     /// Model download progress (0...1), by pack.
     @Published var modelDownloadProgress: [SeparationPack: Double] = [:]
     @Published var modelDownloadError: String?

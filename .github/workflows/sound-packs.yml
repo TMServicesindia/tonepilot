@@ -1,4 +1,4 @@
-name: Sound packs — real-instrument packs from CC0 libraries (phase 1; in-app download)
+name: Sound packs — real-instrument packs from CC0 libraries (phases 1 + 4; in-app download)
 
 # Builds the phase-1 packs (VSCO 2 CE string section + flute, VCSL Steinway B; all CC0 1.0), renders
 # their tones for the nearest-sound search embeddings (same pipeline as the bundled tone tables),
@@ -21,10 +21,14 @@ jobs:
       - name: "Sample libraries (sparse, only the folders used)"
         run: |
           git clone -q --filter=blob:none --no-checkout https://github.com/sgossner/VSCO-2-CE /tmp/vsco
-          git -C /tmp/vsco sparse-checkout set --no-cone "/Strings/Cello Section/susvib/" "/Strings/Viola Section/susvib/" "/Strings/Violin Section/susVib/" "/Woodwinds/Flute/susvib/" /LICENSE
+          git -C /tmp/vsco sparse-checkout set --no-cone "/Strings/Cello Section/susvib/" "/Strings/Viola Section/susvib/" "/Strings/Violin Section/susVib/" "/Woodwinds/Flute/susvib/" \
+            "/Strings/Solo Violin/Arco Vib/" "/Brass/F Horn/sus/" "/Brass/Trumpet/susvib/" "/Brass/Tenor Trombone/sus/" "/Woodwinds/Clarinet/susLong/" \
+            "/Woodwinds/Oboe/Vib/" "/Strings/Harp/" "/Percussion/Glock/" /LICENSE
           git -C /tmp/vsco checkout -q
           git clone -q --filter=blob:none --no-checkout https://github.com/sgossner/VCSL /tmp/vcsl
-          git -C /tmp/vcsl sparse-checkout set --no-cone "/Chordophones/Zithers/Grand Piano, Steinway B/Sus/" /LICENSE
+          git -C /tmp/vcsl sparse-checkout set --no-cone "/Chordophones/Zithers/Grand Piano, Steinway B/Sus/" \
+            "/Idiophones/Struck Idiophones/Vibraphone/Hard Mallets/" "/Idiophones/Struck Idiophones/Marimba/" "/Idiophones/Struck Idiophones/Tubular Bells 1/" \
+            "/Idiophones/Plucked Idiophones/Kalimba, Tanzania/" "/Aerophones/Reed Aerophones/Tenor Saxophone/Vibrato/" "/Electrophones/TX81Z/FM Piano/" /LICENSE
           git -C /tmp/vcsl checkout -q
           head -2 /tmp/vsco/LICENSE /tmp/vcsl/LICENSE
           echo "COMMITS=vsco=$(git -C /tmp/vsco rev-parse HEAD),vcsl=$(git -C /tmp/vcsl rev-parse HEAD)" >> $GITHUB_ENV

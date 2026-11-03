@@ -24,6 +24,7 @@ extension AppModel {
         for pack in packs { for patch in pack.patches { library.upsert(patch) } }
         if library.patches != before { save() }
         installedSoundPacks = packs.map(\.id)
+        installedSoundPackVersions = Dictionary(packs.map { ($0.id, $0.version) }, uniquingKeysWith: { a, _ in a })
         PerceptualToneService.shared.setPackEntries(harmonic: packs.flatMap { $0.embeddings?.harmonic ?? [] },
                                                     plain: packs.flatMap { $0.embeddings?.plain ?? [] })
     }

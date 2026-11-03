@@ -347,6 +347,9 @@ struct SoundPacksSection: View {
                         Spacer()
                         if let p = model.soundPackProgress[pack.id] {
                             ProgressView(value: p).frame(width: 80)
+                        } else if installed, (model.installedSoundPackVersions[pack.id] ?? pack.version) < pack.version {
+                            Button("Update") { model.downloadSoundPack(pack) }
+                                .buttonStyle(.bordered).accessibilityIdentifier("soundpacks.update.\(pack.id)")
                         } else if installed {
                             Text(ByteCountFormatter.string(fromByteCount: model.soundPacks.installedSize(pack.id), countStyle: .file))
                                 .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
