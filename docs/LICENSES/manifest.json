@@ -162,7 +162,7 @@
    "data": "VSCO 2 Community Edition (github.com/sgossner/VSCO-2-CE) and VCSL (github.com/sgossner/VCSL): CC0 1.0, LICENSE files read 2 Nov 2026; each pack.json lists every source file and the library commit",
    "status": "Cleared",
    "reviewer": "pending owner review",
-   "scope": "in-app download of real-instrument tones (string section, Steinway grand, flute)"
+   "scope": "in-app download of real-instrument tones: string section (+ slow / Arabic-style presets), solo violin (+ expressive), Steinway grand, flute (+ bansuri-style imitation), horn, trumpet, trombone, clarinet, oboe, tenor sax, harp, glockenspiel, vibraphone, marimba, tubular bells, kalimba, FM electric piano"
   }
  ]
 }

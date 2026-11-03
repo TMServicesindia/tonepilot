@@ -401,6 +401,33 @@ Stop: no production change, no major training, no release before approval.
 2. Real layered recordings for DEV/TEST.
 3. Decide by the owner's blind A/B on real songs.
 
+## 6v. Phases 3 + 4 (owner, 3 Nov: "Phase 3 and 4"; v0.3.89 stays the base)
+
+**Owner context:**
+- Rejected reverting to the 3-layer limit: v0.3.89's tone maker stays.
+- Automatic blending stays off.
+
+**Phase 4, more sounds:**
+- 14 more CC0 packs on `sounds-v1`: solo violin, horn, trumpet, trombone, clarinet, oboe, harp, glockenspiel (VSCO); vibraphone, marimba, tubular bells, kalimba, tenor sax, FM electric piano (VCSL).
+- Presets (pack tones with vibrato / glide): Arabic-style Strings, Bansuri-style Flute (labelled imitation), Expressive Violin.
+- **Builder:**
+  - parses every naming scheme;
+  - detects each folder's octave convention from measured pitch (VSCO mixes C3 and C4 conventions across folders);
+  - keeps the two dynamics with the most notes.
+- Pack versions + an Update button in Settings.
+- Organ skipped (numbered files, no note names).
+
+**Phase 3, song understanding:**
+- `SongUnderstanding`:
+  - **hook:** distinct sections ranked by repetition × lead / vocal prominence × loudness, with a bonus for an instrumental line with no singing (signature BGM);
+  - **section moods:** energy + major/minor + brightness → plain words;
+  - each with its own confidence.
+- The main tone now comes from the hook section. The main tone card shows "From <section> — the song's (BGM) hook", with a menu to choose another section (your choice wins on re-analysis), and "Feel: … (suggestion)".
+
+**Validation:** none on real songs yet. "Done when" = the hook matches the owner's choice on ≥ 7/10 songs.
+
+**Not done:** 4-part + 6-part fusion (P3.3). It doubles on-device separation time; it needs an owner decision.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
