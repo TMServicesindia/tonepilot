@@ -48,10 +48,16 @@ final class ToneBlendBench: XCTestCase {
                     let id = "\(bank)_\(variant)_\(t.caseIndex)"
                     try InstrumentSetRender.writeWav(clip.samples, to: out.appendingPathComponent("targets/\(id)_stem.wav"), sr: Self.sr)
                     try InstrumentSetRender.writeWav(cleanClip, to: out.appendingPathComponent("targets/\(id)_clean.wav"), sr: Self.sr)
+                    // The other separated parts over the same window (leakage sources for leakage-aware unmixing).
+                    for (name, x) in t.others {
+                        let o = (0..<clip.samples.count).map { i in offset + i < x.count ? x[offset + i] : 0 }
+                        try InstrumentSetRender.writeWav(o, to: out.appendingPathComponent("targets/\(id)_other_\(name).wav"), sr: Self.sr)
+                    }
                     rows.append(["id": id, "bank": bank, "variant": variant, "case": t.caseName, "program": Int(t.program),
                                  "partner": variant == "blend" ? Int(Self.partner(t.caseIndex, t.program) ?? 0) : -1,
                                  "lead_patch": FactoryPatches.id(forProgram: t.program).uuidString,
                                  "partner_patch": variant == "blend" ? FactoryPatches.id(forProgram: Self.partner(t.caseIndex, t.program) ?? 0).uuidString : "",
+                                 "others": t.others.keys.sorted(),
                                  "seconds": Double(clip.samples.count) / Self.sr, "notes": ToneTableDump.noteList(ns)])
                 }
             }

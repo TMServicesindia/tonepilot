@@ -104,6 +104,9 @@ final class ToneTableDump: XCTestCase {
         let samples: [Float], sampleRate: Double, notes: [MelodyNote]
         /// The part alone (no leakage): what the part really sounds like (judging only; the app never has it).
         let clean: [Float]
+        /// The song's other separated parts as the app would have them (backing stem with its own bleed,
+        /// vocals, bass): the sources of this part's leakage.
+        var others: [String: [Float]] = [:]
     }
 
     /// The tone-bench songs (`ToneMatchingBenchmarks.cases`) rendered from `bank`: a 24 s lead line and
@@ -148,9 +151,11 @@ final class ToneTableDump: XCTestCase {
                 backStem[i] += 0.2 * l[i] + other
             }
             out.append(BenchPart(caseIndex: ci, caseName: c.name, part: "lead", program: c.lead, family: gm(c.lead).family,
-                                 samples: leadStem, sampleRate: rsr, notes: lead, clean: l))
+                                 samples: leadStem, sampleRate: rsr, notes: lead, clean: l,
+                                 others: ["backing": backStem, "vocals": v, "bass": bs]))
             out.append(BenchPart(caseIndex: ci, caseName: c.name, part: "backing", program: c.backing, family: gm(c.backing).family,
-                                 samples: backStem, sampleRate: rsr, notes: chords, clean: b))
+                                 samples: backStem, sampleRate: rsr, notes: chords, clean: b,
+                                 others: ["lead": leadStem, "vocals": v, "bass": bs]))
         }
         return out
     }

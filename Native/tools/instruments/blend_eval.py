@@ -232,7 +232,7 @@ def nnls(A, b, iters=500):
     return w
 
 
-def unmix_search(hook, cands):
+def unmix_search(hook, cands, others=None):
     """Spectral unmixing: which candidates, in what amounts, add up to the part's mel power over time.
     Candidates play exactly the part's notes at the same times, so the decomposition is aligned.
     Layers = candidates with >= min_share of the largest weight; balance = sqrt(weight ratio)."""
@@ -243,10 +243,13 @@ def unmix_search(hook, cands):
         if rms > 1e-5:
             C.append((pid, (a * (0.1 / rms)).astype(np.float32)))
     S = [power_mel(a) for _, a in C]
-    n = min(T.shape[1], *(m.shape[1] for m in S))
-    A = np.stack([m[:, :n].ravel() for m in S], 1); b = T[:, :n].ravel()
+    # Leakage-aware: the song's other separated parts join as fixed components. They absorb the bleed
+    # in this part's stem, but can never become layers.
+    O = [power_mel(x) for x in (others or []) if float(np.abs(x).max()) > 1e-6]
+    n = min(T.shape[1], *(m.shape[1] for m in S + O))
+    A = np.stack([m[:, :n].ravel() for m in S + O], 1); b = T[:, :n].ravel()
     scale = A.max() + 1e-12
-    w = nnls(A / scale, b / scale)
+    w = nnls(A / scale, b / scale)[:len(S)]
     order = np.argsort(-w)
     top = w[order[0]]
     keep = [i for i in order if top > 0 and w[i] >= UNMIX["min_share"] * top][:UNMIX["max_layers"]] or [int(order[0])]
@@ -255,8 +258,11 @@ def unmix_search(hook, cands):
     return {"layers": [(C[i][0], bv) for i, bv in zip(keep, bal)], "audio": mix, "single_audio": C[int(order[0])][1]}
 
 
-def unmix_judge(dump, out_md, eat):
-    """Spectral unmixing judged by the SAME pre-registered gate (first run of this method, no tuning)."""
+def unmix_judge(dump, out_md, eat, leak=False):
+    """Spectral unmixing judged by the SAME pre-registered gate (first run of this method, no tuning).
+    leak=True (owner's option 1, 3 Nov; PRE-REGISTERED before its run): the target's other separated parts
+    (backing stem, vocals, bass, as the app would have them) are added as leakage components; same
+    min_share 0.15, same gate A/B/C, one run, no tuning."""
     cnn = model_embedder("panns10", eat)
     targets = {t["id"]: t for t in json.load(open(os.path.join(dump, "targets.json")))}
     rows = []
@@ -268,7 +274,8 @@ def unmix_judge(dump, out_md, eat):
                  if os.path.exists(os.path.join(dump, "renders", f"{t['id']}_{pid}.wav"))]
         if not cands:
             continue
-        r = unmix_search(hook.astype(np.float32), cands)
+        others = [read_wav(os.path.join(dump, "targets", f"{t['id']}_other_{k}.wav"))[0] for k in t.get("others", [])] if leak else None
+        r = unmix_search(hook.astype(np.float32), cands, others)
         ce = cnn(clean, SR)
         ids = [k for k, _ in r["layers"]]
         g = 0.0 if len(ids) == 1 else cos(cnn(r["audio"], SR), ce) - cos(cnn(r["single_audio"], SR), ce)
@@ -279,7 +286,7 @@ def unmix_judge(dump, out_md, eat):
     b = [r for r in rows if r["variant"] == "blend"]; sg = [r for r in rows if r["variant"] == "single"]
     A = sum(r["gain"] > 0.002 for r in b) >= 0.5 * len(b); B = sum(r["gain"] < -0.01 for r in sg) == 0
     C_ = sum(r["gain"] < -0.02 for r in rows) == 0
-    lines = ["# Blend by spectral unmixing — pre-registered gate (first run, no tuning)", "",
+    lines = [f"# Blend by {'leakage-aware ' if leak else ''}spectral unmixing — pre-registered gate (first run, no tuning)", "",
              "| Group | Targets | >1 layer | CNN10 better | Worse < −0.01 | Worse < −0.02 | Mean gain | True 2nd instrument found | True lead kept |",
              "|---|---|---|---|---|---|---|---|---|"]
     for k in sorted({f"{r['bank']} · {r['variant']}" for r in rows}):
@@ -293,7 +300,8 @@ def unmix_judge(dump, out_md, eat):
     open(out_md, "w").write("\n".join(lines) + "\n")
     json.dump(rows, open(out_md.replace(".md", ".json"), "w"), indent=1)
     print("\n".join(lines))
-    print(f"RESULT unmix gate {'PASS' if passed else 'FAIL'}")
+    print(f"RESULT {'leakage-aware ' if leak else ''}unmix gate {'PASS' if passed else 'FAIL'}: blend better {sum(r['gain'] > 0.002 for r in b)}/{len(b)}, "
+          f"single worse>0.01 {sum(r['gain'] < -0.01 for r in sg)}, any worse>0.02 {sum(r['gain'] < -0.02 for r in rows)}")
 
 
 SWEEP = {
@@ -349,5 +357,7 @@ if __name__ == "__main__":
         sweep(dump, sys.argv[3], eat)
     elif mode == "unmix":
         unmix_judge(dump, sys.argv[3], eat)
+    elif mode == "unmix_leak":
+        unmix_judge(dump, sys.argv[3], eat, leak=True)
     else:
         judge(dump, sys.argv[3], eat)
