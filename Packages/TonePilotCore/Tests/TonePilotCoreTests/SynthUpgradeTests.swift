@@ -111,6 +111,9 @@ final class SynthUpgradeTests: XCTestCase {
         let synthLeads: Set<UUID> = [FactoryPatches.anthemSupersawId, FactoryPatches.supersawLeadId, FactoryPatches.powerSawLeadId,
                                      FactoryPatches.drivenSynthBrassId, FactoryPatches.classicSynthBrassId]
         XCTAssertTrue(synthLeads.contains(try XCTUnwrap(a.layers.first { $0.role == .vocalMelody }).patchId))
-        XCTAssertTrue(a.layers.contains { $0.patchId == FactoryPatches.supersawChordsId }, "left hand: supersaw chords")
+        var split = AutoArranger.Options(); split.splitKeyboard = true
+        let hands = AutoArranger.arrange(song, patches: FactoryPatches.all, options: split).song
+        let h = try XCTUnwrap(hands.arrangement(for: hands.orderedSections[0]))
+        XCTAssertTrue(h.layers.contains { $0.patchId == FactoryPatches.supersawChordsId }, "split mode, left hand: supersaw chords")
     }
 }

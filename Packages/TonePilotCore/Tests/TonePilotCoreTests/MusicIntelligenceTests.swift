@@ -187,9 +187,8 @@ final class ArrangementIntelligenceTests: XCTestCase {
             XCTAssertEqual(ai.origin, .aiOriginal)
             XCTAssertEqual(ai.layers, mine.layers)
             XCTAssertFalse(ai.rationale?.isEmpty ?? true)
-            // Split keyboard: something on each hand.
-            XCTAssertTrue(mine.layers.contains { $0.keyRange.high < 60 }, "left-hand layer")
-            XCTAssertTrue(mine.layers.contains { $0.keyRange.low >= 55 }, "right-hand layer")
+            // No AI key map (owner, 3 Nov): every layer plays on all keys.
+            XCTAssertTrue(mine.layers.allSatisfy { $0.keyRange == KeyRange(low: 0, high: 127) && $0.octave == 0 }, "every layer on all keys")
             XCTAssertLessThanOrEqual(mine.layers.count, ToneEngine.liveSlotCount)
             XCTAssertTrue(mine.layers.allSatisfy { FactoryPatches.all.map(\.id).contains($0.patchId) })
         }
@@ -201,6 +200,14 @@ final class ArrangementIntelligenceTests: XCTestCase {
         XCTAssertEqual(ordered[0].arrangementId, ordered[2].arrangementId)
         XCTAssertNotEqual(ordered[0].arrangementId, ordered[1].arrangementId)
         XCTAssertFalse(a0HasLead(ordered[0].activity), "chord roots are not mistaken for a melody")
+        // The optional split mode still gives each hand its own sound.
+        var split = AutoArranger.Options(); split.splitKeyboard = true
+        let hands = AutoArranger.arrange(song, timbres: result.timbres, patches: FactoryPatches.all, options: split).song
+        for s in hands.sections {
+            let t = try XCTUnwrap(hands.arrangement(for: s))
+            XCTAssertTrue(t.layers.contains { $0.keyRange.high < 60 }, "split mode: left-hand layer")
+            XCTAssertTrue(t.layers.contains { $0.keyRange.low >= 55 }, "split mode: right-hand layer")
+        }
         let padSection = arranged.arrangement(for: arranged.orderedSections[1])!
         XCTAssertTrue(padSection.layers.contains { $0.role == .pad }, "sustained section gets strings/pad")
     }
@@ -216,7 +223,15 @@ final class ArrangementIntelligenceTests: XCTestCase {
             MelodyNote(start: Double(i) * 0.8, duration: 0.7, midi: 50 + (i % 5), confidence: 0.8, isOrnamented: i % 2 == 0)
         }
         song.melody = MelodyTrack(notes: low, source: .vocalStem, voicedRatio: 0.8)
-        let out = AutoArranger.arrange(song, patches: FactoryPatches.all).song
+        // Default (no AI key map): the lead plays where the melody is, on all keys, no octave shift.
+        let full = AutoArranger.arrange(song, patches: FactoryPatches.all).song
+        let fullTone = full.arrangement(for: full.sections[0])!
+        let fullLead = fullTone.layers.first { $0.role == .vocalMelody }!
+        XCTAssertEqual(fullLead.octave, 0); XCTAssertEqual(fullLead.keyRange, KeyRange(low: 0, high: 127))
+        XCTAssertEqual(AutoArranger.guideOffset(for: fullTone), 0)
+        // Split mode: a low melody is played an octave up on the right hand.
+        var split = AutoArranger.Options(); split.splitKeyboard = true
+        let out = AutoArranger.arrange(song, patches: FactoryPatches.all, options: split).song
         let a = out.arrangement(for: out.sections[0])!
         let lead = a.layers.first { $0.role == .vocalMelody }!
         XCTAssertEqual(lead.octave, -1, "played an octave up, sounds at the sung pitch")

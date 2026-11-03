@@ -43,8 +43,12 @@ final class ToneQualityTests: XCTestCase {
                                    FactoryPatches.id(forProgram: 30), FactoryPatches.id(forProgram: 56)]
         let lead = try XCTUnwrap(chorus.layers.first { $0.role == .vocalMelody })
         XCTAssertTrue(powerful.contains(lead.patchId), "brass heard in a mass section → a powerful lead, not a voice imitation")
-        XCTAssertTrue(chorus.layers.contains { $0.patchId == FactoryPatches.brassStabsId }, "left hand plays brass stabs")
-        XCTAssertTrue(chorus.layers.contains { $0.patchId == FactoryPatches.subBassId }, "heavy low end → sub bass")
+        // Split mode keeps the powerful accompaniment on the left hand.
+        var split = AutoArranger.Options(); split.splitKeyboard = true
+        let hands = AutoArranger.arrange(massSong(), patches: FactoryPatches.all, options: split).song
+        let h = try XCTUnwrap(hands.arrangement(for: hands.orderedSections[1]))
+        XCTAssertTrue(h.layers.contains { $0.patchId == FactoryPatches.brassStabsId }, "split mode: left hand plays brass stabs")
+        XCTAssertTrue(h.layers.contains { $0.patchId == FactoryPatches.subBassId }, "split mode: heavy low end → sub bass")
         let power: Set<UUID> = [FactoryPatches.brassStabsId, FactoryPatches.powerStringsId, FactoryPatches.subBassId]
         XCTAssertFalse(verse.layers.contains { power.contains($0.patchId) }, "calm verse keeps soft accompaniment")
     }
@@ -83,7 +87,8 @@ final class ToneQualityTests: XCTestCase {
         XCTAssertEqual(mains.count, 1, "the generic stack is replaced, not duplicated")
         let main = try XCTUnwrap(mains.first)
         XCTAssertTrue(main.rationale?.hasPrefix(AutoArranger.aiMainTonePrefix) == true)
-        XCTAssertTrue(main.layers.contains { $0.patchId == FactoryPatches.brassStabsId }, "taken from the chorus (most intense)")
+        let chorusLead = out.arrangement(for: out.orderedSections[1])?.layers.first { $0.role == .vocalMelody }?.patchId
+        XCTAssertEqual(main.layers.first { $0.role == .vocalMelody }?.patchId, chorusLead, "taken from the chorus (most intense)")
         XCTAssertNotEqual(Set(main.layers.map(\.patchId)), Set(Arrangement.starterFilmStack().layers.map(\.patchId)))
 
         // Your own main tone survives a re-run.
