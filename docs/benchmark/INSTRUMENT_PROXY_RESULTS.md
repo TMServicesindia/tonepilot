@@ -387,3 +387,37 @@ Embedding time for all 438 clips (CI CPU): EfficientAT 25 s, CNN10 113 s.
 **Caveats:**
 - The gate passed on the third attempt on the same DEV banks, so this is weaker evidence than a fresh sealed test.
 - Still needed: a new sealed bank (TR.3) and the owner's listening test on real songs.
+
+## Sound engine phase 2: blend search (3 Nov) — FAILED its gate with three methods, kept off
+
+**Setup:**
+- DEV bench (`tone-blend.yml`): 48 targets = 12 bench songs × 2 banks (GeneralUser same bank, TimGM6mb cross-bank) × 2 variants.
+  - "single": the lead plays one instrument.
+  - "blend": the lead is doubled by a second instrument at 70 %.
+- Busiest 6 s, with leakage. Candidates: the top 8 from the app's tone tables.
+- Judge: PANNs CNN10 vs the clean part, compared with the best single sound.
+- Pre-registered gate:
+  - A: blend targets better on ≥ 50 %;
+  - B: single targets none worse by > 0.01;
+  - C: none worse by > 0.02.
+- Rendered GM audio, not real songs.
+
+| Method | Blend targets: >1 layer · better | Single targets: >1 layer · worse > 0.01 | Any worse > 0.02 | Gate |
+|---|---|---|---|---|
+| Embedding score (wH .6, wM .3, λ = δ = .02), run 41679413794 | 0/24 · 0/24 | 0/24 · 0 | 0 | FAIL (A) |
+| Same, λ = δ = 0 (sweep 41682673282, tuning) | 17/24 · 9/24 | 12/24 · 7 | 5 | — |
+| + spectral-shape term (sweep, tuning) | 0–1/24 · 0/24 | 5–9/24 · 3–5 | 2–4 | — |
+| Spectral unmixing (NNLS on mel power), run 41684589993 | 21/24 · 13/24 | 21/24 · 11 | 13 | FAIL (B, C) |
+
+**Diagnosis:**
+1. **EfficientAT barely sees layering.** The best extra layer changed the hook/main similarity by at most +0.0007, even when the true second instrument was shortlisted (15/24). It is built to tell instruments apart, not mixture proportions.
+2. **Unmixing finds blends but cannot reject leakage.** It recovers layered sounds (13/24 better) but explains the stem's leakage with extra layers on single-instrument parts (21/24 multi-layer; 11 worse).
+
+**Decision:**
+- `PartMatcher.blendsEnabled = false`; tuning on these DEV targets stopped (overfitting risk).
+- The app keeps the owner-approved part-based blend: every distinct matched part's sound, all keys.
+
+**What would change the picture (not started):**
+- Unmixing that models the leakage explicitly, e.g. the other stems as extra fixed components.
+- Real recordings with known layering for DEV and TEST.
+- The owner's blind A/B on real songs (the sheet ships in v0.3.89).

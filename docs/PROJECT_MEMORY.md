@@ -380,6 +380,22 @@ Stop: no production change, no major training, no release before approval.
 **Done when:**
 - The owner prefers the real-instrument tone in the blind A/B on 3 chosen songs (e.g. Hukum).
 
+## 6u. Sound engine phase 2: blend search (3 Nov, owner: "Go ahead with phase 2")
+
+**Built:**
+- `BlendSearch` (greedy, hook-first, layer cost + margin, approximate label + alternatives), with tests and a speed budget (~3.7 s per section, est.).
+- Section blends wired through the pipeline and arranger.
+- DEV bench with a Python port and independent judges.
+
+**Gate:** FAILED with three methods: embedding score, the tuning sweep, spectral unmixing. Details: `benchmark/INSTRUMENT_PROXY_RESULTS.md`.
+
+**Status:** blends kept off (`PartMatcher.blendsEnabled = false`); the app keeps the part-based blend.
+
+**Next options for the owner:**
+1. Leakage-aware unmixing (the other stems as extra components).
+2. Real layered recordings for DEV/TEST.
+3. Decide by the owner's blind A/B on real songs.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
