@@ -214,6 +214,88 @@ def judge(dump, out_md, eat):
     print(f"RESULT blend gate {'PASS' if passed else 'FAIL'}: blend targets better {bb}/{bn}; single targets worse>0.01: {sw1}; any worse>0.02: {aw2}")
 
 
+UNMIX = dict(min_share=0.15, max_layers=8)
+
+
+def power_mel(x):
+    """Mel power spectrogram (device front-end, linear power, no mask): layers add in this domain."""
+    if len(x) < SR:
+        x = np.pad(x, (0, SR - len(x)))
+    return np.exp(device_logmel(x.astype(np.float64), None) * 5 - 4.5)   # undo (log(p+1e-5)+4.5)/5 (ignoring the 1e-5)
+
+
+def nnls(A, b, iters=500):
+    """Non-negative least squares by projected gradient (no SciPy needed in the app's Swift port)."""
+    w = np.zeros(A.shape[1]); L = np.linalg.norm(A, 2) ** 2 + 1e-12
+    for _ in range(iters):
+        w = np.maximum(0, w - (A.T @ (A @ w - b)) / L)
+    return w
+
+
+def unmix_search(hook, cands):
+    """Spectral unmixing: which candidates, in what amounts, add up to the part's mel power over time.
+    Candidates play exactly the part's notes at the same times, so the decomposition is aligned.
+    Layers = candidates with >= min_share of the largest weight; balance = sqrt(weight ratio)."""
+    T = power_mel(hook)
+    C = []
+    for pid, a in cands:
+        rms = float(np.sqrt(np.mean(a.astype(np.float64) ** 2)))
+        if rms > 1e-5:
+            C.append((pid, (a * (0.1 / rms)).astype(np.float32)))
+    S = [power_mel(a) for _, a in C]
+    n = min(T.shape[1], *(m.shape[1] for m in S))
+    A = np.stack([m[:, :n].ravel() for m in S], 1); b = T[:, :n].ravel()
+    scale = A.max() + 1e-12
+    w = nnls(A / scale, b / scale)
+    order = np.argsort(-w)
+    top = w[order[0]]
+    keep = [i for i in order if top > 0 and w[i] >= UNMIX["min_share"] * top][:UNMIX["max_layers"]] or [int(order[0])]
+    bal = [float(np.sqrt(w[i] / top)) if top > 0 else 1.0 for i in keep]
+    mix = sum(np.float32(bv) * C[i][1] for i, bv in zip(keep, bal))
+    return {"layers": [(C[i][0], bv) for i, bv in zip(keep, bal)], "audio": mix, "single_audio": C[int(order[0])][1]}
+
+
+def unmix_judge(dump, out_md, eat):
+    """Spectral unmixing judged by the SAME pre-registered gate (first run of this method, no tuning)."""
+    cnn = model_embedder("panns10", eat)
+    targets = {t["id"]: t for t in json.load(open(os.path.join(dump, "targets.json")))}
+    rows = []
+    for sl in json.load(open(os.path.join(dump, "shortlist.json"))):
+        t = targets[sl["id"]]
+        hook, _ = read_wav(os.path.join(dump, "targets", f"{t['id']}_stem.wav"))
+        clean, _ = read_wav(os.path.join(dump, "targets", f"{t['id']}_clean.wav"))
+        cands = [(pid, read_wav(os.path.join(dump, "renders", f"{t['id']}_{pid}.wav"))[0]) for pid in sl["candidates"]
+                 if os.path.exists(os.path.join(dump, "renders", f"{t['id']}_{pid}.wav"))]
+        if not cands:
+            continue
+        r = unmix_search(hook.astype(np.float32), cands)
+        ce = cnn(clean, SR)
+        ids = [k for k, _ in r["layers"]]
+        g = 0.0 if len(ids) == 1 else cos(cnn(r["audio"], SR), ce) - cos(cnn(r["single_audio"], SR), ce)
+        rows.append({"id": t["id"], "variant": t["variant"], "bank": t["bank"], "layers": len(ids), "gain": g,
+                     "partner": bool(t["partner_patch"]) and t["partner_patch"] in ids, "lead": t["lead_patch"] in ids,
+                     "balances": [round(b, 2) for _, b in r["layers"]]})
+        print(f"ROW {t['id']}: {len(ids)} layer(s) {rows[-1]['balances']}, CNN10 gain {g:+.4f}", flush=True)
+    b = [r for r in rows if r["variant"] == "blend"]; sg = [r for r in rows if r["variant"] == "single"]
+    A = sum(r["gain"] > 0.002 for r in b) >= 0.5 * len(b); B = sum(r["gain"] < -0.01 for r in sg) == 0
+    C_ = sum(r["gain"] < -0.02 for r in rows) == 0
+    lines = ["# Blend by spectral unmixing — pre-registered gate (first run, no tuning)", "",
+             "| Group | Targets | >1 layer | CNN10 better | Worse < −0.01 | Worse < −0.02 | Mean gain | True 2nd instrument found | True lead kept |",
+             "|---|---|---|---|---|---|---|---|---|"]
+    for k in sorted({f"{r['bank']} · {r['variant']}" for r in rows}):
+        rs = [r for r in rows if f"{r['bank']} · {r['variant']}" == k]
+        lines.append(f"| {k} | {len(rs)} | {sum(r['layers'] > 1 for r in rs)} | {sum(r['gain'] > 0.002 for r in rs)}/{len(rs)} | "
+                     f"{sum(r['gain'] < -0.01 for r in rs)} | {sum(r['gain'] < -0.02 for r in rs)} | {np.mean([r['gain'] for r in rs]):+.4f} | "
+                     f"{sum(r['partner'] for r in rs)} | {sum(r['lead'] for r in rs)} |")
+    passed = A and B and C_
+    lines += ["", f"**Gate:** A {sum(r['gain'] > 0.002 for r in b)}/{len(b)} {'✓' if A else '✗'} · B {sum(r['gain'] < -0.01 for r in sg)} {'✓' if B else '✗'} · "
+              f"C {sum(r['gain'] < -0.02 for r in rows)} {'✓' if C_ else '✗'} → **{'PASS' if passed else 'FAIL'}**"]
+    open(out_md, "w").write("\n".join(lines) + "\n")
+    json.dump(rows, open(out_md.replace(".md", ".json"), "w"), indent=1)
+    print("\n".join(lines))
+    print(f"RESULT unmix gate {'PASS' if passed else 'FAIL'}")
+
+
 SWEEP = {
     "V0 current (wH .6, wM .3, λ=δ=.02)": {},
     "V1 no layer cost or margin": {"lam": 0.0, "delta": 0.0},
@@ -265,5 +347,7 @@ if __name__ == "__main__":
         shortlist(dump, eat)
     elif mode == "sweep":
         sweep(dump, sys.argv[3], eat)
+    elif mode == "unmix":
+        unmix_judge(dump, sys.argv[3], eat)
     else:
         judge(dump, sys.argv[3], eat)

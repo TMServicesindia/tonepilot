@@ -11,7 +11,7 @@ on:
         description: "Judge only, reusing the targets / shortlist / renders of this earlier run id (empty = full run)"
         default: ""
       mode:
-        description: "judge (pre-registered gate) or sweep (DEV tuning of the score; not a gate)"
+        description: "judge (pre-registered gate), sweep (DEV tuning; not a gate) or unmix (spectral unmixing, same gate)"
         default: "judge"
 
 permissions:
