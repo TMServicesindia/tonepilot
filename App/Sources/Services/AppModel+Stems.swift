@@ -267,6 +267,19 @@ extension AppModel {
         if activeSongId == songId { activate(tone, songId: songId, sectionId: activeSectionId) }
     }
 
+    /// Makes `sectionId` the song's hook (your choice wins over the analysis) and rebuilds the AI main
+    /// tone from it. A main tone you edited yourself is kept.
+    func setHook(_ sectionId: UUID, songId: UUID) {
+        guard var song = song(songId), song.sections.contains(where: { $0.id == sectionId }) else { return }
+        var u = song.understanding ?? SongUnderstanding(hook: nil, moods: [:], overall: nil)
+        u.hook = .init(sectionId: sectionId, kind: u.hook?.sectionId == sectionId ? (u.hook?.kind ?? .mixed) : .mixed, confidence: 1,
+                       reason: "chosen by you", alternatives: u.hook?.alternatives ?? [], chosenByUser: true)
+        song.understanding = u
+        AutoArranger.refreshMainTone(&song)
+        update(song)
+        if activeSongId == songId, isUsingMainTone(song), let tone = mainTone(of: song) { activate(tone, songId: songId, sectionId: activeSectionId) }
+    }
+
     /// Changes the keyboard's tone with each section of the song. Saved per song.
     func useSectionTones(_ songId: UUID) {
         guard let song = song(songId) else { return }

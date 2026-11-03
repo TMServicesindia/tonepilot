@@ -187,7 +187,7 @@
             "high" : 127,
             "low" : 1
           },
-          "volume" : 0.72
+          "volume" : 0.8130434782608696
         },
         {
           "enabled" : true,
@@ -208,7 +208,7 @@
             "high" : 127,
             "low" : 1
           },
-          "volume" : 0.3
+          "volume" : 0.28695652173913044
         }
       ],
       "master" : {
@@ -217,18 +217,18 @@
         "delayLevel" : 0.6,
         "delayTime" : 0.35,
         "eq" : {
-          "highDB" : 0,
-          "lowDB" : 0,
-          "midDB" : 0,
-          "midFrequency" : 1200
+          "highDB" : 2,
+          "lowDB" : 1,
+          "midDB" : 1,
+          "midFrequency" : 2000
         },
         "reverbDamping" : 0.5,
-        "reverbLevel" : 1,
-        "reverbSize" : 0.75
+        "reverbLevel" : 0.55,
+        "reverbSize" : 0.6
       },
       "masterGain" : 0.8,
       "name" : "Main tone",
-      "rationale" : "AI main tone from Intro: Main sound (all keys): Trumpet — a bright brass melody; heard: brass 60%; intensity soft. Soft strings underneath (all keys): the song has a sustained bed (90%). Closest available sounds — approximations, not the original studio instruments."
+      "rationale" : "AI main tone from Interlude — the song's hook: heard 1× in the song; the sung melody carries this section. Main sound (all keys): Trumpet — a bright brass melody; heard: brass 60%; intensity powerful. Soft strings underneath (all keys): the song has a sustained bed (91%). Closest available sounds — approximations, not the original studio instruments."
     },
     {
       "id" : "uuid:6",
@@ -237,7 +237,7 @@
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:4",
+          "id" : "uuid:7",
           "keyRange" : {
             "high" : 127,
             "low" : 0
@@ -258,7 +258,7 @@
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:5",
+          "id" : "uuid:8",
           "keyRange" : {
             "high" : 127,
             "low" : 0
@@ -299,13 +299,13 @@
     },
     {
       "derivedFrom" : "uuid:6",
-      "id" : "uuid:7",
+      "id" : "uuid:9",
       "isFavorite" : false,
       "layers" : [
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:4",
+          "id" : "uuid:7",
           "keyRange" : {
             "high" : 127,
             "low" : 0
@@ -326,7 +326,7 @@
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:5",
+          "id" : "uuid:8",
           "keyRange" : {
             "high" : 127,
             "low" : 0
@@ -366,13 +366,13 @@
       "rationale" : "Main sound (all keys): Trumpet — a bright brass melody; heard: brass 60%; intensity soft. Soft strings underneath (all keys): the song has a sustained bed (90%). Closest available sounds — approximations, not the original studio instruments."
     },
     {
-      "id" : "uuid:8",
+      "id" : "uuid:10",
       "isFavorite" : false,
       "layers" : [
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:9",
+          "id" : "uuid:4",
           "keyRange" : {
             "high" : 127,
             "low" : 0
@@ -393,7 +393,7 @@
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:10",
+          "id" : "uuid:5",
           "keyRange" : {
             "high" : 127,
             "low" : 0
@@ -433,14 +433,14 @@
       "rationale" : "Main sound (all keys): Trumpet — a bright brass melody; heard: brass 60%; intensity powerful. Soft strings underneath (all keys): the song has a sustained bed (91%). Closest available sounds — approximations, not the original studio instruments."
     },
     {
-      "derivedFrom" : "uuid:8",
+      "derivedFrom" : "uuid:10",
       "id" : "uuid:11",
       "isFavorite" : false,
       "layers" : [
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:9",
+          "id" : "uuid:4",
           "keyRange" : {
             "high" : 127,
             "low" : 0
@@ -461,7 +461,7 @@
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:10",
+          "id" : "uuid:5",
           "keyRange" : {
             "high" : 127,
             "low" : 0
@@ -1496,7 +1496,7 @@
           "source" : "mixFeatures"
         }
       ],
-      "arrangementId" : "uuid:7",
+      "arrangementId" : "uuid:9",
       "confidence" : 0.5,
       "endTime" : 23.986213151927437,
       "id" : "uuid:1",
@@ -1659,5 +1659,32 @@
       "sectionId" : "uuid:2"
     }
   ],
+  "understanding" : {
+    "hook" : {
+      "alternatives" : [
+        "uuid:1"
+      ],
+      "chosenByUser" : false,
+      "confidence" : 1,
+      "kind" : "vocal",
+      "reason" : "heard 1× in the song; the sung melody carries this section.",
+      "sectionId" : "uuid:2"
+    },
+    "moods" : {
+      "uuid:1" : {
+        "confidence" : 0.0354860286342435,
+        "energy" : 0.33412425662261824,
+        "label" : "calm, warm",
+        "valence" : 0.10000000000000003
+      },
+      "uuid:2" : {
+        "confidence" : 0.06350849663983957,
+        "energy" : 0.6784124381831914,
+        "label" : "energetic, celebratory",
+        "valence" : 0.10000000000000003
+      }
+    },
+    "overall" : "calm, warm"
+  },
   "userConfirmedRights" : true
 }

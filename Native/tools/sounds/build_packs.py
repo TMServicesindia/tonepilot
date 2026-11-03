@@ -225,7 +225,12 @@ def build(pack, roots, out, commits):
         layers = sorted({k[2] for k in parsed})
         if "layers" in pack:
             layers = [l for l in layers if l in pack["layers"]]
-        layers = [layers[0], layers[-1]] if len(layers) > 2 else layers
+        if len(layers) > 2:
+            # The two dynamics that cover the most notes (soft first); folders where only one dynamic is
+            # complete (e.g. a harp sampled mostly at mf) keep that one plus the next fullest.
+            notes = {l: len({(k[0], k[1]) for k in parsed if k[2] == l}) for l in layers}
+            best = sorted(layers, key=lambda l: (-notes[l], l))[:2]
+            layers = sorted(best) if min(notes[l] for l in best) >= 0.6 * max(notes.values()) else [best[0]]
         # Octave convention of this folder: the one the measured pitches confirm most often.
         loaded, fits = [], {1: 0, 2: 0}
         for (pc, octv, layer), (f, _) in sorted(parsed.items()):

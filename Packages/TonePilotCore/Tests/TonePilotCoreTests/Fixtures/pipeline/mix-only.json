@@ -57,7 +57,7 @@
       },
       "masterGain" : 0.85,
       "name" : "Main tone",
-      "rationale" : "AI main tone from Chorus \/ Hook 2: Main sound (all keys): Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Closest available sounds — approximations, not the original studio instruments."
+      "rationale" : "AI main tone from Chorus \/ Hook 2 — the song's hook: heard 2× in the song; the lead line and the song's energy peak here. Main sound (all keys): Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Closest available sounds — approximations, not the original studio instruments."
     },
     {
       "id" : "uuid:7",
@@ -1865,5 +1865,45 @@
       "sectionId" : "uuid:4"
     }
   ],
+  "understanding" : {
+    "hook" : {
+      "alternatives" : [
+        "uuid:2",
+        "uuid:4"
+      ],
+      "chosenByUser" : false,
+      "confidence" : 1,
+      "kind" : "mixed",
+      "reason" : "heard 2× in the song; the lead line and the song's energy peak here.",
+      "sectionId" : "uuid:3"
+    },
+    "moods" : {
+      "uuid:1" : {
+        "confidence" : 0.09338772941879302,
+        "energy" : 0.3094769199482178,
+        "label" : "calm, warm",
+        "valence" : 0.10000000000000003
+      },
+      "uuid:2" : {
+        "confidence" : 0.6516943363775815,
+        "energy" : 0.16092219915628808,
+        "label" : "tender, melancholic",
+        "valence" : -0.7
+      },
+      "uuid:3" : {
+        "confidence" : 0.1152278273263756,
+        "energy" : 0.42604403379110123,
+        "label" : "bright, flowing",
+        "valence" : 0.10000000000000003
+      },
+      "uuid:4" : {
+        "confidence" : 0.654524248602199,
+        "energy" : 0.04429038737621296,
+        "label" : "tender, melancholic",
+        "valence" : -0.7
+      }
+    },
+    "overall" : "tender, melancholic"
+  },
   "userConfirmedRights" : true
 }

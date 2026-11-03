@@ -649,6 +649,23 @@ struct MyKeyboardCard: View {
                 }
                 Text(usingMain ? "One tone for the whole song." : "The tone changes with each section.")
                     .font(.caption2).foregroundStyle(.secondary)
+                // Phase 3: where the main tone comes from (the song's hook) and how the song feels — suggestions.
+                if usingMain, let u = song.understanding, let hook = u.hook,
+                   let hs = song.sections.first(where: { $0.id == hook.sectionId }) {
+                    Menu {
+                        ForEach(song.orderedSections.filter { s in !song.orderedSections.contains { $0.id != s.id && $0.repetitionGroup != nil && $0.repetitionGroup == s.repetitionGroup && $0.type == s.type && $0.startTime < s.startTime } }) { s in
+                            Button(s.label) { model.setHook(s.id, songId: song.id) }
+                        }
+                    } label: {
+                        Label("From \(hs.label) — \(hook.chosenByUser ? "your choice" : (hook.kind == .bgm ? "the song's BGM hook" : "the song's hook"))",
+                              systemImage: "music.note")
+                            .font(.caption).lineLimit(1)
+                    }
+                    .accessibilityIdentifier("tone.hookSource")
+                    if let feel = u.moods[hs.id.uuidString]?.label ?? u.overall {
+                        Text("Feel: \(feel) (suggestion)").font(.caption2).foregroundStyle(.secondary)
+                    }
+                }
             }
             HStack {
                 if usingMain, let main = model.mainTone(of: song) {

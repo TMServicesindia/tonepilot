@@ -161,6 +161,8 @@ public struct Song: Codable, Hashable, Identifiable, Sendable {
     /// Sound-engine phase 2: per section (by section id), the measured blend of library sounds that
     /// recreates the section's main sound — one layer, or as many as help (`BlendSearch`).
     public var sectionBlends: [String: BlendSearch.Result]?
+    /// Phase 3: the song's hook and each section's mood (measured suggestions; your hook choice wins).
+    public var understanding: SongUnderstanding?
 
     public init(id: UUID = UUID(), title: String, artist: String? = nil, film: String? = nil,
                 composer: String? = nil, language: String? = nil, tags: [String] = [],

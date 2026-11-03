@@ -262,7 +262,10 @@ public enum AutoArranger {
             arranged.append(section.id)
         }
         song.toneSuggestions = newSuggestions
-        if onlySection == nil { refreshMainTone(&song) }
+        if onlySection == nil {
+            song.understanding = SongUnderstanding.analyse(song, timbres: timbres)
+            refreshMainTone(&song)
+        }
         song.updatedAt = Date()
         return Result(song: song, arranged: arranged)
     }
@@ -282,6 +285,13 @@ public enum AutoArranger {
         }
         var time: [UUID: Double] = [:]
         for (s, a) in withTone { if let l = lead(a) { time[l, default: 0] += weight(s) } }
+        // Phase 3: the song's hook section (or the one you chose) gives the main tone.
+        if let hook = song.understanding?.hook, let pair = withTone.first(where: { $0.0.id == hook.sectionId }) {
+            var tone = Arrangement(name: "Main tone", layers: pair.1.layers, masterGain: pair.1.masterGain, master: pair.1.master)
+            tone.rationale = "\(aiMainTonePrefix) from \(pair.0.label) — " + (hook.chosenByUser ? "the section you chose as the hook. " : "the song's hook: \(hook.reason) ")
+                + (pair.1.rationale ?? "")
+            return tone
+        }
         guard let mainLead = time.max(by: { ($0.value, $1.key.uuidString) < ($1.value, $0.key.uuidString) })?.key else { return nil }
         let pick = withTone.filter { lead($0.1) == mainLead }.max { weight($0.0) < weight($1.0) }
         guard let (section, source) = pick else { return nil }

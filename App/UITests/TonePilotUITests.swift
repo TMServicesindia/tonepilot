@@ -75,6 +75,12 @@ final class TonePilotUITests: XCTestCase {
                 tap(element("tonemode.main"), "main tone")
                 if round == 2 {
                     // Blind comparison sheet: opens and closes (no downloads needed).
+                    let hookMenu = element("tone.hookSource")
+                    if hookMenu.waitForExistence(timeout: 2) {
+                        tap(hookMenu, "open the hook menu (main tone source)")
+                        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.02)).tap()   // close it without choosing
+                        assertAlive("hook menu")
+                    }
                     let compare = element("tone.compare")
                     if compare.waitForExistence(timeout: 3) {
                         tap(compare, thenExpect: element("compare.done"), limit: 5, "open the blind comparison")
