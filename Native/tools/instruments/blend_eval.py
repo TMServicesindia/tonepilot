@@ -84,29 +84,45 @@ def shortlist(dump, eat):
     print(f"SHORTLIST {len(out)} targets x {P['shortlist']} candidates")
 
 
-def blend_search(model, hook, notes, cands):
-    """Port of BlendSearch.search. cands: [(patch_id, audio)] best single first (shortlist order)."""
+def spectral_shape(x):
+    """Long-term average log-mel spectrum with its overall level removed (device front-end, no mask):
+    reacts directly to how much of each instrument is in a blend."""
+    if len(x) < SR:
+        x = np.pad(x, (0, SR - len(x)))
+    v = device_logmel(x.astype(np.float64), None).mean(1)
+    return v - v.mean()
+
+
+def blend_search(model, hook, notes, cands, p=None):
+    """Port of BlendSearch.search. cands: [(patch_id, audio)] best single first (shortlist order).
+    `p` overrides the parameters (sweep); wSpec > 0 adds the spectral-shape term."""
+    P = {**globals()["P"], **(p or {})}
+    wspec = P.get("wSpec", 0.0)
     emb = lambda x, masked: embedding(model, x, notes if masked else None, P["maxWindows"])
     hookT, mainT = emb(hook, True), emb(hook, False)
+    specT = spectral_shape(hook) if wspec else None
     C = []
     for pid, a in cands:
         rms = float(np.sqrt(np.mean(a.astype(np.float64) ** 2)))
         if rms <= 1e-5:
             continue
         a = (a * (0.1 / rms)).astype(np.float32)
-        C.append({"id": pid, "audio": a, "eh": emb(a, True), "em": emb(a, False)})
-    score = lambda h, m, n: P["wHook"] * h + P["wMain"] * m - P["lam"] * (n - 1)
-    singles = sorted(({**c, "h": cos(c["eh"], hookT), "m": cos(c["em"], mainT)} for c in C),
-                     key=lambda c: -score(c["h"], c["m"], 1))
+        C.append({"id": pid, "audio": a, "eh": emb(a, True), "em": emb(a, False), "sp": spectral_shape(a) if wspec else None})
+    def score(h, m, n, sp=0.0):
+        return P["wHook"] * h + P["wMain"] * m + wspec * sp - P["lam"] * (n - 1)
+    spc = lambda x_sp: cos(x_sp, specT) if wspec else 0.0
+    singles = sorted(({**c, "h": cos(c["eh"], hookT), "m": cos(c["em"], mainT), "s": spc(c["sp"])} for c in C),
+                     key=lambda c: -score(c["h"], c["m"], 1, c["s"]))
     first = singles[0]
     chosen, bal = [first], [1.0]
-    mix = first["audio"].copy(); cur_h, cur_m = first["h"], first["m"]; cur_s = score(cur_h, cur_m, 1)
+    mix = first["audio"].copy(); cur_h, cur_m = first["h"], first["m"]; cur_s = score(cur_h, cur_m, 1, first["s"])
     cur_eh, cur_em = first["eh"], first["em"]
     floor = first["h"] - P["hookSlack"]
     diag = None
     while len(chosen) < min(P["maxLayers"], len(C)):
         rest = [c for c in C if all(c["id"] != k["id"] for k in chosen)]
-        approx = lambda c: score(cos(cur_eh + 0.55 * c["eh"], hookT), cos(cur_em + 0.55 * c["em"], mainT), len(chosen) + 1)
+        approx = lambda c: score(cos(cur_eh + 0.55 * c["eh"], hookT), cos(cur_em + 0.55 * c["em"], mainT), len(chosen) + 1,
+                                 spc(spectral_shape(mix + np.float32(0.55) * c["audio"])) if wspec else 0.0)
         short = sorted(rest, key=lambda c: -approx(c))[:P["perRound"]]
         best = None
         for c in short:
@@ -114,7 +130,7 @@ def blend_search(model, hook, notes, cands):
                 x = mix + np.float32(v) * c["audio"]
                 eh, em = emb(x, True), emb(x, False)
                 h, m = cos(eh, hookT), cos(em, mainT)
-                s = score(h, m, len(chosen) + 1)
+                s = score(h, m, len(chosen) + 1, spc(spectral_shape(x)) if wspec else 0.0)
                 if best is None or s > best[5]:
                     best = (c, v, x, h, m, s, eh, em)
         if diag is None and best is not None:
@@ -124,7 +140,7 @@ def blend_search(model, hook, notes, cands):
         chosen.append(best[0]); bal.append(best[1])
         mix, cur_h, cur_m, cur_s, cur_eh, cur_em = best[2], best[3], best[4], best[5], best[6], best[7]
     return {"layers": [(c["id"], b) for c, b in zip(chosen, bal)], "audio": mix, "single_audio": first["audio"],
-            "single": first["id"], "hook": cur_h, "score": cur_s, "single_score": score(first["h"], first["m"], 1), "diag": diag or {}}
+            "single": first["id"], "hook": cur_h, "score": cur_s, "single_score": score(first["h"], first["m"], 1, first["s"]), "diag": diag or {}}
 
 
 def judge(dump, out_md, eat):
@@ -198,10 +214,56 @@ def judge(dump, out_md, eat):
     print(f"RESULT blend gate {'PASS' if passed else 'FAIL'}: blend targets better {bb}/{bn}; single targets worse>0.01: {sw1}; any worse>0.02: {aw2}")
 
 
+SWEEP = {
+    "V0 current (wH .6, wM .3, λ=δ=.02)": {},
+    "V1 no layer cost or margin": {"lam": 0.0, "delta": 0.0},
+    "V2 small cost (λ=δ=.002)": {"lam": 0.002, "delta": 0.002},
+    "V3 + spectral shape (wH .3, wM .2, wS .5, λ=δ=.01)": {"wHook": 0.3, "wMain": 0.2, "wSpec": 0.5, "lam": 0.01, "delta": 0.01},
+    "V4 spectral shape only (λ=δ=.01)": {"wHook": 0.0, "wMain": 0.0, "wSpec": 1.0, "lam": 0.01, "delta": 0.01},
+    "V5 + spectral shape (wH .3, wM .2, wS .5, λ=δ=.02)": {"wHook": 0.3, "wMain": 0.2, "wSpec": 0.5, "lam": 0.02, "delta": 0.02},
+}
+
+
+def sweep(dump, out_md, eat):
+    """DEV tuning (not a gate): each variant's choices judged by CNN10 vs the clean part."""
+    model = make_model(eat)
+    cnn = model_embedder("panns10", eat)
+    targets = {t["id"]: t for t in json.load(open(os.path.join(dump, "targets.json")))}
+    work = []
+    for sl in json.load(open(os.path.join(dump, "shortlist.json"))):
+        t = targets[sl["id"]]
+        hook, _ = read_wav(os.path.join(dump, "targets", f"{t['id']}_stem.wav"))
+        clean, _ = read_wav(os.path.join(dump, "targets", f"{t['id']}_clean.wav"))
+        cands = [(pid, read_wav(os.path.join(dump, "renders", f"{t['id']}_{pid}.wav"))[0]) for pid in sl["candidates"]
+                 if os.path.exists(os.path.join(dump, "renders", f"{t['id']}_{pid}.wav"))]
+        if cands:
+            work.append((t, hook.astype(np.float32), cands, cnn(clean, SR)))
+    lines = ["# Blend search DEV sweep (tuning, not a gate) — CNN10 vs the clean part", "",
+             "| Variant | Blend targets: >1 layer | better | 2nd instrument found | Single targets: >1 layer | worse > 0.01 | Any worse > 0.02 | Mean gain (blend) |",
+             "|---|---|---|---|---|---|---|---|"]
+    for name, pv in SWEEP.items():
+        res = {"blend": [], "single": []}
+        for t, hook, cands, ce in work:
+            r = blend_search(model, hook, t["notes"], cands, pv)
+            ids = [k for k, _ in r["layers"]]
+            g = 0.0 if len(ids) == 1 else cos(cnn(r["audio"], SR), ce) - cos(cnn(r["single_audio"], SR), ce)
+            res[t["variant"]].append({"multi": len(ids) > 1, "gain": g, "partner": bool(t["partner_patch"]) and t["partner_patch"] in ids})
+        b, sg = res["blend"], res["single"]
+        allr = b + sg
+        lines.append(f"| {name} | {sum(r['multi'] for r in b)}/{len(b)} | {sum(r['gain'] > 0.002 for r in b)}/{len(b)} | {sum(r['partner'] for r in b)} | "
+                     f"{sum(r['multi'] for r in sg)}/{len(sg)} | {sum(r['gain'] < -0.01 for r in sg)} | {sum(r['gain'] < -0.02 for r in allr)} | "
+                     f"{np.mean([r['gain'] for r in b]):+.4f} |")
+        print(lines[-1], flush=True)
+    open(out_md, "w").write("\n".join(lines) + "\n")
+    print("\n".join(lines))
+
+
 if __name__ == "__main__":
     mode, dump = sys.argv[1], sys.argv[2]
     eat = sys.argv[sys.argv.index("--eat") + 1]
     if mode == "shortlist":
         shortlist(dump, eat)
+    elif mode == "sweep":
+        sweep(dump, sys.argv[3], eat)
     else:
         judge(dump, sys.argv[3], eat)

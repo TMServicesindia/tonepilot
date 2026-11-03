@@ -10,6 +10,9 @@ on:
       reuse_run:
         description: "Judge only, reusing the targets / shortlist / renders of this earlier run id (empty = full run)"
         default: ""
+      mode:
+        description: "judge (pre-registered gate) or sweep (DEV tuning of the score; not a gate)"
+        default: "judge"
 
 permissions:
   contents: write
@@ -104,7 +107,7 @@ jobs:
           pip install -q panns-inference==0.1.1
           git clone -q https://github.com/fschmid56/EfficientAT /tmp/eat
           set -o pipefail
-          cd /tmp/eat && python $GITHUB_WORKSPACE/Native/tools/instruments/blend_eval.py judge /tmp/bd /tmp/blend.md --eat /tmp/eat 2>&1 | tee /tmp/blend.log | grep -E "^\||RESULT|Error|error|Traceback" | tail -20
+          cd /tmp/eat && python $GITHUB_WORKSPACE/Native/tools/instruments/blend_eval.py ${{ inputs.mode || 'judge' }} /tmp/bd /tmp/blend.md --eat /tmp/eat 2>&1 | tee /tmp/blend.log | grep -E "^\||RESULT|Error|error|Traceback" | tail -20
           grep "^RESULT" /tmp/blend.log | while IFS= read -r l; do echo "::notice title=Blend search::$l"; done
       - name: Push to branch ci/tone-blend
         if: always()
@@ -113,5 +116,5 @@ jobs:
           cd $GITHUB_WORKSPACE
           git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
           git checkout -q --orphan ci/tone-blend && git rm -rqf . && mkdir -p blend
-          cp /tmp/blend.md /tmp/blend.json /tmp/blend.log blend/; echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID}" > blend/SOURCE.txt
+          cp /tmp/blend.md /tmp/blend.log blend/; cp /tmp/blend.json blend/ 2>/dev/null || true; echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID}" > blend/SOURCE.txt
           git add blend && git commit -qm "Tone blend phase 2" && git push -qf origin ci/tone-blend
