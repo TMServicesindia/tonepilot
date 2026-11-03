@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
-      - name: Sample libraries (sparse: only the folders used)
+      - name: "Sample libraries (sparse, only the folders used)"
         run: |
           git clone -q --filter=blob:none --no-checkout https://github.com/sgossner/VSCO-2-CE /tmp/vsco
           git -C /tmp/vsco sparse-checkout set --no-cone "/Strings/Cello Section/susvib/" "/Strings/Viola Section/susvib/" "/Strings/Violin Section/susVib/" "/Woodwinds/Flute/susvib/" /LICENSE
