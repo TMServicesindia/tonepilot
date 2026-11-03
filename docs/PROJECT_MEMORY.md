@@ -326,6 +326,26 @@ Stop: no production change, no major training, no release before approval.
   - tone fitting budget 0.58 s.
 - macos-15 runners were unavailable five times on 2 Nov. Manual full builds of `main` (runner input) now publish too, with the same gate.
 
+## 6s. Owner feedback on v0.3.87 (3 Nov): no AI key map; the tone should sound like the song
+
+**Owner said:**
+- The 4-part model is good for the main tone but sometimes misses the lead sound.
+- The 6-part model is good but doesn't use the piano part properly.
+- The AI splits the keyboard and maps sounds to keys. The owner wants it flexible, with every sound on all keys of the 61-key CT-X870IN.
+- Target: the overall sound should be about 90 % like the song's. For Hukum, the owner's own Casio layer (Arabic Strings + Slow Strings, for the BGM line most people play) beats ours.
+
+**Done:**
+- `AutoArranger.Options.splitKeyboard = false` (default): every AI layer covers all keys with no octave shift.
+- A tone is now the song's own sounds blended: the main sound plus up to two of the song's matched accompaniment parts (backing / piano / guitar).
+- No guessed bass / celesta / left-hand layers. A soft strings pad is added only when no accompaniment was matched and the song has a sustained bed.
+- Piano / guitar stems are searched unmasked (chordal, like backing).
+- Tone fit stays on melody parts only.
+- Pipeline fixtures re-recorded for this approved change.
+
+**Open:**
+- casio.com is blocked in this session, so the CT-X870IN tone list couldn't be read. Needed for "on your Casio: Arabic Strings + Slow Strings" suggestions by name.
+- A "whole-song sound" match % (target 90 %) is not yet measurable on real songs.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

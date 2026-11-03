@@ -24,10 +24,10 @@
           "id" : "uuid:6",
           "keyRange" : {
             "high" : 127,
-            "low" : 56
+            "low" : 0
           },
           "muted" : false,
-          "octave" : -1,
+          "octave" : 0,
           "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "motif",
@@ -38,27 +38,6 @@
             "low" : 1
           },
           "volume" : 0.8
-        },
-        {
-          "enabled" : true,
-          "fineTuneCents" : 0,
-          "id" : "uuid:7",
-          "keyRange" : {
-            "high" : 55,
-            "low" : 24
-          },
-          "muted" : false,
-          "octave" : 0,
-          "pan" : -0.1,
-          "patchId" : "uuid:?",
-          "role" : "harmony",
-          "solo" : false,
-          "transpose" : 0,
-          "velocityRange" : {
-            "high" : 127,
-            "low" : 1
-          },
-          "volume" : 0.6
         }
       ],
       "master" : {
@@ -78,10 +57,10 @@
       },
       "masterGain" : 0.85,
       "name" : "Main tone",
-      "rationale" : "AI main tone from Chorus \/ Hook 2: Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: articulated accompaniment — piano keeps Root–Fifth–Root patterns clear. Closest available sounds — approximations, not the original studio instruments."
+      "rationale" : "AI main tone from Chorus \/ Hook 2: Main sound (all keys): Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Closest available sounds — approximations, not the original studio instruments."
     },
     {
-      "id" : "uuid:8",
+      "id" : "uuid:7",
       "isFavorite" : false,
       "layers" : [
         {
@@ -90,10 +69,10 @@
           "id" : "uuid:6",
           "keyRange" : {
             "high" : 127,
-            "low" : 56
+            "low" : 0
           },
           "muted" : false,
-          "octave" : -1,
+          "octave" : 0,
           "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "motif",
@@ -104,27 +83,6 @@
             "low" : 1
           },
           "volume" : 0.8
-        },
-        {
-          "enabled" : true,
-          "fineTuneCents" : 0,
-          "id" : "uuid:7",
-          "keyRange" : {
-            "high" : 55,
-            "low" : 24
-          },
-          "muted" : false,
-          "octave" : 0,
-          "pan" : -0.1,
-          "patchId" : "uuid:?",
-          "role" : "harmony",
-          "solo" : false,
-          "transpose" : 0,
-          "velocityRange" : {
-            "high" : 127,
-            "low" : 1
-          },
-          "volume" : 0.6
         }
       ],
       "master" : {
@@ -145,11 +103,11 @@
       "masterGain" : 0.85,
       "name" : "Chorus \/ Hook 1 (AI)",
       "origin" : "aiOriginal",
-      "rationale" : "Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: articulated accompaniment — piano keeps Root–Fifth–Root patterns clear. Closest available sounds — approximations, not the original studio instruments."
+      "rationale" : "Main sound (all keys): Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Closest available sounds — approximations, not the original studio instruments."
     },
     {
-      "derivedFrom" : "uuid:8",
-      "id" : "uuid:9",
+      "derivedFrom" : "uuid:7",
+      "id" : "uuid:8",
       "isFavorite" : false,
       "layers" : [
         {
@@ -158,10 +116,10 @@
           "id" : "uuid:6",
           "keyRange" : {
             "high" : 127,
-            "low" : 56
+            "low" : 0
           },
           "muted" : false,
-          "octave" : -1,
+          "octave" : 0,
           "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "motif",
@@ -172,27 +130,6 @@
             "low" : 1
           },
           "volume" : 0.8
-        },
-        {
-          "enabled" : true,
-          "fineTuneCents" : 0,
-          "id" : "uuid:7",
-          "keyRange" : {
-            "high" : 55,
-            "low" : 24
-          },
-          "muted" : false,
-          "octave" : 0,
-          "pan" : -0.1,
-          "patchId" : "uuid:?",
-          "role" : "harmony",
-          "solo" : false,
-          "transpose" : 0,
-          "velocityRange" : {
-            "high" : 127,
-            "low" : 1
-          },
-          "volume" : 0.6
         }
       ],
       "master" : {
@@ -213,22 +150,22 @@
       "masterGain" : 0.85,
       "name" : "Chorus \/ Hook 1 (My Version)",
       "origin" : "myVersion",
-      "rationale" : "Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: articulated accompaniment — piano keeps Root–Fifth–Root patterns clear. Closest available sounds — approximations, not the original studio instruments."
+      "rationale" : "Main sound (all keys): Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Closest available sounds — approximations, not the original studio instruments."
     },
     {
-      "id" : "uuid:10",
+      "id" : "uuid:9",
       "isFavorite" : false,
       "layers" : [
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:11",
+          "id" : "uuid:10",
           "keyRange" : {
             "high" : 127,
-            "low" : 56
+            "low" : 0
           },
           "muted" : false,
-          "octave" : -1,
+          "octave" : 0,
           "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "motif",
@@ -243,14 +180,14 @@
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:12",
+          "id" : "uuid:11",
           "keyRange" : {
-            "high" : 55,
-            "low" : 24
+            "high" : 127,
+            "low" : 0
           },
           "muted" : false,
           "octave" : 0,
-          "pan" : -0.1,
+          "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "pad",
           "solo" : false,
@@ -259,28 +196,7 @@
             "high" : 127,
             "low" : 1
           },
-          "volume" : 0.6
-        },
-        {
-          "enabled" : true,
-          "fineTuneCents" : 0,
-          "id" : "uuid:13",
-          "keyRange" : {
-            "high" : 127,
-            "low" : 56
-          },
-          "muted" : false,
-          "octave" : 0,
-          "pan" : 0.15,
-          "patchId" : "uuid:?",
-          "role" : "pad",
-          "solo" : false,
-          "transpose" : 0,
-          "velocityRange" : {
-            "high" : 127,
-            "low" : 1
-          },
-          "volume" : 0.35
+          "volume" : 0.3
         }
       ],
       "master" : {
@@ -301,23 +217,23 @@
       "masterGain" : 0.8,
       "name" : "Interlude (AI)",
       "origin" : "aiOriginal",
-      "rationale" : "Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (100%). Closest available sounds — approximations, not the original studio instruments."
+      "rationale" : "Main sound (all keys): Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Soft strings underneath (all keys): the song has a sustained bed (100%). Closest available sounds — approximations, not the original studio instruments."
     },
     {
-      "derivedFrom" : "uuid:10",
-      "id" : "uuid:14",
+      "derivedFrom" : "uuid:9",
+      "id" : "uuid:12",
       "isFavorite" : false,
       "layers" : [
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:11",
+          "id" : "uuid:10",
           "keyRange" : {
             "high" : 127,
-            "low" : 56
+            "low" : 0
           },
           "muted" : false,
-          "octave" : -1,
+          "octave" : 0,
           "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "motif",
@@ -332,14 +248,14 @@
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:12",
+          "id" : "uuid:11",
           "keyRange" : {
-            "high" : 55,
-            "low" : 24
+            "high" : 127,
+            "low" : 0
           },
           "muted" : false,
           "octave" : 0,
-          "pan" : -0.1,
+          "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "pad",
           "solo" : false,
@@ -348,28 +264,7 @@
             "high" : 127,
             "low" : 1
           },
-          "volume" : 0.6
-        },
-        {
-          "enabled" : true,
-          "fineTuneCents" : 0,
-          "id" : "uuid:13",
-          "keyRange" : {
-            "high" : 127,
-            "low" : 56
-          },
-          "muted" : false,
-          "octave" : 0,
-          "pan" : 0.15,
-          "patchId" : "uuid:?",
-          "role" : "pad",
-          "solo" : false,
-          "transpose" : 0,
-          "velocityRange" : {
-            "high" : 127,
-            "low" : 1
-          },
-          "volume" : 0.35
+          "volume" : 0.3
         }
       ],
       "master" : {
@@ -390,22 +285,22 @@
       "masterGain" : 0.8,
       "name" : "Interlude (My Version)",
       "origin" : "myVersion",
-      "rationale" : "Right hand: Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (100%). Closest available sounds — approximations, not the original studio instruments."
+      "rationale" : "Main sound (all keys): Grand Piano — clear, steady notes with decaying attacks (instrumental motif); intensity soft. Soft strings underneath (all keys): the song has a sustained bed (100%). Closest available sounds — approximations, not the original studio instruments."
     },
     {
-      "id" : "uuid:15",
+      "id" : "uuid:13",
       "isFavorite" : false,
       "layers" : [
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:16",
+          "id" : "uuid:14",
           "keyRange" : {
             "high" : 127,
-            "low" : 56
+            "low" : 0
           },
           "muted" : false,
-          "octave" : -1,
+          "octave" : 0,
           "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "motif",
@@ -420,14 +315,14 @@
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:17",
+          "id" : "uuid:15",
           "keyRange" : {
-            "high" : 55,
-            "low" : 24
+            "high" : 127,
+            "low" : 0
           },
           "muted" : false,
           "octave" : 0,
-          "pan" : -0.1,
+          "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "pad",
           "solo" : false,
@@ -436,28 +331,7 @@
             "high" : 127,
             "low" : 1
           },
-          "volume" : 0.6
-        },
-        {
-          "enabled" : true,
-          "fineTuneCents" : 0,
-          "id" : "uuid:18",
-          "keyRange" : {
-            "high" : 127,
-            "low" : 56
-          },
-          "muted" : false,
-          "octave" : 0,
-          "pan" : 0.15,
-          "patchId" : "uuid:?",
-          "role" : "pad",
-          "solo" : false,
-          "transpose" : 0,
-          "velocityRange" : {
-            "high" : 127,
-            "low" : 1
-          },
-          "volume" : 0.35
+          "volume" : 0.3
         }
       ],
       "master" : {
@@ -478,23 +352,23 @@
       "masterGain" : 0.8,
       "name" : "Outro (AI)",
       "origin" : "aiOriginal",
-      "rationale" : "Right hand: Harmonium-like Reed — a sustained sung melody with a warm, reedy Indian colour (instrumental motif); intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (100%). Closest available sounds — approximations, not the original studio instruments."
+      "rationale" : "Main sound (all keys): Harmonium-like Reed — a sustained sung melody with a warm, reedy Indian colour (instrumental motif); intensity soft. Soft strings underneath (all keys): the song has a sustained bed (100%). Closest available sounds — approximations, not the original studio instruments."
     },
     {
-      "derivedFrom" : "uuid:15",
-      "id" : "uuid:19",
+      "derivedFrom" : "uuid:13",
+      "id" : "uuid:16",
       "isFavorite" : false,
       "layers" : [
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:16",
+          "id" : "uuid:14",
           "keyRange" : {
             "high" : 127,
-            "low" : 56
+            "low" : 0
           },
           "muted" : false,
-          "octave" : -1,
+          "octave" : 0,
           "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "motif",
@@ -509,14 +383,14 @@
         {
           "enabled" : true,
           "fineTuneCents" : 0,
-          "id" : "uuid:17",
+          "id" : "uuid:15",
           "keyRange" : {
-            "high" : 55,
-            "low" : 24
+            "high" : 127,
+            "low" : 0
           },
           "muted" : false,
           "octave" : 0,
-          "pan" : -0.1,
+          "pan" : 0,
           "patchId" : "uuid:?",
           "role" : "pad",
           "solo" : false,
@@ -525,28 +399,7 @@
             "high" : 127,
             "low" : 1
           },
-          "volume" : 0.6
-        },
-        {
-          "enabled" : true,
-          "fineTuneCents" : 0,
-          "id" : "uuid:18",
-          "keyRange" : {
-            "high" : 127,
-            "low" : 56
-          },
-          "muted" : false,
-          "octave" : 0,
-          "pan" : 0.15,
-          "patchId" : "uuid:?",
-          "role" : "pad",
-          "solo" : false,
-          "transpose" : 0,
-          "velocityRange" : {
-            "high" : 127,
-            "low" : 1
-          },
-          "volume" : 0.35
+          "volume" : 0.3
         }
       ],
       "master" : {
@@ -567,7 +420,7 @@
       "masterGain" : 0.8,
       "name" : "Outro (My Version)",
       "origin" : "myVersion",
-      "rationale" : "Right hand: Harmonium-like Reed — a sustained sung melody with a warm, reedy Indian colour (instrumental motif); intensity soft. Left hand: sustained harmony dominates, so broken chords ring as strings\/pad. Strings under the right hand: a sustained bed is present (100%). Closest available sounds — approximations, not the original studio instruments."
+      "rationale" : "Main sound (all keys): Harmonium-like Reed — a sustained sung melody with a warm, reedy Indian colour (instrumental motif); intensity soft. Soft strings underneath (all keys): the song has a sustained bed (100%). Closest available sounds — approximations, not the original studio instruments."
     }
   ],
   "beatTimes" : [
@@ -1221,7 +1074,7 @@
         ],
         "confidence" : 0.6146876037477733,
         "duration" : 3.877732426303855,
-        "id" : "uuid:20",
+        "id" : "uuid:17",
         "isOrnamented" : false,
         "midi" : 48,
         "start" : 0,
@@ -1233,7 +1086,7 @@
         ],
         "confidence" : 0.6272839561981314,
         "duration" : 3.947392290249433,
-        "id" : "uuid:21",
+        "id" : "uuid:18",
         "isOrnamented" : false,
         "midi" : 53,
         "start" : 3.93578231292517,
@@ -1245,7 +1098,7 @@
         ],
         "confidence" : 0.6317075672395089,
         "duration" : 3.947392290249433,
-        "id" : "uuid:22",
+        "id" : "uuid:19",
         "isOrnamented" : false,
         "midi" : 55,
         "start" : 7.9412244897959186,
@@ -1257,7 +1110,7 @@
         ],
         "confidence" : 0.616743689687813,
         "duration" : 3.947392290249433,
-        "id" : "uuid:23",
+        "id" : "uuid:20",
         "isOrnamented" : false,
         "midi" : 48,
         "start" : 11.935056689342403,
@@ -1269,7 +1122,7 @@
         ],
         "confidence" : 0.5024738340274147,
         "duration" : 4.005442176870749,
-        "id" : "uuid:24",
+        "id" : "uuid:21",
         "isOrnamented" : false,
         "midi" : 45,
         "start" : 15.952108843537415,
@@ -1281,7 +1134,7 @@
         ],
         "confidence" : 0.5610347365050815,
         "duration" : 3.9938321995464854,
-        "id" : "uuid:25",
+        "id" : "uuid:22",
         "isOrnamented" : false,
         "midi" : 50,
         "start" : 19.957551020408165,
@@ -1293,7 +1146,7 @@
         ],
         "confidence" : 0.562397184399511,
         "duration" : 4.017052154195011,
-        "id" : "uuid:26",
+        "id" : "uuid:23",
         "isOrnamented" : false,
         "midi" : 52,
         "start" : 23.95138321995465,
@@ -1305,7 +1158,7 @@
         ],
         "confidence" : 0.5032997237660034,
         "duration" : 3.9706122448979593,
-        "id" : "uuid:27",
+        "id" : "uuid:24",
         "isOrnamented" : false,
         "midi" : 45,
         "start" : 27.96843537414966,
@@ -1317,7 +1170,7 @@
         ],
         "confidence" : 0.6186891256009831,
         "duration" : 3.947392290249433,
-        "id" : "uuid:28",
+        "id" : "uuid:25",
         "isOrnamented" : false,
         "midi" : 48,
         "start" : 31.93904761904762,
@@ -1329,7 +1182,7 @@
         ],
         "confidence" : 0.623149168577747,
         "duration" : 4.005442176870749,
-        "id" : "uuid:29",
+        "id" : "uuid:26",
         "isOrnamented" : false,
         "midi" : 53,
         "start" : 35.9328798185941,
@@ -1341,7 +1194,7 @@
         ],
         "confidence" : 0.6319314560469459,
         "duration" : 3.947392290249433,
-        "id" : "uuid:30",
+        "id" : "uuid:27",
         "isOrnamented" : false,
         "midi" : 55,
         "start" : 39.938321995464854,
@@ -1353,7 +1206,7 @@
         ],
         "confidence" : 0.6174607256696639,
         "duration" : 3.93578231292517,
-        "id" : "uuid:31",
+        "id" : "uuid:28",
         "isOrnamented" : false,
         "midi" : 48,
         "start" : 43.9437641723356,
@@ -1709,7 +1562,7 @@
         ],
         "confidence" : 0.5025964255782142,
         "duration" : 4.005442176870749,
-        "id" : "uuid:32",
+        "id" : "uuid:29",
         "isOrnamented" : true,
         "midi" : 45,
         "start" : 47.96081632653061,
@@ -1721,7 +1574,7 @@
         ],
         "confidence" : 0.5610006539974102,
         "duration" : 3.9938321995464854,
-        "id" : "uuid:33",
+        "id" : "uuid:30",
         "isOrnamented" : false,
         "midi" : 50,
         "start" : 51.96625850340136,
@@ -1733,7 +1586,7 @@
         ],
         "confidence" : 0.5625399169714554,
         "duration" : 4.005442176870749,
-        "id" : "uuid:34",
+        "id" : "uuid:31",
         "isOrnamented" : false,
         "midi" : 52,
         "start" : 55.960090702947845,
@@ -1745,7 +1598,7 @@
         ],
         "confidence" : 0.5032149036373712,
         "duration" : 3.93578231292517,
-        "id" : "uuid:35",
+        "id" : "uuid:32",
         "isOrnamented" : false,
         "midi" : 45,
         "start" : 59.965532879818596,
@@ -1765,7 +1618,7 @@
           "source" : "mixFeatures"
         }
       ],
-      "arrangementId" : "uuid:9",
+      "arrangementId" : "uuid:8",
       "confidence" : 0.4,
       "endTime" : 15.975328798185942,
       "id" : "uuid:1",
@@ -1792,7 +1645,7 @@
           "source" : "mixFeatures"
         }
       ],
-      "arrangementId" : "uuid:14",
+      "arrangementId" : "uuid:12",
       "confidence" : 0.39999999999999997,
       "endTime" : 31.973877551020408,
       "id" : "uuid:2",
@@ -1833,7 +1686,7 @@
           "source" : "mixFeatures"
         }
       ],
-      "arrangementId" : "uuid:9",
+      "arrangementId" : "uuid:8",
       "confidence" : 0.3851641654968262,
       "endTime" : 47.972426303854874,
       "id" : "uuid:3",
@@ -1860,7 +1713,7 @@
           "source" : "mixFeatures"
         }
       ],
-      "arrangementId" : "uuid:19",
+      "arrangementId" : "uuid:16",
       "confidence" : 0.4482410877943039,
       "endTime" : 64,
       "id" : "uuid:4",

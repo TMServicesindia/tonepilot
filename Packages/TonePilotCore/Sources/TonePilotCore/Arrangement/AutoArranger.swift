@@ -20,6 +20,10 @@ public enum AutoArranger {
         /// Lowest and highest physical keys (CT-X870IN: C2–C7).
         public var keyboardLow: Int = 36
         public var keyboardHigh: Int = 96
+        /// Split the keyboard into AI-chosen left / right hand sounds. Off (owner, 3 Nov): every layer
+        /// plays on all keys, so the player is free to play anywhere on the 61 keys, and a tone is the
+        /// song's own sounds blended together rather than a key map.
+        public var splitKeyboard = false
         public init() {}
     }
 
@@ -420,6 +424,7 @@ public enum AutoArranger {
             if available[leftPatch] == nil { leftPatch = FactoryPatches.id(forProgram: 61) }
         }
         var left = Layer(patchId: leftPatch, volume: 0.6, pan: -0.1, keyRange: leftRange, role: padLevel > keysLevel + 0.1 ? .pad : .harmony)
+        var leftFromSong = false
         // The song's own accompaniment instrument (backing / piano / guitar part), measured.
         let accompaniment = ["backing", "piano", "guitar"].compactMap { song.partMatches?[$0] }.filter(\.isTrusted)
         // Perceptual picks first (measured better across sound sources), then by match strength.
@@ -428,6 +433,7 @@ public enum AutoArranger {
             left.patchId = m.patchId
             left.effectsOverride = m.effects(base: patch.effects)
             m.applyFit(to: &left)
+            leftFromSong = true
             leftWhy = m.isPerceptual ? "\(m.name), the nearest sound to the song's \(m.part) part (whole tone library)"
                                      : "\(m.name), matched to the song's \(m.part) part (\(Int((m.similarity * 100).rounded()))% tone match)"
             if let f = m.fitSummary { leftWhy += " — " + f.trimmingCharacters(in: CharacterSet(charactersIn: ".")) }
@@ -453,6 +459,42 @@ public enum AutoArranger {
             why.append(sub ? "Sub synth bass under your left-hand root: heavy low end in a powerful section."
                            : "Bass doubles your left-hand root an octave down: strong low end in this section.")
         }
+        // No AI key map: one tone across all keys, made of the song's own sounds.
+        if !options.splitKeyboard {
+            let all = KeyRange(low: 0, high: 127)
+            var blend: [Layer] = []
+            var blendWhy: [String] = []
+            if var lead = layers.first(where: { [.lead, .vocalMelody, .motif].contains($0.role) }) {
+                lead.keyRange = all; lead.octave = 0; lead.pan = 0
+                blend.append(lead)
+                blendWhy += why.filter { $0.hasPrefix("Right hand:") }.map { "Main sound (all keys):" + $0.dropFirst("Right hand:".count) }
+                blendWhy += why.filter { $0.hasPrefix("Fitted to the song:") }
+            }
+            // The song's own accompaniment sounds (backing, piano, guitar parts), strongest match first, up to two.
+            let ranked = accompaniment.sorted { ($0.isPerceptual ? 1 : 0, $0.perceptualScore ?? $0.similarity) > ($1.isPerceptual ? 1 : 0, $1.perceptualScore ?? $1.similarity) }
+            for m in ranked where blend.count < 3 && !blend.contains(where: { $0.patchId == m.patchId }) {
+                guard let patch = available[m.patchId] else { continue }
+                var under = Layer(patchId: m.patchId, volume: blend.isEmpty ? 0.8 : (blend.count == 1 ? 0.5 : 0.35), keyRange: all,
+                                  role: m.part == "piano" || m.part == "guitar" ? .harmony : .pad)
+                under.effectsOverride = m.effects(base: patch.effects)
+                m.applyFit(to: &under)
+                blend.append(under)
+                blendWhy.append("Blended with (all keys): \(m.name), " + (m.isPerceptual ? "the nearest sound to the song's \(m.part) part." : "matched to the song's \(m.part) part."))
+            }
+            if leftFromSong || blend.count > 1 {
+                // the song's own sounds are in the blend
+            } else if padLevel > 0.45 || blend.isEmpty {
+                let pad = Layer(patchId: FactoryPatches.id(forProgram: section.type == .chorus ? 48 : 49), volume: blend.isEmpty ? 0.75 : 0.3,
+                                keyRange: all, role: .pad)
+                if !blend.contains(where: { $0.patchId == pad.patchId }) {
+                    blend.append(pad)
+                    blendWhy.append("Soft strings underneath (all keys): the song has a sustained bed (\(Int(padLevel * 100))%).")
+                }
+            }
+            layers = blend
+            why = blendWhy
+        }
+
         // Clean gain staging: layers that sound together never add up past the engine's headroom
         // (the limiter stays a safety net, not part of the sound).
         for probe: UInt8 in [48, 72] {

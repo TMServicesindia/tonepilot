@@ -57,8 +57,8 @@ public enum PartMatcher {
     /// passes its pre-registered DEV gate (tone-fit.yml, independent judges). ON since DEV run 41497516817:
     /// CNN10 better in 10/17 applied fits, none worse (melody parts; not yet checked on real songs).
     public static let fitsPlaying = true
-    /// Which parts are fitted: melody parts only (DEV run 2: backing gained in 6/16 fits, leads 9/16).
-    public static func fitsPlaying(part: String) -> Bool { fitsPlaying && part != StemInfo.Kind.backing.rawValue }
+    /// Which parts are fitted: melody parts only (validated on leads; DEV run 2: backing gained in 6/16 fits). Chordal parts keep their tone's own playing.
+    public static func fitsPlaying(part: String) -> Bool { fitsPlaying && (part == StemInfo.Kind.lead.rawValue || part == StemInfo.Kind.other.rawValue) }
 
     /// The nearest-sound search (tone research E-4/E-5, sealed-tested): the platform supplies the
     /// part's audio at 32 kHz (the separated stem file, full band) and the embedding model.
@@ -85,7 +85,9 @@ public enum PartMatcher {
                                hook: PerceptualHook, patches: [InstrumentPatch],
                                instrument: (InstrumentPatch) -> LoadedInstrument?) -> PartMatch? {
         guard let x = hook.audio32k(kind, start, start + slice.duration), x.count > Int(EfficientATFrontEnd.sampleRate) else { return nil }
-        let masked = kind != .backing
+        // Melody parts are masked with their notes; chordal parts (backing, piano, guitar) are not — a
+        // single extracted note line doesn't describe chords (DEV/sealed: backing best unmasked).
+        let masked = kind == .lead || kind == .other || kind == .vocals
         guard let e = try? PerceptualToneSearch.embedding(samples: x, notes: masked ? notes : nil, embed: hook.embed) else { return nil }
         let table = masked ? hook.harmonic : hook.plain
         let allowed = Set(patches.filter { $0.family != .percussion }.map(\.id))
@@ -128,7 +130,7 @@ public enum PartMatcher {
               let firstOriginal = notes.first(where: { $0.id == firstShifted.id }) else { return false }
         let offset = firstOriginal.start - firstShifted.start   // where the window starts in `slice`
         guard let x = hook.audio32k(kind, start + offset, start + offset + clip.duration), x.count > Int(sr) else { return false }
-        let masked = kind != .backing
+        let masked = kind == .lead || kind == .other || kind == .vocals
         func embed(_ y: [Float]) -> [Float]? { try? PerceptualToneSearch.embedding(samples: y, notes: masked ? ns : nil, embed: hook.embed) }
         func render(_ s: ToneFitter.Settings?) -> [Float] {
             ToneMatcher.render(patch, instrument: instrument, notes: ns, seconds: Double(x.count) / sr, sampleRate: sr, eq: eq, fit: s).samples
