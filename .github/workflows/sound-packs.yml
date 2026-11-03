@@ -1,0 +1,116 @@
+name: Sound packs — real-instrument packs from CC0 libraries (phase 1; in-app download)
+
+# Builds the phase-1 packs (VSCO 2 CE string section + flute, VCSL Steinway B; all CC0 1.0), renders
+# their tones for the nearest-sound search embeddings (same pipeline as the bundled tone tables),
+# checks every file decodes with AVAudioFile, and publishes them to the `sounds-v1` release with a
+# size + SHA-256 manifest (archives first, manifest last). No app build.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Sample libraries (sparse: only the folders used)
+        run: |
+          git clone -q --filter=blob:none --no-checkout https://github.com/sgossner/VSCO-2-CE /tmp/vsco
+          git -C /tmp/vsco sparse-checkout set --no-cone "/Strings/Cello Section/susvib/" "/Strings/Viola Section/susvib/" "/Strings/Violin Section/susVib/" "/Woodwinds/Flute/susvib/" /LICENSE
+          git -C /tmp/vsco checkout -q
+          git clone -q --filter=blob:none --no-checkout https://github.com/sgossner/VCSL /tmp/vcsl
+          git -C /tmp/vcsl sparse-checkout set --no-cone "/Chordophones/Zithers/Grand Piano, Steinway B/Sus/" /LICENSE
+          git -C /tmp/vcsl checkout -q
+          head -2 /tmp/vsco/LICENSE /tmp/vcsl/LICENSE
+          echo "COMMITS=vsco=$(git -C /tmp/vsco rev-parse HEAD),vcsl=$(git -C /tmp/vcsl rev-parse HEAD)" >> $GITHUB_ENV
+      - name: Build packs
+        run: |
+          pip install -q "numpy<2" scipy soundfile
+          python Native/tools/sounds/build_packs.py /tmp/vsco /tmp/vcsl /tmp/sp --commits "$COMMITS" | tee /tmp/build.log
+          grep "^PACK" /tmp/build.log | while IFS= read -r l; do echo "::notice title=Sound pack::$l"; done
+      - uses: actions/upload-artifact@v4
+        with: { name: packs-raw, path: /tmp/sp, retention-days: 7 }
+
+  dump:
+    needs: build
+    runs-on: ubuntu-latest
+    container: swift:6.0-noble
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: packs-raw, path: /tmp/sp }
+      - name: Render pack tones (tone-table phrase, 3 registers)
+        working-directory: Packages/TonePilotCore
+        env: { TP_PACKS: /tmp/sp, TP_PACK_DUMP: /tmp/pdump }
+        run: |
+          swift test -c release --filter "SoundPackDump|SoundPackTests" 2>&1 | grep -E "PACKDUMP|error:|Executed" | tail -6
+          test -f /tmp/pdump/table.json
+      - uses: actions/upload-artifact@v4
+        with: { name: packdump, path: /tmp/pdump, retention-days: 7 }
+
+  embed:
+    needs: dump
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: packs-raw, path: /tmp/sp }
+      - uses: actions/download-artifact@v4
+        with: { name: packdump, path: /tmp/pdump }
+      - name: Embeddings (device-parity EfficientAT path) into pack.json
+        run: |
+          pip install -q "numpy<2" scipy librosa
+          pip install -q --index-url https://download.pytorch.org/whl/cpu "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2"
+          git clone -q https://github.com/fschmid56/EfficientAT /tmp/eat
+          S=$GITHUB_WORKSPACE/Native/tools
+          (cd /tmp/eat && python $S/instruments/tone_t1.py /tmp/pdump --export-tables /tmp/ptables --eat /tmp/eat)
+          python $S/sounds/merge_embeddings.py /tmp/sp /tmp/pdump /tmp/ptables
+      - uses: actions/upload-artifact@v4
+        with: { name: packs-final, path: /tmp/sp/packs, retention-days: 14 }
+
+  publish:
+    needs: embed
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: packs-final, path: /tmp/packs }
+      - name: Every file decodes with AVAudioFile (the app's decoder)
+        run: |
+          set -o pipefail
+          swift Native/tools/sounds/check_flac.swift /tmp/packs | tee /tmp/check.log | tail -5
+          grep "^RESULT" /tmp/check.log | while IFS= read -r l; do echo "::notice title=Sound packs::$l"; done
+      - name: Archive + manifest
+        run: |
+          mkdir -p /tmp/rel && cd /tmp/packs
+          for id in *; do aa archive -d "$id" -o "/tmp/rel/$id.aar" -a lzfse; done
+          python3 - <<'PY'
+          import hashlib, json, os
+          rel, packs = "/tmp/rel", "/tmp/packs"
+          out = {"version": 1, "packs": {}}
+          for f in sorted(os.listdir(rel)):
+              pid = f[:-4]; p = json.load(open(os.path.join(packs, pid, "pack.json")))
+              data = open(os.path.join(rel, f), "rb").read()
+              out["packs"][pid] = {"file": f, "size": len(data), "sha256": hashlib.sha256(data).hexdigest(), "name": p["name"],
+                                   "family": p["family"], "version": p["version"], "license": p["source"]["license"],
+                                   "tones": [t["name"] for t in p["tones"]]}
+              print(f"RELEASE {pid}: {len(data) / 1e6:.1f} MB archive, {len(p['tones'])} tones")
+          json.dump(out, open(os.path.join(rel, "manifest.json"), "w"), indent=1)
+          PY
+      - name: Publish to release sounds-v1 (archives first, manifest last)
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh release view sounds-v1 > /dev/null 2>&1 || gh release create sounds-v1 --title "Sound packs (in-app download)" \
+            --notes "Real-instrument sound packs for TonePilot, built from CC0 libraries (VSCO 2 CE, VCSL) by .github/workflows/sound-packs.yml. Downloaded inside the app." --latest=false
+          gh release upload sounds-v1 /tmp/rel/*.aar --clobber
+          gh release upload sounds-v1 /tmp/rel/manifest.json --clobber

@@ -17,10 +17,13 @@ public enum PerceptualToneSearch {
 
     /// Precomputed embeddings of the tone library (generated in CI with the same pipeline).
     public struct ToneTable: Codable, Sendable {
-        public struct Entry: Codable, Sendable {
+        public struct Entry: Codable, Hashable, Sendable {
             public let patch: UUID
             public let register: Int
             public let embedding: [Float]
+            public init(patch: UUID, register: Int, embedding: [Float]) {
+                self.patch = patch; self.register = register; self.embedding = embedding
+            }
         }
         public let version: Int
         public let model: String
