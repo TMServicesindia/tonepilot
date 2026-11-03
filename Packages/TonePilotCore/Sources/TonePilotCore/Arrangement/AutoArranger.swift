@@ -470,9 +470,10 @@ public enum AutoArranger {
                 blendWhy += why.filter { $0.hasPrefix("Right hand:") }.map { "Main sound (all keys):" + $0.dropFirst("Right hand:".count) }
                 blendWhy += why.filter { $0.hasPrefix("Fitted to the song:") }
             }
-            // The song's own accompaniment sounds (backing, piano, guitar parts), strongest match first, up to two.
+            // The song's own accompaniment sounds (backing, piano, guitar parts), strongest match first. No fixed
+            // layer limit (owner, 3 Nov): every distinct matched sound joins, up to the engine's live slots.
             let ranked = accompaniment.sorted { ($0.isPerceptual ? 1 : 0, $0.perceptualScore ?? $0.similarity) > ($1.isPerceptual ? 1 : 0, $1.perceptualScore ?? $1.similarity) }
-            for m in ranked where blend.count < 3 && !blend.contains(where: { $0.patchId == m.patchId }) {
+            for m in ranked where blend.count < ToneEngine.liveSlotCount && !blend.contains(where: { $0.patchId == m.patchId }) {
                 guard let patch = available[m.patchId] else { continue }
                 var under = Layer(patchId: m.patchId, volume: blend.isEmpty ? 0.8 : (blend.count == 1 ? 0.5 : 0.35), keyRange: all,
                                   role: m.part == "piano" || m.part == "guitar" ? .harmony : .pad)

@@ -339,6 +339,7 @@ Stop: no production change, no major training, no release before approval.
 - A tone is now the song's own sounds blended: the main sound plus up to two of the song's matched accompaniment parts (backing / piano / guitar).
 - No guessed bass / celesta / left-hand layers. A soft strings pad is added only when no accompaniment was matched and the song has a sustained bed.
 - Piano / guitar stems are searched unmasked (chordal, like backing).
+- Owner (3 Nov, later): no fixed layer limit. Every distinct matched sound joins the blend, up to the engine's 8 live slots, gain-staged. The architecture proposal's search adds layers one by one while each measurably helps.
 - Tone fit stays on melody parts only.
 - Pipeline fixtures re-recorded for this approved change.
 

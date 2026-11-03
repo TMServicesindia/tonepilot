@@ -39,6 +39,15 @@ final class FullKeyboardToneTests: XCTestCase {
         XCTAssertLessThanOrEqual(tone.layers.map(\.volume).reduce(0, +), 1.1 + 1e-9, "layers sounding together stay within headroom")
     }
 
+    func testNoFixedLayerLimit() throws {
+        // Lead + backing + piano + guitar all matched to different sounds → all four in the blend.
+        let s = song(parts: ["lead": match("lead", 40), "backing": match("backing", 49), "piano": match("piano", 0), "guitar": match("guitar", 24)])
+        let arranged = AutoArranger.arrange(s, patches: FactoryPatches.all).song
+        let tone = try XCTUnwrap(arranged.arrangement(for: arranged.sections[0]))
+        XCTAssertEqual(Set(tone.layers.map(\.patchId)).count, 4, "every distinct matched sound joins")
+        XCTAssertLessThanOrEqual(tone.layers.map(\.volume).reduce(0, +), 1.1 + 1e-9, "still within headroom")
+    }
+
     func testTheSplitStaysAvailableAsAnOption() throws {
         var o = AutoArranger.Options(); o.splitKeyboard = true
         let s = song(parts: ["lead": match("lead", 40), "backing": match("backing", 49)])
