@@ -73,6 +73,14 @@ final class TonePilotUITests: XCTestCase {
                 page("keyboard")
                 tap(element("tonemode.sections"), "tone per section")
                 tap(element("tonemode.main"), "main tone")
+                if round == 2 {
+                    // Blind comparison sheet: opens and closes (no downloads needed).
+                    let compare = element("tone.compare")
+                    if compare.waitForExistence(timeout: 3) {
+                        tap(compare, thenExpect: element("compare.done"), limit: 5, "open the blind comparison")
+                        tap(element("compare.done"), "close the blind comparison")
+                    }
+                }
                 if round == 1 {
                     // Tone editor: open the main tone, a layer and its effects, move Drive.
                     let edit = element("tone.editMain")

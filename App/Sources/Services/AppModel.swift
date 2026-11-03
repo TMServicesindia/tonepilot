@@ -359,6 +359,22 @@ final class AppModel: ObservableObject {
 
     func applyActiveArrangement() {
         let patches = Dictionary(library.patches.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        // Sampled instruments (sound packs, user samples) are decoded in the background the first time;
+        // the previous sound keeps playing meanwhile, then the tone is applied (never a UI stall).
+        let pending = (activeArrangement?.audibleLayers ?? []).compactMap { patches[$0.patchId] }.filter { !cache.isReady($0) }
+        if !pending.isEmpty, host != nil {
+            let directory = store.sampleDirectory, decoder = cache.sampleDecoder, target = activeArrangement?.id
+            Task.detached(priority: .userInitiated) { [weak self] in
+                let loaded = pending.compactMap { p in (try? InstrumentCache.loadSamples(p, sampleDirectory: directory, decoder: decoder)).map { (p, $0) } }
+                await MainActor.run {
+                    guard let self else { return }
+                    for (p, inst) in loaded { self.cache.install(inst, for: p) }
+                    if loaded.count < pending.count { self.patchLoadErrors = pending.filter { p in !loaded.contains { $0.0.id == p.id } }.map { "\($0.name): its recordings couldn't be read" } }
+                    if self.activeArrangement?.id == target, loaded.count == pending.count { self.applyActiveArrangement() }
+                }
+            }
+            return
+        }
         output.perform(router.setArrangement(activeArrangement))
         if let host {
             patchLoadErrors = host.controller.apply(activeArrangement, patches: patches, cache: cache)

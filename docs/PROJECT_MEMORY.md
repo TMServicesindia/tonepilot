@@ -347,6 +347,39 @@ Stop: no production change, no major training, no release before approval.
 - casio.com is blocked in this session, so the CT-X870IN tone list couldn't be read. Needed for "on your Casio: Arabic Strings + Slow Strings" suggestions by name.
 - A "whole-song sound" match % (target 90 %) is not yet measurable on real songs.
 
+## 6t. Sound engine phase 1 (owner approved the architecture proposal, 3 Nov)
+
+**Proposal:** a Claude Doc, "TonePilot Sound Engine & Musical Intelligence — Architecture Proposal". The owner approved it and phase 1.
+
+**Built in phase 1:**
+- **Real-instrument packs from CC0 libraries**, built in CI (`sound-packs.yml`) and published on release `sounds-v1` (run 41585160284):
+
+| Pack | Library | Samples | Size | Tones |
+|---|---|---|---|---|
+| String section | VSCO 2 CE (cello/viola/violin sections) | 34 | 4.8 MB | Real Strings, Real Slow Strings |
+| Steinway B grand | VCSL | 84 | 9.2 MB | Steinway Grand |
+| Flute | VSCO | 10 | 1.3 MB | Real Flute |
+
+  - The libraries ship WAV only (no SFZ), so samples are mapped from their file names.
+  - Octave conventions differ: VSCO names middle C "C3", VCSL "C4". Every root is confirmed by measured pitch.
+  - Sustained instruments are looped; FLAC 32 kHz mono.
+  - All 128 files decode with AVAudioFile on the Mac CI runner.
+  - Every pack carries search embeddings computed with the bundled tables' pipeline.
+- **App:**
+  - `SoundPackStore`: download, SHA-256 check, validation and delete.
+  - Pack tones join the library and the nearest-sound search.
+  - Settings › Real instrument sounds (included in the stress test).
+  - Sampled instruments now decode off the main thread (`InstrumentCache.loadSamples`); the previous sound plays meanwhile.
+  - Blind A/B comparison sheet ("Compare blind" on the main tone card).
+- **Licences:** manifest item `sound-packs-vsco-vcsl` (Cleared, CC0). GeneralUser GS re-labelled `SAFE*` per the audit.
+- **Budgets:** sound pack load 0.21 s for a piano-sized pack (Linux release; limit 3 s).
+
+**Deferred:**
+- The SFZ importer (not needed for VSCO/VCSL) moves to phase 4.
+
+**Done when:**
+- The owner prefers the real-instrument tone in the blind A/B on 3 chosen songs (e.g. Hukum).
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

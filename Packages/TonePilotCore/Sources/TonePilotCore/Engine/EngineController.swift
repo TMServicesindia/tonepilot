@@ -67,13 +67,7 @@ public final class InstrumentCache {
         if let synth = patch.synth, patch.sourceType == .synthesized {
             loaded = LoadedInstrument(name: patch.name, synth: synth)
         } else if !patch.sampleZones.isEmpty {
-            let samples = try patch.sampleZones.map { zone -> LoadedInstrument.UserSample in
-                do {
-                    let d = try sampleDecoder(sampleDirectory.appendingPathComponent(zone.fileName))
-                    return LoadedInstrument.UserSample(frames: d.frames, sampleRate: d.sampleRate, zone: zone)
-                } catch { throw InstrumentLoadError.sampleUnreadable(zone.fileName) }
-            }
-            loaded = LoadedInstrument(name: patch.name, userSamples: samples, envelope: patch.envelope)
+            loaded = try Self.loadSamples(patch, sampleDirectory: sampleDirectory, decoder: sampleDecoder)
         } else if let ref = patch.soundFont {
             let b = try bank(named: ref.fileName)
             // Apple's melodic bank MSB 0x79 maps to SF2 bank 0; 0x78 (percussion) to bank 128.
@@ -84,6 +78,32 @@ public final class InstrumentCache {
         }
         instruments[key] = loaded
         return loaded
+    }
+
+    /// Decodes a multisample patch's recordings (user samples, sound packs). Pure: safe off the main
+    /// thread, so large sampled instruments never block the UI (install the result with `install`).
+    public static func loadSamples(_ patch: InstrumentPatch, sampleDirectory: URL,
+                                   decoder: (URL) throws -> (frames: [Float], sampleRate: Double)) throws -> LoadedInstrument {
+        let samples = try patch.sampleZones.map { zone -> LoadedInstrument.UserSample in
+            do {
+                let d = try decoder(sampleDirectory.appendingPathComponent(zone.fileName))
+                return LoadedInstrument.UserSample(frames: d.frames, sampleRate: d.sampleRate, zone: zone)
+            } catch { throw InstrumentLoadError.sampleUnreadable(zone.fileName) }
+        }
+        return LoadedInstrument(name: patch.name, userSamples: samples, envelope: patch.envelope)
+    }
+
+    /// True when `patch` can be applied without decoding recordings from disk (multisample
+    /// patches need `loadSamples` first; synths and SoundFont presets are cheap).
+    public func isReady(_ patch: InstrumentPatch) -> Bool {
+        patch.sampleZones.isEmpty || instruments[Self.key(for: patch)] != nil
+    }
+
+    /// Adds an instrument decoded elsewhere (see `loadSamples`).
+    public func install(_ instrument: LoadedInstrument, for patch: InstrumentPatch) {
+        let key = Self.key(for: patch)
+        instruments[key] = instrument
+        lastUsed[key] = Date()
     }
 
     /// Loads instruments for upcoming sections ahead of time so switching never waits on disk.

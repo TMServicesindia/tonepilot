@@ -119,6 +119,34 @@ final class SpeedBudgetTests: XCTestCase {
         XCTAssertLessThan(took, 3, "tone fitting took \(took) s")
     }
 
+    /// Loading the largest phase-1 sound pack instrument (piano: 84 recordings × 7 s, 32 kHz) off the
+    /// main thread: decode + building the engine's sample pool. The app decodes FLAC with AVAudioFile;
+    /// this measures the shared part with WAV files on disk.
+    func testSoundPackInstrumentLoadsQuickly() throws {
+        try budgetsApply()
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("pack-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir.appendingPathComponent("packs/p"), withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let sr = 32_000, n = 7 * sr
+        var zones: [SampleZone] = []
+        for i in 0..<84 {
+            let root = 22 + i
+            let f: Double = 440 * pow(2, (Double(root) - 69) / 12)
+            let w: Double = 2 * Double.pi * f / Double(sr), decay: Double = 1 / Double(sr)
+            var x = [Float](repeating: 0, count: n)
+            for k in 0..<n { let t = Double(k); x[k] = Float(0.4 * sin(w * t) * exp(-t * decay)) }
+            let name = "packs/p/\(root).wav"
+            try WAVDecoder.encode16(x, sampleRate: sr).write(to: dir.appendingPathComponent(name))
+            zones.append(SampleZone(fileName: name, rootNote: UInt8(root), keyRange: KeyRange(low: UInt8(root), high: UInt8(root))))
+        }
+        let patch = InstrumentPatch(name: "Pack piano", family: .piano, sourceType: .licensedSample, sampleZones: zones)
+        var inst: LoadedInstrument?
+        let took = seconds { inst = try? InstrumentCache.loadSamples(patch, sampleDirectory: dir, decoder: { try WAVDecoder.decodeMono(url: $0) }) }
+        print("SPEED sound pack load: \(String(format: "%.2f", took)) s for 84 recordings × 7 s (piano-sized pack), off the main thread")
+        XCTAssertNotNil(inst)
+        XCTAssertLessThan(took, 3, "sound pack load took \(took) s")
+    }
+
     func testPatternLearningIsQuick() throws {
         try budgetsApply()
         let pattern: [(Int, ArpeggioPattern.Degree)] = [(0, .root), (3, .fifth), (6, .octave), (8, .third), (11, .fifth), (14, .octave)]

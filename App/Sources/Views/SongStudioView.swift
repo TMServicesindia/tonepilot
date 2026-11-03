@@ -52,6 +52,8 @@ struct SongStudioView: View {
     @State private var editingTone: ToneEditTarget?
     /// The tone editor opens full height (its layers are its main content); it can be pulled down to half.
     @State private var toneDetent: PresentationDetent = .large
+    /// Blind A/B listening test of two tones on the song's melody.
+    @State private var comparing = false
     @State private var guideFor: UUID?
     @State private var editingSection: SongSection?
     @State private var showDetails = false
@@ -78,7 +80,8 @@ struct SongStudioView: View {
                         SongPartsCard(song: song)
                         AIPartsCard(song: song)
                     case .keyboard:
-                        MyKeyboardCard(song: song, onChangeSound: changeSound, onEditSound: editSound, onEditTone: { editingTone = ToneEditTarget(id: $0) })
+                        MyKeyboardCard(song: song, onChangeSound: changeSound, onEditSound: editSound, onEditTone: { editingTone = ToneEditTarget(id: $0) },
+                                       onCompare: { comparing = true })
                     case .arpeggio:
                         SongArpeggioCard(song: song)
                     case .sections:
@@ -102,6 +105,10 @@ struct SongStudioView: View {
                     .environmentObject(model)
                     .presentationDetents([.medium, .large], selection: $toneDetent)
                     .onAppear { toneDetent = .large }
+            }
+            .sheet(isPresented: $comparing) {
+                NavigationStack { BlindCompareView(songId: songId, onDone: { comparing = false }) }
+                    .environmentObject(model)
             }
             .sheet(item: $editingSection) { section in
                 SectionEditorSheet(songId: songId, section: section).environmentObject(model)
@@ -613,6 +620,7 @@ struct MyKeyboardCard: View {
     let onChangeSound: (UUID) -> Void
     let onEditSound: (UUID) -> Void
     let onEditTone: (UUID) -> Void
+    var onCompare: () -> Void = {}
 
     var body: some View {
         let switching = song.switching ?? SwitchingSettings()
@@ -647,6 +655,9 @@ struct MyKeyboardCard: View {
                     Button { onEditTone(main.id) } label: { Label("Edit main tone", systemImage: "slider.horizontal.3") }
                         .buttonStyle(.borderedProminent)
                         .accessibilityIdentifier("tone.editMain")
+                    Button { onCompare() } label: { Label("Compare blind", systemImage: "ear") }
+                        .buttonStyle(.bordered)
+                        .accessibilityIdentifier("tone.compare")
                 } else if let sectionId {
                     Button { onChangeSound(sectionId) } label: { Label("Change sound", systemImage: "music.note.list") }
                         .buttonStyle(.borderedProminent)
