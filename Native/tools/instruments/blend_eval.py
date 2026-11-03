@@ -103,6 +103,7 @@ def blend_search(model, hook, notes, cands):
     mix = first["audio"].copy(); cur_h, cur_m = first["h"], first["m"]; cur_s = score(cur_h, cur_m, 1)
     cur_eh, cur_em = first["eh"], first["em"]
     floor = first["h"] - P["hookSlack"]
+    diag = None
     while len(chosen) < min(P["maxLayers"], len(C)):
         rest = [c for c in C if all(c["id"] != k["id"] for k in chosen)]
         approx = lambda c: score(cos(cur_eh + 0.55 * c["eh"], hookT), cos(cur_em + 0.55 * c["em"], mainT), len(chosen) + 1)
@@ -116,12 +117,14 @@ def blend_search(model, hook, notes, cands):
                 s = score(h, m, len(chosen) + 1)
                 if best is None or s > best[5]:
                     best = (c, v, x, h, m, s, eh, em)
+        if diag is None and best is not None:
+            diag = {"gain": best[5] - cur_s, "hook_delta": best[3] - first["h"], "main_delta": best[4] - cur_m, "tried": best[0]["id"]}
         if best is None or not (best[5] > cur_s + P["delta"] and best[3] >= floor):
             break
         chosen.append(best[0]); bal.append(best[1])
         mix, cur_h, cur_m, cur_s, cur_eh, cur_em = best[2], best[3], best[4], best[5], best[6], best[7]
     return {"layers": [(c["id"], b) for c, b in zip(chosen, bal)], "audio": mix, "single_audio": first["audio"],
-            "single": first["id"], "hook": cur_h, "score": cur_s, "single_score": score(first["h"], first["m"], 1)}
+            "single": first["id"], "hook": cur_h, "score": cur_s, "single_score": score(first["h"], first["m"], 1), "diag": diag or {}}
 
 
 def judge(dump, out_md, eat):
@@ -149,7 +152,9 @@ def judge(dump, out_md, eat):
         rows.append({"id": t["id"], "bank": t["bank"], "variant": t["variant"], "layers": len(ids), "ids": ids,
                      "balances": [b for _, b in r["layers"]], "cnn_gain": g_cnn, "mfcc_gain": g_mfcc,
                      "lead_found": t["lead_patch"] in ids, "partner_found": bool(t["partner_patch"]) and t["partner_patch"] in ids,
-                     "score_gain": r["score"] - r["single_score"]})
+                     "score_gain": r["score"] - r["single_score"], "diag": r["diag"],
+                     "partner_in_shortlist": bool(t["partner_patch"]) and t["partner_patch"] in sl["candidates"],
+                     "lead_in_shortlist": t["lead_patch"] in sl["candidates"]})
         print(f"ROW {t['id']}: {len(ids)} layer(s), CNN10 gain {g_cnn:+.4f}, MFCC gain {g_mfcc:+.3f}", flush=True)
 
     def stats(rs):
@@ -178,6 +183,15 @@ def judge(dump, out_md, eat):
     passed = A and B and C
     lines += ["", f"**Pre-registered gate:** A blend targets better in ≥ 50 %: {bb}/{bn} {'✓' if A else '✗'} · "
               f"B single targets none worse by > 0.01: {sw1} {'✓' if B else '✗'} · C none worse by > 0.02: {aw2} {'✓' if C else '✗'} → **{'PASS' if passed else 'FAIL'}**"]
+    # Diagnostics: the best extra layer tried in round 1 (before the margin and the hook rule).
+    lines += ["", "**Diagnostics (round 1, best extra layer tried):**", "",
+              "| Group | Score gain p50 / p90 / max | Gain > 0 | Gain > 0.01 | Gain > 0.02 | Hook change p50 | Blocked by the hook rule | 2nd instrument in shortlist | Lead in shortlist |",
+              "|---|---|---|---|---|---|---|---|---|"]
+    for k in sorted(groups):
+        rs = groups[k]; g = np.array([r["diag"].get("gain", -1) for r in rs]); hd = np.array([r["diag"].get("hook_delta", 0) for r in rs])
+        blocked = sum(1 for r in rs if r["diag"].get("gain", -1) > P["delta"] and r["diag"].get("hook_delta", 0) < -P["hookSlack"])
+        lines.append(f"| {k} | {np.median(g):+.4f} / {np.percentile(g, 90):+.4f} / {g.max():+.4f} | {(g > 0).sum()} | {(g > 0.01).sum()} | {(g > 0.02).sum()} | "
+                     f"{np.median(hd):+.4f} | {blocked} | {sum(r['partner_in_shortlist'] for r in rs)} | {sum(r['lead_in_shortlist'] for r in rs)} |")
     open(out_md, "w").write("\n".join(lines) + "\n")
     json.dump(rows, open(out_md.replace(".md", ".json"), "w"), indent=1)
     print("\n".join(lines))

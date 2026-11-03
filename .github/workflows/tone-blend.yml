@@ -6,12 +6,18 @@ name: Tone blend (phase 2) — blend search vs best single sound, independent ju
 # part. Pre-registered gate in Native/tools/instruments/blend_eval.py. Rendered GM audio, not real songs.
 on:
   workflow_dispatch:
+    inputs:
+      reuse_run:
+        description: "Judge only, reusing the targets / shortlist / renders of this earlier run id (empty = full run)"
+        default: ""
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   dump:
+    if: ${{ inputs.reuse_run == '' }}
     runs-on: ubuntu-latest
     container: swift:6.0-noble
     timeout-minutes: 60
@@ -35,6 +41,7 @@ jobs:
 
   shortlist:
     needs: dump
+    if: ${{ inputs.reuse_run == '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -54,6 +61,7 @@ jobs:
 
   render:
     needs: shortlist
+    if: ${{ inputs.reuse_run == '' }}
     runs-on: ubuntu-latest
     container: swift:6.0-noble
     timeout-minutes: 60
@@ -76,6 +84,7 @@ jobs:
 
   judge:
     needs: render
+    if: ${{ always() && (needs.render.result == 'success' || inputs.reuse_run != '') }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -83,11 +92,11 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
       - uses: actions/download-artifact@v4
-        with: { name: bd-targets, path: /tmp/bd }
+        with: { name: bd-targets, path: /tmp/bd, run-id: "${{ inputs.reuse_run || github.run_id }}", github-token: "${{ github.token }}" }
       - uses: actions/download-artifact@v4
-        with: { name: bd-shortlist, path: /tmp/bd }
+        with: { name: bd-shortlist, path: /tmp/bd, run-id: "${{ inputs.reuse_run || github.run_id }}", github-token: "${{ github.token }}" }
       - uses: actions/download-artifact@v4
-        with: { name: bd-renders, path: /tmp/bd/renders }
+        with: { name: bd-renders, path: /tmp/bd/renders, run-id: "${{ inputs.reuse_run || github.run_id }}", github-token: "${{ github.token }}" }
       - name: Blend search + judges
         run: |
           pip install -q "numpy<2" scipy librosa
