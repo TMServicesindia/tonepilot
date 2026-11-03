@@ -1,0 +1,71 @@
+--2026-11-03 18:12:07--  http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_indices.csv
+Resolving storage.googleapis.com (storage.googleapis.com)... 142.251.219.155, 142.251.219.27, 142.251.218.91, ...
+Connecting to storage.googleapis.com (storage.googleapis.com)|142.251.219.155|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 14675 (14K) [application/octet-stream]
+Saving to: ‘/home/runner/panns_data/class_labels_indices.csv’
+
+     0K .......... ....                                       100% 19.4M=0.001s
+
+2026-11-03 18:12:07 (19.4 MB/s) - ‘/home/runner/panns_data/class_labels_indices.csv’ saved [14675/14675]
+
+CNN10 checkpoint sha256 5240bdc47444e331bbeb54fd741d2b3f933a4526e84b0c17bf3593df94b13962; unexpected keys ignored: 0
+ROW same_single_0: 3 layer(s) [1.0, 0.55, 0.52], CNN10 gain -0.0016
+ROW same_single_1: 1 layer(s) [1.0], CNN10 gain +0.0000
+ROW same_single_2: 2 layer(s) [1.0, 0.6], CNN10 gain +0.0001
+ROW same_single_3: 2 layer(s) [1.0, 0.41], CNN10 gain -0.0328
+ROW same_single_4: 2 layer(s) [1.0, 0.76], CNN10 gain -0.0088
+ROW same_single_5: 2 layer(s) [1.0, 0.81], CNN10 gain +0.0757
+ROW same_single_6: 6 layer(s) [1.0, 0.82, 0.79, 0.63, 0.52, 0.44], CNN10 gain -0.0684
+ROW same_single_7: 3 layer(s) [1.0, 0.89, 0.42], CNN10 gain +0.0155
+ROW same_single_8: 3 layer(s) [1.0, 0.79, 0.63], CNN10 gain -0.0250
+ROW same_single_9: 1 layer(s) [1.0], CNN10 gain +0.0000
+ROW same_single_10: 3 layer(s) [1.0, 0.49, 0.44], CNN10 gain -0.1022
+ROW same_single_11: 4 layer(s) [1.0, 0.87, 0.67, 0.66], CNN10 gain +0.1131
+ROW same_blend_0: 3 layer(s) [1.0, 0.73, 0.41], CNN10 gain +0.1125
+ROW same_blend_1: 4 layer(s) [1.0, 0.54, 0.42, 0.4], CNN10 gain +0.0111
+ROW same_blend_2: 6 layer(s) [1.0, 0.99, 0.97, 0.77, 0.54, 0.49], CNN10 gain +0.0176
+ROW same_blend_3: 3 layer(s) [1.0, 0.9, 0.64], CNN10 gain -0.0007
+ROW same_blend_4: 4 layer(s) [1.0, 0.75, 0.5, 0.39], CNN10 gain +0.0210
+ROW same_blend_5: 6 layer(s) [1.0, 0.91, 0.85, 0.64, 0.57, 0.44], CNN10 gain +0.0355
+ROW same_blend_6: 5 layer(s) [1.0, 0.95, 0.93, 0.89, 0.74], CNN10 gain -0.0186
+ROW same_blend_7: 3 layer(s) [1.0, 0.64, 0.63], CNN10 gain -0.0267
+ROW same_blend_8: 4 layer(s) [1.0, 0.79, 0.72, 0.69], CNN10 gain -0.0397
+ROW same_blend_9: 4 layer(s) [1.0, 0.79, 0.49, 0.42], CNN10 gain +0.0390
+ROW same_blend_10: 4 layer(s) [1.0, 0.8, 0.69, 0.56], CNN10 gain -0.0070
+ROW same_blend_11: 5 layer(s) [1.0, 0.66, 0.57, 0.56, 0.56], CNN10 gain +0.1035
+ROW timgm_single_0: 3 layer(s) [1.0, 0.91, 0.75], CNN10 gain +0.0156
+ROW timgm_single_1: 4 layer(s) [1.0, 0.72, 0.63, 0.62], CNN10 gain -0.0263
+ROW timgm_single_2: 2 layer(s) [1.0, 0.51], CNN10 gain +0.0015
+ROW timgm_single_3: 1 layer(s) [1.0], CNN10 gain +0.0000
+ROW timgm_single_4: 6 layer(s) [1.0, 0.97, 0.63, 0.62, 0.52, 0.44], CNN10 gain -0.0521
+ROW timgm_single_5: 2 layer(s) [1.0, 0.79], CNN10 gain +0.0111
+ROW timgm_single_6: 5 layer(s) [1.0, 0.81, 0.73, 0.57, 0.44], CNN10 gain -0.0779
+ROW timgm_single_7: 2 layer(s) [1.0, 0.56], CNN10 gain -0.0200
+ROW timgm_single_8: 1 layer(s) [1.0], CNN10 gain +0.0000
+ROW timgm_single_9: 6 layer(s) [1.0, 0.96, 0.7, 0.66, 0.42, 0.41], CNN10 gain -0.0468
+ROW timgm_single_10: 3 layer(s) [1.0, 0.76, 0.43], CNN10 gain -0.1151
+ROW timgm_single_11: 5 layer(s) [1.0, 0.69, 0.57, 0.57, 0.51], CNN10 gain -0.0209
+ROW timgm_blend_0: 1 layer(s) [1.0], CNN10 gain +0.0000
+ROW timgm_blend_1: 4 layer(s) [1.0, 0.72, 0.63, 0.62], CNN10 gain -0.0228
+ROW timgm_blend_2: 1 layer(s) [1.0], CNN10 gain +0.0000
+ROW timgm_blend_3: 1 layer(s) [1.0], CNN10 gain +0.0000
+ROW timgm_blend_4: 4 layer(s) [1.0, 0.93, 0.78, 0.68], CNN10 gain +0.0477
+ROW timgm_blend_5: 4 layer(s) [1.0, 0.8, 0.62, 0.51], CNN10 gain -0.0281
+ROW timgm_blend_6: 4 layer(s) [1.0, 0.94, 0.63, 0.46], CNN10 gain +0.0419
+ROW timgm_blend_7: 2 layer(s) [1.0, 0.63], CNN10 gain -0.0121
+ROW timgm_blend_8: 3 layer(s) [1.0, 0.98, 0.87], CNN10 gain +0.0982
+ROW timgm_blend_9: 2 layer(s) [1.0, 0.83], CNN10 gain +0.0036
+ROW timgm_blend_10: 2 layer(s) [1.0, 0.95], CNN10 gain +0.0179
+ROW timgm_blend_11: 3 layer(s) [1.0, 0.86, 0.7], CNN10 gain +0.1140
+# Blend by leakage-aware spectral unmixing — pre-registered gate (first run, no tuning)
+
+| Group | Targets | >1 layer | CNN10 better | Worse < −0.01 | Worse < −0.02 | Mean gain | True 2nd instrument found | True lead kept |
+|---|---|---|---|---|---|---|---|---|
+| same · blend | 12 | 12 | 7/12 | 3 | 2 | +0.0206 | 2 | 5 |
+| same · single | 12 | 10 | 3/12 | 4 | 4 | -0.0029 | 0 | 8 |
+| timgm · blend | 12 | 9 | 6/12 | 3 | 2 | +0.0217 | 1 | 2 |
+| timgm · single | 12 | 10 | 2/12 | 7 | 7 | -0.0276 | 0 | 4 |
+
+**Gate:** A 13/24 ✓ · B 11 ✗ · C 15 ✗ → **FAIL**
+RESULT leakage-aware unmix gate FAIL: blend better 13/24, single worse>0.01 11, any worse>0.02 15

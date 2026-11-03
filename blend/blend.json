@@ -1,0 +1,684 @@
+[
+ {
+  "id": "same_single_0",
+  "variant": "single",
+  "bank": "same",
+  "layers": 3,
+  "gain": -0.0015928263344596738,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.55,
+   0.52
+  ]
+ },
+ {
+  "id": "same_single_1",
+  "variant": "single",
+  "bank": "same",
+  "layers": 1,
+  "gain": 0.0,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0
+  ]
+ },
+ {
+  "id": "same_single_2",
+  "variant": "single",
+  "bank": "same",
+  "layers": 2,
+  "gain": 0.00011082060968647944,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.6
+  ]
+ },
+ {
+  "id": "same_single_3",
+  "variant": "single",
+  "bank": "same",
+  "layers": 2,
+  "gain": -0.03275449158141697,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.41
+  ]
+ },
+ {
+  "id": "same_single_4",
+  "variant": "single",
+  "bank": "same",
+  "layers": 2,
+  "gain": -0.008807858598787965,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.76
+  ]
+ },
+ {
+  "id": "same_single_5",
+  "variant": "single",
+  "bank": "same",
+  "layers": 2,
+  "gain": 0.07566151036636981,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.81
+  ]
+ },
+ {
+  "id": "same_single_6",
+  "variant": "single",
+  "bank": "same",
+  "layers": 6,
+  "gain": -0.06838346937247086,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.82,
+   0.79,
+   0.63,
+   0.52,
+   0.44
+  ]
+ },
+ {
+  "id": "same_single_7",
+  "variant": "single",
+  "bank": "same",
+  "layers": 3,
+  "gain": 0.015491475684871192,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.89,
+   0.42
+  ]
+ },
+ {
+  "id": "same_single_8",
+  "variant": "single",
+  "bank": "same",
+  "layers": 3,
+  "gain": -0.02501031162938261,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.79,
+   0.63
+  ]
+ },
+ {
+  "id": "same_single_9",
+  "variant": "single",
+  "bank": "same",
+  "layers": 1,
+  "gain": 0.0,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0
+  ]
+ },
+ {
+  "id": "same_single_10",
+  "variant": "single",
+  "bank": "same",
+  "layers": 3,
+  "gain": -0.10215884337870362,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.49,
+   0.44
+  ]
+ },
+ {
+  "id": "same_single_11",
+  "variant": "single",
+  "bank": "same",
+  "layers": 4,
+  "gain": 0.1131330942495169,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.87,
+   0.67,
+   0.66
+  ]
+ },
+ {
+  "id": "same_blend_0",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 3,
+  "gain": 0.11252383722180981,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.73,
+   0.41
+  ]
+ },
+ {
+  "id": "same_blend_1",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 4,
+  "gain": 0.01110701520955637,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.54,
+   0.42,
+   0.4
+  ]
+ },
+ {
+  "id": "same_blend_2",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 6,
+  "gain": 0.017571326113681063,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.99,
+   0.97,
+   0.77,
+   0.54,
+   0.49
+  ]
+ },
+ {
+  "id": "same_blend_3",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 3,
+  "gain": -0.0006806341692072726,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.9,
+   0.64
+  ]
+ },
+ {
+  "id": "same_blend_4",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 4,
+  "gain": 0.021003719171505897,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.75,
+   0.5,
+   0.39
+  ]
+ },
+ {
+  "id": "same_blend_5",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 6,
+  "gain": 0.03551942897591687,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.91,
+   0.85,
+   0.64,
+   0.57,
+   0.44
+  ]
+ },
+ {
+  "id": "same_blend_6",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 5,
+  "gain": -0.018639610639235138,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.95,
+   0.93,
+   0.89,
+   0.74
+  ]
+ },
+ {
+  "id": "same_blend_7",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 3,
+  "gain": -0.026654378552648184,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.64,
+   0.63
+  ]
+ },
+ {
+  "id": "same_blend_8",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 4,
+  "gain": -0.039689360416357844,
+  "partner": true,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.79,
+   0.72,
+   0.69
+  ]
+ },
+ {
+  "id": "same_blend_9",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 4,
+  "gain": 0.038950147769053034,
+  "partner": true,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.79,
+   0.49,
+   0.42
+  ]
+ },
+ {
+  "id": "same_blend_10",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 4,
+  "gain": -0.007016253229706559,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.8,
+   0.69,
+   0.56
+  ]
+ },
+ {
+  "id": "same_blend_11",
+  "variant": "blend",
+  "bank": "same",
+  "layers": 5,
+  "gain": 0.10351641724484684,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.66,
+   0.57,
+   0.56,
+   0.56
+  ]
+ },
+ {
+  "id": "timgm_single_0",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 3,
+  "gain": 0.01563287615594744,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.91,
+   0.75
+  ]
+ },
+ {
+  "id": "timgm_single_1",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 4,
+  "gain": -0.026318181025709264,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.72,
+   0.63,
+   0.62
+  ]
+ },
+ {
+  "id": "timgm_single_2",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 2,
+  "gain": 0.001477969286182046,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.51
+  ]
+ },
+ {
+  "id": "timgm_single_3",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 1,
+  "gain": 0.0,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0
+  ]
+ },
+ {
+  "id": "timgm_single_4",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 6,
+  "gain": -0.05206622981100828,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.97,
+   0.63,
+   0.62,
+   0.52,
+   0.44
+  ]
+ },
+ {
+  "id": "timgm_single_5",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 2,
+  "gain": 0.011134137279868561,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.79
+  ]
+ },
+ {
+  "id": "timgm_single_6",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 5,
+  "gain": -0.07790662779225532,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.81,
+   0.73,
+   0.57,
+   0.44
+  ]
+ },
+ {
+  "id": "timgm_single_7",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 2,
+  "gain": -0.020001019507812745,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.56
+  ]
+ },
+ {
+  "id": "timgm_single_8",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 1,
+  "gain": 0.0,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0
+  ]
+ },
+ {
+  "id": "timgm_single_9",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 6,
+  "gain": -0.04679682300042742,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.96,
+   0.7,
+   0.66,
+   0.42,
+   0.41
+  ]
+ },
+ {
+  "id": "timgm_single_10",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 3,
+  "gain": -0.11508567823794735,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.76,
+   0.43
+  ]
+ },
+ {
+  "id": "timgm_single_11",
+  "variant": "single",
+  "bank": "timgm",
+  "layers": 5,
+  "gain": -0.02089288510559839,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.69,
+   0.57,
+   0.57,
+   0.51
+  ]
+ },
+ {
+  "id": "timgm_blend_0",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 1,
+  "gain": 0.0,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0
+  ]
+ },
+ {
+  "id": "timgm_blend_1",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 4,
+  "gain": -0.022840917899246915,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.72,
+   0.63,
+   0.62
+  ]
+ },
+ {
+  "id": "timgm_blend_2",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 1,
+  "gain": 0.0,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0
+  ]
+ },
+ {
+  "id": "timgm_blend_3",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 1,
+  "gain": 0.0,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0
+  ]
+ },
+ {
+  "id": "timgm_blend_4",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 4,
+  "gain": 0.047722280696049335,
+  "partner": false,
+  "lead": true,
+  "balances": [
+   1.0,
+   0.93,
+   0.78,
+   0.68
+  ]
+ },
+ {
+  "id": "timgm_blend_5",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 4,
+  "gain": -0.028107505237430774,
+  "partner": true,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.8,
+   0.62,
+   0.51
+  ]
+ },
+ {
+  "id": "timgm_blend_6",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 4,
+  "gain": 0.04189692745045648,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.94,
+   0.63,
+   0.46
+  ]
+ },
+ {
+  "id": "timgm_blend_7",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 2,
+  "gain": -0.012138795543582104,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.63
+  ]
+ },
+ {
+  "id": "timgm_blend_8",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 3,
+  "gain": 0.09823907936244314,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.98,
+   0.87
+  ]
+ },
+ {
+  "id": "timgm_blend_9",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 2,
+  "gain": 0.003590195385969497,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.83
+  ]
+ },
+ {
+  "id": "timgm_blend_10",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 2,
+  "gain": 0.01789768308932338,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.95
+  ]
+ },
+ {
+  "id": "timgm_blend_11",
+  "variant": "blend",
+  "bank": "timgm",
+  "layers": 3,
+  "gain": 0.11403150862088307,
+  "partner": false,
+  "lead": false,
+  "balances": [
+   1.0,
+   0.86,
+   0.7
+  ]
+ }
+]
