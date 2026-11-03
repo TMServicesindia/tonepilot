@@ -48,6 +48,26 @@ final class FullKeyboardToneTests: XCTestCase {
         XCTAssertLessThanOrEqual(tone.layers.map(\.volume).reduce(0, +), 1.1 + 1e-9, "still within headroom")
     }
 
+    func testMeasuredBlendBecomesTheTone() throws {
+        var s = song(parts: ["lead": match("lead", 40), "backing": match("backing", 49)])
+        let a = FactoryPatches.id(forProgram: 40), b = FactoryPatches.id(forProgram: 89), c = FactoryPatches.id(forProgram: 48)
+        s.sectionBlends = [s.sections[0].id.uuidString: BlendSearch.Result(
+            layers: [.init(patchId: a, balance: 1), .init(patchId: b, balance: 0.55), .init(patchId: c, balance: 0.35)],
+            hookSimilarity: 0.6, mainSimilarity: 0.7, score: 0.6, singleBest: a, singleScore: 0.55, approximate: true,
+            alternatives: [FactoryPatches.id(forProgram: 73)], reasons: ["Violin: closest single", "Warm Pad at 55 %", "Strings at 35 %"])]
+        var o = AutoArranger.Options(); o.useBlends = true
+        let out = AutoArranger.arrange(s, patches: FactoryPatches.all, options: o).song
+        let tone = try XCTUnwrap(out.arrangement(for: out.sections[0]))
+        XCTAssertEqual(tone.layers.map(\.patchId), [a, b, c], "the measured blend, in order, three layers")
+        XCTAssertTrue(tone.layers.allSatisfy { $0.keyRange == KeyRange(low: 0, high: 127) })
+        XCTAssertGreaterThan(tone.layers[0].volume, tone.layers[2].volume, "balances kept")
+        XCTAssertTrue(tone.rationale?.contains("Approximate") == true, "approximate results say so and offer alternatives")
+        // Switched off: the part-based blend is used instead.
+        var noBlends = AutoArranger.Options(); noBlends.useBlends = false
+        let off = AutoArranger.arrange(s, patches: FactoryPatches.all, options: noBlends).song
+        XCTAssertNotEqual(off.arrangement(for: off.sections[0])?.layers.map(\.patchId), [a, b, c])
+    }
+
     func testTheSplitStaysAvailableAsAnOption() throws {
         var o = AutoArranger.Options(); o.splitKeyboard = true
         let s = song(parts: ["lead": match("lead", 40), "backing": match("backing", 49)])

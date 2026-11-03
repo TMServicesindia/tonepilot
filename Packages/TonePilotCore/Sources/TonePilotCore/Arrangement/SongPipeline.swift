@@ -52,6 +52,10 @@ public enum SongPipeline {
             if let perceptual {
                 let leads = PartMatcher.matchSectionLeads(song: song, parts: stems, patches: patches, instrument: toneInstrument, perceptual: perceptual)
                 song.sectionLeadMatches = leads.isEmpty ? nil : leads
+                if PartMatcher.blendsEnabled {
+                    let blends = PartMatcher.matchSectionBlends(song: song, parts: stems, patches: patches, instrument: toneInstrument, perceptual: perceptual)
+                    song.sectionBlends = blends.isEmpty ? nil : blends
+                }
                 _ = progress?(0.95)
             }
         }

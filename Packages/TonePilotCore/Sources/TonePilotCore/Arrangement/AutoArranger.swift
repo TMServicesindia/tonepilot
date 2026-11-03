@@ -24,6 +24,8 @@ public enum AutoArranger {
         /// plays on all keys, so the player is free to play anywhere on the 61 keys, and a tone is the
         /// song's own sounds blended together rather than a key map.
         public var splitKeyboard = false
+        /// Use the measured section blends (phase 2) when present. Follows the DEV gate switch.
+        public var useBlends = PartMatcher.blendsEnabled
         public init() {}
     }
 
@@ -494,6 +496,28 @@ public enum AutoArranger {
             }
             layers = blend
             why = blendWhy
+            // Phase 2: the measured blend for this section (one sound or as many layers as help) wins.
+            if options.useBlends, let measured = song.sectionBlends?[section.id.uuidString], !measured.layers.isEmpty,
+               measured.layers.allSatisfy({ available[$0.patchId] != nil }) {
+                let leadRole = blend.first?.role ?? .lead
+                let lm = song.sectionLeadMatches?[section.id.uuidString] ?? song.partMatches?["lead"] ?? song.partMatches?["other"]
+                layers = measured.layers.enumerated().map { i, c in
+                    var l = Layer(patchId: c.patchId, volume: 0.8 * c.balance, keyRange: all, role: i == 0 ? leadRole : .pad)
+                    if let m = lm, m.patchId == c.patchId, let patch = available[c.patchId] {
+                        l.effectsOverride = m.effects(base: patch.effects)
+                        m.applyFit(to: &l)
+                    }
+                    return l
+                }
+                let names = measured.layers.compactMap { available[$0.patchId]?.name }
+                why = ["Main sound (all keys): " + (names.count == 1 ? "\(names[0]) — one sound is closest to the song here."
+                                                     : names.joined(separator: " + ") + " — this blend sounds closer to the song than any single sound.")]
+                why += measured.reasons.map { "· " + $0 + "." }
+                if measured.approximate {
+                    let alts = measured.alternatives.compactMap { available[$0]?.name }
+                    why.append("Approximate: the closest sounds available are still some way from the song" + (alts.isEmpty ? "." : "; also try " + alts.joined(separator: ", ") + "."))
+                }
+            }
         }
 
         // Clean gain staging: layers that sound together never add up past the engine's headroom

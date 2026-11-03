@@ -57,6 +57,52 @@ public enum PartMatcher {
     /// passes its pre-registered DEV gate (tone-fit.yml, independent judges). ON since DEV run 41497516817:
     /// CNN10 better in 10/17 applied fits, none worse (melody parts; not yet checked on real songs).
     public static let fitsPlaying = true
+    /// Sound-engine phase 2 blends (one sound or as many layers as help). Off until the blend search
+    /// passes its pre-registered DEV gate (tone-blend.yml, independent judges); then switched on here.
+    public static let blendsEnabled = false
+
+    /// Per distinct section (repeats share one), the blend that recreates its main sound: the hook is the
+    /// lead part (masked with its notes), the main sound is every melodic part summed; candidates are the
+    /// nearest-sound search's top tones. Needs the perceptual hook; at most `maxGroups` groups.
+    public static func matchSectionBlends(song: Song, parts audio: [StemInfo.Kind: AudioBuffer], patches: [InstrumentPatch],
+                                          instrument: (InstrumentPatch) -> LoadedInstrument?, perceptual hook: PerceptualHook,
+                                          maxGroups: Int = 6, parameters: BlendSearch.Parameters = .init()) -> [String: BlendSearch.Result] {
+        let kind: StemInfo.Kind = audio[.lead] != nil ? .lead : .other
+        guard let buffer = audio[kind], !song.sections.isEmpty else { return [:] }
+        let melodic = [StemInfo.Kind.lead, .backing, .other, .piano, .guitar].filter { audio[$0] != nil && ($0 != .other || kind == .other) }
+        var groups: [String: [SongSection]] = [:], order: [String] = []
+        for s in song.sections.sorted(by: { $0.startTime < $1.startTime }) {
+            let key = s.repetitionGroup.map { "\($0)-\(s.type.rawValue)" } ?? s.id.uuidString
+            if groups[key] == nil { order.append(key) }
+            groups[key, default: []].append(s)
+        }
+        let allowed = Set(patches.filter { $0.family != .percussion }.map(\.id))
+        let byId = Dictionary(patches.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        var out: [String: BlendSearch.Result] = [:]
+        for key in order.prefix(maxGroups) {
+            guard let members = groups[key], let section = members.max(by: { $0.duration < $1.duration }) else { continue }
+            let a = Int(section.startTime * buffer.sampleRate), b = min(buffer.samples.count, Int(min(section.endTime, section.startTime + 24) * buffer.sampleRate))
+            guard b - a > Int(buffer.sampleRate * 3) else { continue }
+            let slice = AudioBuffer(samples: Array(buffer.samples[a..<b]), sampleRate: buffer.sampleRate)
+            guard let track = MelodyExtractor.extract(slice, source: .fullMix), track.voicedRatio > 0.2,
+                  track.notes.filter({ $0.duration >= 0.12 }).count >= 6,
+                  let hookAudio = hook.audio32k(kind, section.startTime, section.startTime + slice.duration) else { continue }
+            // The main sound: every melodic part over the same span, summed.
+            var main = hookAudio
+            for k in melodic where k != kind {
+                guard let x = hook.audio32k(k, section.startTime, section.startTime + slice.duration) else { continue }
+                for i in 0..<min(main.count, x.count) { main[i] += x[i] }
+            }
+            // Candidates: the nearest-sound search's ranking for the hook.
+            guard let e = try? PerceptualToneSearch.embedding(samples: hookAudio, notes: track.notes, embed: hook.embed) else { continue }
+            let ranked = PerceptualToneSearch.rank(e, table: hook.harmonic, allowed: allowed).prefix(parameters.shortlist).compactMap { byId[$0.patch] }
+            guard let r = BlendSearch.search(hook: hookAudio, notes: track.notes, main: main, candidates: Array(ranked),
+                                             instrument: instrument, embed: hook.embed, parameters: parameters) else { continue }
+            for s in members { out[s.id.uuidString] = r }
+        }
+        return out
+    }
+
     /// Which parts are fitted: melody parts only (validated on leads; DEV run 2: backing gained in 6/16 fits). Chordal parts keep their tone's own playing.
     public static func fitsPlaying(part: String) -> Bool { fitsPlaying && (part == StemInfo.Kind.lead.rawValue || part == StemInfo.Kind.other.rawValue) }
 

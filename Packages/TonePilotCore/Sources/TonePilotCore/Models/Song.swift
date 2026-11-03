@@ -158,6 +158,9 @@ public struct Song: Codable, Hashable, Identifiable, Sendable {
     /// The lead part's nearest tone per section (key: section id), so pallavi, charanam and interludes
     /// can each get the sound actually played there (`PartMatcher.matchSectionLeads`).
     public var sectionLeadMatches: [String: PartMatch]?
+    /// Sound-engine phase 2: per section (by section id), the measured blend of library sounds that
+    /// recreates the section's main sound — one layer, or as many as help (`BlendSearch`).
+    public var sectionBlends: [String: BlendSearch.Result]?
 
     public init(id: UUID = UUID(), title: String, artist: String? = nil, film: String? = nil,
                 composer: String? = nil, language: String? = nil, tags: [String] = [],
