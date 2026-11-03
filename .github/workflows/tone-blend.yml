@@ -1,0 +1,108 @@
+name: Tone blend (phase 2) — blend search vs best single sound, independent judges (research only, no app build)
+
+# DEV banks only (GeneralUser = same bank, TimGM6mb = cross-bank). Targets: the bench songs' lead
+# parts, plain ("single") and doubled by a second instrument at 70 % ("blend"). Candidates: the app's
+# bundled tone tables. Search: a port of BlendSearch.swift. Judges: PANNs CNN10 + MFCC vs the clean
+# part. Pre-registered gate in Native/tools/instruments/blend_eval.py. Rendered GM audio, not real songs.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    container: swift:6.0-noble
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Banks
+        run: |
+          apt-get update -qq && apt-get install -y -qq curl timgm6mb-soundfont > /dev/null
+          curl -fsSL -o /tmp/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+      - name: Targets (single + layered leads, busiest 6 s)
+        working-directory: Packages/TonePilotCore
+        env:
+          TP_SF2: /tmp/GeneralUser-GS.sf2
+          TP_BLEND_DUMP: /tmp/bd
+          TP_TONE_TARGETS: "same=/tmp/GeneralUser-GS.sf2,timgm=/usr/share/sounds/sf2/TimGM6mb.sf2"
+        run: |
+          swift test -c release --filter "ToneBlendBench.testDumpBlendTargets" 2>&1 | grep -E "BLENDDUMP|error:|Executed" | tail -4
+          test -f /tmp/bd/targets.json
+      - uses: actions/upload-artifact@v4
+        with: { name: bd-targets, path: /tmp/bd, retention-days: 7 }
+
+  shortlist:
+    needs: dump
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: bd-targets, path: /tmp/bd }
+      - name: Rank the library (bundled tone tables)
+        run: |
+          pip install -q "numpy<2" scipy librosa
+          pip install -q --index-url https://download.pytorch.org/whl/cpu "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2"
+          git clone -q https://github.com/fschmid56/EfficientAT /tmp/eat
+          cd /tmp/eat && python $GITHUB_WORKSPACE/Native/tools/instruments/blend_eval.py shortlist /tmp/bd --eat /tmp/eat
+      - uses: actions/upload-artifact@v4
+        with: { name: bd-shortlist, path: /tmp/bd/shortlist.json, retention-days: 7 }
+
+  render:
+    needs: shortlist
+    runs-on: ubuntu-latest
+    container: swift:6.0-noble
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: bd-targets, path: /tmp/bd }
+      - uses: actions/download-artifact@v4
+        with: { name: bd-shortlist, path: /tmp/bd }
+      - name: Bank
+        run: |
+          apt-get update -qq && apt-get install -y -qq curl > /dev/null
+          curl -fsSL -o /tmp/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+      - name: Render the shortlisted tones on each target's notes
+        working-directory: Packages/TonePilotCore
+        env: { TP_SF2: /tmp/GeneralUser-GS.sf2, TP_BLEND_DUMP: /tmp/bd }
+        run: swift test -c release --filter "ToneBlendBench.testRenderShortlist" 2>&1 | grep -E "BLENDRENDER|error:|Executed" | tail -4
+      - uses: actions/upload-artifact@v4
+        with: { name: bd-renders, path: /tmp/bd/renders, retention-days: 7 }
+
+  judge:
+    needs: render
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - uses: actions/download-artifact@v4
+        with: { name: bd-targets, path: /tmp/bd }
+      - uses: actions/download-artifact@v4
+        with: { name: bd-shortlist, path: /tmp/bd }
+      - uses: actions/download-artifact@v4
+        with: { name: bd-renders, path: /tmp/bd/renders }
+      - name: Blend search + judges
+        run: |
+          pip install -q "numpy<2" scipy librosa
+          pip install -q --index-url https://download.pytorch.org/whl/cpu "torch==2.2.2" "torchvision==0.17.2" "torchaudio==2.2.2"
+          pip install -q panns-inference==0.1.1
+          git clone -q https://github.com/fschmid56/EfficientAT /tmp/eat
+          set -o pipefail
+          cd /tmp/eat && python $GITHUB_WORKSPACE/Native/tools/instruments/blend_eval.py judge /tmp/bd /tmp/blend.md --eat /tmp/eat 2>&1 | tee /tmp/blend.log | grep -E "^\||RESULT|Error|error|Traceback" | tail -20
+          grep "^RESULT" /tmp/blend.log | while IFS= read -r l; do echo "::notice title=Blend search::$l"; done
+      - name: Push to branch ci/tone-blend
+        if: always()
+        run: |
+          [ -f /tmp/blend.md ] || exit 0
+          cd $GITHUB_WORKSPACE
+          git config user.name "github-actions"; git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan ci/tone-blend && git rm -rqf . && mkdir -p blend
+          cp /tmp/blend.md /tmp/blend.json /tmp/blend.log blend/; echo "commit ${GITHUB_SHA} · run ${GITHUB_RUN_ID}" > blend/SOURCE.txt
+          git add blend && git commit -qm "Tone blend phase 2" && git push -qf origin ci/tone-blend

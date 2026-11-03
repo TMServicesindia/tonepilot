@@ -1,0 +1,193 @@
+"""Sound-engine phase 2 DEV bench: does the blend search (one sound, or as many layers as help)
+recreate a part better than the best single sound? Rendered GM audio (DEV banks), not real songs.
+
+Steps (see .github/workflows/tone-blend.yml):
+  shortlist <dump> --eat <repo>   rank the library for each target with the app's bundled tone tables
+                                  (harmonic table, target masked with its extracted notes) -> shortlist.json (top 8)
+  judge <dump> <out.md> --eat <repo>
+                                  run the blend search (a line-for-line port of BlendSearch.swift, same
+                                  parameters) on the Swift renders of the shortlist, then judge the result
+                                  against the CLEAN part with models the search never uses: PANNs CNN10
+                                  (primary) and MFCC distance; EfficientAT reported for reference.
+
+PRE-REGISTERED GATE (written before the first run):
+  A. "blend" targets (lead doubled by a second instrument at 70 %): the search's tone is closer than the
+     best single sound (CNN10 gain > 0.002) on >= 50 % of them;
+  B. "single" targets: no target worse than the best single sound by > 0.01 (CNN10);
+  C. no target at all worse by > 0.02.
+"""
+import json, math, os, sys
+import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+from common import read_wav  # noqa: E402
+from tone_t1 import device_logmel, mfcc_embed, model_embedder  # noqa: E402
+
+SR = 32000
+P = dict(wHook=0.6, wMain=0.3, lam=0.02, delta=0.02, hookSlack=0.01, shortlist=8, perRound=2,
+         balances=[0.35, 0.55, 0.8], maxLayers=8, maxWindows=6)
+PAD = float((np.log(1e-5) + 4.5) / 5)
+
+
+def make_model(eat):
+    import embed as E
+    import torch
+    m = E.EfficientAT(eat)
+    def run(wins):
+        with torch.no_grad():
+            _, feats = m.m(torch.from_numpy(np.stack(wins).astype(np.float32))[:, None])
+        return feats.reshape(len(wins), -1).numpy()
+    return run
+
+
+def embedding(model, x, notes=None, max_windows=None):
+    """PerceptualToneSearch.embedding: device front-end (+ harmonic mask), 1 s windows (hop 50), optional
+    evenly spaced subset (BlendSearch's maxWindows), mean of window embeddings."""
+    if len(x) < SR:
+        x = np.pad(x, (0, SR - len(x)))
+    mel = device_logmel(x.astype(np.float64), notes)
+    n = mel.shape[1]
+    starts = [0] if n <= 101 else list(range(0, n - 101 + 1, 50))
+    wins = []
+    for s0 in starts:
+        w = np.full((128, 101), PAD, np.float32)
+        k = min(101, n - s0); w[:, :k] = mel[:, s0:s0 + k]
+        wins.append(w)
+    if max_windows and len(wins) > max_windows:
+        step = (len(wins) - 1) / (max_windows - 1)
+        wins = [wins[min(len(wins) - 1, int(math.floor(i * step + 0.5)))] for i in range(max_windows)]
+    return model(wins).mean(0)
+
+
+def cos(a, b):
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b) + 1e-12))
+
+
+def shortlist(dump, eat):
+    model = make_model(eat)
+    table = json.load(open(os.path.join(HERE, "../../../App/Resources/ML/tone_table_harmonic.json")))
+    ents = table["entries"]
+    E = np.array([e["embedding"] for e in ents], np.float64)
+    E /= np.linalg.norm(E, axis=1, keepdims=True) + 1e-12
+    out = []
+    for t in json.load(open(os.path.join(dump, "targets.json"))):
+        x, _ = read_wav(os.path.join(dump, "targets", f"{t['id']}_stem.wav"))
+        e = embedding(model, x, t["notes"])
+        s = E @ (e / (np.linalg.norm(e) + 1e-12))
+        best = {}
+        for i, ent in enumerate(ents):
+            best[ent["patch"]] = max(best.get(ent["patch"], -2), float(s[i]))
+        ranked = sorted(best, key=lambda k: -best[k])[:P["shortlist"]]
+        out.append({"id": t["id"], "candidates": ranked})
+    json.dump(out, open(os.path.join(dump, "shortlist.json"), "w"), indent=1)
+    print(f"SHORTLIST {len(out)} targets x {P['shortlist']} candidates")
+
+
+def blend_search(model, hook, notes, cands):
+    """Port of BlendSearch.search. cands: [(patch_id, audio)] best single first (shortlist order)."""
+    emb = lambda x, masked: embedding(model, x, notes if masked else None, P["maxWindows"])
+    hookT, mainT = emb(hook, True), emb(hook, False)
+    C = []
+    for pid, a in cands:
+        rms = float(np.sqrt(np.mean(a.astype(np.float64) ** 2)))
+        if rms <= 1e-5:
+            continue
+        a = (a * (0.1 / rms)).astype(np.float32)
+        C.append({"id": pid, "audio": a, "eh": emb(a, True), "em": emb(a, False)})
+    score = lambda h, m, n: P["wHook"] * h + P["wMain"] * m - P["lam"] * (n - 1)
+    singles = sorted(({**c, "h": cos(c["eh"], hookT), "m": cos(c["em"], mainT)} for c in C),
+                     key=lambda c: -score(c["h"], c["m"], 1))
+    first = singles[0]
+    chosen, bal = [first], [1.0]
+    mix = first["audio"].copy(); cur_h, cur_m = first["h"], first["m"]; cur_s = score(cur_h, cur_m, 1)
+    cur_eh, cur_em = first["eh"], first["em"]
+    floor = first["h"] - P["hookSlack"]
+    while len(chosen) < min(P["maxLayers"], len(C)):
+        rest = [c for c in C if all(c["id"] != k["id"] for k in chosen)]
+        approx = lambda c: score(cos(cur_eh + 0.55 * c["eh"], hookT), cos(cur_em + 0.55 * c["em"], mainT), len(chosen) + 1)
+        short = sorted(rest, key=lambda c: -approx(c))[:P["perRound"]]
+        best = None
+        for c in short:
+            for v in P["balances"]:
+                x = mix + np.float32(v) * c["audio"]
+                eh, em = emb(x, True), emb(x, False)
+                h, m = cos(eh, hookT), cos(em, mainT)
+                s = score(h, m, len(chosen) + 1)
+                if best is None or s > best[5]:
+                    best = (c, v, x, h, m, s, eh, em)
+        if best is None or not (best[5] > cur_s + P["delta"] and best[3] >= floor):
+            break
+        chosen.append(best[0]); bal.append(best[1])
+        mix, cur_h, cur_m, cur_s, cur_eh, cur_em = best[2], best[3], best[4], best[5], best[6], best[7]
+    return {"layers": [(c["id"], b) for c, b in zip(chosen, bal)], "audio": mix, "single_audio": first["audio"],
+            "single": first["id"], "hook": cur_h, "score": cur_s, "single_score": score(first["h"], first["m"], 1)}
+
+
+def judge(dump, out_md, eat):
+    model = make_model(eat)
+    cnn = model_embedder("panns10", eat)
+    targets = {t["id"]: t for t in json.load(open(os.path.join(dump, "targets.json")))}
+    rows = []
+    for sl in json.load(open(os.path.join(dump, "shortlist.json"))):
+        t = targets[sl["id"]]
+        hook, _ = read_wav(os.path.join(dump, "targets", f"{t['id']}_stem.wav"))
+        clean, _ = read_wav(os.path.join(dump, "targets", f"{t['id']}_clean.wav"))
+        cands = []
+        for pid in sl["candidates"]:
+            p = os.path.join(dump, "renders", f"{t['id']}_{pid}.wav")
+            if os.path.exists(p):
+                cands.append((pid, read_wav(p)[0]))
+        if not cands:
+            continue
+        r = blend_search(model, hook.astype(np.float32), t["notes"], cands)
+        ce = cnn(clean, SR)
+        g_cnn = cos(cnn(r["audio"], SR), ce) - cos(cnn(r["single_audio"], SR), ce)
+        mc = mfcc_embed(clean, SR)
+        g_mfcc = float(np.linalg.norm(mfcc_embed(r["single_audio"], SR) - mc) - np.linalg.norm(mfcc_embed(r["audio"], SR) - mc))
+        ids = [k for k, _ in r["layers"]]
+        rows.append({"id": t["id"], "bank": t["bank"], "variant": t["variant"], "layers": len(ids), "ids": ids,
+                     "balances": [b for _, b in r["layers"]], "cnn_gain": g_cnn, "mfcc_gain": g_mfcc,
+                     "lead_found": t["lead_patch"] in ids, "partner_found": bool(t["partner_patch"]) and t["partner_patch"] in ids,
+                     "score_gain": r["score"] - r["single_score"]})
+        print(f"ROW {t['id']}: {len(ids)} layer(s), CNN10 gain {g_cnn:+.4f}, MFCC gain {g_mfcc:+.3f}", flush=True)
+
+    def stats(rs):
+        n = len(rs); multi = sum(r["layers"] > 1 for r in rs)
+        better = sum(r["cnn_gain"] > 0.002 for r in rs); worse1 = sum(r["cnn_gain"] < -0.01 for r in rs)
+        worse2 = sum(r["cnn_gain"] < -0.02 for r in rs)
+        return n, multi, better, worse1, worse2, (min(r["cnn_gain"] for r in rs) if rs else 0.0), \
+            (float(np.mean([r["cnn_gain"] for r in rs])) if rs else 0.0), sum(r["mfcc_gain"] > 0 for r in rs), \
+            sum(r["partner_found"] for r in rs)
+
+    lines = ["# Blend search (phase 2) on the DEV bench — independent judges", "",
+             "Rendered GM audio (DEV banks), not real songs. Judged against the part alone (no leakage), best single sound vs the search's tone.", "",
+             "| Group | Targets | Chose > 1 layer | CNN10 better | Worse (< −0.01) | Worse (< −0.02) | Worst | Mean CNN10 gain | MFCC closer | True 2nd instrument found |",
+             "|---|---|---|---|---|---|---|---|---|---|"]
+    groups = {}
+    for r in rows:
+        groups.setdefault(f"{r['bank']} · {r['variant']}", []).append(r)
+    for k in sorted(groups):
+        n, multi, b, w1, w2, worst, mean, mf, pf = stats(groups[k])
+        lines.append(f"| {k} | {n} | {multi} | {b}/{n} | {w1} | {w2} | {worst:+.3f} | {mean:+.4f} | {mf}/{n} | {pf} |")
+    blend = [r for r in rows if r["variant"] == "blend"]; single = [r for r in rows if r["variant"] == "single"]
+    bn, _, bb, _, _, _, _, _, _ = stats(blend)
+    _, _, _, sw1, _, _, _, _, _ = stats(single)
+    _, _, _, _, aw2, _, _, _, _ = stats(rows)
+    A = bn > 0 and bb >= 0.5 * bn; B = sw1 == 0; C = aw2 == 0
+    passed = A and B and C
+    lines += ["", f"**Pre-registered gate:** A blend targets better in ≥ 50 %: {bb}/{bn} {'✓' if A else '✗'} · "
+              f"B single targets none worse by > 0.01: {sw1} {'✓' if B else '✗'} · C none worse by > 0.02: {aw2} {'✓' if C else '✗'} → **{'PASS' if passed else 'FAIL'}**"]
+    open(out_md, "w").write("\n".join(lines) + "\n")
+    json.dump(rows, open(out_md.replace(".md", ".json"), "w"), indent=1)
+    print("\n".join(lines))
+    print(f"RESULT blend gate {'PASS' if passed else 'FAIL'}: blend targets better {bb}/{bn}; single targets worse>0.01: {sw1}; any worse>0.02: {aw2}")
+
+
+if __name__ == "__main__":
+    mode, dump = sys.argv[1], sys.argv[2]
+    eat = sys.argv[sys.argv.index("--eat") + 1]
+    if mode == "shortlist":
+        shortlist(dump, eat)
+    else:
+        judge(dump, sys.argv[3], eat)

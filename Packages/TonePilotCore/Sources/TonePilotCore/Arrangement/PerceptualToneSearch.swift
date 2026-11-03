@@ -54,12 +54,19 @@ public enum PerceptualToneSearch {
 
     /// Mean embedding of `samples` (mono, 32 kHz). `notes` (seconds relative to `samples`) enable the
     /// harmonic mask; nil = whole signal. `embed` maps one [128 × 101] window to an embedding.
-    public static func embedding(samples: [Float], notes: [MelodyNote]?, embed: ([Float]) throws -> [Float]) rethrows -> [Float]? {
+    /// `maxWindows`: use at most this many windows, evenly spaced (blend search: the song and every
+    /// candidate use the same subset, so comparisons stay fair; nil = all, as in the tone tables).
+    public static func embedding(samples: [Float], notes: [MelodyNote]?, maxWindows: Int? = nil,
+                                 embed: ([Float]) throws -> [Float]) rethrows -> [Float]? {
         var x = samples
         let minCount = Int(EfficientATFrontEnd.sampleRate)
         if x.count < minCount { x += [Float](repeating: 0, count: minCount - x.count) }
         let mel = EfficientATFrontEnd.logMel(x, keepHarmonicsOf: notes)
-        let ws = windows(frames: mel.frames, values: mel.values)
+        var ws = windows(frames: mel.frames, values: mel.values)
+        if let cap = maxWindows, cap > 0, ws.count > cap {
+            let step = Double(ws.count - 1) / Double(cap - 1 == 0 ? 1 : cap - 1)
+            ws = (0..<cap).map { i in ws[min(ws.count - 1, Int((Double(i) * step).rounded()))] }
+        }
         guard !ws.isEmpty else { return nil }
         var sum: [Float]? = nil
         for w in ws {

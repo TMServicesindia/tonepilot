@@ -110,8 +110,9 @@ final class ToneTableDump: XCTestCase {
     /// chord backing, with vocal and bass, and 20 % of each part leaking into the other's stem.
     /// `perform`: an optional way of playing each part (envelope / filter / vibrato), seeded per case.
     static func benchParts(bank tb: SoundFontBank, fallback load: (InstrumentPatch) -> LoadedInstrument?,
-                           perform: ((Int, String, InstrumentPatch) -> ToneFitter.Settings?)? = nil) -> [BenchPart] {
-        let seconds = 24.0, rsr = 44_100.0
+                           perform: ((Int, String, InstrumentPatch) -> ToneFitter.Settings?)? = nil,
+                           partner: ((Int, UInt8) -> UInt8?)? = nil, sampleRate rsr: Double = 44_100) -> [BenchPart] {
+        let seconds = 24.0
         func gm(_ p: UInt8) -> InstrumentPatch { FactoryPatches.patch(forProgram: p)! }
         var out: [BenchPart] = []
         for (ci, c) in ToneMatchingBenchmarks.cases.enumerated() {
@@ -136,7 +137,10 @@ final class ToneTableDump: XCTestCase {
                 return [0, 4, 7].map { MelodyNote(start: s, duration: 1.95, midi: root + $0, confidence: 1) }
             }
             let bassNotes: [MelodyNote] = stride(from: 0.0, to: seconds - 1, by: 0.5).map { MelodyNote(start: $0, duration: 0.45, midi: 36 + [0, 5, 7, 9][Int($0 / 2) % 4], confidence: 1) }
-            let l = render(c.lead, lead, "lead"), b = render(c.backing, chords, "backing"), v = render(52, vocal), bs = render(33, bassNotes)
+            var l = render(c.lead, lead, "lead")
+            // Layered variant (blend bench): the lead line doubled by a second instrument at 70 %.
+            if let q = partner?(ci, c.lead) { l = zip(l, render(q, lead)).map { $0 + 0.7 * $1 } }
+            let b = render(c.backing, chords, "backing"), v = render(52, vocal), bs = render(33, bassNotes)
             var leadStem = l, backStem = b
             for i in 0..<l.count {
                 let other: Float = 0.15 * v[i] + 0.1 * bs[i]

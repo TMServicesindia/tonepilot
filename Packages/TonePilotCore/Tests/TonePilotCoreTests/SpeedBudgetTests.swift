@@ -147,6 +147,27 @@ final class SpeedBudgetTests: XCTestCase {
         XCTAssertLessThan(took, 3, "sound pack load took \(took) s")
     }
 
+    /// Blend search for one section (sound-engine phase 2): 8 candidate tones on an 8 s hook. The
+    /// embedding model is a stand-in here (Linux); the Core ML cost is added from the windows counted
+    /// × 10.4 ms per window (measured on the Mac build runner, CPU only; faster on the Neural Engine).
+    func testBlendSearchIsQuick() throws {
+        try budgetsApply()
+        let tones = try BlendSearchTests.tones()
+        let candidates = Array((tones + FactoryPatches.all.filter { $0.synth != nil && $0.family != .percussion && $0.family != .bass }).prefix(8))
+        let target = zip(BlendSearchTests.render(tones[0]), BlendSearchTests.render(tones.last!)).map { $0 + 0.8 * $1 }
+        var windows = 0
+        var result: BlendSearch.Result?
+        let took = seconds {
+            result = BlendSearch.search(hook: target, notes: BlendSearchTests.notes, main: target, candidates: candidates,
+                                        instrument: BlendSearchTests.load, embed: { w in windows += 1; return BlendSearchTests.standIn(w) })
+        }
+        let coreML = Double(windows) * 0.0104
+        let layers = result?.layers.count ?? 0
+        print("SPEED blend search: \(String(format: "%.2f", took)) s + Core ML est. \(String(format: "%.2f", coreML)) s (\(windows) windows) for 8 candidates on an 8 s hook, \(layers) layer(s)")
+        XCTAssertNotNil(result)
+        XCTAssertLessThan(took + coreML, 3 * Double(max(1, layers)) + 3, "blend search took \(took + coreML) s (budget 3 s per added layer + 3 s for the singles)")
+    }
+
     func testPatternLearningIsQuick() throws {
         try budgetsApply()
         let pattern: [(Int, ArpeggioPattern.Degree)] = [(0, .root), (3, .fifth), (6, .octave), (8, .third), (11, .fifth), (14, .octave)]
