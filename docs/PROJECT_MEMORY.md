@@ -391,8 +391,13 @@ Stop: no production change, no major training, no release before approval.
 
 **Status:** blends kept off (`PartMatcher.blendsEnabled = false`); the app keeps the part-based blend.
 
+**Option 1, leakage-aware unmixing (owner chose it, 3 Nov):**
+- Built in Swift (`BlendSearch.unmix`, 1.12 s per section) and judged once, pre-registered (run 41689603211).
+- **FAIL:** 13/24 blend targets better; 11 single targets worse.
+- Bleed is not the cause: unmixing over-fits by combining candidates.
+
 **Next options for the owner:**
-1. Leakage-aware unmixing (the other stems as extra components).
+1. Held-out model selection for unmixing (fit on half the frames, keep a layer only if the other half improves).
 2. Real layered recordings for DEV/TEST.
 3. Decide by the owner's blind A/B on real songs.
 

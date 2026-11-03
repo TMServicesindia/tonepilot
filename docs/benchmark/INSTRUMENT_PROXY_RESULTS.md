@@ -408,6 +408,7 @@ Embedding time for all 438 clips (CI CPU): EfficientAT 25 s, CNN10 113 s.
 | Same, λ = δ = 0 (sweep 41682673282, tuning) | 17/24 · 9/24 | 12/24 · 7 | 5 | — |
 | + spectral-shape term (sweep, tuning) | 0–1/24 · 0/24 | 5–9/24 · 3–5 | 2–4 | — |
 | Spectral unmixing (NNLS on mel power), run 41684589993 | 21/24 · 13/24 | 21/24 · 11 | 13 | FAIL (B, C) |
+| Leakage-aware unmixing (other stems as fixed bleed components; owner's option 1, pre-registered), run 41689603211 | 21/24 · 13/24 | 20/24 · 11 | 15 | FAIL (B, C) |
 
 **Diagnosis:**
 1. **EfficientAT barely sees layering.** The best extra layer changed the hook/main similarity by at most +0.0007, even when the true second instrument was shortlisted (15/24). It is built to tell instruments apart, not mixture proportions.
@@ -416,6 +417,13 @@ Embedding time for all 438 clips (CI CPU): EfficientAT 25 s, CNN10 113 s.
 **Decision:**
 - `PartMatcher.blendsEnabled = false`; tuning on these DEV targets stopped (overfitting risk).
 - The app keeps the owner-approved part-based blend: every distinct matched part's sound, all keys.
+
+**Leakage-aware result:** adding the bleed sources changed almost nothing (single targets still 20/24 multi-layer). So bleed is not why single-instrument parts get extra layers. The cause is model flexibility:
+- with 8 candidates, a non-negative mix of several always fits a part's spectrum better than one does;
+- the timbre is never exact (other bank), and the extracted notes are never exact (timing, missed notes);
+- fit improvement alone cannot tell a real second instrument from a better approximation.
+
+**Next principled step (proposal, not started):** held-out model selection. Fit on half of the frames and judge on the other half; a layer is kept only if it improves the held-out fit by a margin. This is the standard guard against this kind of over-fitting.
 
 **What would change the picture (not started):**
 - Unmixing that models the leakage explicitly, e.g. the other stems as extra fixed components.
