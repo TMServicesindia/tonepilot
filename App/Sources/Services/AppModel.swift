@@ -77,6 +77,12 @@ final class AppModel: ObservableObject {
     }
     /// Separation models, downloaded inside the app when first needed.
     let models = ModelStore()
+    /// Real-instrument sound packs (downloaded on request; their tones join the library and the search).
+    lazy var soundPacks = SoundPackStore(sampleDirectory: store.sampleDirectory)
+    @Published var soundPackList: [SoundPackStore.Manifest.Pack] = []
+    @Published var soundPackProgress: [String: Double] = [:]
+    @Published var soundPackError: String?
+    @Published var installedSoundPacks: [String] = []
     /// Model download progress (0...1), by pack.
     @Published var modelDownloadProgress: [SeparationPack: Double] = [:]
     @Published var modelDownloadError: String?
@@ -170,6 +176,7 @@ final class AppModel: ObservableObject {
             self.startEngine()
             self.wireMIDI()
             self.installBundledSoundFontsThenPreload()
+            self.refreshSoundPacks()
         }
         maintenanceTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.maintenance() }

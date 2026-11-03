@@ -17,6 +17,14 @@ final class PerceptualToneService: @unchecked Sendable {
     private var harmonic: PerceptualToneSearch.ToneTable?
     private var plain: PerceptualToneSearch.ToneTable?
     private var failed = false
+    /// Embeddings of installed sound packs' tones (added to the bundled tables).
+    private var packHarmonic: [PerceptualToneSearch.ToneTable.Entry] = []
+    private var packPlain: [PerceptualToneSearch.ToneTable.Entry] = []
+
+    func setPackEntries(harmonic: [PerceptualToneSearch.ToneTable.Entry], plain: [PerceptualToneSearch.ToneTable.Entry]) {
+        lock.lock(); defer { lock.unlock() }
+        packHarmonic = harmonic; packPlain = plain
+    }
 
     /// Loads (once) the compiled model and both tables. The `.mlpackage` is compiled on first use
     /// and the compiled copy cached in Application Support.
@@ -58,7 +66,10 @@ final class PerceptualToneService: @unchecked Sendable {
     /// The hook for one analysis: the separated parts' files (decoded at 32 kHz, full band, on demand).
     /// nil when the search isn't available (then the fingerprint matcher is used as before).
     func hook(stemFiles: [StemInfo.Kind: URL]) -> PartMatcher.PerceptualHook? {
-        guard !stemFiles.isEmpty, let (model, harmonic, plain) = load() else { return nil }
+        guard !stemFiles.isEmpty, let (model, bundledHarmonic, bundledPlain) = load() else { return nil }
+        lock.lock()
+        let harmonic = bundledHarmonic.adding(packHarmonic), plain = bundledPlain.adding(packPlain)
+        lock.unlock()
         let audio = PartAudioCache(files: stemFiles)
         let input: MLMultiArray
         do { input = try MLMultiArray(shape: [1, 1, 128, 101], dataType: .float32) } catch { return nil }

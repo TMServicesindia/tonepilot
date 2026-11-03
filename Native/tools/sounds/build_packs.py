@@ -41,12 +41,17 @@ OCTAVE_OFFSET = {"vsco": 2, "vcsl": 1}   # MIDI = 12 * (octave + offset) + pitch
 NAME = re.compile(r"_([A-G]#?)(-?\d)_v[l]?(\d+)(?:_(?:rr)?(\d+))?\.wav$", re.I)
 
 
-def detect_f0(x):
-    seg = x[int(0.4 * SR):int(1.4 * SR)] if len(x) > int(1.4 * SR) else x
+def detect_f0(x, expected):
+    """Strongest spectral peak. High notes decay fast (a piano's top octave is mostly gone after
+    0.3 s), so they are measured right after the attack; others in their steady part."""
+    if expected > 700:
+        seg = x[int(0.02 * SR):int(0.32 * SR)]
+    else:
+        seg = x[int(0.4 * SR):int(1.4 * SR)] if len(x) > int(1.4 * SR) else x
     n = 1 << 17
     spec = np.abs(np.fft.rfft(seg * np.hanning(len(seg)), n=n))
     freqs = np.fft.rfftfreq(n, 1 / SR)
-    keep = (freqs > 25) & (freqs < 4000)
+    keep = (freqs > max(25, expected * 0.45)) & (freqs < min(SR / 2 - 100, expected * 7))   # ignore rumble far below the note
     return float(freqs[np.argmax(spec * keep)])
 
 
@@ -146,7 +151,7 @@ def build(pack, roots, out, commits):
         entries = [e for e in entries if e["root"] in kr]
         for e in entries:
             x = load(os.path.join(d, e["file"]))
-            f0 = detect_f0(x)
+            f0 = detect_f0(x, 440 * 2 ** ((e["root"] - 69) / 12))
             if not pitch_fits(f0, e["root"]):
                 dropped.append(f"{e['file']}: name says MIDI {e['root']}, measured peak {f0:.1f} Hz")
                 continue

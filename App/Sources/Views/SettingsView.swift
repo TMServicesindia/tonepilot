@@ -30,6 +30,7 @@ struct SettingsView: View {
                 Text("The TonePilot engine supports per-layer envelope, filter, EQ, chorus, glide/vibrato, and the generated accompaniment. The Apple sampler is a simpler fallback.")
             }
             SeparationModelsSection()
+            SoundPacksSection()
             Section("AI analysis") {
                 NavigationLink { AnalysisServerSettingsView() } label: {
                     Label("Analysis server (vocal separation)", systemImage: "server.rack")
@@ -192,6 +193,9 @@ struct LicensesView: View {
             Section("Nearest-sound search") {
                 Text("Finding the nearest tone for each separated part uses EfficientAT mn10 (MIT, Florian Schmid, github.com/fschmid56/EfficientAT), converted to Core ML and run on this iPhone. Its pretrained weights were trained on Google AudioSet; AudioSet label names are CC BY-SA 4.0.")
             }
+            Section("Real instrument sounds") {
+                Text("Downloadable sound packs are built from VSCO 2 Community Edition (Sam Gossner and contributors, github.com/sgossner/VSCO-2-CE) and the Versilian Community Sample Library (github.com/sgossner/VCSL), both released under CC0 1.0 (public domain). Each pack lists every original file it uses.")
+            }
             Section("Separation & recording") {
                 Text("Stem separation on this iPhone: Demucs v4 htdemucs / htdemucs_6s (MIT, Meta AI) via demucs.cpp (MIT, Sevag Hanssian) and Eigen (MPL-2.0); models are downloaded in the app.")
                 Text("MP3 export (Record): LAME 3.100 (GNU LGPL 2.0, lame.sourceforge.io). TonePilot's full source, including how LAME is built, is public, so it can be rebuilt with a modified LAME.")
@@ -321,3 +325,50 @@ struct SeparationModelsSection: View {
         }
     }
 }
+
+
+/// Real-instrument sound packs (CC0 recordings): download / delete. Installed packs' tones appear in
+/// the tone library and in the nearest-sound search.
+struct SoundPacksSection: View {
+    @EnvironmentObject var model: AppModel
+
+    var body: some View {
+        Section {
+            if model.soundPackList.isEmpty && model.installedSoundPacks.isEmpty {
+                Text(model.soundPackError == nil ? "Checking for sound packs…" : "Sound packs aren't available right now.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            ForEach(model.soundPackList) { pack in
+                let installed = model.installedSoundPacks.contains(pack.id)
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(pack.name).font(.subheadline.weight(.semibold))
+                        if installed { StatusPill(text: "Installed", color: Theme.accent) }
+                        Spacer()
+                        if let p = model.soundPackProgress[pack.id] {
+                            ProgressView(value: p).frame(width: 80)
+                        } else if installed {
+                            Text(ByteCountFormatter.string(fromByteCount: model.soundPacks.installedSize(pack.id), countStyle: .file))
+                                .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                            Button(role: .destructive) { model.deleteSoundPack(pack.id) } label: { Image(systemName: "trash") }
+                                .buttonStyle(.borderless).accessibilityLabel("Delete \(pack.name)")
+                                .accessibilityIdentifier("soundpacks.delete.\(pack.id)")
+                        } else {
+                            Button("Download \(ByteCountFormatter.string(fromByteCount: pack.size, countStyle: .file))") { model.downloadSoundPack(pack) }
+                                .buttonStyle(.bordered).accessibilityIdentifier("soundpacks.download.\(pack.id)")
+                        }
+                    }
+                    Text(pack.tones.joined(separator: ", ")).font(.caption).foregroundStyle(.secondary)
+                }
+                .accessibilityIdentifier("soundpacks.row.\(pack.id)")
+            }
+            if let e = model.soundPackError { Text(e).font(.caption).foregroundStyle(Theme.bad) }
+        } header: {
+            Text("Real instrument sounds").accessibilityIdentifier("settings.soundpacks")
+        } footer: {
+            Text("Recorded instruments from free, public-domain (CC0) libraries: VSCO 2 Community Edition and the Versilian Community Sample Library. Each pack's sounds play on all keys and join the nearest-sound search. Wi-Fi recommended.")
+        }
+        .onAppear { if model.soundPackList.isEmpty { model.loadSoundPackList() } }
+    }
+}
+

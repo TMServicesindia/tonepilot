@@ -28,10 +28,10 @@
    "code": null,
    "weights": "GeneralUser GS SoundFont: music creation private or commercial; use in software projects",
    "dependencies": null,
-   "data": "Sample origins not fully verified by the author; training use not addressed",
-   "status": "Cleared",
+   "data": "Sample origins not fully verified by the author (licence v2.0: 'cannot be 100% sure where all of the samples originated'; flagged for commercial software). Re-labelled from Cleared on 3 Nov 2026 (architecture proposal, section C).",
+   "status": "SAFE*",
    "reviewer": "pending owner review",
-   "scope": "playback only"
+   "scope": "playback (personal builds); not a commercial clearance"
   },
   {
    "id": "lame-3.100",
@@ -152,6 +152,17 @@
    "status": "SAFE*",
    "reviewer": "pending owner review",
    "scope": "nearest-sound tone search for separated parts (personal builds); not a commercial clearance"
+  },
+  {
+   "id": "sound-packs-vsco-vcsl",
+   "shipped": "download",
+   "code": null,
+   "weights": null,
+   "dependencies": "Built by .github/workflows/sound-packs.yml (Native/tools/sounds/build_packs.py); release sounds-v1 with size + SHA-256 per pack",
+   "data": "VSCO 2 Community Edition (github.com/sgossner/VSCO-2-CE) and VCSL (github.com/sgossner/VCSL): CC0 1.0, LICENSE files read 2 Nov 2026; each pack.json lists every source file and the library commit",
+   "status": "Cleared",
+   "reviewer": "pending owner review",
+   "scope": "in-app download of real-instrument tones (string section, Steinway grand, flute)"
   }
  ]
 }

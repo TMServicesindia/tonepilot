@@ -137,6 +137,15 @@ final class TonePilotUITests: XCTestCase {
                 tap(element("transport.play"), "pause (round \(round))")
                 tap(app.tabBars.buttons["Record"], thenExpect: element("record.button"), "Record tab")
                 tap(app.tabBars.buttons["Settings"], "Settings tab")
+                if round == 1 {
+                    // Real instrument sounds (sound packs): the section shows without downloading anything.
+                    let packs = element("settings.soundpacks")
+                    var scrolls = 0
+                    while !packs.exists && scrolls < 5 { app.swipeUp(); scrolls += 1 }
+                    XCTAssertTrue(packs.waitForExistence(timeout: 5), "Settings shows the Real instrument sounds section")
+                    assertAlive("sound packs section")
+                    app.swipeDown(); app.swipeDown(); app.swipeDown()
+                }
                 tap(app.tabBars.buttons["Songs"], "Songs tab")
                 tap(app.tabBars.buttons["Play"], thenExpect: element("transport.play"), "back to Play")
             }
