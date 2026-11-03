@@ -61,15 +61,14 @@ public enum PartMatcher {
     /// passes its pre-registered DEV gate (tone-blend.yml, independent judges); then switched on here.
     public static let blendsEnabled = false
 
-    /// Per distinct section (repeats share one), the blend that recreates its main sound: the hook is the
-    /// lead part (masked with its notes), the main sound is every melodic part summed; candidates are the
-    /// nearest-sound search's top tones. Needs the perceptual hook; at most `maxGroups` groups.
+    /// Per distinct section (repeats share one), the blend that recreates its lead sound by leakage-aware
+    /// spectral unmixing (`BlendSearch.unmix`): candidates are the nearest-sound search's top tones; the
+    /// other separated parts absorb the stem's bleed. Needs the perceptual hook; at most `maxGroups` groups.
     public static func matchSectionBlends(song: Song, parts audio: [StemInfo.Kind: AudioBuffer], patches: [InstrumentPatch],
                                           instrument: (InstrumentPatch) -> LoadedInstrument?, perceptual hook: PerceptualHook,
-                                          maxGroups: Int = 6, parameters: BlendSearch.Parameters = .init()) -> [String: BlendSearch.Result] {
+                                          maxGroups: Int = 6, parameters: BlendSearch.UnmixParameters = .init()) -> [String: BlendSearch.Result] {
         let kind: StemInfo.Kind = audio[.lead] != nil ? .lead : .other
         guard let buffer = audio[kind], !song.sections.isEmpty else { return [:] }
-        let melodic = [StemInfo.Kind.lead, .backing, .other, .piano, .guitar].filter { audio[$0] != nil && ($0 != .other || kind == .other) }
         var groups: [String: [SongSection]] = [:], order: [String] = []
         for s in song.sections.sorted(by: { $0.startTime < $1.startTime }) {
             let key = s.repetitionGroup.map { "\($0)-\(s.type.rawValue)" } ?? s.id.uuidString
@@ -87,17 +86,16 @@ public enum PartMatcher {
             guard let track = MelodyExtractor.extract(slice, source: .fullMix), track.voicedRatio > 0.2,
                   track.notes.filter({ $0.duration >= 0.12 }).count >= 6,
                   let hookAudio = hook.audio32k(kind, section.startTime, section.startTime + slice.duration) else { continue }
-            // The main sound: every melodic part over the same span, summed.
-            var main = hookAudio
-            for k in melodic where k != kind {
-                guard let x = hook.audio32k(k, section.startTime, section.startTime + slice.duration) else { continue }
-                for i in 0..<min(main.count, x.count) { main[i] += x[i] }
-            }
+            // The song's other separated parts over the same span: the sources of this stem's bleed
+            // (leakage-aware unmixing; they absorb it and can never become layers).
+            let leakKinds: [StemInfo.Kind] = [.vocals, .drums, .bass, .backing, .piano, .guitar, .other]
+                .filter { $0 != kind && !($0 == .other && audio[.lead] != nil) && audio[$0] != nil }
+            let others = leakKinds.compactMap { hook.audio32k($0, section.startTime, section.startTime + slice.duration) }
             // Candidates: the nearest-sound search's ranking for the hook.
             guard let e = try? PerceptualToneSearch.embedding(samples: hookAudio, notes: track.notes, embed: hook.embed) else { continue }
             let ranked = PerceptualToneSearch.rank(e, table: hook.harmonic, allowed: allowed).prefix(parameters.shortlist).compactMap { byId[$0.patch] }
-            guard let r = BlendSearch.search(hook: hookAudio, notes: track.notes, main: main, candidates: Array(ranked),
-                                             instrument: instrument, embed: hook.embed, parameters: parameters) else { continue }
+            guard let r = BlendSearch.unmix(hook: hookAudio, notes: track.notes, others: others, candidates: Array(ranked),
+                                            instrument: instrument, parameters: parameters) else { continue }
             for s in members { out[s.id.uuidString] = r }
         }
         return out

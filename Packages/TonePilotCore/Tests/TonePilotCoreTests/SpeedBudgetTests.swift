@@ -168,6 +168,23 @@ final class SpeedBudgetTests: XCTestCase {
         XCTAssertLessThan(took + coreML, 3 * Double(max(1, layers)) + 3, "blend search took \(took + coreML) s (budget 3 s per added layer + 3 s for the singles)")
     }
 
+    /// Leakage-aware unmixing for one section (the phase-2 blend method): 8 candidates rendered on a 6 s
+    /// hook + 3 bleed sources, mel power, normal equations, projected-gradient NNLS. No model calls.
+    func testUnmixIsQuick() throws {
+        try budgetsApply()
+        let tones = try BlendSearchTests.tones()
+        let candidates = Array((tones + FactoryPatches.all.filter { $0.synth != nil && $0.family != .percussion && $0.family != .bass }).prefix(8))
+        let target = zip(BlendSearchTests.render(tones[0]), BlendSearchTests.render(tones.last!)).map { $0 + 0.8 * $1 }
+        let others = (0..<3).map { k in BlendSearchTests.render(candidates[min(candidates.count - 1, 4 + k)]) }
+        var result: BlendSearch.Result?
+        let took = seconds {
+            result = BlendSearch.unmix(hook: target, notes: BlendSearchTests.notes, others: others, candidates: candidates, instrument: BlendSearchTests.load)
+        }
+        print("SPEED blend unmixing: \(String(format: "%.2f", took)) s per section (8 candidates, 3 bleed sources, 6 s), \(result?.layers.count ?? 0) layer(s)")
+        XCTAssertNotNil(result)
+        XCTAssertLessThan(took, 3, "unmixing took \(took) s")
+    }
+
     func testPatternLearningIsQuick() throws {
         try budgetsApply()
         let pattern: [(Int, ArpeggioPattern.Degree)] = [(0, .root), (3, .fifth), (6, .octave), (8, .third), (11, .fifth), (14, .octave)]

@@ -68,4 +68,29 @@ final class BlendSearchTests: XCTestCase {
         XCTAssertEqual(r.layers.count, 1, "layer limit respected")
         XCTAssertTrue(r.approximate, "labelled approximate below the threshold")
     }
+
+    // MARK: Leakage-aware unmixing
+
+    func testUnmixFindsTheLayersAndIgnoresKnownLeakage() throws {
+        let t = try Self.tones()
+        let a = t[0], b = try XCTUnwrap(t.first { $0.synth?.waveform == .sine }), leakTone = t[2]
+        // The other part (e.g. backing) bleeding in at 20 %, on its own notes.
+        let chords = (0..<6).map { MelodyNote(start: Double($0) * 1.4, duration: 1.3, midi: 48 + [0, 4, 7][$0 % 3], confidence: 1) }
+        var other = ToneMatcher.render(leakTone, instrument: Self.load(leakTone)!, notes: chords, seconds: 8.5, sampleRate: Self.sr).samples
+        let rms = (other.map { Double($0) * Double($0) }.reduce(0, +) / Double(other.count)).squareRoot()
+        for i in other.indices { other[i] *= Float(0.1 / rms) }
+        // Real layers are never phase-locked (separate players / recordings): the second layer is 31 ms
+        // late, so the two add in power as real instruments do (perfectly in-phase synths would not).
+        let lag = Int(0.031 * Self.sr), rb = Self.render(b)
+        let late = [Float](repeating: 0, count: lag) + rb.prefix(rb.count - lag)
+        let layered = zip(zip(Self.render(a), late).map { $0 + 0.8 * $1 }, other).map { $0 + 0.2 * $1 }
+        let r = try XCTUnwrap(BlendSearch.unmix(hook: layered, notes: Self.notes, others: [other], candidates: t, instrument: Self.load))
+        XCTAssertEqual(Set(r.layers.map(\.patchId)), [a.id, b.id], "both layers found, leakage not mistaken for a layer: \(r.reasons)")
+        if r.layers.count == 2 { XCTAssertEqual(r.layers[1].balance, 0.8, accuracy: 0.2, "balance recovered") }
+
+        let single = zip(Self.render(t[2]), other).map { $0 + 0.2 * $1 }
+        let s = try XCTUnwrap(BlendSearch.unmix(hook: single, notes: Self.notes, others: [other], candidates: t, instrument: Self.load))
+        XCTAssertEqual(s.layers.map(\.patchId), [t[2].id], "one sound kept when one is enough, with leakage present: \(s.reasons)")
+    }
 }
+
