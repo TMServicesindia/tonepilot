@@ -442,6 +442,7 @@ Stop: no production change, no major training, no release before approval.
 - Settings → Separation models → "Check tones with both models" (`settings.fusion`, default on). One separation at a time: a separation you start stops the second one first.
 - Speed budget: fusion matching (2 parts, 60 s) 8.99 s on Linux release (budget 30 s).
 - **Not validated** on real songs: owner check of which choice sounds closer is pending.
+- **Published as v0.3.91** (run 41771840250, macos-14, all gates passed): launch median 1.86 s, peak memory 147 MB, app 59 MB, fusion matching 4.69 s on Mac CI.
 
 ## 7. Open owner decisions
 
