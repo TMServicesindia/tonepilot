@@ -457,6 +457,24 @@ Stop: no production change, no major training, no release before approval.
 - Pattern-learning budget now includes the check: 11.5 s per 242 s song on Linux release (budget 20 s).
 - **Not validated** on real songs (needs owner listening: TODO 6.4).
 
+## 6y. Section repeat grouping fixed (TODO 5.4, 4 Nov)
+
+- **Bug:** `StructureAnalyzer.assignGroups` compared two sections' aligned similarity with each section's "own" similarity, but measured that on the diagonal, so it was always 1. Only near-identical repeats were grouped, and the claimed "best alignment" was never tried.
+  - Consequence: hooks were found almost without repetition evidence; section leads and arpeggio patterns were learned per section, not per repeat.
+- **Fix:** two segments are one section when, lined up beat by beat (best of shifts up to ±4 beats, any offset of the shorter one), they are ≥ 0.6 alike and ≥ 0.10 more alike than at random beats.
+  - Contrast 0.10 was chosen on DEV: the centre of the range that passes at floors 0.5–0.7.
+- **Benchmark** `SectionGroupingBenchmarks` (synthetic, GeneralUser GS; pair precision / recall):
+
+  | Song | Set | Before | After |
+  |---|---|---|---|
+  | dev 1 | DEV | P 1.00 / R 0.50 | P 1.00 / R 1.00 |
+  | dev 2 (repeat adds strings) | DEV | P 1.00 / R 0.25 | P 1.00 / R 1.00 |
+  | held-out 3 | held-out | P 1.00 / R 0.00 | P 1.00 / R 1.00 |
+  | held-out 4 | held-out | P 1.00 / R 1.00 | P 1.00 / R 1.00 |
+
+- **Known limit (dev 3):** the same notes played on other instruments (e.g. an interlude playing the tune on flute) are grouped as a repeat (P 0.50). A sound-shape check on the 12 timbre bands could not separate this from "repeat with a part added" (tried, removed). The user can still give that section its own tone. Next: use the recognised instruments per section to split such groups.
+- Core suite: 274 tests, 0 failures.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

@@ -193,7 +193,7 @@ Documents:
 | 5.1 | Beat This! evaluated, not adopted (no improvement) | 🧪 ✅ |
 | 5.2 | Rhythm-cycle inference: 31/36, 0% wrong-confident | 🧪 |
 | 5.3 | Harmony hypotheses: 83% on the untouched held-out set with stems; weak on inversions/pedal | 🧪 |
-| 5.4 | Sections: fix repeat grouping; instrument changes per section | ⏳ |
+| 5.4 | Sections: **repeat grouping fixed 4 Nov** (benchmark recall 0–0.5 → 1.00, precision 1.00 incl. held-out). Next: split groups whose recognised instruments differ (same tune on another instrument is still grouped) | 🔨 |
 | 5.5 | Melody / phrase analysis benchmark | ⏳ |
 | 5.6 | Validate 5.2–5.5 on real songs | 📝 |
 | 5.7 | Separation on Indian orchestral/electronic mixes (SDR on licensed multitracks) | ⏳ |
