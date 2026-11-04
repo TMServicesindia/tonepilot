@@ -428,6 +428,21 @@ Stop: no production change, no major training, no release before approval.
 
 **Not done:** 4-part + 6-part fusion (P3.3). It doubles on-device separation time; it needs an owner decision.
 
+## 6w. 4-part + 6-part fusion (P3.3; owner, 4 Nov: "Go ahead with the 4-part and 6-part fusion")
+
+- After a song is separated on the iPhone and analysed, it is separated again **in the background** with the other model (4 ↔ 6 parts). The other model is downloaded once if missing.
+- The second model's parts are matched exactly like the first (`PartFusion.matchSet` = `PartMatcher.match` + `matchSectionLeads`; Music split into lead/backing if the first was). Its audio files are deleted afterwards; only the matches are kept (`Song.fusion`).
+- `PartFusion.fuse` compares per part (melody, backing, piano, guitar) and per section lead:
+  - same tone → confidence 1 − (1−a)(1−b);
+  - same family → ×1.1;
+  - different → halved, **both tones shown**;
+  - only one model has the part → unchanged.
+- **Default "Both models"**: melody, section leads and backing from the 4-part model; piano / guitar from the 6-part model. This is the owner's listening judgement (3 Nov: the Quiet model is better for the main tone), **not a measured gate**.
+- The main tone card shows e.g. "Separations differ: 4 parts heard X, 6 parts heard Y". A menu (`tone.fusion`) offers Both models / 4 parts only / 6 parts only. Choosing re-arranges off the main thread; tones you edited are kept.
+- Settings → Separation models → "Check tones with both models" (`settings.fusion`, default on). One separation at a time: a separation you start stops the second one first.
+- Speed budget: fusion matching (2 parts, 60 s) 8.99 s on Linux release (budget 30 s).
+- **Not validated** on real songs: owner check of which choice sounds closer is pending.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

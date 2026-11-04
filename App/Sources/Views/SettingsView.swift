@@ -318,6 +318,14 @@ struct SeparationModelsSection: View {
                 }
             }
             if let e = model.modelDownloadError { Text(e).font(.caption).foregroundStyle(Theme.bad) }
+            Toggle(isOn: $model.fusionEnabled) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Check tones with both models")
+                    Text("After a song is separated, it is separated again with the other model in the background (about twice the time; downloads that model once). Where both hear the same instrument the tone is surer; where they differ you can choose.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            .accessibilityIdentifier("settings.fusion")
         } header: {
             Text("Separation models")
         } footer: {

@@ -77,6 +77,19 @@ enum UITestSeed {
         } catch {
             model.engineError = "Test song couldn't be written: \(error.localizedDescription)"
         }
+        // P3.3: a 4-part / 6-part fusion that disagrees on the melody, so the choice menu shows (no separation runs).
+        let patches = model.library.patches
+        if let flute = patches.first(where: { $0.family == .flute }), let strings = patches.first(where: { $0.family == .strings }),
+           let piano = patches.first(where: { $0.family == .piano }) {
+            func m(_ kind: StemInfo.Kind, _ p: InstrumentPatch) -> PartMatch {
+                PartMatch(part: kind.rawValue, patchId: p.id, name: p.name, similarity: 0.7, eq: EQSettings(), reverbMix: 0.2,
+                          section: "Chorus", method: PartMatcher.perceptualMethod, perceptualScore: 0.6)
+            }
+            song.fusion = PartFusion.fuse(quiet: .init(parts: 4, matches: ["other": m(.other, flute)], sectionLeads: [:]),
+                                          six: .init(parts: 6, matches: ["other": m(.other, strings), "piano": m(.piano, piano)], sectionLeads: [:]),
+                                          patches: patches)
+            PartFusion.apply(.fused, to: &song)
+        }
         model.update(song)
     }
 

@@ -81,6 +81,14 @@ final class TonePilotUITests: XCTestCase {
                         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.02)).tap()   // close it without choosing
                         assertAlive("hook menu")
                     }
+                    // 4-part / 6-part fusion: switch to one model's tones and back (rebuilds the tones).
+                    let fusion = element("tone.fusion")
+                    if fusion.waitForExistence(timeout: 2) {
+                        tap(fusion, thenExpect: app.buttons["4 parts only"].firstMatch, limit: 3, "open the 4/6-part menu")
+                        tap(app.buttons["4 parts only"].firstMatch, thenExpect: fusion, limit: 5, "use the 4-part tones")
+                        tap(fusion, thenExpect: app.buttons["6 parts only"].firstMatch, limit: 3, "open the 4/6-part menu again")
+                        tap(app.buttons["6 parts only"].firstMatch, thenExpect: fusion, limit: 5, "use the 6-part tones")
+                    }
                     let compare = element("tone.compare")
                     if compare.waitForExistence(timeout: 3) {
                         tap(compare, thenExpect: element("compare.done"), limit: 5, "open the blind comparison")
@@ -158,6 +166,11 @@ final class TonePilotUITests: XCTestCase {
                     while !packs.exists && scrolls < 5 { app.swipeUp(); scrolls += 1 }
                     XCTAssertTrue(packs.waitForExistence(timeout: 5), "Settings shows the Real instrument sounds section")
                     assertAlive("sound packs section")
+                    let fusionSetting = element("settings.fusion")
+                    if fusionSetting.waitForExistence(timeout: 2) {
+                        let sw = fusionSetting.switches.firstMatch.exists ? fusionSetting.switches.firstMatch : fusionSetting
+                        tap(sw, "both-models setting off"); tap(sw, "both-models setting on")
+                    }
                     app.swipeDown(); app.swipeDown(); app.swipeDown()
                 }
                 tap(app.tabBars.buttons["Songs"], "Songs tab")

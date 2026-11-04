@@ -163,6 +163,9 @@ public struct Song: Codable, Hashable, Identifiable, Sendable {
     public var sectionBlends: [String: BlendSearch.Result]?
     /// Phase 3: the song's hook and each section's mood (measured suggestions; your hook choice wins).
     public var understanding: SongUnderstanding?
+    /// P3.3: the part matches from both separation models (4 and 6 parts), compared; nil until the
+    /// second separation has run. `partMatches` / `sectionLeadMatches` hold the chosen set.
+    public var fusion: PartFusion?
 
     public init(id: UUID = UUID(), title: String, artist: String? = nil, film: String? = nil,
                 composer: String? = nil, language: String? = nil, tags: [String] = [],

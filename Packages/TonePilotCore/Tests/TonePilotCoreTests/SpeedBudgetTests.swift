@@ -98,6 +98,29 @@ final class SpeedBudgetTests: XCTestCase {
         XCTAssertLessThan(took, 8, "tone matching took \(took) s")
     }
 
+    /// P3.3 fusion: matching the second separation's parts (Music + piano, 24 s sections, fingerprint path —
+    /// on the iPhone the nearest-sound search replaces most of it) and comparing both sets.
+    func testFusionMatchingIsQuick() throws {
+        try budgetsApply()
+        let synths = FactoryPatches.all.filter { $0.synth != nil && $0.family != .percussion }
+        guard let lead = synths.first(where: { $0.family == .flute || $0.family == .synthLead }), let keys = synths.first(where: { $0.family == .electricPiano || $0.family == .piano }) ?? synths.last else { throw XCTSkip("no synths") }
+        func inst(_ p: InstrumentPatch) -> LoadedInstrument? { p.synth.map { LoadedInstrument(name: p.name, synth: $0) } }
+        let notes: [MelodyNote] = (0..<120).map { MelodyNote(start: 0.2 + Double($0) * 0.5, duration: 0.4, midi: 64 + ($0 * 5) % 12, confidence: 0.9) }
+        let other = ToneMatcher.render(lead, instrument: inst(lead)!, notes: notes, seconds: 60, sampleRate: 44_100)
+        let piano = ToneMatcher.render(keys, instrument: inst(keys)!, notes: notes.map { var n = $0; n.midi -= 12; return n }, seconds: 60, sampleRate: 44_100)
+        var song = Song(title: "fusion", sections: [SongSection(type: .chorus, startTime: 0, endTime: 30, provenance: .algorithm),
+                                                    SongSection(type: .verse, startTime: 30, endTime: 60, provenance: .algorithm)])
+        song.partMatches = ["other": PartMatch(part: "other", patchId: lead.id, name: lead.name, similarity: 0.8, eq: EQSettings(), reverbMix: 0.2, section: "Chorus")]
+        var f: PartFusion?
+        let took = seconds {
+            let six = PartFusion.matchSet(parts: 6, song: song, stems: [.other: other, .piano: piano], patches: Array(synths), instrument: inst, perceptual: nil)
+            f = PartFusion.fuse(quiet: .init(parts: 4, matches: song.partMatches ?? [:], sectionLeads: [:]), six: six, patches: synths)
+        }
+        print("SPEED fusion matching: \(String(format: "%.2f", took)) s for 2 parts of the second separation")
+        XCTAssertNotNil(f?.entries[PartFusion.melodyKey])
+        XCTAssertLessThan(took, 30, "fusion matching took \(took) s")
+    }
+
     /// Fitting the chosen tone's envelope / filter / vibrato to one part (tone recreation T3): a
     /// 24-second section at 44.1 kHz with other parts leaking in. The app fits up to ~12 parts and
     /// section leads per song, in the background after the analysis.

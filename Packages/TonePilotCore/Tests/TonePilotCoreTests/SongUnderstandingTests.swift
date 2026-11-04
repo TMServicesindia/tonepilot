@@ -8,7 +8,9 @@ final class SongUnderstandingTests: XCTestCase {
     static let loud = SectionTimbre(centroid: 2700, onsetRate: 6.0, lowEnergyShare: 0.4, highEnergyShare: 0.2, sustain: 0.35, loudness: 0.3)
 
     /// A Hukum-like song: a signature instrumental line (intro + interludes, no singing), sung verses and choruses.
-    func song() -> Song {
+    func song() -> Song { Self.makeSong() }
+
+    static func makeSong() -> Song {
         func s(_ type: SectionType, _ label: String, _ start: Double, group: String, lead: Double, vocal: Double, _ t: SectionTimbre) -> SongSection {
             var x = SongSection(type: type, startTime: start, endTime: start + 15, provenance: .algorithm)
             x.label = label; x.repetitionGroup = group; x.timbre = t

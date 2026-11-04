@@ -100,6 +100,20 @@ final class AppModel: ObservableObject {
     var lastGateSection: UUID?
     /// What each accompaniment slot was last set to (skip redundant engine updates).
     var accompanimentSlotState: [String: String] = [:]
+    /// P3.3: after a song is separated, separate it again with the other model (4 ↔ 6 parts) in the
+    /// background and compare both models' tone matches (`AppModel+Fusion`).
+    @Published var fusionEnabled: Bool = UserDefaults.standard.object(forKey: "fusion") as? Bool ?? true {
+        didSet {
+            UserDefaults.standard.set(fusionEnabled, forKey: "fusion")
+            if !fusionEnabled { for id in fusionProgress.keys { cancelFusion(id) } }
+        }
+    }
+    /// The second separation + matching (0...1 while running), and its last error.
+    @Published var fusionProgress: [UUID: Double] = [:]
+    @Published var fusionError: [UUID: String] = [:]
+    let fusionCancels = CancelFlags()
+    /// A separation you started while the second separation ran (it starts once that one has stopped).
+    var pendingSeparation: UUID?
     /// Separate parts automatically after the first analysis of an imported song.
     @Published var autoSeparate: Bool = UserDefaults.standard.object(forKey: "autoSeparate") as? Bool ?? true {
         didSet { UserDefaults.standard.set(autoSeparate, forKey: "autoSeparate") }
@@ -945,6 +959,8 @@ final class AppModel: ObservableObject {
                     self.analysisStage[songId] = nil
                     self.update(s)
                     if self.activeSongId == songId { self.startPerformance(songId: songId) }
+                    // Analysed from parts separated here: check them with the other model too (P3.3).
+                    self.startFusionIfNeeded(songId)
                     // First analysis done: separate the parts (Moises-style) in the background.
                     if self.autoSeparate, s.sourceType == .importedFile, self.stemKinds(for: s).isEmpty,
                        self.separationError[songId] == nil {

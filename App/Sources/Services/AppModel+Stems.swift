@@ -41,6 +41,12 @@ extension AppModel {
     func separateStems(_ songId: UUID) {
         let pack = separationPack
         guard !isSeparating(songId), modelDownloadProgress[pack] == nil else { return }
+        // One separation at a time (memory): a running second separation stops first, then this starts.
+        if let fusing = fusionProgress.keys.first {
+            pendingSeparation = songId
+            cancelFusion(fusing)
+            return
+        }
         if models.isInstalled(pack) { runSeparation(songId, pack: pack); return }
         downloadModel(pack) { [weak self] ok in if ok { self?.runSeparation(songId, pack: pack) } }
     }

@@ -614,6 +614,42 @@ struct SeparationCard: View {
 
 // MARK: My keyboard
 
+/// P3.3: what the 4-part and 6-part separations heard for the main tone, and which matches are used.
+struct FusionLine: View {
+    @EnvironmentObject var model: AppModel
+    let song: Song
+
+    var body: some View {
+        if let p = model.fusionProgress[song.id] {
+            Text("Checking the tone with the \(model.separatedPack(song) == .six ? "4" : "6")-part model… \(Int(p * 100))%")
+                .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                .accessibilityIdentifier("fusion.status")
+        } else if let f = song.fusion, f.isCurrent(song) {
+            Menu {
+                ForEach(PartFusion.Choice.allCases, id: \.self) { c in
+                    Button { model.setFusionChoice(c, songId: song.id) } label: {
+                        if c == f.choice { Label(c.title, systemImage: "checkmark") } else { Text(c.title) }
+                    }
+                }
+            } label: {
+                let e = f.mainEntry(song)
+                Label(e.map(PartFusion.describe) ?? "Tone checked with both separations", systemImage: e?.agreement == .different ? "arrow.triangle.branch" : "checkmark.seal")
+                    .font(.caption).lineLimit(2).multilineTextAlignment(.leading)
+            }
+            .accessibilityIdentifier("tone.fusion")
+        } else if let e = model.fusionError[song.id] {
+            Text(e).font(.caption2).foregroundStyle(Theme.warn).lineLimit(2)
+        } else if model.fusionEnabled, let pack = model.separatedPack(song), song.partMatches?.isEmpty == false, !model.isSeparating(song.id) {
+            Button { model.startFusionIfNeeded(song.id) } label: {
+                Label("Check the tone with the \(pack == .six ? "4" : "6")-part model too", systemImage: "square.stack.3d.up")
+                    .font(.caption)
+            }
+            .buttonStyle(.borderless)
+            .accessibilityIdentifier("fusion.start")
+        }
+    }
+}
+
 struct MyKeyboardCard: View {
     @EnvironmentObject var model: AppModel
     let song: Song
@@ -666,6 +702,7 @@ struct MyKeyboardCard: View {
                         Text("Feel: \(feel) (suggestion)").font(.caption2).foregroundStyle(.secondary)
                     }
                 }
+                FusionLine(song: song)
             }
             HStack {
                 if usingMain, let main = model.mainTone(of: song) {
