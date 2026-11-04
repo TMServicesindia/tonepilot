@@ -59,6 +59,9 @@ targets:
         type: folder
         buildPhase: resources
         optional: true
+      - path: App/Resources/Licenses
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: TonePilotCore
       - target: CDemucs

@@ -181,6 +181,26 @@ struct TroubleshootingView: View {
     }
 }
 
+/// One bundled licence text (App/Resources/Licenses), shown in full.
+struct LicenseText: View {
+    let file: String
+    static var bundled: [String] {
+        guard let dir = Bundle.main.url(forResource: "Licenses", withExtension: nil),
+              let names = try? FileManager.default.contentsOfDirectory(atPath: dir.path) else { return [] }
+        return names.filter { $0.hasSuffix(".txt") }.map { String($0.dropLast(4)) }.sorted()
+    }
+    var body: some View {
+        let url = Bundle.main.url(forResource: "Licenses", withExtension: nil)?.appendingPathComponent(file + ".txt")
+        ScrollView {
+            Text(url.flatMap { try? String(contentsOf: $0, encoding: .utf8) } ?? "Licence text missing.")
+                .font(.caption.monospaced()).textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading).padding()
+        }
+        .navigationTitle(file)
+        .accessibilityIdentifier("licenses.text")
+    }
+}
+
 struct LicensesView: View {
     var body: some View {
         List {
@@ -199,6 +219,12 @@ struct LicensesView: View {
             Section("Separation & recording") {
                 Text("Stem separation on this iPhone: Demucs v4 htdemucs / htdemucs_6s (MIT, Meta AI) via demucs.cpp (MIT, Sevag Hanssian) and Eigen (MPL-2.0); models are downloaded in the app.")
                 Text("MP3 export (Record): LAME 3.100 (GNU LGPL 2.0, lame.sourceforge.io). TonePilot's full source, including how LAME is built, is public, so it can be rebuilt with a modified LAME.")
+            }
+            Section("Full licence texts") {
+                ForEach(LicenseText.bundled, id: \.self) { name in
+                    NavigationLink(name) { LicenseText(file: name) }
+                        .accessibilityIdentifier("licenses.full.\(name)")
+                }
             }
             Section("Optional analysis server") {
                 Text("Demucs (MIT, github.com/adefossez/demucs) for stem separation and Spotify Basic Pitch (Apache-2.0, github.com/spotify/basic-pitch) for vocal transcription run on your own Mac/server — not bundled in the app.")

@@ -233,5 +233,5 @@ Documents:
 |---|---|---|
 | 8.1 | Demucs weights permission (email drafted) | 👤 |
 | 8.2 | GeneralUser GS training permission (email drafted) | 👤 |
-| 8.3 | Attribution file in the app (CC BY, MIT, Apache, LGPL notices) | ⏳ |
+| 8.3 | Attribution in the app: **full licence texts bundled 4 Nov** (`App/Resources/Licenses`: Demucs MIT, demucs.cpp MIT, EfficientAT MIT, Eigen MPL-2.0, LAME LGPL 2.0, GeneralUser GS licence) under Settings › Licenses › Full licence texts (stress-tested) | 🔨 |
 | 8.4 | Commercial licence gate passing | ⏳ (blocked by 8.1) |

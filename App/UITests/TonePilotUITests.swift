@@ -177,6 +177,21 @@ final class TonePilotUITests: XCTestCase {
                         tap(sw, "both-models setting off"); tap(sw, "both-models setting on")
                     }
                     app.swipeDown(); app.swipeDown(); app.swipeDown()
+                    // Licences: every bundled full licence text opens.
+                    let licenses = app.buttons["Licenses & credits"].firstMatch
+                    var tries = 0
+                    while !(licenses.exists && licenses.isHittable) && tries < 6 { app.swipeUp(); tries += 1 }
+                    if licenses.exists {
+                        tap(licenses, "open Licenses")
+                        let full = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'licenses.full.'")).firstMatch
+                        var scrolls = 0
+                        while !(full.exists && full.isHittable) && scrolls < 4 { app.swipeUp(); scrolls += 1 }
+                        XCTAssertTrue(full.waitForExistence(timeout: 3), "the full licence texts are bundled")
+                        tap(full, thenExpect: element("licenses.text"), "open a full licence text")
+                        app.navigationBars.buttons.firstMatch.tap(); assertAlive("back from the licence text")
+                        app.navigationBars.buttons.firstMatch.tap(); assertAlive("back from Licenses")
+                    }
+                    for _ in 0..<6 { app.swipeDown() }
                 }
                 tap(app.tabBars.buttons["Songs"], "Songs tab")
                 tap(app.tabBars.buttons["Play"], thenExpect: element("transport.play"), "back to Play")
