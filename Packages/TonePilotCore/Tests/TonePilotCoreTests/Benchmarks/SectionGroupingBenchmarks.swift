@@ -17,7 +17,9 @@ final class SectionGroupingBenchmarks: XCTestCase {
     struct Part { let label: String; let instruments: [UInt8]; let extra: UInt8?; let gain: Float }
     /// Chords (bar roots) and register per label.
     static let shapes: [String: (roots: [Int], high: Bool)] = [
-        "A": ([0, 9, 5, 7], false), "B": ([5, 7, 0, 0], true), "C": ([2, 7, 0, 9], false), "D": ([9, 5, 0, 7], true)]
+        "A": ([0, 9, 5, 7], false), "B": ([5, 7, 0, 0], true), "C": ([2, 7, 0, 9], false), "D": ([9, 5, 0, 7], true),
+        // "E": A's notes on other instruments (an interlude playing the tune on flute) — a different section for tones.
+        "E": ([0, 9, 5, 7], false)]
 
     func song(_ plan: [Part], bpm: Double, barsPer: Int = 8, sr: Double = 22_050) -> (AudioBuffer, [(String, Double, Double)]) {
         let beat = 60 / bpm, t0 = 0.5
@@ -69,6 +71,10 @@ final class SectionGroupingBenchmarks: XCTestCase {
         ("dev 2 ABAB'CB'", 92, [.init(label: "A", instruments: [4, 32], extra: nil, gain: 1), .init(label: "B", instruments: [24, 32], extra: nil, gain: 1.3),
                                 .init(label: "A", instruments: [4, 32], extra: nil, gain: 1), .init(label: "B", instruments: [24, 32], extra: 48, gain: 1.5),
                                 .init(label: "C", instruments: [4, 32], extra: nil, gain: 1), .init(label: "B", instruments: [24, 32], extra: 48, gain: 1.5)]),
+        // Added 4 Nov after the section audit merged a same-notes / other-instruments section (DEV from now on).
+        ("dev 3 ABABE", 100, [.init(label: "A", instruments: [0, 49], extra: nil, gain: 1), .init(label: "B", instruments: [61, 33], extra: nil, gain: 1.6),
+                              .init(label: "A", instruments: [0, 49], extra: nil, gain: 1), .init(label: "B", instruments: [61, 33], extra: nil, gain: 1.6),
+                              .init(label: "E", instruments: [73, 46], extra: nil, gain: 1)]),
     ]
     static let heldOut: [(String, Double, [Part])] = [
         ("held-out 3 ABACAB", 110, [.init(label: "A", instruments: [46, 42], extra: nil, gain: 1), .init(label: "B", instruments: [56, 33], extra: nil, gain: 1.4),
@@ -78,6 +84,23 @@ final class SectionGroupingBenchmarks: XCTestCase {
                                   .init(label: "B", instruments: [0, 32], extra: 40, gain: 1.4), .init(label: "A", instruments: [0, 32], extra: nil, gain: 1),
                                   .init(label: "B", instruments: [0, 32], extra: 40, gain: 1.5)]),
     ]
+
+    /// DEV-only sweep of the grouping contrast and floor (held-out songs never used here).
+    func testContrastSweepOnDev() throws {
+        guard ProcessInfo.processInfo.environment["TP_SWEEP"] != nil else { throw XCTSkip("TP_SWEEP not set") }
+        let rendered = Self.dev.map { (name, bpm, plan) in (name, song(plan, bpm: bpm), plan) }
+        defer { StructureAnalyzer.groupingContrast = 0.10; StructureAnalyzer.groupingFloor = 0.6 }
+        for floor: Float in [0.5, 0.6, 0.7] { for c: Float in [0.02, 0.04, 0.06, 0.08, 0.10, 0.14] {
+            StructureAnalyzer.groupingContrast = c; StructureAnalyzer.groupingFloor = floor
+            var line = String(format: "SWEEP floor %.2f contrast %.2f:", floor, c)
+            for (name, (audio, truth), _) in rendered {
+                var opt = SongAnalyzer.Options(); opt.extractMelody = false
+                let s = score(try SongAnalyzer.analyze(audio, options: opt).sections, truth)
+                line += String(format: " %@ P %.2f R %.2f (%@)", name, s.p, s.r, s.groups)
+            }
+            print(line)
+        } }
+    }
 
     func testRepeatGrouping() throws {
         for (set, songs) in [("DEV", Self.dev), ("HELD-OUT", Self.heldOut)] {

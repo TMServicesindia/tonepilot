@@ -85,24 +85,51 @@ public enum StructureAnalyzer {
         return segments
     }
 
-    /// Two segments are "the same section" when their cross-similarity is close to
-    /// their own internal similarity. Uses the best diagonal alignment so repeats of
-    /// slightly different lengths still match.
-    static func assignGroups(_ segments: inout [Segment], ssm: [[Float]], ratio: Float = 0.93) {
-        func within(_ s: Segment) -> Float { blockMean(ssm, s.startBeat..<s.endBeat, s.startBeat..<s.endBeat, diagonal: true) }
+    /// Two segments are "the same section" when, lined up beat by beat (best of a few small shifts, so
+    /// repeats that start a beat or two early / late still match), they are clearly more alike than the
+    /// same two segments compared at random beats. A repeat lines up chord for chord; a different section
+    /// with the same instruments doesn't. (Until 4 Nov the reference was the segment's own diagonal,
+    /// which is always 1, so only near-identical repeats were grouped — section benchmark recall 0–0.5.)
+    nonisolated(unsafe) static var groupingContrast: Float = 0.10   // DEV sweep: 0.10 passes at floors 0.5–0.7 (centre of the passing range)
+    nonisolated(unsafe) static var groupingFloor: Float = 0.6
+
+    /// Known limit (section benchmark dev 3): the same notes on other instruments are grouped as a repeat —
+    /// the 12 timbre bands can't separate that from a repeat with a part added (tested 4 Nov).
+    static func assignGroups(_ segments: inout [Segment], ssm: [[Float]]) {
+        func same(_ i: Int, _ j: Int) -> Bool {
+            let a = segments[i], b = segments[j]
+            let ra = a.startBeat..<a.endBeat, rb = b.startBeat..<b.endBeat
+            let aligned = bestAligned(ssm, ra, rb, maxShift: 4)
+            let random = blockMean(ssm, ra, rb, diagonal: false)
+            return aligned >= groupingFloor && aligned - random >= groupingContrast
+        }
         var nextGroup = 0
         for i in segments.indices {
             if segments[i].group >= 0 { continue }
             segments[i].group = nextGroup
-            let wi = within(segments[i])
             for j in segments.indices where j > i && segments[j].group < 0 {
-                let wj = within(segments[j])
-                let cross = blockMean(ssm, segments[i].startBeat..<segments[i].endBeat,
-                                      segments[j].startBeat..<segments[j].endBeat, diagonal: true)
-                if cross >= ratio * min(wi, wj) { segments[j].group = nextGroup }
+                if same(i, j) { segments[j].group = nextGroup }
             }
             nextGroup += 1
         }
+    }
+
+    /// The best aligned (diagonal) similarity over shifts of up to `maxShift` beats either way, and any
+    /// offset of the shorter segment inside the longer one.
+    static func bestAligned(_ ssm: [[Float]], _ a: Range<Int>, _ b: Range<Int>, maxShift: Int) -> Float {
+        let len = min(a.count, b.count)
+        guard len > 4 else { return blockMean(ssm, a, b, diagonal: true) }
+        var best: Float = -1
+        let spread = abs(a.count - b.count)
+        for shift in -maxShift...(maxShift + spread) {
+            let sa = shift < 0 ? -shift : 0, sb = shift > 0 ? shift : 0
+            let n = min(a.count - sa, b.count - sb)
+            guard n >= len - maxShift, n > 0 else { continue }
+            var s: Float = 0
+            for k in 0..<n { s += ssm[a.lowerBound + sa + k][b.lowerBound + sb + k] }
+            best = max(best, s / Float(n))
+        }
+        return best
     }
 
     /// Mean similarity along aligned beats (diagonal) — repeated sections line up beat by beat.
