@@ -473,7 +473,8 @@ Stop: no production change, no major training, no release before approval.
   | held-out 4 | held-out | P 1.00 / R 1.00 | P 1.00 / R 1.00 |
 
 - **Known limit (dev 3):** the same notes played on other instruments (e.g. an interlude playing the tune on flute) are grouped as a repeat (P 0.50). A sound-shape check on the 12 timbre bands could not separate this from "repeat with a part added" (tried, removed). The user can still give that section its own tone. Next: use the recognised instruments per section to split such groups.
-- Core suite: 274 tests, 0 failures.
+- Core suite: 274 tests, 0 failures. **Published v0.3.93** (launch median 2.03 s, peak 147 MB).
+- Accompaniment check published in **v0.3.92**; full licence texts in the app (Settings › Licenses › Full licence texts) in **v0.3.94** (launch median 2.47 s, peak 152 MB, all gates passed).
 
 ## 7. Open owner decisions
 
