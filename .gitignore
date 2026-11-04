@@ -32,3 +32,4 @@ Packages/TonePilotCore/.build-docker2/
 __pycache__/
 *.pyc
 Packages/TonePilotCore/.*.sf2
+Packages/TonePilotCore/bench-sf2.sf2
