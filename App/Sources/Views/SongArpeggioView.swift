@@ -21,10 +21,52 @@ struct SongArpeggioCard: View {
             } else {
                 notLearned
             }
+            if let arp = song.arpeggio { skippedSections(arp) }
         }
         .padding(14)
         .background(Theme.panel, in: RoundedRectangle(cornerRadius: 16))
         .onDisappear { if model.arpeggioPreview?.songId == song.id { model.stopArpeggioPreview() } }
+    }
+
+    // MARK: No fill unless sure
+
+    /// Sections the song doesn't play broken chords in: no fill was made; you can add one anyway.
+    @ViewBuilder private func skippedSections(_ arp: SongArpeggio) -> some View {
+        let skipped = song.orderedSections.filter { arp.skipped?[$0.id.uuidString] != nil && arp.playable(for: $0.id) == nil }
+        // Repeats share one row.
+        let rows = skipped.filter { s in !skipped.contains { $0.id != s.id && $0.repetitionGroup != nil && $0.repetitionGroup == s.repetitionGroup && $0.type == s.type && $0.startTime < s.startTime } }
+        if !rows.isEmpty {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("No fill (the song doesn't play broken chords here)").font(.subheadline.weight(.semibold))
+                ForEach(rows) { s in
+                    HStack {
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(s.label).font(.subheadline).lineLimit(1)
+                            Text(Self.heard(arp.skipped?[s.id.uuidString])).font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Button("Add a fill anyway") {
+                            model.setArpeggioStyle(ArpeggioStyles.all.first?.id, songId: song.id, sectionId: s.id)
+                            model.selectArpeggioSection(s.id, songId: song.id)
+                        }
+                        .font(.caption.weight(.semibold)).buttonStyle(.bordered)
+                        .accessibilityIdentifier("arpeggio.addFill")
+                    }
+                }
+            }
+            .padding(12)
+            .background(Theme.panelRaised, in: RoundedRectangle(cornerRadius: 12))
+            .accessibilityIdentifier("arpeggio.skipped")
+        }
+    }
+
+    static func heard(_ kind: String?) -> String {
+        switch AccompanimentClassifier.Kind(rawValue: kind ?? "") {
+        case .blockChords: return "Heard block chords / strums"
+        case .melodic: return "Heard a melody line, not chords"
+        case .some(.none): return "Too quiet or too short to tell"
+        default: return "Not sure enough to fill"
+        }
     }
 
     // MARK: Not learned yet

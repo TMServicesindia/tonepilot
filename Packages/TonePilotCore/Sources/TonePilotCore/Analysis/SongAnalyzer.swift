@@ -188,9 +188,10 @@ public enum SongAnalyzer {
 
         var limitations = baseLimitations
         if options.stems.isEmpty { limitations.append(noStemsLimitation) }
-        // Song Arpeggio: each section's broken-chord pattern, from the Music part only.
+        // Song Arpeggio: each section's broken-chord pattern, from the Music part only — only where the
+        // song really plays broken chords (no fill unless sure).
         let arpeggio = options.stems[.other].flatMap { music in
-            tempo == nil ? nil : ArpeggioLearner.learn(.init(music: music, beats: beats, beatsPerBar: meter?.value ?? 4,
+            tempo == nil ? nil : ArpeggioLearner.learnGated(.init(music: music, beats: beats, beatsPerBar: meter?.value ?? 4,
                                                              chords: chords, sections: sections))
         }
         return SongAnalysisResult(
@@ -370,10 +371,18 @@ extension Song {
                 }
             }
         }
+        if let new {
+            var skipped: [String: String] = [:]
+            for s in sections {
+                if let match = analysed.min(by: { abs($0.startTime - s.startTime) < abs($1.startTime - s.startTime) }),
+                   abs(match.startTime - s.startTime) < 1, let k = new.skipped?[match.id.uuidString] { skipped[s.id.uuidString] = k }
+            }
+            merged.skipped = skipped.isEmpty ? nil : skipped
+        }
         for (k, p) in old?.patterns ?? [:] where p.userEdited && sections.contains(where: { $0.id.uuidString == k }) {
             merged.patterns[k] = p
         }
-        return merged.patterns.isEmpty ? nil : merged
+        return merged.patterns.isEmpty && merged.skipped == nil && (merged.styleChoices ?? [:]).isEmpty ? nil : merged
     }
 }
 

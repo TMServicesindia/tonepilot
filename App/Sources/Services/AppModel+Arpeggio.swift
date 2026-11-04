@@ -14,7 +14,8 @@ struct ArpeggioPreview: Equatable {
 /// - Preview: the section's pattern on the song's own chords, on the engine's own pattern clock.
 extension AppModel {
     func arpeggioSections(_ song: Song) -> [SongSection] {
-        song.orderedSections.filter { song.arpeggio?.pattern(for: $0.id) != nil }
+        // Learned patterns, and sections you gave a fill yourself (e.g. one the song plays in block chords).
+        song.orderedSections.filter { song.arpeggio?.playable(for: $0.id) != nil }
     }
 
     /// Section the arpeggio follows: the one playing (song running), else the one chosen on the page.

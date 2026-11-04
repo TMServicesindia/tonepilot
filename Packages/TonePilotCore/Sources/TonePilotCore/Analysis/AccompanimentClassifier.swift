@@ -135,3 +135,29 @@ public enum AccompanimentClassifier {
         return Verdict(kind: .brokenChord, confidence: conf, evidence: ev, allowsArpeggio: conf >= th.minConfidence)
     }
 }
+
+extension ArpeggioLearner {
+    /// The learner with the no-fill-unless-sure check (Phase 4, shipped): a section keeps its learned
+    /// broken-chord pattern only when `AccompanimentClassifier` hears broken chords there; held or sparse
+    /// accompaniment keeps a held chord; block chords / strums, melodic lines and silence get no fill and
+    /// are listed in `skipped` with what was heard. Synthetic benchmark (AccompanimentBenchmarks): false
+    /// arpeggios 7/7 → 0/7 and unwanted fills 4/4 → 0/4 on dev and two held-out songs.
+    public static func learnGated(_ input: Input, thresholds: AccompanimentClassifier.Thresholds = .init()) -> SongArpeggio? {
+        guard var arp = learn(input) else { return nil }
+        let ctx = AccompanimentClassifier.SongContext(music: input.music)
+        var skipped: [String: String] = [:]
+        for s in input.sections {
+            let id = s.id.uuidString
+            guard var p = arp.patterns[id] else { continue }
+            let v = AccompanimentClassifier.classify(ctx, beats: input.beats, chords: input.chords, section: s,
+                                                     beatsPerBar: max(2, min(7, input.beatsPerBar)), thresholds: thresholds)
+            if v.allowsArpeggio { continue }
+            if v.kind == .sustained || v.kind == .sparse { p.sustained = true; arp.patterns[id] = p; continue }
+            arp.patterns[id] = nil
+            skipped[id] = v.kind.rawValue
+        }
+        arp.skipped = skipped.isEmpty ? nil : skipped
+        // Kept even with no pattern left, so the app can say why there's no fill (and offer one anyway).
+        return arp.patterns.isEmpty && skipped.isEmpty ? nil : arp
+    }
+}

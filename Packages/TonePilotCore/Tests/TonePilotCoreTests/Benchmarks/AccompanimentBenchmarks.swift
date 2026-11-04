@@ -108,18 +108,14 @@ final class AccompanimentBenchmarks: XCTestCase {
     /// Phase 4 investigation: the learner's pattern survives only when AccompanimentClassifier allows it.
     /// Sustained/sparse sections may keep a held chord; everything else gets no fill.
     static let gatedLearner: Decider = { music, beats, chords, sections in
-        let learned = currentLearner(music, beats, chords, sections)
+        // The shipped path (ArpeggioLearner.learnGated), plus the classifier's evidence for the log.
         let ctx = AccompanimentClassifier.SongContext(music: music)
-        var out: [String: ArpeggioPattern] = [:]
         for s in sections {
             let v = AccompanimentClassifier.classify(ctx, beats: beats, chords: chords, section: s)
             let ev = v.evidence.sorted { $0.key < $1.key }.map { String(format: "%@ %.2f", $0.key, $0.value) }.joined(separator: ", ")
             print("ACCOMP-EVIDENCE \(s.label ?? "?"): \(v.kind.rawValue) conf \(String(format: "%.2f", v.confidence)) · \(ev)")
-            guard let p = learned[s.id.uuidString] else { continue }
-            if v.allowsArpeggio { out[s.id.uuidString] = p }
-            else if v.kind == .sustained || v.kind == .sparse { var held = p; held.sustained = true; out[s.id.uuidString] = held }
         }
-        return out
+        return ArpeggioLearner.learnGated(.init(music: music, beats: beats, beatsPerBar: 4, chords: chords, sections: sections))?.patterns ?? [:]
     }
 
     struct Tally {

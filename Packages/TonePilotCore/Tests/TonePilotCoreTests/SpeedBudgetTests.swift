@@ -214,7 +214,7 @@ final class SpeedBudgetTests: XCTestCase {
         let r = ArpeggioTests.render(bpm: 96, beatsPerBar: 4, stepsPerBeat: 4, bars: 96, pattern: pattern, progression: ["C", "Am", "F", "G"])
         let input = ArpeggioLearner.Input(music: r.0, beats: r.1, beatsPerBar: 4, chords: r.2, sections: r.3)
         var out: SongArpeggio?
-        let took = seconds { out = ArpeggioLearner.learn(input) }
+        let took = seconds { out = ArpeggioLearner.learnGated(input) }   // shipped path (with the accompaniment check)
         print("SPEED pattern learning: \(String(format: "%.2f", took)) s for \(Int(r.0.duration)) s of audio")
         XCTAssertNotNil(out)
         XCTAssertLessThan(took, 20, "pattern learning took \(took) s")

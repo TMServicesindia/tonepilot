@@ -444,6 +444,19 @@ Stop: no production change, no major training, no release before approval.
 - **Not validated** on real songs: owner check of which choice sounds closer is pending.
 - **Published as v0.3.91** (run 41771840250, macos-14, all gates passed): launch median 1.86 s, peak memory 147 MB, app 59 MB, fusion matching 4.69 s on Mac CI.
 
+## 6x. No fill unless sure, shipped (owner, 4 Nov: "Go with other things pending")
+
+- `ArpeggioLearner.learnGated` (used by the analysis): a section keeps its learned broken-chord pattern only when `AccompanimentClassifier` hears broken chords there.
+  - Held or sparse accompaniment → a held chord.
+  - Block chords / strums, melodic lines, silence → no fill, listed in `SongArpeggio.skipped` with what was heard.
+- The benchmark now measures this shipped path. Results are identical to the 6.2 investigation (synthetic, GeneralUser GS):
+  - false arpeggios 7/7 → **0/7**;
+  - unwanted fills 4/4 → **0/4**;
+  - real arpeggios kept: dev 1/2, held-out 2/2, held-out 2 1/2 (the triplet sometimes blocked: the safe side).
+- Because a real arpeggio can be blocked, the Song Arpeggio page lists skipped sections ("Heard block chords / strums") with **Add a fill anyway** (`arpeggio.addFill`, in the stress test). A fill you add plays with no learned pattern.
+- Pattern-learning budget now includes the check: 11.5 s per 242 s song on Linux release (budget 20 s).
+- **Not validated** on real songs (needs owner listening: TODO 6.4).
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.

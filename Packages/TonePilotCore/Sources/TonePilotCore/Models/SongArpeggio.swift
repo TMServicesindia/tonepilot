@@ -129,6 +129,9 @@ public struct SongArpeggio: Codable, Hashable, Sendable {
     public var liveFill: Bool?
     /// Major/minor you played per root (pitch class → "m" or ""), learned while you play.
     public var chordMemory: [String: String]?
+    /// Sections given no fill because the song doesn't play broken chords there (section id →
+    /// `AccompanimentClassifier.Kind` raw value, e.g. "blockChords").
+    public var skipped: [String: String]?
 
     public var memory: [Int: ChordSymbol.Quality] {
         Dictionary(uniqueKeysWithValues: (chordMemory ?? [:]).compactMap { k, v in Int(k).map { ($0, v == "m" ? ChordSymbol.Quality.minor : .major) } })

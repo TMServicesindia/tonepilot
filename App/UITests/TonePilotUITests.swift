@@ -134,6 +134,11 @@ final class TonePilotUITests: XCTestCase {
                     }
                 }
                 page("arpeggio")
+                if round == 1 {
+                    // No fill unless sure: a section heard as block chords has no fill; add one anyway.
+                    let add = element("arpeggio.addFill")
+                    if add.waitForExistence(timeout: 3) { tap(add, "add a fill to a block-chord section") }
+                }
                 let live = element("arpeggio.live")
                 if live.waitForExistence(timeout: 3) {
                     tap(live, "live fill-in on")

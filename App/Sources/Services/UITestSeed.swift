@@ -43,6 +43,9 @@ enum UITestSeed {
                                              .init(step: 8, degree: .octave, velocity: 0.8, length: 3), .init(step: 12, degree: .third, velocity: 0.7, length: 3)],
                                       centerNote: 55, timingMatch: 0.9, positionMatch: 0.9, bars: 8)
         song.arpeggio = SongArpeggio(patterns: Dictionary(uniqueKeysWithValues: song.sections.map { ($0.id.uuidString, pattern) }), bpm: bpm)
+        // No fill unless sure: the intro is heard as block chords (no pattern), so "Add a fill anyway" shows.
+        song.arpeggio?.patterns[song.sections[0].id.uuidString] = nil
+        song.arpeggio?.skipped = [song.sections[0].id.uuidString: AccompanimentClassifier.Kind.blockChords.rawValue]
 
         // Audio: a plucked chord per beat (music), bass roots, a kick, and a hummed melody.
         let n = Int(seconds * sr)
