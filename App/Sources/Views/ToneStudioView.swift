@@ -92,7 +92,7 @@ struct ArrangementEditorView: View {
     @State private var addingLayer = false
     @State private var exportURL: URL?
 
-    private static let layerColors: [Color] = [.orange, .teal, .purple, .pink, .yellow, .mint]
+    private static let layerColors: [Color] = DS.Palette.section
 
     private var arrangement: Arrangement? {
         if let songId { return model.song(songId)?.arrangements.first { $0.id == arrangementId } }
@@ -104,12 +104,12 @@ struct ArrangementEditorView: View {
             Form {
                 if arrangement.origin == .aiOriginal {
                     Section {
-                        Label("AI Original — kept unchanged so you can always go back.", systemImage: "lock")
-                        Text("Edit the section's My Version instead (Song › section ⋯ › Edit tone).").font(.caption).foregroundStyle(.secondary)
+                        Label("TonePilot's original tone. It stays unchanged so you can always go back.", systemImage: "lock")
+                        Text("To change it, edit My Version from the Tone page.").font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
                     }
                 }
                 if let rationale = arrangement.rationale {
-                    Section("Why the AI built this") { Text(rationale).font(.footnote) }
+                    Section("Why this tone") { Text(rationale).font(DS.Text.caption) }
                 }
                 Section {
                     TextField("Tone name", text: binding(\.name))
@@ -150,7 +150,7 @@ struct ArrangementEditorView: View {
                         Text("Maximum \(maxLayers) layers with this engine.").font(.caption).foregroundStyle(.secondary)
                     }
                 } header: { Text("Layers") } footer: {
-                    Text("Layers on the same keys sound together. Use key ranges for splits (e.g. bass on the left hand) and velocity ranges to switch sounds by how hard you play.")
+                    Text("Layers on the same keys sound together. Split the keyboard in Keys and pitch.")
                 }
 
                 if !model.patchLoadErrors.isEmpty {
@@ -174,6 +174,8 @@ struct ArrangementEditorView: View {
                 }
             }
             .disabled(arrangement.origin == .aiOriginal)
+            .scrollContentBackground(.hidden)
+            .background(DS.Palette.canvas)
             .navigationTitle(arrangement.name)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }
@@ -256,33 +258,76 @@ struct LayerEditor: View {
     var fullControls = true
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Circle().fill(color).frame(width: 10, height: 10)
+        let effects = Binding(get: { layer.effectsOverride ?? patch?.effects ?? EffectSettings() },
+                              set: { layer.effectsOverride = $0 })
+        VStack(alignment: .leading, spacing: DS.Space.m) {
+            // Layer header (spec §2.7): drawing, name, source; tap = show the details.
+            HStack(spacing: DS.Space.m) {
+                InstrumentTile(drawing: patch.map { InstrumentDrawing.forFamily($0.family) } ?? .synth, size: 56)
                 Button(action: onToggle) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(patch?.name ?? "Missing patch").font(.headline)
-                        HStack(spacing: 6) {
-                            if let patch { SourceTypeBadge(type: patch.sourceType) }
-                            Text(summary).font(.caption).foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                        HStack(spacing: DS.Space.s) {
+                            Circle().fill(color).frame(width: 8, height: 8)
+                            Text(patch?.name ?? "Missing sound").font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary).lineLimit(2)
                         }
+                        Text(source).font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
+                        Label(expanded ? "Hide details" : "Details", systemImage: expanded ? "chevron.up" : "chevron.down")
+                            .font(DS.Text.metadata.weight(.semibold)).foregroundStyle(DS.Palette.accent)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("layer.header")
-                Spacer()
-                Toggle("M", isOn: $layer.muted).toggleStyle(.button).controlSize(.small).tint(Theme.warn)
-                    .accessibilityLabel("Mute")
-                Toggle("S", isOn: $layer.solo).toggleStyle(.button).controlSize(.small).tint(.yellow)
-                    .accessibilityLabel("Solo")
+                Button("Swap", action: onChangePatch)
+                    .font(DS.Text.caption.weight(.semibold))
+                    .buttonStyle(.bordered).tint(DS.Palette.accent)
+                    .frame(minHeight: DS.Size.touchTarget)
+                    .accessibilityIdentifier("layer.swap")
             }
-            HStack {
-                Image(systemName: "speaker.fill").font(.caption)
-                Slider(value: $layer.volume, in: 0...1)
+            // The three controls people reach for: level, brightness, reverb.
+            labelledSlider("Level", value: $layer.volume, range: 0...1, id: "layer.level")
+            labelledSlider("Brightness", value: effects.eq.highDB, range: -12...12, id: "layer.brightness")
+                .disabled(!fullControls)
+            labelledSlider("Reverb", value: effects.reverbMix, range: 0...100, id: "layer.reverb")
+            HStack(spacing: DS.Space.s) {
+                toggleButton(layer.muted ? "Muted" : "Mute", on: $layer.muted, id: "layer.mute")
+                toggleButton("Solo", on: $layer.solo, id: "layer.solo")
+                Spacer()
             }
             if expanded { details }
         }
+        .padding(.vertical, DS.Space.xs)
         .opacity(layer.enabled ? 1 : 0.5)
+    }
+
+    private var source: String {
+        let kind = patch.map { $0.sourceType.displayName } ?? "Sound"
+        return summary.isEmpty ? kind : "\(kind) · \(summary)"
+    }
+
+    private func labelledSlider(_ title: String, value: Binding<Double>, range: ClosedRange<Double>, id: String) -> some View {
+        HStack(spacing: DS.Space.m) {
+            Text(title).font(DS.Text.bodySecondary).foregroundStyle(DS.Palette.textSecondary)
+                .frame(minWidth: 84, alignment: .leading)
+            Slider(value: value, in: range)
+                .tint(DS.Palette.accent)
+                .accessibilityLabel(title)
+                .accessibilityIdentifier(id)
+        }
+    }
+
+    private func toggleButton(_ title: String, on: Binding<Bool>, id: String) -> some View {
+        Button { on.wrappedValue.toggle() } label: {
+            Text(title).font(DS.Text.caption.weight(.semibold))
+                .frame(minWidth: 72, minHeight: DS.Size.touchTarget - 8)
+                .foregroundStyle(on.wrappedValue ? DS.Palette.accent : DS.Palette.textSecondary)
+                .background(on.wrappedValue ? DS.Palette.accentMuted : DS.Palette.elevated,
+                            in: RoundedRectangle(cornerRadius: DS.Radius.s, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(id)
+        .accessibilityAddTraits(on.wrappedValue ? .isSelected : [])
     }
 
     private var summary: String {
@@ -294,40 +339,69 @@ struct LayerEditor: View {
         return parts.joined(separator: " · ")
     }
 
+    /// Plain summaries for the Details rows (spec §2.7: icon + one line).
+    private var keysSummary: String { layer.keyRange == .full ? "All keys" : "\(NoteName.name(for: Int(layer.keyRange.low)))–\(NoteName.name(for: Int(layer.keyRange.high)))" }
+    private var envelopeSummary: String {
+        guard let e = layer.envelopeOverride else { return "From the sound" }
+        return e.attack > 0.15 ? "Slow attack" : (e.release > 1.5 ? "Long release" : "Adjusted")
+    }
+    private var filterSummary: String {
+        let f = layer.filterOverride ?? patch?.filter ?? FilterSettings()
+        return f.enabled ? (layer.filterOverride == nil ? "Fitted to the sound" : "Adjusted") : "Off"
+    }
+    private var expressionSummary: String {
+        let ex = layer.expressionOverride ?? patch?.expression ?? .poly
+        var parts: [String] = []
+        if ex.mono { parts.append("One note at a time") }
+        if ex.vibratoDepth > 0 { parts.append("Vibrato") }
+        return parts.isEmpty ? "None" : parts.joined(separator: " · ")
+    }
+
+    private func detailLabel(_ title: String, _ symbol: String, _ summary: String) -> some View {
+        HStack(spacing: DS.Space.m) {
+            Image(systemName: symbol).foregroundStyle(DS.Palette.accent).frame(width: DS.Space.xl)
+            Text(title).font(DS.Text.body).foregroundStyle(DS.Palette.textPrimary)
+            Spacer(minLength: DS.Space.s)
+            Text(summary).font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    // Details (spec §2.7, Logic's Details pattern): one row per topic with a plain summary; each opens in place.
     @ViewBuilder private var details: some View {
-        Button("Change sound…", action: onChangePatch)
-        Toggle("Enabled", isOn: $layer.enabled)
-        HStack { Text("Pan"); Slider(value: $layer.pan, in: -1...1) }
-        Stepper("Octave \(layer.octave > 0 ? "+" : "")\(layer.octave)", value: $layer.octave, in: -3...3)
-        Stepper("Transpose \(layer.transpose > 0 ? "+" : "")\(layer.transpose) semitones", value: $layer.transpose, in: -12...12)
-        HStack {
-            Text("Fine tune \(Int(layer.fineTuneCents)) ct")
-            Slider(value: $layer.fineTuneCents, in: -100...100, step: 1)
-        }
-        Stepper("Lowest key \(NoteName.name(for: Int(layer.keyRange.low)))",
-                value: Binding(get: { Int(layer.keyRange.low) }, set: { layer.keyRange = KeyRange(low: UInt8($0), high: layer.keyRange.high) }),
-                in: 0...Int(layer.keyRange.high))
-        Stepper("Highest key \(NoteName.name(for: Int(layer.keyRange.high)))",
-                value: Binding(get: { Int(layer.keyRange.high) }, set: { layer.keyRange = KeyRange(low: layer.keyRange.low, high: UInt8($0)) }),
-                in: Int(layer.keyRange.low)...127)
-        Stepper("Softest velocity \(layer.velocityRange.low)",
-                value: Binding(get: { Int(layer.velocityRange.low) }, set: { layer.velocityRange = VelocityRange(low: UInt8($0), high: layer.velocityRange.high) }),
-                in: 1...Int(layer.velocityRange.high), step: 5)
-        Stepper("Hardest velocity \(layer.velocityRange.high)",
-                value: Binding(get: { Int(layer.velocityRange.high) }, set: { layer.velocityRange = VelocityRange(low: layer.velocityRange.low, high: UInt8($0)) }),
-                in: Int(layer.velocityRange.low)...127, step: 5)
-        Picker("MIDI channel", selection: $layer.midiChannel) {
-            Text("Any").tag(UInt8?.none)
-            ForEach(1...16, id: \.self) { Text("\($0)").tag(UInt8?.some(UInt8($0))) }
-        }
-        Picker("Role", selection: $layer.role) {
-            Text("None").tag(MusicalRole?.none)
-            ForEach(MusicalRole.allCases, id: \.self) { Text($0.displayName).tag(MusicalRole?.some($0)) }
-        }
         let effects = Binding(get: { layer.effectsOverride ?? patch?.effects ?? EffectSettings() },
                               set: { layer.effectsOverride = $0 })
-        DisclosureGroup("Effects & EQ") {
-            HStack { Text("Reverb"); Slider(value: effects.reverbMix, in: 0...100) }
+        DisclosureGroup {
+            Toggle("Play this layer", isOn: $layer.enabled)
+            HStack { Text("Pan"); Slider(value: $layer.pan, in: -1...1) }
+            Stepper("Octave \(layer.octave > 0 ? "+" : "")\(layer.octave)", value: $layer.octave, in: -3...3)
+            Stepper("Transpose \(layer.transpose > 0 ? "+" : "")\(layer.transpose) semitones", value: $layer.transpose, in: -12...12)
+            HStack {
+                Text("Fine tune \(Int(layer.fineTuneCents)) ct")
+                Slider(value: $layer.fineTuneCents, in: -100...100, step: 1)
+            }
+            Stepper("Lowest key \(NoteName.name(for: Int(layer.keyRange.low)))",
+                    value: Binding(get: { Int(layer.keyRange.low) }, set: { layer.keyRange = KeyRange(low: UInt8($0), high: layer.keyRange.high) }),
+                    in: 0...Int(layer.keyRange.high))
+            Stepper("Highest key \(NoteName.name(for: Int(layer.keyRange.high)))",
+                    value: Binding(get: { Int(layer.keyRange.high) }, set: { layer.keyRange = KeyRange(low: layer.keyRange.low, high: UInt8($0)) }),
+                    in: Int(layer.keyRange.low)...127)
+            Stepper("Softest touch \(layer.velocityRange.low)",
+                    value: Binding(get: { Int(layer.velocityRange.low) }, set: { layer.velocityRange = VelocityRange(low: UInt8($0), high: layer.velocityRange.high) }),
+                    in: 1...Int(layer.velocityRange.high), step: 5)
+            Stepper("Hardest touch \(layer.velocityRange.high)",
+                    value: Binding(get: { Int(layer.velocityRange.high) }, set: { layer.velocityRange = VelocityRange(low: layer.velocityRange.low, high: UInt8($0)) }),
+                    in: Int(layer.velocityRange.low)...127, step: 5)
+            Picker("MIDI channel", selection: $layer.midiChannel) {
+                Text("Any").tag(UInt8?.none)
+                ForEach(1...16, id: \.self) { Text("\($0)").tag(UInt8?.some(UInt8($0))) }
+            }
+            Picker("Role", selection: $layer.role) {
+                Text("None").tag(MusicalRole?.none)
+                ForEach(MusicalRole.allCases, id: \.self) { Text($0.displayName).tag(MusicalRole?.some($0)) }
+            }
+        } label: { detailLabel("Keys and pitch", "pianokeys", keysSummary).accessibilityIdentifier("layer.details.keys") }
+        DisclosureGroup {
             HStack { Text("Chorus"); Slider(value: effects.chorusMix, in: 0...100) }.disabled(!fullControls)
             HStack { Text("Delay"); Slider(value: effects.delayMix, in: 0...100) }
             // Warm saturation for powerful leads, brass and synths (0 = clean).
@@ -339,12 +413,11 @@ struct LayerEditor: View {
             if fullControls {
                 eqSlider("Low", effects.eq.lowDB)
                 eqSlider("Mid", effects.eq.midDB)
-                eqSlider("High", effects.eq.highDB)
             }
-        }
+        } label: { Label("Effects & EQ", systemImage: "sparkles").accessibilityIdentifier("layer.details.effects") }
         if fullControls {
-            DisclosureGroup("Envelope (attack · decay · sustain · release)") {
-                Toggle(patch?.usesOwnEnvelope == true ? "Override the patch envelope" : "Override the SoundFont's envelope",
+            DisclosureGroup {
+                Toggle(patch?.usesOwnEnvelope == true ? "Change the sound's envelope" : "Change the SoundFont's envelope",
                        isOn: Binding(get: { layer.envelopeOverride != nil },
                                      set: { layer.envelopeOverride = $0 ? (patch?.envelope ?? Envelope()) : nil }))
                 if layer.envelopeOverride != nil {
@@ -354,8 +427,8 @@ struct LayerEditor: View {
                     HStack { Text("Sustain \(Int(env.wrappedValue.sustain * 100))%"); Slider(value: env.sustain, in: 0...1) }
                     timeSlider("Release", env.release, 0.01...6)
                 }
-            }
-            DisclosureGroup("Filter") {
+            } label: { detailLabel("Envelope", "waveform.path.ecg", envelopeSummary).accessibilityIdentifier("layer.details.envelope") }
+            DisclosureGroup {
                 let filter = Binding(get: { layer.filterOverride ?? patch?.filter ?? FilterSettings() }, set: { layer.filterOverride = $0 })
                 Toggle("Low-pass filter", isOn: filter.enabled)
                 if filter.wrappedValue.enabled {
@@ -375,10 +448,10 @@ struct LayerEditor: View {
                         Slider(value: filter.velocityBrightness, in: 0...3)
                     }
                 }
-            }
-            DisclosureGroup("Expression (mono · glide · vibrato · bend)") {
+            } label: { detailLabel("Filter", "camera.filters", filterSummary).accessibilityIdentifier("layer.details.filter") }
+            DisclosureGroup {
                 let ex = Binding(get: { layer.expressionOverride ?? patch?.expression ?? .poly }, set: { layer.expressionOverride = $0 })
-                Toggle("Mono / legato (one note at a time)", isOn: ex.mono)
+                Toggle("One note at a time (legato)", isOn: ex.mono)
                 if ex.wrappedValue.mono { timeSlider("Glide", ex.glideTime, 0...0.5) }
                 HStack { Text("Vibrato \(Int(ex.wrappedValue.vibratoDepth)) ct").frame(width: 110, alignment: .leading); Slider(value: ex.vibratoDepth, in: 0...60) }
                 if ex.wrappedValue.vibratoDepth > 0 {
@@ -386,11 +459,11 @@ struct LayerEditor: View {
                     timeSlider("Vibrato delay", ex.vibratoDelay, 0...1.5)
                 }
                 Stepper("Pitch-bend range ±\(Int(ex.wrappedValue.bendRange)) semitones", value: ex.bendRange, in: 1...12)
-                HStack { Text("Velocity response"); Slider(value: ex.velocitySensitivity, in: 0...1) }
-            }
+                HStack { Text("Touch response"); Slider(value: ex.velocitySensitivity, in: 0...1) }
+            } label: { detailLabel("Vibrato and glide", "scribble.variable", expressionSummary).accessibilityIdentifier("layer.details.expression") }
         } else {
-            Text("Envelope, filter, EQ, chorus and expression need the TonePilot engine (Settings › Sound engine).")
-                .font(.caption2).foregroundStyle(.secondary)
+            Text("Envelope, filter and vibrato need the TonePilot engine (Settings › Sound engine).")
+                .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
         }
     }
 

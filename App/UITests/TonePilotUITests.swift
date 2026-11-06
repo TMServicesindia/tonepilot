@@ -137,6 +137,14 @@ final class TonePilotUITests: XCTestCase {
                             XCTContext.runActivity(named: "Tone editor element tree") { a in a.add(XCTAttachment(string: app.debugDescription)) }
                             print("TONE EDITOR TREE\n" + app.debugDescription.split(separator: "\n").prefix(80).joined(separator: "\n"))
                         }
+                        // The layer's main controls (spec §2.7): level, brightness, reverb; mute on and off.
+                        for id in ["layer.level", "layer.brightness", "layer.reverb"] {
+                            let slider = app.sliders[id].firstMatch
+                            if slider.waitForExistence(timeout: 2), slider.isHittable { slider.adjust(toNormalizedSliderPosition: 0.6) }
+                        }
+                        let mute = element("layer.mute")
+                        if mute.waitForExistence(timeout: 2), mute.isHittable { mute.tap(); mute.tap() }
+                        assertAlive("layer controls")
                         tap(header, "expand a layer")
                         let effects = app.buttons["Effects & EQ"].firstMatch
                         if effects.waitForExistence(timeout: 3) {
