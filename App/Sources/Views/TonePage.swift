@@ -42,7 +42,11 @@ struct MyKeyboardCard: View {
                 .dsSurface(padding: 0)
             }
             if let track = model.studioTracks(for: song).first(where: { $0.id == SongStudio.keyboard }) {
-                TrackRow(track: track, songId: song.id, showHeader: false)
+                VStack(alignment: .leading, spacing: DS.Space.xs) {
+                    Text("Your keys' volume").font(DS.Text.label).foregroundStyle(DS.Palette.textPrimary)
+                    TrackRow(track: track, songId: song.id, showHeader: false)
+                }
+                .dsSurface()
             }
             if !usingMain, !song.sections.isEmpty { SectionSwitchingOptions(song: song) }
         }
@@ -57,12 +61,16 @@ private struct ConnectionChips: View {
         let noKeyboard = model.midi.sources.isEmpty
         let speaker = AudioSessionSetup.isBuiltInSpeaker
         if noKeyboard || speaker {
-            HStack(spacing: DS.Space.s) {
-                if noKeyboard { DSChip(text: "Casio not connected", symbol: "pianokeys", tone: .accent) }
-                if speaker { DSChip(text: "Playing on the iPhone speaker", symbol: "speaker.wave.2", tone: .neutral) }
-                Spacer(minLength: 0)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: DS.Space.s) { chips(noKeyboard, speaker); Spacer(minLength: 0) }
+                VStack(alignment: .leading, spacing: DS.Space.xs) { chips(noKeyboard, speaker) }
             }
         }
+    }
+
+    @ViewBuilder private func chips(_ noKeyboard: Bool, _ speaker: Bool) -> some View {
+        if noKeyboard { DSChip(text: "Casio not connected", symbol: "pianokeys", tone: .accent).fixedSize() }
+        if speaker { DSChip(text: "Playing on the iPhone speaker", symbol: "speaker.wave.2", tone: .neutral).fixedSize() }
     }
 }
 
@@ -87,6 +95,8 @@ private struct ToneSuggestionCard: View {
             HStack {
                 if usingMain, hook != nil {
                     DSChip(text: hook?.chosenByUser == true ? "From the section you chose" : "Suggested for the hook", symbol: "sparkles", tone: .accent)
+                } else if usingMain {
+                    DSChip(text: "One tone for the whole song", symbol: "music.note", tone: .accent)
                 } else {
                     DSChip(text: "Tone for \(section?.label ?? "this section")", symbol: "music.note", tone: .accent)
                 }
@@ -117,15 +127,10 @@ private struct ToneSuggestionCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             if usingMain, hookSection != nil { hookMenu }
-            HStack(spacing: DS.Space.s) {
-                Button(action: onChange) { Label("Change", systemImage: "arrow.triangle.2.circlepath") }
-                    .buttonStyle(.dsSecondary)
-                    .accessibilityIdentifier("tone.change")
-                if usingMain {
-                    Button(action: onCompare) { Label("Compare", systemImage: "ear") }
-                        .buttonStyle(.dsSecondary)
-                        .accessibilityIdentifier("tone.compare")
-                }
+            // Side by side; stacked at large text sizes so labels never break mid-word.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: DS.Space.s) { actionButtons }
+                VStack(spacing: DS.Space.s) { actionButtons }
             }
             FusionLine(song: song)
         }
@@ -138,6 +143,17 @@ private struct ToneSuggestionCard: View {
         )
         .overlay(RoundedRectangle(cornerRadius: DS.Radius.l, style: .continuous).strokeBorder(DS.Palette.accent.opacity(0.28), lineWidth: 1))
         .accessibilityIdentifier("tone.card")
+    }
+
+    @ViewBuilder private var actionButtons: some View {
+        Button(action: onChange) { Label("Change", systemImage: "arrow.triangle.2.circlepath").fixedSize() }
+            .buttonStyle(.dsSecondary)
+            .accessibilityIdentifier("tone.change")
+        if usingMain {
+            Button(action: onCompare) { Label("Compare", systemImage: "ear").fixedSize() }
+                .buttonStyle(.dsSecondary)
+                .accessibilityIdentifier("tone.compare")
+        }
     }
 
     /// One plain sentence: where the tone comes from. No scores.
