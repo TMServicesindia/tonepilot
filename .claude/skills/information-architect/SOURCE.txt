@@ -1,0 +1,1 @@
+Source: https://github.com/richhemsley3/claude-design-skills (commit 1185d0d), MIT licence. Installed 6 Nov 2026 for the TonePilot UX work. Markdown/YAML only; no scripts copied or run.

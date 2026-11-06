@@ -38,3 +38,13 @@ asks to try features before the gate finishes. Every change must still go throug
 ## Constraints
 - Don't analyse ripped/pirated MP3s; don't download from YouTube or piracy sites.
 - Don't recommend free-signing / enterprise-certificate install services.
+
+## Design work (UX transformation, from 6 Nov)
+- Design skills are installed project-level in `.claude/skills/` (MIT, sources in each `SOURCE.txt`):
+  `apple-hig` (authority for iOS conventions), `apple-design-system`, `apple-typography`,
+  `apple-ux-writing`, `apple-sf-symbols`, `ios-ui-review`, `ios-accessibility-audit`,
+  `information-architect`, `ux-heuristics`, `design-critique`, `content-copy-designer`, `user-researcher`.
+- Precedence: Apple's official HIG > `apple-hig` > the others. Web-oriented skills were deliberately not installed.
+- One design system: tokens in `design/tokens/tonepilot.tokens.json` (platform-neutral, so an Android
+  Compose theme can be generated from the same file), implemented in SwiftUI under `App/Sources/DesignSystem/`.
+  No raw colours, font sizes, spacing or radii in screens.
