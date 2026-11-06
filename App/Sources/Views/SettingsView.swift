@@ -295,7 +295,7 @@ struct SetupWizardView: View {
                 Spacer(minLength: DS.Space.l)
                 if step == 0 { welcome } else { ready }
                 Spacer()
-                Text("Step \(step + 1) of 2").font(DS.Text.metadata).foregroundStyle(DS.Palette.textTertiary)
+                Text("Step \(step + 1) of 2").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                     .frame(maxWidth: .infinity)
             }
             .padding(DS.Space.xl)

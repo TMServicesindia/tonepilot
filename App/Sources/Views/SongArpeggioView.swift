@@ -306,7 +306,7 @@ struct PatternGrid: View {
                                         in: RoundedRectangle(cornerRadius: DS.Radius.s, style: .continuous))
                             .overlay(RoundedRectangle(cornerRadius: DS.Radius.s, style: .continuous)
                                 .stroke(yourSteps.contains(step) ? DS.Palette.textPrimary : .clear, lineWidth: 2))
-                            .foregroundStyle(hit == nil ? DS.Palette.textTertiary : DS.Palette.onAccent)
+                            .foregroundStyle(hit == nil ? DS.Palette.textSecondary : DS.Palette.onAccent)
                             .accessibilityLabel("Step \(step + 1): \(hit?.degree.label ?? "rest")\(yourSteps.contains(step) ? ", you play" : "")")
                     }
                 }

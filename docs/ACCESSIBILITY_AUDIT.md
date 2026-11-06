@@ -30,3 +30,16 @@
   - grouped cards (`.accessibilityElement(children: .combine)`) where it reads better.
 - **Identifiers:** every interactive control in redesigned screens gets one, and the screen tour covers every screen.
 - **Remaining manual checks:** an interactive VoiceOver pass and a contrast measurement on device. These are listed in the roadmap, not claimed done.
+
+## Contrast check of the tokens (6 Nov, after the build)
+
+| Text colour | on canvas | on surface | on elevated |
+|---|---|---|---|
+| textPrimary #F5F5F7 | 17.3 | 15.3 | 12.8 |
+| textSecondary #A3A3AB | 7.5 | 6.6 | 5.6 |
+| accent #FFAD32 | 10.1 | 8.9 | 7.5 |
+| textTertiary #707078 | 3.8 | 3.4 | **2.8** |
+
+onAccent on accent: 10.1. `textTertiary` is below 4.5 : 1 for text and below 3 : 1 on `elevated`,
+so it is kept for placeholders and decorative icons only. Fixed: the Analysing "Waiting" step, the
+Arpeggio grid's rest dots and the first-run step counter now use `textSecondary`.

@@ -121,7 +121,7 @@ struct AnalysisStepList: View {
             switch state {
             case .done: return DS.Palette.success
             case .running: return DS.Palette.accent
-            case .waiting: return DS.Palette.textTertiary
+            case .waiting: return DS.Palette.textSecondary
             case .failed: return DS.Palette.error
             }
         }()
@@ -136,7 +136,7 @@ struct AnalysisStepList: View {
         return HStack(spacing: DS.Space.m) {
             Image(systemName: step.symbol)
                 .frame(width: DS.Size.touchTarget - DS.Space.l, height: DS.Size.touchTarget - DS.Space.l)
-                .foregroundStyle(state == .waiting ? DS.Palette.textTertiary : tint)
+                .foregroundStyle(tint)
                 .background(state == .running ? DS.Palette.accentMuted : DS.Palette.elevated, in: RoundedRectangle(cornerRadius: DS.Radius.s, style: .continuous))
             Text(step.name).font(DS.Text.body)
                 .foregroundStyle(state == .waiting ? DS.Palette.textSecondary : DS.Palette.textPrimary)
