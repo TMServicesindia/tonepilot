@@ -243,10 +243,12 @@ struct ContinueCard: View {
                     .accessibilityHidden(true)
             }
             .padding(DS.Space.m)
-            .background(
-                LinearGradient(colors: [DS.Palette.ambientViolet.opacity(1.2), DS.Palette.accent.opacity(0.08)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    .background(DS.Palette.surface),
-                in: RoundedRectangle(cornerRadius: DS.Radius.l, style: .continuous))
+            .background {
+                RoundedRectangle(cornerRadius: DS.Radius.l, style: .continuous).fill(DS.Palette.surface)
+                    .overlay(RoundedRectangle(cornerRadius: DS.Radius.l, style: .continuous)
+                        .fill(LinearGradient(colors: [DS.Palette.ambientViolet, DS.Palette.accent.opacity(0.08)],
+                                             startPoint: .topLeading, endPoint: .bottomTrailing)))
+            }
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
