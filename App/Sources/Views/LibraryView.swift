@@ -27,7 +27,7 @@ struct LibraryView: View {
         List {
             if let error = model.importError {
                 Section {
-                    Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(Theme.bad).font(.footnote)
+                    Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(DS.Palette.error).font(DS.Text.caption)
                     Button("Try again") { model.importError = nil; pickMP3 = true }
                 }
             }
@@ -176,9 +176,9 @@ struct LibraryView: View {
 
     private func chip(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title).font(.subheadline)
+            Text(title).font(DS.Text.bodySecondary)
                 .padding(.horizontal, 12).padding(.vertical, 6)
-                .background(selected ? Theme.accent : Theme.panelRaised, in: Capsule())
+                .background(selected ? DS.Palette.accent : DS.Palette.elevated, in: Capsule())
                 .foregroundStyle(selected ? .black : .primary)
         }
         .buttonStyle(.plain)
@@ -307,7 +307,7 @@ struct ImportSongView: View {
                         .disabled(URL(string: link)?.host?.contains("youtu") != true || title.isEmpty)
                 }
 
-                if let error { Text(error).foregroundStyle(Theme.bad).font(.footnote) }
+                if let error { Text(error).foregroundStyle(DS.Palette.error).font(DS.Text.caption) }
             }
             .navigationTitle("Add song")
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }

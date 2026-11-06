@@ -22,42 +22,42 @@ struct LiveGuideStrip: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("LEFT HAND").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
+                    Text("LEFT HAND").font(.caption2.weight(.bold)).foregroundStyle(DS.Palette.textSecondary)
                     if let current {
                         Text(transposed(current).patternText).font(.system(size: 30, weight: .bold, design: .rounded))
                             .lineLimit(1).minimumScaleFactor(0.6)
                         Text("\(transposed(current).chord) · \(transposed(current).patternNoteNames)")
-                            .font(.caption.monospaced()).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.7)
+                            .font(.caption.monospaced()).foregroundStyle(DS.Palette.textSecondary).lineLimit(1).minimumScaleFactor(0.7)
                     } else {
                         Text(time == nil ? "Press play to follow" : "—").font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.6)
+                            .foregroundStyle(DS.Palette.textSecondary).lineLimit(1).minimumScaleFactor(0.6)
                         Text(" ").font(.caption.monospaced())
                     }
                 }
                 Spacer(minLength: 8)
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("NEXT").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
+                    Text("NEXT").font(.caption2.weight(.bold)).foregroundStyle(DS.Palette.textSecondary)
                     Text(next.map { transposed($0).chord } ?? "—").font(.title3.weight(.semibold)).lineLimit(1)
                     Text(next.map { String(format: "in %.1f s", max(0, $0.time - t)) } ?? " ")
-                        .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                        .font(.caption2.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
                 }
                 .frame(width: 86, alignment: .trailing)
                 .opacity(next == nil ? 0.4 : 1)
             }
             // Always takes its line, so the strip doesn't jump when a drone section starts or ends.
-            Text("No clear chord here — play the Sa–Pa drone or follow the melody.").font(.caption2).foregroundStyle(Theme.warn)
+            Text("No clear chord here — play the Sa–Pa drone or follow the melody.").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning)
                 .lineLimit(1).minimumScaleFactor(0.7)
                 .opacity(current?.isDrone == true ? 1 : 0)
             // Only when the song has a melody estimate (fixed per song, so nothing moves while playing).
             if song.melody != nil {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text("RIGHT HAND").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
-                    Label("Tricky phrase", systemImage: "exclamationmark.triangle.fill").font(.caption2).foregroundStyle(Theme.warn)
+                    Text("RIGHT HAND").font(.caption2.weight(.bold)).foregroundStyle(DS.Palette.textSecondary)
+                    Label("Tricky phrase", systemImage: "exclamationmark.triangle.fill").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning)
                         .opacity(difficult ? 1 : 0)
                 }
                 if melody.isEmpty {
-                    Text(song.melody == nil ? "No melody estimate for this song" : "—").font(.caption).foregroundStyle(.secondary)
+                    Text(song.melody == nil ? "No melody estimate for this song" : "—").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                         .frame(height: 44, alignment: .leading)
                 } else {
                     HStack(spacing: 6) {
@@ -65,11 +65,11 @@ struct LiveGuideStrip: View {
                             let key = n.midi + melodyOffset + transpose
                             VStack(spacing: 1) {
                                 Text(NoteName.name(for: key)).font(i == 0 ? .headline.monospaced() : .caption.monospaced())
-                                Text("〰︎").font(.caption2).foregroundStyle(Theme.accent).opacity(n.isOrnamented ? 1 : 0)
+                                Text("〰︎").font(DS.Text.metadata).foregroundStyle(DS.Palette.accent).opacity(n.isOrnamented ? 1 : 0)
                             }
                             .frame(minWidth: 34, minHeight: 36)
                             .padding(.horizontal, 4).padding(.vertical, 2)
-                            .background(i == 0 && n.start <= t ? Theme.accent.opacity(0.35) : Theme.panelRaised, in: RoundedRectangle(cornerRadius: 6))
+                            .background(i == 0 && n.start <= t ? DS.Palette.accent.opacity(0.35) : DS.Palette.elevated, in: RoundedRectangle(cornerRadius: 6))
                         }
                     }
                 }
@@ -166,10 +166,10 @@ struct MelodyChordGuideView: View {
 
     private func chordSection(_ song: Song) -> some View {
         Section {
-            if (song.chordGuide ?? []).isEmpty { Text("No chords yet — analyse the song first.").foregroundStyle(.secondary) }
+            if (song.chordGuide ?? []).isEmpty { Text("No chords yet — analyse the song first.").foregroundStyle(DS.Palette.textSecondary) }
             ForEach(song.chordGuide ?? []) { step in
                 HStack {
-                    Text(step.time.mmss).font(.caption.monospacedDigit()).foregroundStyle(.secondary).frame(width: 44, alignment: .leading)
+                    Text(step.time.mmss).font(.caption.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary).frame(width: 44, alignment: .leading)
                     Menu {
                         if !step.alternatives.isEmpty {
                             Section("Likely alternatives") { ForEach(step.alternatives, id: \.self) { alt in Button(alt) { model.correctChord(songId: songId, stepId: step.id, to: alt) } } }
@@ -183,11 +183,11 @@ struct MelodyChordGuideView: View {
                             }
                         }
                     } label: {
-                        Text(step.chord).font(.headline).frame(minWidth: 60, alignment: .leading)
+                        Text(step.chord).font(DS.Text.section).frame(minWidth: 60, alignment: .leading)
                     }
                     Text(step.patternText).font(.subheadline.monospaced())
                     Spacer()
-                    if step.userEdited { Image(systemName: "checkmark.seal").foregroundStyle(Theme.good) }
+                    if step.userEdited { Image(systemName: "checkmark.seal").foregroundStyle(DS.Palette.success) }
                     else { ConfidenceBadge(confidence: step.confidence, provenance: .algorithm) }
                 }
             }
@@ -201,7 +201,7 @@ struct MelodyChordGuideView: View {
         return Section {
             if let melody = song.melody {
                 Text(melody.source == .vocalStem ? "Transcribed from the separated vocals." : "Predominant line of the full mix — may follow an instrument where nobody sings.")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 ForEach(song.orderedSections) { section in
                     let notes = melody.notes(in: section.startTime, section.endTime).filter { $0.start >= section.startTime }
                     if !notes.isEmpty {
@@ -211,7 +211,7 @@ struct MelodyChordGuideView: View {
                     }
                 }
             } else {
-                Text("No melody estimate yet.").foregroundStyle(.secondary)
+                Text("No melody estimate yet.").foregroundStyle(DS.Palette.textSecondary)
             }
         } header: { Text("Right hand · melody") } footer: {
             Text("〰︎ marks slides, vibrato or gamaka-like movement kept from the recording. Notes are shown on the keys to press\(offset != 0 ? " (shifted \(offset > 0 ? "up" : "down") an octave to match the lead tone)" : "").")
@@ -220,12 +220,12 @@ struct MelodyChordGuideView: View {
 
     private func noteRow(_ n: MelodyNote, offset: Int, difficult: Bool) -> some View {
         HStack {
-            Text(n.start.mmss).font(.caption.monospacedDigit()).foregroundStyle(.secondary).frame(width: 44, alignment: .leading)
+            Text(n.start.mmss).font(.caption.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary).frame(width: 44, alignment: .leading)
             Text(NoteName.name(for: n.midi + offset + (song?.performanceTranspose ?? 0))).font(.body.monospaced().weight(.semibold)).frame(width: 48, alignment: .leading)
-            Text("\(n.duration, specifier: "%.2f") s").font(.caption).foregroundStyle(.secondary)
-            if n.isOrnamented { Text("〰︎").foregroundStyle(Theme.accent) }
-            if difficult { Image(systemName: "exclamationmark.triangle").font(.caption).foregroundStyle(Theme.warn) }
-            if n.confidence < 0.4 { Image(systemName: "questionmark.circle").font(.caption).foregroundStyle(Theme.warn) }
+            Text("\(n.duration, specifier: "%.2f") s").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
+            if n.isOrnamented { Text("〰︎").foregroundStyle(DS.Palette.accent) }
+            if difficult { Image(systemName: "exclamationmark.triangle").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning) }
+            if n.confidence < 0.4 { Image(systemName: "questionmark.circle").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning) }
             Spacer()
             Button { model.editMelodyNote(songId: songId, noteId: n.id, semitones: -1) } label: { Image(systemName: "minus.circle") }
             Button { model.editMelodyNote(songId: songId, noteId: n.id, semitones: 1) } label: { Image(systemName: "plus.circle") }

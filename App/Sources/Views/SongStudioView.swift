@@ -282,7 +282,7 @@ struct StudioAnalysisStatus: View {
             .dsSurface()
         default:
             if let notice = model.analysisNotice[song.id] {
-                Label(notice, systemImage: "info.circle").font(.caption).foregroundStyle(Theme.warn)
+                Label(notice, systemImage: "info.circle").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
@@ -306,17 +306,17 @@ struct ToneModeSwitch: View {
                 option("Per section", selected: !main, id: "tonemode.sections") { model.useSectionTones(song.id) }
             }
             .padding(3)
-            .background(Theme.panelRaised, in: Capsule())
+            .background(DS.Palette.elevated, in: Capsule())
         }
         .padding(.horizontal, 14).padding(.vertical, 10)
-        .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
+        .background(DS.Palette.surface, in: RoundedRectangle(cornerRadius: 14))
     }
 
     private func option(_ title: String, selected: Bool, id: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(title).font(.subheadline.weight(.semibold))
+            Text(title).font(DS.Text.label)
                 .padding(.horizontal, 12).frame(minHeight: 36)
-                .background(selected ? Theme.accent : Color.clear, in: Capsule())
+                .background(selected ? DS.Palette.accent : Color.clear, in: Capsule())
                 .foregroundStyle(selected ? .black : .primary)
         }
         .buttonStyle(.plain)
@@ -343,7 +343,7 @@ struct TransportBar: View {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     Capsule().fill(Color.white.opacity(0.12))
-                    Capsule().fill(Theme.accent).frame(width: geo.size.width * min(1, max(0, pos / duration)))
+                    Capsule().fill(DS.Palette.accent).frame(width: geo.size.width * min(1, max(0, pos / duration)))
                 }
                 .frame(height: 4)
                 .frame(maxHeight: .infinity)
@@ -362,7 +362,7 @@ struct TransportBar: View {
                 Spacer()
                 Text(duration.mmss)
             }
-            .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+            .font(.caption2.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
             HStack(spacing: 0) {
                 barButton(model.loopSectionId == nil ? "repeat" : "repeat.1", label: model.loopSectionId == nil ? "Loop this section" : "Stop looping",
                           active: model.loopSectionId != nil) { model.studioToggleLoop() }
@@ -394,7 +394,7 @@ struct TransportBar: View {
                     Text(model.studioRate == 1 ? "1×" : "\(Int(model.studioRate * 100))%")
                         .font(.subheadline.weight(.bold).monospacedDigit())
                         .frame(width: 48, height: 48)
-                        .foregroundStyle(model.studioRate == 1 ? Color.primary : Theme.accent)
+                        .foregroundStyle(model.studioRate == 1 ? Color.primary : DS.Palette.accent)
                 }
                 .accessibilityLabel("Speed \(Int(model.studioRate * 100)) percent")
                 .disabled(!hasAudio)
@@ -409,7 +409,7 @@ struct TransportBar: View {
         Button(action: action) {
             Image(systemName: symbol).font(.title3.weight(.semibold))
                 .frame(width: 48, height: 48)
-                .foregroundStyle(active ? Theme.accent : .primary)
+                .foregroundStyle(active ? DS.Palette.accent : .primary)
         }
         .accessibilityLabel(label)
     }
@@ -444,11 +444,11 @@ private struct StudioTimelineContent: View {
                             let isCurrent = current?.id == s.id
                             Button { model.studioJump(to: s.id) } label: {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(s.label).font(.subheadline.weight(.semibold)).lineLimit(1)
+                                    Text(s.label).font(DS.Text.label).lineLimit(1)
                                     Text(s.startTime.mmss).font(.caption2.monospacedDigit())
                                 }
                                 .padding(.horizontal, 12).frame(minHeight: 44)
-                                .background(isCurrent ? Theme.accent : Theme.panelRaised, in: RoundedRectangle(cornerRadius: 10))
+                                .background(isCurrent ? DS.Palette.accent : DS.Palette.elevated, in: RoundedRectangle(cornerRadius: 10))
                                 .overlay(alignment: .top) {
                                     RoundedRectangle(cornerRadius: 2).fill(SectionTimeline.color(for: s)).frame(height: 3).padding(.horizontal, 8)
                                 }
@@ -466,7 +466,7 @@ private struct StudioTimelineContent: View {
             }
         }
         .padding(14)
-        .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
+        .background(DS.Palette.surface, in: RoundedRectangle(cornerRadius: 14))
     }
 }
 
@@ -500,7 +500,7 @@ struct WaveformTimeline: View {
                     }
                 }
                 let x = size.width * min(1, max(0, position / duration))
-                ctx.fill(Path(CGRect(x: x - 1, y: 0, width: 2, height: size.height)), with: .color(Theme.accent))
+                ctx.fill(Path(CGRect(x: x - 1, y: 0, width: 2, height: size.height)), with: .color(DS.Palette.accent))
             }
             .contentShape(Rectangle())
             .gesture(DragGesture(minimumDistance: 0).onEnded { v in
@@ -543,45 +543,45 @@ struct SeparationCard: View {
                 HStack(spacing: 10) {
                     ProgressView().controlSize(.small)
                     VStack(alignment: .leading, spacing: 1) {
-                        Text("Separating vocals, drums, bass & music").font(.subheadline.weight(.semibold))
-                        Text(timeText(p)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                        Text("Separating vocals, drums, bass & music").font(DS.Text.label)
+                        Text(timeText(p)).font(.caption.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
                     }
                     Spacer()
-                    Button("Cancel") { model.cancelSeparation(song.id) }.font(.caption.weight(.semibold))
+                    Button("Cancel") { model.cancelSeparation(song.id) }.font(DS.Text.metadata.weight(.semibold))
                 }
-                ProgressView(value: p).tint(Theme.accent)
+                ProgressView(value: p).tint(DS.Palette.accent)
                 Text("You can already play with the full recording. Keep TonePilot open.")
-                    .font(.caption2).foregroundStyle(.secondary)
+                    .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
             }
             .padding(14)
-            .background(Theme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+            .background(DS.Palette.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
         } else if let d = model.modelDownloadProgress[model.separationPack] {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 10) {
                     ProgressView().controlSize(.small)
-                    Text("Downloading the separation model (one time)…").font(.subheadline.weight(.semibold))
+                    Text("Downloading the separation model (one time)…").font(DS.Text.label)
                     Spacer()
                     Text("\(Int(d * 100))%").font(.caption.monospacedDigit())
                 }
-                ProgressView(value: d).tint(Theme.accent)
-                Text("Separation starts automatically when it's done. Wi-Fi recommended.").font(.caption2).foregroundStyle(.secondary)
+                ProgressView(value: d).tint(DS.Palette.accent)
+                Text("Separation starts automatically when it's done. Wi-Fi recommended.").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
             }
             .padding(14)
-            .background(Theme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+            .background(DS.Palette.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
         } else if !separated, model.audioURL(for: song) != nil {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .center, spacing: 12) {
                     Image(systemName: "scissors").font(.title3.weight(.semibold))
                         .frame(width: 44, height: 44)
-                        .background(Theme.accent.opacity(0.2), in: RoundedRectangle(cornerRadius: 12))
-                        .foregroundStyle(Theme.accent)
+                        .background(DS.Palette.accent.opacity(0.2), in: RoundedRectangle(cornerRadius: 12))
+                        .foregroundStyle(DS.Palette.accent)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Separate the parts").font(.subheadline.weight(.semibold))
+                        Text("Separate the parts").font(DS.Text.label)
                         if let e = model.separationError[song.id] ?? model.modelDownloadError {
-                            Text(e).font(.caption).foregroundStyle(Theme.bad).lineLimit(3)
+                            Text(e).font(DS.Text.metadata).foregroundStyle(DS.Palette.error).lineLimit(3)
                         } else {
                             Text(song.analysisStatus == .running ? "Starts after the analysis." : model.separationPack.detail)
-                                .font(.caption).foregroundStyle(.secondary)
+                                .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                         }
                     }
                     Spacer(minLength: 4)
@@ -595,11 +595,11 @@ struct SeparationCard: View {
                 }
                 .pickerStyle(.segmented)
                 if !model.models.isInstalled(model.separationPack) {
-                    Text("The first time, the separation model is downloaded (Wi-Fi recommended).").font(.caption2).foregroundStyle(.secondary)
+                    Text("The first time, the separation model is downloaded (Wi-Fi recommended).").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 }
             }
             .padding(14)
-            .background(Theme.panel, in: RoundedRectangle(cornerRadius: 16))
+            .background(DS.Palette.surface, in: RoundedRectangle(cornerRadius: 16))
         }
     }
 
@@ -622,7 +622,7 @@ struct FusionLine: View {
     var body: some View {
         if let p = model.fusionProgress[song.id] {
             Text("Checking the tone with the \(model.separatedPack(song) == .six ? "4" : "6")-part model… \(Int(p * 100))%")
-                .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                .font(.caption2.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
                 .accessibilityIdentifier("fusion.status")
         } else if let f = song.fusion, f.isCurrent(song) {
             Menu {
@@ -634,15 +634,15 @@ struct FusionLine: View {
             } label: {
                 let e = f.mainEntry(song)
                 Label(e.map(PartFusion.describe) ?? "Tone checked with both separations", systemImage: e?.agreement == .different ? "arrow.triangle.branch" : "checkmark.seal")
-                    .font(.caption).lineLimit(2).multilineTextAlignment(.leading)
+                    .font(DS.Text.metadata).lineLimit(2).multilineTextAlignment(.leading)
             }
             .accessibilityIdentifier("tone.fusion")
         } else if let e = model.fusionError[song.id] {
-            Text(e).font(.caption2).foregroundStyle(Theme.warn).lineLimit(2)
+            Text(e).font(DS.Text.metadata).foregroundStyle(DS.Palette.warning).lineLimit(2)
         } else if model.fusionEnabled, let pack = model.separatedPack(song), song.partMatches?.isEmpty == false, !model.isSeparating(song.id) {
             Button { model.startFusionIfNeeded(song.id) } label: {
                 Label("Check the tone with the \(pack == .six ? "4" : "6")-part model too", systemImage: "square.stack.3d.up")
-                    .font(.caption)
+                    .font(DS.Text.metadata)
             }
             .buttonStyle(.borderless)
             .accessibilityIdentifier("fusion.start")
@@ -697,12 +697,12 @@ extension SongPartsCard {
         if let p = model.musicSplitProgress[song.id] {
             HStack(spacing: 10) {
                 ProgressView().controlSize(.small)
-                Text("Finding the lead instruments in the music… \(Int(p * 100))%").font(.caption)
+                Text("Finding the lead instruments in the music… \(Int(p * 100))%").font(DS.Text.metadata)
             }
         } else if model.canSplitMusic(song) {
             Button { model.splitMusic(song.id) } label: {
                 Label("Split Music into Lead & Backing", systemImage: "wand.and.rays").labelStyle(.titleAndIcon)
-                    .font(.subheadline.weight(.semibold)).frame(maxWidth: .infinity, minHeight: 44)
+                    .font(DS.Text.label).frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.dsSecondary)
             .accessibilityIdentifier("parts.split")
@@ -725,23 +725,23 @@ struct TrackRow: View {
             if showHeader {
                 HStack(spacing: 10) {
                     Image(systemName: track.symbol)
-                        .font(.body)
+                        .font(DS.Text.body)
                         .frame(width: 28)
-                        .foregroundStyle(track.enabled ? Theme.accent : .secondary)
+                        .foregroundStyle(track.enabled ? DS.Palette.accent : .secondary)
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 6) {
-                            Text(track.name).font(.subheadline.weight(.semibold))
+                            Text(track.name).font(DS.Text.label)
                             TrackKindBadge(kind: track.kind)
                         }
-                        Text(track.detail).font(.caption2).foregroundStyle(.secondary).lineLimit(2)
+                        Text(track.detail).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(2)
                     }
                     Spacer(minLength: 4)
                     if track.canSolo {
                         Button { model.toggleSolo(track.id, songId: songId) } label: {
                             Text("S").font(.caption.bold())
                                 .frame(width: 32, height: 32)
-                                .background(track.soloed ? Theme.accent : Theme.panelRaised, in: RoundedRectangle(cornerRadius: 8))
+                                .background(track.soloed ? DS.Palette.accent : DS.Palette.elevated, in: RoundedRectangle(cornerRadius: 8))
                                 .foregroundStyle(track.soloed ? .black : .secondary)
                                 .frame(width: 44, height: 44)
                                 .contentShape(Rectangle())
@@ -755,13 +755,13 @@ struct TrackRow: View {
             }
             if track.enabled {
                 HStack(spacing: 8) {
-                    Image(systemName: "speaker.fill").font(.caption2).foregroundStyle(.secondary)
+                    Image(systemName: "speaker.fill").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                     Slider(value: $level, in: 0...1) { editing in
                         dragging = editing
                         if !editing { model.setTrackLevel(track.id, level, songId: songId) }
                     }
                     .accessibilityLabel("\(track.name) volume")
-                    Image(systemName: "speaker.wave.3.fill").font(.caption2).foregroundStyle(.secondary)
+                    Image(systemName: "speaker.wave.3.fill").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 }
                 .padding(.leading, showHeader ? 38 : 0)
             }
@@ -778,8 +778,8 @@ struct TrackKindBadge: View {
         let (text, color): (String, Color) = {
             switch kind {
             case .audio: return ("Audio", .teal)
-            case .generated: return ("AI notes", Theme.accent)
-            case .live: return ("Live", Theme.good)
+            case .generated: return ("AI notes", DS.Palette.accent)
+            case .live: return ("Live", DS.Palette.success)
             }
         }()
         Text(text).font(.caption2.weight(.semibold))
@@ -862,11 +862,11 @@ struct FlowSections: View {
                 let on = selected?.contains(s.id) ?? true
                 Button { onToggle(s.id) } label: {
                     HStack(spacing: 4) {
-                        Image(systemName: on ? "checkmark.circle.fill" : "circle").font(.caption)
-                        Text(s.label).font(.caption).lineLimit(1)
+                        Image(systemName: on ? "checkmark.circle.fill" : "circle").font(DS.Text.metadata)
+                        Text(s.label).font(DS.Text.metadata).lineLimit(1)
                     }
                     .padding(.horizontal, 8).frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
-                    .background(on ? Theme.accent.opacity(0.25) : Theme.panelRaised, in: RoundedRectangle(cornerRadius: 8))
+                    .background(on ? DS.Palette.accent.opacity(0.25) : DS.Palette.elevated, in: RoundedRectangle(cornerRadius: 8))
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("\(s.label): AI \(on ? "plays" : "doesn't play") the melody")
@@ -1012,13 +1012,13 @@ struct TonePickerSheet: View {
             List {
                 Section {
                     Text("Tap a tone to hear it on your keyboard. Nothing changes until you choose **Use for \(sectionLabel)**.")
-                        .font(.footnote).foregroundStyle(.secondary)
+                        .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
                     if let previewing {
                         Button {
                             model.assignTone(previewing, songId: songId, sectionId: sectionId)
                             dismiss()
                         } label: {
-                            Label("Use “\(previewing.name)” for \(sectionLabel)", systemImage: "checkmark.circle.fill").font(.headline)
+                            Label("Use “\(previewing.name)” for \(sectionLabel)", systemImage: "checkmark.circle.fill").font(DS.Text.section)
                         }
                     }
                 }
@@ -1056,11 +1056,11 @@ struct TonePickerSheet: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(entry.tone.name)
-                    Text(entry.subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    Text(entry.subtitle).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
                 }
                 Spacer()
                 if model.previewingToneId == entry.tone.id {
-                    Image(systemName: "speaker.wave.2.fill").foregroundStyle(Theme.accent).accessibilityLabel("Previewing")
+                    Image(systemName: "speaker.wave.2.fill").foregroundStyle(DS.Palette.accent).accessibilityLabel("Previewing")
                 }
             }
             .contentShape(Rectangle())
@@ -1080,7 +1080,7 @@ struct FreePlayView: View {
             Section {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack { ConnectionStatus(midi: model.midi); Spacer() }
-                    Text("NOW ON YOUR KEYBOARD").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
+                    Text("NOW ON YOUR KEYBOARD").font(.caption2.weight(.bold)).foregroundStyle(DS.Palette.textSecondary)
                     Text(model.activeArrangement?.name ?? "No tone selected").font(.title2.weight(.bold))
                 }
                 .padding(.vertical, 4)
@@ -1098,10 +1098,10 @@ struct FreePlayView: View {
                             VStack(alignment: .leading) {
                                 Text(song.title).lineLimit(1)
                                 Text(song.analysisStatus == .completed ? "\(song.sections.count) sections · ready" : "Not analysed yet")
-                                    .font(.caption).foregroundStyle(.secondary)
+                                    .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                             }
                             Spacer()
-                            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+                            Image(systemName: "chevron.right").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                         }
                     }
                     .foregroundStyle(.primary)

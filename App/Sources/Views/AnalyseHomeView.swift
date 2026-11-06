@@ -25,9 +25,9 @@ struct AnalyseHomeView: View {
                             Spacer()
                             switch song.analysisStatus {
                             case .running: ProgressView(value: model.analysisProgress[song.id] ?? 0).frame(width: 60)
-                            case .completed: Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.good)
-                            case .failed: Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Theme.bad)
-                            default: Text("Not analysed").font(.caption).foregroundStyle(.secondary)
+                            case .completed: Image(systemName: "checkmark.circle.fill").foregroundStyle(DS.Palette.success)
+                            case .failed: Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(DS.Palette.error)
+                            default: Text("Not analysed").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                             }
                         }
                     }

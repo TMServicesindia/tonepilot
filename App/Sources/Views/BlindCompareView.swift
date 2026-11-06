@@ -72,8 +72,8 @@ struct BlindCompareView: View {
                 }
                 if let c = choice {
                     Section("Result") {
-                        Text("You chose \(name(order[c])).").font(.subheadline.weight(.semibold))
-                        Text("Sound X was \(name(order[0])); Sound Y was \(name(order[1])).").font(.caption).foregroundStyle(.secondary)
+                        Text("You chose \(name(order[c])).").font(DS.Text.label)
+                        Text("Sound X was \(name(order[0])); Sound Y was \(name(order[1])).").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                         Button("Another round") { order = Bool.random() ? order : order.reversed(); choice = nil }
                         Button("New pair") { order = []; choice = nil }
                     }
@@ -82,7 +82,7 @@ struct BlindCompareView: View {
             if !results.isEmpty {
                 Section("Your results (\(results.count))") {
                     ForEach(results.suffix(6).reversed()) { r in
-                        Text("\(r.songTitle): chose \(r.winnerName) over \(r.loserName)").font(.caption)
+                        Text("\(r.songTitle): chose \(r.winnerName) over \(r.loserName)").font(DS.Text.metadata)
                     }
                 }
             }

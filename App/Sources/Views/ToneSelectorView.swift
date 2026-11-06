@@ -21,16 +21,16 @@ struct ToneSelectorView: View {
                         ConnectionStatus(midi: model.midi)
                         Spacer()
                         if AudioSessionSetup.isBuiltInSpeaker {
-                            Label("iPhone speaker", systemImage: "speaker.wave.2").font(.caption).foregroundStyle(Theme.warn)
+                            Label("iPhone speaker", systemImage: "speaker.wave.2").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning)
                         }
                     }
-                    Text("NOW PLAYING ON YOUR KEYBOARD").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
+                    Text("NOW PLAYING ON YOUR KEYBOARD").font(.caption2.weight(.bold)).foregroundStyle(DS.Palette.textSecondary)
                     Text(model.activeArrangement?.name ?? "No tone selected").font(.title2.weight(.bold))
                     if let a = model.activeArrangement {
                         Text(a.layers.compactMap { model.library.patch(id: $0.patchId)?.name }.joined(separator: " + "))
-                            .font(.caption).foregroundStyle(.secondary)
+                            .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                     }
-                    if let savedMessage { Text(savedMessage).font(.caption).foregroundStyle(Theme.good) }
+                    if let savedMessage { Text(savedMessage).font(DS.Text.metadata).foregroundStyle(DS.Palette.success) }
                 }
                 .padding(.vertical, 4)
             }
@@ -41,7 +41,7 @@ struct ToneSelectorView: View {
                 }
             }
             Section {
-                if list.myTones.isEmpty { Text("Save any tone here with ⋯ › Save to My Tones.").font(.caption).foregroundStyle(.secondary) }
+                if list.myTones.isEmpty { Text("Save any tone here with ⋯ › Save to My Tones.").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary) }
                 ForEach(list.myTones) { entry in row(entry, canSave: false) }
             } header: { Text("My tones") }
             ForEach(list.instruments) { group in
@@ -74,10 +74,10 @@ struct ToneSelectorView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(entry.tone.name).font(.body.weight(isActive(entry.tone) ? .bold : .regular))
-                        Text(entry.subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        Text(entry.subtitle).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
                     }
                     Spacer()
-                    if isActive(entry.tone) { Image(systemName: "pianokeys.inverse").foregroundStyle(Theme.accent) }
+                    if isActive(entry.tone) { Image(systemName: "pianokeys.inverse").foregroundStyle(DS.Palette.accent) }
                 }
                 .contentShape(Rectangle())
             }
@@ -85,7 +85,7 @@ struct ToneSelectorView: View {
             if canSave {
                 Menu {
                     Button { save(entry) } label: { Label("Save to My Tones", systemImage: "star") }
-                } label: { Image(systemName: "ellipsis.circle").foregroundStyle(.secondary) }
+                } label: { Image(systemName: "ellipsis.circle").foregroundStyle(DS.Palette.textSecondary) }
             }
         }
     }

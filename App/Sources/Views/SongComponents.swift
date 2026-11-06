@@ -7,7 +7,7 @@ struct Card<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(title.uppercased()).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            Text(title.uppercased()).font(DS.Text.metadata.weight(.semibold)).foregroundStyle(DS.Palette.textSecondary)
             content
         }
         .padding(14)
@@ -57,7 +57,7 @@ struct SectionTimeline: View {
             HStack {
                 Text("0:00"); Spacer(); Text(duration.mmss)
             }
-            .font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+            .font(.caption2.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
         }
     }
 }

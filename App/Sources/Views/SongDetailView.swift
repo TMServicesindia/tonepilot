@@ -52,10 +52,10 @@ struct SongDetailView: View {
     private func header(_ song: Song) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text([song.artist, song.album ?? song.film, song.composer, song.language].compactMap { $0 }.joined(separator: " · ").ifEmpty(" "))
-                .font(.subheadline).foregroundStyle(.secondary)
+                .font(DS.Text.bodySecondary).foregroundStyle(DS.Palette.textSecondary)
             if song.sourceType == .youtubeLink, let link = song.sourceReference, let url = URL(string: link) {
                 Link(destination: url) { Label("Open in YouTube", systemImage: "play.rectangle") }
-                Text("Reference link only. Play it in YouTube Music and use Listen Mode to analyse it.").font(.caption).foregroundStyle(.secondary)
+                Text("Reference link only. Play it in YouTube Music and use Listen Mode to analyse it.").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 Button { showListen = true } label: { Label("Listen while it plays", systemImage: "ear") }
             }
         }
@@ -72,11 +72,11 @@ struct SongDetailView: View {
             Card(title: "Building your arrangement") {
                 VStack(alignment: .leading, spacing: 8) {
                     ProgressView(value: model.analysisProgress[songId] ?? 0) {
-                        Text(model.analysisStage[songId] ?? "Analysing on this iPhone…").font(.subheadline)
+                        Text(model.analysisStage[songId] ?? "Analysing on this iPhone…").font(DS.Text.bodySecondary)
                     }
                     Text("Tempo, key and chords → melody → sections and what plays in each → tones, layers and effects for every section.")
-                        .font(.caption).foregroundStyle(.secondary)
-                    Button("Cancel") { model.cancelAnalysis(songId: songId) }.font(.caption)
+                        .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
+                    Button("Cancel") { model.cancelAnalysis(songId: songId) }.font(DS.Text.metadata)
                 }
             }
         case .unavailable:
@@ -84,7 +84,7 @@ struct SongDetailView: View {
         case .notStarted, .failed:
             Card(title: "Analysis") {
                 VStack(alignment: .leading, spacing: 8) {
-                    if let e = song.analysisError { Text(e).foregroundStyle(Theme.bad).font(.footnote) }
+                    if let e = song.analysisError { Text(e).foregroundStyle(DS.Palette.error).font(DS.Text.caption) }
                     if song.sourceType == .listened {
                         Button { showListen = true } label: { Label("Listen again to analyse", systemImage: "ear") }.buttonStyle(.borderedProminent)
                     } else if song.sourceType == .importedFile {
@@ -93,7 +93,7 @@ struct SongDetailView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     } else {
-                        Text("No audio. Add sections manually below.").foregroundStyle(.secondary)
+                        Text("No audio. Add sections manually below.").foregroundStyle(DS.Palette.textSecondary)
                     }
                 }
             }
@@ -117,7 +117,7 @@ struct SongDetailView: View {
                         if !(song.stems ?? []).isEmpty { chip("Stems: \((song.stems ?? []).map(\.kind.rawValue).joined(separator: ", "))", 0.8, .model) }
                     }
                 }
-                if let notice = model.analysisNotice[songId] { Text(notice).font(.caption).foregroundStyle(Theme.warn) }
+                if let notice = model.analysisNotice[songId] { Text(notice).font(DS.Text.metadata).foregroundStyle(DS.Palette.warning) }
                 Button {
                     model.openStudio(songId)
                     dismiss()
@@ -134,11 +134,11 @@ struct SongDetailView: View {
                 }
                 DisclosureGroup("What the AI can and can't do", isExpanded: $showLimitations) {
                     VStack(alignment: .leading, spacing: 4) {
-                        ForEach(limitations(song), id: \.self) { Text("• " + $0).font(.caption) }
+                        ForEach(limitations(song), id: \.self) { Text("• " + $0).font(DS.Text.metadata) }
                     }
                 }
-                .font(.footnote)
-                Button(song.sourceType == .listened ? "Listen again to re-analyse" : "Re-analyse") { startAnalysis(song) }.font(.caption)
+                .font(DS.Text.caption)
+                Button(song.sourceType == .listened ? "Listen again to re-analyse" : "Re-analyse") { startAnalysis(song) }.font(DS.Text.metadata)
             }
         }
     }
@@ -156,7 +156,7 @@ struct SongDetailView: View {
                 row("Style", song.insights.map { $0.style.joined(separator: " · ") })
                 if let movement = song.insights?.rootMovement(from: 0, to: 30), !movement.isEmpty { row("Bass (start)", movement) }
                 if let gaps = song.insights?.gaps, !gaps.isEmpty {
-                    Text("Not available for this audio: " + gaps.joined(separator: "; ")).font(.caption).foregroundStyle(Theme.warn)
+                    Text("Not available for this audio: " + gaps.joined(separator: "; ")).font(DS.Text.metadata).foregroundStyle(DS.Palette.warning)
                 }
             }
         }
@@ -165,10 +165,10 @@ struct SongDetailView: View {
     @ViewBuilder private func row(_ label: String, _ value: String?) -> some View {
         if let value, !value.isEmpty {
             HStack(alignment: .top) {
-                Text(label).foregroundStyle(.secondary).frame(width: 84, alignment: .leading)
+                Text(label).foregroundStyle(DS.Palette.textSecondary).frame(width: 84, alignment: .leading)
                 Text(value)
             }
-            .font(.subheadline)
+            .font(DS.Text.bodySecondary)
         }
     }
 
@@ -179,11 +179,11 @@ struct SongDetailView: View {
 
     private func chip(_ text: String, _ confidence: Double, _ provenance: ValueProvenance) -> some View {
         HStack(spacing: 4) {
-            Text(text).font(.caption.weight(.semibold))
-            if provenance != .user && confidence < 0.6 { Image(systemName: "questionmark.circle").font(.caption2).foregroundStyle(Theme.warn) }
+            Text(text).font(DS.Text.metadata.weight(.semibold))
+            if provenance != .user && confidence < 0.6 { Image(systemName: "questionmark.circle").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning) }
         }
         .padding(.horizontal, 8).padding(.vertical, 4)
-        .background(Theme.panelRaised, in: Capsule())
+        .background(DS.Palette.elevated, in: Capsule())
     }
 
     // MARK: Sections
@@ -218,7 +218,7 @@ struct SongDetailView: View {
         Card(title: "Correct the analysis") {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text("Tempo").foregroundStyle(.secondary).frame(width: 64, alignment: .leading)
+                    Text("Tempo").foregroundStyle(DS.Palette.textSecondary).frame(width: 64, alignment: .leading)
                     if let bpm = song.bpm {
                         Text("\(bpm.value, specifier: "%.1f")").font(.body.monospacedDigit())
                         ConfidenceBadge(confidence: bpm.confidence, provenance: bpm.provenance)
@@ -226,11 +226,11 @@ struct SongDetailView: View {
                         Button("÷2") { setBPM(song, bpm.value / 2) }.buttonStyle(.bordered).controlSize(.small)
                         Button("×2") { setBPM(song, bpm.value * 2) }.buttonStyle(.bordered).controlSize(.small)
                     } else {
-                        Text("Not detected").foregroundStyle(.secondary)
+                        Text("Not detected").foregroundStyle(DS.Palette.textSecondary)
                     }
                 }
                 HStack {
-                    Text("Key").foregroundStyle(.secondary).frame(width: 64, alignment: .leading)
+                    Text("Key").foregroundStyle(DS.Palette.textSecondary).frame(width: 64, alignment: .leading)
                     Menu(song.key?.value.displayName ?? "Set key") {
                         ForEach(0..<12, id: \.self) { tonic in
                             ForEach([MusicalKey.Mode.major, .minor], id: \.self) { mode in
@@ -243,7 +243,7 @@ struct SongDetailView: View {
                     Spacer()
                 }
                 HStack {
-                    Text("Meter").foregroundStyle(.secondary).frame(width: 64, alignment: .leading)
+                    Text("Meter").foregroundStyle(DS.Palette.textSecondary).frame(width: 64, alignment: .leading)
                     Picker("Meter", selection: Binding(get: { song.timeSignature?.value ?? 4 },
                                                        set: { var s = song; s.timeSignature = .user($0); model.update(s) })) {
                         Text("3/4 · 6/8").tag(3); Text("4/4").tag(4)
@@ -251,7 +251,7 @@ struct SongDetailView: View {
                     .pickerStyle(.segmented)
                 }
                 Text("Chords and melody notes are corrected in the Melody & chord guide; section timing via each section's ⋯ menu.")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
             }
         }
     }
@@ -283,15 +283,15 @@ struct SectionToneRow: View {
                 RoundedRectangle(cornerRadius: 3).fill(SectionTimeline.color(for: section)).frame(width: 6, height: 38)
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
-                        Text(section.label).font(.headline)
-                        if section.isClimax == true { Text("CLIMAX").font(.caption2.bold()).padding(.horizontal, 5).background(Theme.accent.opacity(0.3), in: Capsule()) }
+                        Text(section.label).font(DS.Text.section)
+                        if section.isClimax == true { Text("CLIMAX").font(.caption2.bold()).padding(.horizontal, 5).background(DS.Palette.accent.opacity(0.3), in: Capsule()) }
                         if section.provenance != .user { ConfidenceBadge(confidence: section.confidence, provenance: section.provenance) }
                     }
-                    Text("\(section.startTime.mmss) – \(section.endTime.mmss)").font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    Text("\(section.startTime.mmss) – \(section.endTime.mmss)").font(.caption.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
                 }
                 Spacer()
                 Button { model.activate(tone, songId: song.id, sectionId: section.id) } label: {
-                    Image(systemName: isActive ? "pianokeys.inverse" : "pianokeys").foregroundStyle(isActive ? Theme.accent : .primary)
+                    Image(systemName: isActive ? "pianokeys.inverse" : "pianokeys").foregroundStyle(isActive ? DS.Palette.accent : .primary)
                 }
                 .accessibilityLabel("Use this section's tone on the keyboard")
                 Menu {
@@ -320,18 +320,18 @@ struct SectionToneRow: View {
                 } label: { Image(systemName: "ellipsis.circle") }
             }
             .buttonStyle(.borderless)
-            .font(.title3)
+            .font(DS.Text.section)
 
             HStack(spacing: 6) {
-                Image(systemName: "dial.medium").font(.caption).foregroundStyle(.secondary)
-                Text(toneSummary).font(.caption).lineLimit(2)
+                Image(systemName: "dial.medium").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
+                Text(toneSummary).font(DS.Text.metadata).lineLimit(2)
             }
             if let activity = section.activity, !activity.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
                         ForEach(Array(activity.prefix(5).enumerated()), id: \.offset) { _, a in
                             Text("\(a.role.displayName) \(Int(a.level * 100))%")
-                                .font(.caption2).padding(.horizontal, 6).padding(.vertical, 2)
+                                .font(DS.Text.metadata).padding(.horizontal, 6).padding(.vertical, 2)
                                 .background((a.source == .stems ? Color.blue : Color.gray).opacity(0.25), in: Capsule())
                         }
                     }
@@ -340,7 +340,7 @@ struct SectionToneRow: View {
             if isSelected { details }
         }
         .padding(10)
-        .background(isSelected || isActive ? Theme.panelRaised : Color.clear, in: RoundedRectangle(cornerRadius: 10))
+        .background(isSelected || isActive ? DS.Palette.elevated : Color.clear, in: RoundedRectangle(cornerRadius: 10))
     }
 
     private var toneSummary: String {
@@ -359,11 +359,11 @@ struct SectionToneRow: View {
             Label("Section guide & practice", systemImage: "music.note.list")
         }
         if let rationale = song.aiOriginal(for: section)?.rationale ?? tone?.rationale {
-            Text(rationale).font(.caption).foregroundStyle(.secondary)
+            Text(rationale).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
         }
         if let a = section.activity, !a.isEmpty {
             VStack(alignment: .leading, spacing: 2) {
-                ForEach(Array(a.enumerated()), id: \.offset) { _, item in Text("• \(item.evidence)").font(.caption2).foregroundStyle(.secondary) }
+                ForEach(Array(a.enumerated()), id: \.offset) { _, item in Text("• \(item.evidence)").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary) }
             }
         }
         let chords = (song.chordGuide ?? []).filter { $0.time >= section.startTime && $0.time < section.endTime }
@@ -372,12 +372,12 @@ struct SectionToneRow: View {
         }
         let suggestions = song.toneSuggestions.filter { $0.sectionId == section.id }
         if !suggestions.isEmpty {
-            Text("Other lead sounds to try (closest-match estimates, not instrument recognition):").font(.caption2).foregroundStyle(.secondary)
+            Text("Other lead sounds to try (closest-match estimates, not instrument recognition):").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
                     ForEach(suggestions) { s in
                         Button(model.library.patch(id: s.patchId)?.name ?? s.family.displayName) { tryLead(s.patchId) }
-                            .buttonStyle(.bordered).font(.caption)
+                            .buttonStyle(.bordered).font(DS.Text.metadata)
                     }
                 }
             }

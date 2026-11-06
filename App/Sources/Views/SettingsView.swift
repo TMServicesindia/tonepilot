@@ -111,30 +111,30 @@ struct MIDIDiagnosticsView: View {
         List {
             Section("MIDI inputs") {
                 if midi.sources.isEmpty {
-                    Label("No MIDI device detected", systemImage: "exclamationmark.triangle").foregroundStyle(Theme.warn)
+                    Label("No MIDI device detected", systemImage: "exclamationmark.triangle").foregroundStyle(DS.Palette.warning)
                     Text("Connect the Casio's USB TO HOST port to the iPhone with an Apple USB camera adapter (Lightning) or a USB-C to USB-B cable, and switch the keyboard on.")
-                        .font(.footnote)
+                        .font(DS.Text.caption)
                 }
                 ForEach(midi.sources) { s in
                     HStack {
                         Image(systemName: s.looksLikeCasio ? "pianokeys" : "cable.connector")
                         VStack(alignment: .leading) {
                             Text(s.name)
-                            if let m = s.manufacturer { Text(m).font(.caption).foregroundStyle(.secondary) }
+                            if let m = s.manufacturer { Text(m).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary) }
                         }
                     }
                 }
-                if let e = midi.setupError { Text(e).foregroundStyle(Theme.bad) }
+                if let e = midi.setupError { Text(e).foregroundStyle(DS.Palette.error) }
                 Button("Rescan devices") { midi.refreshSources() }
             }
             Section("Audio output") {
-                Text(model.output.routeDescription).font(.footnote)
+                Text(model.output.routeDescription).font(DS.Text.caption)
                 OutputMeter()
                 if model.patchLoadErrors.isEmpty == false {
-                    ForEach(model.patchLoadErrors, id: \.self) { Text($0).font(.footnote).foregroundStyle(Theme.bad) }
+                    ForEach(model.patchLoadErrors, id: \.self) { Text($0).font(DS.Text.caption).foregroundStyle(DS.Palette.error) }
                 }
                 Button("All notes off") { model.panic() }
-                Text("Held notes: \(model.router.heldNoteCount)").font(.caption).foregroundStyle(.secondary)
+                Text("Held notes: \(model.router.heldNoteCount)").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
             }
             Section {
                 AuditionStrip()
@@ -144,7 +144,7 @@ struct MIDIDiagnosticsView: View {
                     Text(line).font(.caption.monospaced())
                 }
             } header: {
-                HStack { Text("Incoming MIDI"); Spacer(); Button("Clear") { midi.clearLog() }.font(.caption) }
+                HStack { Text("Incoming MIDI"); Spacer(); Button("Clear") { midi.clearLog() }.font(DS.Text.metadata) }
             }
         }
         .navigationTitle("Diagnostics")
@@ -159,15 +159,15 @@ struct SoundFontSettingsView: View {
     var body: some View {
         List {
             Section {
-                if model.installedSoundFonts.isEmpty { Text("None installed").foregroundStyle(.secondary) }
+                if model.installedSoundFonts.isEmpty { Text("None installed").foregroundStyle(DS.Palette.textSecondary) }
                 ForEach(model.installedSoundFonts, id: \.self) { name in
                     HStack {
                         Text(name)
-                        if name == FactoryPatches.defaultSoundFontFile { Spacer(); Text("Default").font(.caption).foregroundStyle(Theme.good) }
+                        if name == FactoryPatches.defaultSoundFontFile { Spacer(); Text("Default").font(DS.Text.metadata).foregroundStyle(DS.Palette.success) }
                     }
                 }
                 Button { importing = true } label: { Label("Import .sf2 / .dls from Files", systemImage: "square.and.arrow.down") }
-                if let error { Text(error).foregroundStyle(Theme.bad) }
+                if let error { Text(error).foregroundStyle(DS.Palette.error) }
             } footer: {
                 Text("The built-in sounds use General MIDI presets from \(FactoryPatches.defaultSoundFontFile). If it is missing, every layer will be silent or play a plain sine tone. Download GeneralUser GS (free, by S. Christian Collins) from github.com/mrbumpy409/GeneralUser-GS, rename the .sf2 to \(FactoryPatches.defaultSoundFontFile), and import it here.")
             }
@@ -185,18 +185,18 @@ struct ConnectionGuideView: View {
             Section("1 · MIDI: Casio → iPhone (your playing)") {
                 Text("Casio USB TO HOST (USB-B) → USB-A-to-B cable → Apple Lightning to USB 3 Camera Adapter → iPhone. On USB-C iPhones use a USB-C to USB-B cable.")
                 Text("The Lightning USB 3 adapter has a charging port — plug in power if the keyboard isn't detected; the phone may not supply enough power.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                    .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
             }
             Section("2 · Audio: iPhone → Casio speakers (the sound)") {
                 Text("MIDI carries no audio. TonePilot's sound comes out of the iPhone's audio output, so it needs a second cable into the Casio's AUDIO IN (3.5 mm stereo mini jack).")
                 Text("USB-C iPhones: a USB-C hub with a USB-A port (for the Casio) and a 3.5 mm jack. Lightning iPhones: the single port is taken by the camera adapter, so put a powered USB hub on the adapter and connect both the Casio and a small class-compliant USB audio interface or USB DAC. Avoid Bluetooth audio — it adds 100–200 ms delay.")
                 Text("Cable: 3.5 mm stereo male to 3.5 mm stereo male, from the headphone/line output into AUDIO IN. Start with iPhone volume around 60% and raise it until the sound is clear without distortion.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                    .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
             }
             Section("3 · Avoid hearing the Casio's own voice too") {
                 Text("Turn the Casio's main/tone volume down, or set Local Control off in the keyboard's MIDI settings if your model offers it. AUDIO IN playback keeps working, so you hear only TonePilot.")
                 Text("Check your keyboard's manual for the exact menu — the steps differ between Casio models.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                    .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
             }
             Section("4 · Test") {
                 Text("Settings › MIDI & audio diagnostics: press a key and watch for 'Note On'. Then tap the audition keys: if you hear them through the Casio, the audio path works.")
@@ -219,8 +219,8 @@ struct TroubleshootingView: View {
     var body: some View {
         List(items, id: \.0) { item in
             VStack(alignment: .leading, spacing: 6) {
-                Text(item.0).font(.headline)
-                Text(item.1).font(.subheadline).foregroundStyle(.secondary)
+                Text(item.0).font(DS.Text.section)
+                Text(item.1).font(DS.Text.bodySecondary).foregroundStyle(DS.Palette.textSecondary)
             }
             .padding(.vertical, 4)
         }
@@ -371,7 +371,7 @@ struct AnalysisServerSettingsView: View {
                     Task { status = await model.testServer(); testing = false }
                 }
                 .disabled(testing)
-                if let status { Text(status).font(.footnote) }
+                if let status { Text(status).font(DS.Text.caption) }
             }
         }
         .navigationTitle("Analysis server")
@@ -391,29 +391,29 @@ struct SeparationModelsSection: View {
                 let installed = model.models.isInstalled(pack)
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text(pack.title).font(.subheadline.weight(.semibold))
-                        if model.separationPack == pack { StatusPill(text: "Used", color: Theme.accent) }
+                        Text(pack.title).font(DS.Text.label)
+                        if model.separationPack == pack { StatusPill(text: "Used", color: DS.Palette.accent) }
                         Spacer()
                         if let p = model.modelDownloadProgress[pack] {
                             ProgressView(value: p).frame(width: 80)
                         } else if installed {
                             Text(ByteCountFormatter.string(fromByteCount: model.models.installedSize(pack), countStyle: .file))
-                                .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                                .font(.caption.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
                             Button(role: .destructive) { model.deleteModel(pack) } label: { Image(systemName: "trash") }
                                 .buttonStyle(.borderless).accessibilityLabel("Delete \(pack.title) model")
                         } else {
                             Button("Download") { model.downloadModel(pack) }.buttonStyle(.bordered)
                         }
                     }
-                    Text(pack.detail).font(.caption).foregroundStyle(.secondary)
+                    Text(pack.detail).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 }
             }
-            if let e = model.modelDownloadError { Text(e).font(.caption).foregroundStyle(Theme.bad) }
+            if let e = model.modelDownloadError { Text(e).font(DS.Text.metadata).foregroundStyle(DS.Palette.error) }
             Toggle(isOn: $model.fusionEnabled) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Check tones with both models")
                     Text("After a song is separated, it is separated again with the other model in the background (about twice the time; downloads that model once). Where both hear the same instrument the tone is surer; where they differ you can choose.")
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 }
             }
             .accessibilityIdentifier("settings.fusion")
@@ -435,14 +435,14 @@ struct SoundPacksSection: View {
         Section {
             if model.soundPackList.isEmpty && model.installedSoundPacks.isEmpty {
                 Text(model.soundPackError == nil ? "Checking for sound packs…" : "Sound packs aren't available right now.")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
             }
             ForEach(model.soundPackList) { pack in
                 let installed = model.installedSoundPacks.contains(pack.id)
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text(pack.name).font(.subheadline.weight(.semibold))
-                        if installed { StatusPill(text: "Installed", color: Theme.accent) }
+                        Text(pack.name).font(DS.Text.label)
+                        if installed { StatusPill(text: "Installed", color: DS.Palette.accent) }
                         Spacer()
                         if let p = model.soundPackProgress[pack.id] {
                             ProgressView(value: p).frame(width: 80)
@@ -451,7 +451,7 @@ struct SoundPacksSection: View {
                                 .buttonStyle(.bordered).accessibilityIdentifier("soundpacks.update.\(pack.id)")
                         } else if installed {
                             Text(ByteCountFormatter.string(fromByteCount: model.soundPacks.installedSize(pack.id), countStyle: .file))
-                                .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                                .font(.caption.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
                             Button(role: .destructive) { model.deleteSoundPack(pack.id) } label: { Image(systemName: "trash") }
                                 .buttonStyle(.borderless).accessibilityLabel("Delete \(pack.name)")
                                 .accessibilityIdentifier("soundpacks.delete.\(pack.id)")
@@ -460,11 +460,11 @@ struct SoundPacksSection: View {
                                 .buttonStyle(.bordered).accessibilityIdentifier("soundpacks.download.\(pack.id)")
                         }
                     }
-                    Text(pack.tones.joined(separator: ", ")).font(.caption).foregroundStyle(.secondary)
+                    Text(pack.tones.joined(separator: ", ")).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 }
                 .accessibilityIdentifier("soundpacks.row.\(pack.id)")
             }
-            if let e = model.soundPackError { Text(e).font(.caption).foregroundStyle(Theme.bad) }
+            if let e = model.soundPackError { Text(e).font(DS.Text.metadata).foregroundStyle(DS.Palette.error) }
         } header: {
             Text("Real instrument sounds").accessibilityIdentifier("settings.soundpacks")
         } footer: {

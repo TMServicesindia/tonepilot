@@ -45,7 +45,7 @@ struct SamplePatchCreatorView: View {
             Section {
                 ForEach($rows) { $row in
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(row.url.lastPathComponent).font(.headline).lineLimit(1)
+                        Text(row.url.lastPathComponent).font(DS.Text.section).lineLimit(1)
                         Stepper("Recorded pitch (root): \(NoteName.name(for: row.root))", value: $row.root, in: 24...108)
                         Stepper("Lowest key: \(NoteName.name(for: row.low))", value: $row.low, in: 0...row.high)
                         Stepper("Highest key: \(NoteName.name(for: row.high))", value: $row.high, in: row.low...127)
@@ -59,7 +59,7 @@ struct SamplePatchCreatorView: View {
                             }
                         }
                         if max(abs(row.low - row.root), abs(row.high - row.root)) > 7 {
-                            Text("Covers more than ±7 semitones from its recorded pitch — far keys will sound pitch-shifted.").font(.caption2).foregroundStyle(Theme.warn)
+                            Text("Covers more than ±7 semitones from its recorded pitch — far keys will sound pitch-shifted.").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning)
                         }
                     }
                 }
@@ -79,7 +79,7 @@ struct SamplePatchCreatorView: View {
                 Toggle("I recorded these or have the right to use them", isOn: $confirmed)
                 Button("Create instrument") { create() }
                     .disabled(rows.isEmpty || !confirmed || name.isEmpty)
-                if let result { Text(result).font(.footnote) }
+                if let result { Text(result).font(DS.Text.caption) }
             }
         }
         .navigationTitle("Sample instrument")

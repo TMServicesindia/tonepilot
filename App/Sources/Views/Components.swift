@@ -142,7 +142,7 @@ struct AuditionStrip: View {
     var body: some View {
         VStack(spacing: 6) {
             HStack {
-                Text("Audition").font(.caption).foregroundStyle(.secondary)
+                Text("Audition").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 Spacer()
                 Button { base = max(36, base - 12) } label: { Image(systemName: "chevron.left") }
                 Text(NoteName.name(for: base)).font(.caption.monospaced())

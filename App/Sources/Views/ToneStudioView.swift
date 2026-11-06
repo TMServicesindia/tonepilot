@@ -12,7 +12,7 @@ struct ToneStudioHomeView: View {
 
     var body: some View {
         List {
-            if let importMessage { Text(importMessage).font(.footnote).foregroundStyle(.secondary) }
+            if let importMessage { Text(importMessage).font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary) }
             Section {
                 NavigationLink { ToneSelectorView() } label: { Label("Choose a tone to play", systemImage: "pianokeys") }
             }
@@ -64,15 +64,15 @@ struct ToneStudioHomeView: View {
             HStack {
                 VStack(alignment: .leading) {
                     HStack(spacing: 6) {
-                        Text(a.name).font(.headline)
-                        if a.origin == .myVersion { Text("AI-built").font(.caption2).padding(.horizontal, 5).background(Theme.accent.opacity(0.25), in: Capsule()) }
+                        Text(a.name).font(DS.Text.section)
+                        if a.origin == .myVersion { Text("AI-built").font(DS.Text.metadata).padding(.horizontal, 5).background(DS.Palette.accent.opacity(0.25), in: Capsule()) }
                     }
                     Text("\(a.layers.count) layer\(a.layers.count == 1 ? "" : "s") · " +
                          a.layers.compactMap { model.library.patch(id: $0.patchId)?.name }.joined(separator: " + "))
-                        .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
                 }
                 Spacer()
-                if model.activeArrangement?.id == a.id { Image(systemName: "speaker.wave.2.fill").foregroundStyle(Theme.accent) }
+                if model.activeArrangement?.id == a.id { Image(systemName: "speaker.wave.2.fill").foregroundStyle(DS.Palette.accent) }
             }
         }
         .foregroundStyle(.primary)
@@ -147,7 +147,7 @@ struct ArrangementEditorView: View {
                     if arrangement.layers.count < maxLayers {
                         Button { addingLayer = true } label: { Label("Add layer", systemImage: "plus") }
                     } else {
-                        Text("Maximum \(maxLayers) layers with this engine.").font(.caption).foregroundStyle(.secondary)
+                        Text("Maximum \(maxLayers) layers with this engine.").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                     }
                 } header: { Text("Layers") } footer: {
                     Text("Layers on the same keys sound together. Split the keyboard in Keys and pitch.")
@@ -155,7 +155,7 @@ struct ArrangementEditorView: View {
 
                 if !model.patchLoadErrors.isEmpty {
                     Section("Problems") {
-                        ForEach(model.patchLoadErrors, id: \.self) { Text($0).font(.footnote).foregroundStyle(Theme.bad) }
+                        ForEach(model.patchLoadErrors, id: \.self) { Text($0).font(DS.Text.caption).foregroundStyle(DS.Palette.error) }
                         NavigationLink("Install a SoundFont") { SoundFontSettingsView() }
                     }
                 }
@@ -534,7 +534,7 @@ struct PatchPicker: View {
 
     private func eraChip(_ tag: String?, _ name: String) -> some View {
         Button { era = tag } label: {
-            Text(name).font(.subheadline.weight(.semibold))
+            Text(name).font(DS.Text.label)
                 .padding(.horizontal, 12).padding(.vertical, 6)
                 .background(Capsule().fill(era == tag ? Color.accentColor : Color.secondary.opacity(0.18)))
                 .foregroundStyle(era == tag ? Color.white : Color.primary)

@@ -52,13 +52,13 @@ struct ListenModeView: View {
                 Section {
                     if capture.isListening {
                         HStack {
-                            Image(systemName: "waveform").foregroundStyle(Theme.accent)
+                            Image(systemName: "waveform").foregroundStyle(DS.Palette.accent)
                             Text("Listening · \(capture.elapsed.mmss)").font(.headline.monospacedDigit())
                             Spacer()
                         }
                         ProgressView(value: Double(min(1, capture.level * 8)))
-                        if capture.tooQuiet { Text("I can barely hear anything — turn the music up or move the phone closer.").font(.caption).foregroundStyle(Theme.warn) }
-                        if capture.songEnded { Text("Sounds like the song ended.").font(.caption).foregroundStyle(Theme.good) }
+                        if capture.tooQuiet { Text("I can barely hear anything — turn the music up or move the phone closer.").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning) }
+                        if capture.songEnded { Text("Sounds like the song ended.").font(DS.Text.metadata).foregroundStyle(DS.Palette.success) }
                         Button("Stop & build arrangement") { finish() }.buttonStyle(.borderedProminent)
                         Button("Cancel", role: .destructive) { capture.cancel() }
                     } else {
@@ -73,8 +73,8 @@ struct ListenModeView: View {
                             .buttonStyle(SongLink(linkText) == nil ? AnyButtonStyle(.borderedProminent) : AnyButtonStyle(.bordered))
                             .disabled(!canStart)
                     }
-                    if let e = capture.error { Text(e).font(.footnote).foregroundStyle(Theme.bad) }
-                    if let message { Text(message).font(.footnote) }
+                    if let e = capture.error { Text(e).font(DS.Text.caption).foregroundStyle(DS.Palette.error) }
+                    if let message { Text(message).font(DS.Text.caption) }
                 }
             }
             .navigationTitle("Listen Mode")

@@ -33,7 +33,7 @@ struct SectionEditorSheet: View {
                         mutate { list in list.filter { $0.id != section.id } }
                     }
                 }
-                if let error { Text(error).foregroundStyle(Theme.bad) }
+                if let error { Text(error).foregroundStyle(DS.Palette.error) }
             }
             .navigationTitle("Edit section")
             .toolbar {
