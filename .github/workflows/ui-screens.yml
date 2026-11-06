@@ -16,6 +16,13 @@ jobs:
       - uses: actions/checkout@v4
       - name: Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+      - name: Sources the app build needs (as in ios-build.yml)
+        run: |
+          curl -fsSL -o App/Resources/SoundFonts/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+          Native/fetch-demucs.sh
+          Native/fetch-lame.sh
+          mkdir -p App/Resources/Models
+          curl -fsSL -o App/Resources/Models/DEMUCS-LICENSE.txt https://raw.githubusercontent.com/facebookresearch/demucs/main/LICENSE || true
       - name: Project
         run: |
           brew install xcodegen
