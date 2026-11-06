@@ -754,6 +754,36 @@ final class AppModel: ObservableObject {
         if activeSongId == songId { configureAccompaniment(for: song) }
     }
 
+    /// Corrects a chord and the same chord at the same place in every repeat of its section
+    /// (same repetition group and type, within 0.3 s of the same offset into the section).
+    func correctChordInRepeats(songId: UUID, stepId: UUID, to symbol: String) {
+        guard var song = song(songId), var steps = song.chordGuide, let step = steps.first(where: { $0.id == stepId }) else { return }
+        let sections = song.orderedSections
+        guard let home = sections.last(where: { $0.startTime <= step.time + 0.01 }) else { correctChord(songId: songId, stepId: stepId, to: symbol); return }
+        let offset = step.time - home.startTime
+        let repeats = sections.filter { $0.id == home.id || ($0.repetitionGroup != nil && $0.repetitionGroup == home.repetitionGroup && $0.type == home.type) }
+        for r in repeats {
+            for i in steps.indices where steps[i].chord == step.chord && abs((steps[i].time - r.startTime) - offset) < 0.3 {
+                if let fixed = ChordGuide.correct(steps[i], to: symbol) { steps[i] = fixed }
+            }
+        }
+        song.chordGuide = steps
+        update(song)
+        if activeSongId == songId { configureAccompaniment(for: song) }
+    }
+
+    /// Plays a chord's left-hand pattern (root → fifth → octave) on the current tone, for "Hear it".
+    func auditionChord(_ notes: [Int]) {
+        Task { @MainActor in
+            for n in notes {
+                let note = UInt8(max(0, min(127, n)))
+                audition(note: note, on: true)
+                try? await Task.sleep(nanoseconds: 380_000_000)
+                audition(note: note, on: false)
+            }
+        }
+    }
+
     func editMelodyNote(songId: UUID, noteId: UUID, semitones: Int? = nil, delete: Bool = false) {
         guard var song = song(songId), var melody = song.melody, let i = melody.notes.firstIndex(where: { $0.id == noteId }) else { return }
         if delete { melody.notes.remove(at: i) } else if let s = semitones {

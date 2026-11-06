@@ -62,6 +62,8 @@ struct SongStudioView: View {
     @State private var editingSection: SongSection?
     @State private var showDetails = false
     @State private var showMelodyGuide = false
+    /// The chord step being corrected (sheet).
+    @State private var correctingChord: SectionRef?
     @State private var showSoundLibrary = false
     @State private var showListen = false
     @AppStorage("studioPage") private var page = StudioPage.play
@@ -81,7 +83,11 @@ struct SongStudioView: View {
                             SeparationCard(song: song)
                             PerformanceHeader(song: song)
                             SongMapTimeline(song: song)
-                            if !(song.chordGuide ?? []).isEmpty { ChordKeysCard(song: song) { showMelodyGuide = true } }
+                            if !(song.chordGuide ?? []).isEmpty {
+                                ChordKeysCard(song: song) { stepId in
+                                    if let stepId { correctingChord = SectionRef(id: stepId) } else { showMelodyGuide = true }
+                                }
+                            }
                             ToneRow(song: song) { page = .keyboard }
                         case .mix:
                             SongPartsCard(song: song)
@@ -122,6 +128,7 @@ struct SongStudioView: View {
                 SectionEditorSheet(songId: songId, section: section).environmentObject(model)
             }
             .sheet(isPresented: $showListen) { ListenModeView(songId: songId).environmentObject(model) }
+            .sheet(item: $correctingChord) { ref in ChordCorrectionSheet(songId: songId, stepId: ref.id).environmentObject(model) }
             .navigationDestination(item: $guideFor) { SectionGuideView(songId: songId, sectionId: $0) }
             .navigationDestination(isPresented: $showDetails) { SongDetailView(songId: songId) }
             .navigationDestination(isPresented: $showMelodyGuide) { MelodyChordGuideView(songId: songId) }
@@ -650,35 +657,33 @@ struct SongPartsCard: View {
         let tracks = model.studioTracks(for: song).filter { $0.group == .songParts }
         let acc = song.accompaniment ?? AccompanimentSettings()
         let stems = tracks.filter { $0.id != SongStudio.original }
+        let clearSolo: (title: String, id: String, run: () -> Void)? = stems.contains(where: \.soloed)
+            ? (title: "Clear solo", id: "parts.clearSolo", run: { stems.filter(\.soloed).forEach { model.toggleSolo($0.id, songId: song.id) } })
+            : nil
         if !tracks.isEmpty {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Label("Song parts", systemImage: "waveform").font(.headline)
-                    Spacer()
-                    if !stems.isEmpty, stems.contains(where: \.soloed) {
-                        Button("Clear solo") { stems.filter(\.soloed).forEach { model.toggleSolo($0.id, songId: song.id) } }
-                            .font(.caption.weight(.semibold))
-                    }
-                }
+            VStack(alignment: .leading, spacing: DS.Space.m) {
+                DSSectionHeader(title: "Parts", action: clearSolo)
                 if stems.isEmpty {
-                    Text("The full recording. Separate the parts to switch the vocals, drums, bass and music on and off.")
-                        .font(.caption).foregroundStyle(.secondary)
+                    Text("The full recording. Separate the parts to turn the vocals, drums, bass and music on and off.")
+                        .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
                     ForEach(tracks) { TrackRow(track: $0, songId: song.id) }
                 } else {
-                    Text("Tap a part's name to mute it and play it yourself; long-press to hear it alone. Slide to set its volume.")
-                        .font(.caption).foregroundStyle(.secondary)
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                        ForEach(stems) { StemTile(track: $0, songId: song.id, gated: SongStudio.isGated($0.id, acc)) }
+                    VStack(spacing: 0) {
+                        ForEach(Array(stems.enumerated()), id: \.element.id) { i, t in
+                            PartRow(track: t, songId: song.id, gated: SongStudio.isGated(t.id, acc))
+                            if i < stems.count - 1 { Divider().overlay(DS.Palette.divider).padding(.leading, 68) }
+                        }
                     }
+                    .dsSurface(padding: 0)
+                    Label("Mute a part to play it yourself.", systemImage: "info.circle")
+                        .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
                     musicSplit
                     if let full = tracks.first(where: { $0.id == SongStudio.original }) {
                         DisclosureGroup("Full recording") { TrackRow(track: full, songId: song.id).padding(.top, 6) }
-                            .font(.subheadline).tint(.secondary)
+                            .font(DS.Text.bodySecondary).tint(DS.Palette.textSecondary)
                     }
                 }
             }
-            .padding(14)
-            .background(Theme.panel, in: RoundedRectangle(cornerRadius: 16))
         }
     }
 }
@@ -696,108 +701,10 @@ extension SongPartsCard {
                 Label("Split Music into Lead & Backing", systemImage: "wand.and.rays").labelStyle(.titleAndIcon)
                     .font(.subheadline.weight(.semibold)).frame(maxWidth: .infinity, minHeight: 44)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.dsSecondary)
             .accessibilityIdentifier("parts.split")
-            Text("Separates the interlude melodies (flute, strings, nadaswaram) from the pads and chords, so the original can play just the lead parts for you.")
-                .font(.caption2).foregroundStyle(.secondary)
+            .accessibilityHint("Separates the lead melodies from the pads and chords")
         }
-    }
-}
-
-/// One separated part as a big, colourful tile: tap = on/off, long-press = solo, slider = volume.
-struct StemTile: View {
-    @EnvironmentObject var model: AppModel
-    let track: StudioTrack
-    let songId: UUID
-    let gated: Bool
-    @State private var level: Double = 0
-    @State private var dragging = false
-
-    private var color: Color {
-        switch track.id {
-        case SongStudio.stem(.vocals): return .pink
-        case SongStudio.stem(.drums): return .orange
-        case SongStudio.stem(.bass): return .purple
-        case SongStudio.stem(.lead): return .yellow
-        case SongStudio.stem(.piano): return .mint
-        case SongStudio.stem(.guitar): return .brown
-        case SongStudio.stem(.backing): return .indigo
-        default: return .teal
-        }
-    }
-
-    var body: some View {
-        let on = track.enabled
-        VStack(alignment: .leading, spacing: 10) {
-            // Tap / long-press only on the top of the tile, so the volume slider below gets the drag.
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top) {
-                    Image(systemName: track.symbol)
-                        .font(.title2.weight(.semibold))
-                        .frame(width: 44, height: 44)
-                        .background((on ? color : Color.gray).opacity(on ? 0.28 : 0.15), in: RoundedRectangle(cornerRadius: 12))
-                        .foregroundStyle(on ? color : .secondary)
-                    Spacer()
-                    if track.soloed {
-                        Text("SOLO").font(.caption2.bold()).padding(.horizontal, 6).padding(.vertical, 3)
-                            .background(Theme.accent, in: Capsule()).foregroundStyle(.black)
-                    } else if gated {
-                        Image(systemName: "wand.and.stars").font(.caption).foregroundStyle(Theme.accent)
-                            .accessibilityLabel("Plays only in chosen sections")
-                    }
-                }
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(track.name).font(.headline).lineLimit(1)
-                    Text(on ? (gated ? "Fills in chosen parts" : "Playing") : "Muted — you play")
-                        .font(.caption).foregroundStyle(on ? Color.secondary : Theme.accent).lineLimit(1)
-                    // The nearest TonePilot tone for this part, measured (always laid out: no jumps).
-                    let match = SongStudio.stemKind(track.id).flatMap { model.song(songId)?.partMatches?[$0.rawValue] }
-                    Text(match.map { "Sounds like \($0.name) · \(Int(($0.similarity * 100).rounded()))%" } ?? " ")
-                        .font(.caption2.weight(.semibold)).foregroundStyle(Theme.accent).lineLimit(1)
-                        .opacity(match == nil ? 0 : 1)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("stem.header.\(track.id)")
-            .accessibilityAddTraits(.isButton)
-            .onTapGesture {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                model.setTrack(track.id, on: !on, songId: songId)
-            }
-            .onLongPressGesture(minimumDuration: 0.4) {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                model.toggleSolo(track.id, songId: songId)
-            }
-            HStack(spacing: 6) {
-                Image(systemName: level < 0.01 ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                    .font(.caption2).foregroundStyle(.secondary).frame(width: 16)
-                Slider(value: $level, in: 0...1) { editing in
-                    dragging = editing
-                    if !editing { model.setTrackLevel(track.id, level, songId: songId) }
-                }
-                .tint(color)
-                .accessibilityLabel("\(track.name) volume")
-                .accessibilityIdentifier("stem.volume.\(track.id)")
-                Text("\(Int((level * 100).rounded()))").font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
-                    .frame(width: 24, alignment: .trailing)
-            }
-            .opacity(on ? 1 : 0.5)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Theme.panelRaised.opacity(on ? 1 : 0.5), in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(track.soloed ? Theme.accent : (on ? color.opacity(0.5) : .clear), lineWidth: 1.5))
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel("\(track.name), \(on ? "on" : "muted")")
-        .accessibilityAddTraits(.isButton)
-        .accessibilityAction(named: on ? "Mute" : "Unmute") { model.setTrack(track.id, on: !on, songId: songId) }
-        .accessibilityAction(named: track.soloed ? "Stop solo" : "Solo") { model.toggleSolo(track.id, songId: songId) }
-        .onAppear { level = track.volume }
-        .onChange(of: track.volume) { _, v in if !dragging { level = v } }
-        .onChange(of: level) { _, v in if dragging { model.previewTrackLevel(track.id, v, songId: songId) } }
-        .animation(.easeOut(duration: 0.15), value: on)
     }
 }
 

@@ -59,7 +59,15 @@ final class TonePilotUITests: XCTestCase {
                 XCTAssertTrue(element("play.section").waitForExistence(timeout: 3), "Play page shows the current section")
                 XCTAssertTrue(element("play.map").exists, "Play page shows the song map")
                 XCTAssertTrue(element("play.chord").exists, "Play page shows the chord card with the keys guide")
-                if round == 1 { tap(element("play.tone"), thenExpect: element("tonemode.main"), limit: 3, "tone row opens the Tone page") }
+                if round == 1 {
+                    // Correct a chord: tap the chord card → sheet → pick a root, hear it, cancel (nothing saved).
+                    tap(element("play.chord"), thenExpect: element("chord.save"), limit: 4, "open chord correction")
+                    tap(element("chord.root.9"), "pick root A")
+                    tap(element("chord.hear"), "hear the chord")
+                    tap(element("chord.cancel"), "close chord correction")
+                    XCTAssertTrue(element("play.tone").waitForExistence(timeout: 3), "back on the Play page")
+                    tap(element("play.tone"), thenExpect: element("tonemode.main"), limit: 3, "tone row opens the Tone page")
+                }
                 page("mix")
                 if round == 1 {
                     let split = element("parts.split")
@@ -75,6 +83,13 @@ final class TonePilotUITests: XCTestCase {
                     vocals.tap(); assertAlive("unmute vocals")
                     vocals.press(forDuration: 0.6); assertAlive("solo vocals")
                     vocals.press(forDuration: 0.6); assertAlive("unsolo vocals")
+                }
+                // Labelled Mute / Solo buttons (the visible way; name tap / long-press are shortcuts).
+                let drumsMute = element("stem.mute.audio.stem.drums")
+                if drumsMute.waitForExistence(timeout: 2) {
+                    tap(drumsMute, "mute drums (button)"); tap(drumsMute, "unmute drums (button)")
+                    let drumsSolo = element("stem.solo.audio.stem.drums")
+                    tap(drumsSolo, "solo drums (button)"); tap(drumsSolo, "unsolo drums (button)")
                 }
                 let volume = element("stem.volume.audio.stem.drums")
                 if volume.waitForExistence(timeout: 2) { volume.adjust(toNormalizedSliderPosition: round % 2 == 0 ? 0.3 : 0.9); assertAlive("drums volume") }

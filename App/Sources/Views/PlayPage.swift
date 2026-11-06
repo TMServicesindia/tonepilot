@@ -118,7 +118,8 @@ private struct SongMapContent: View {
 struct ChordKeysCard: View {
     @EnvironmentObject var model: AppModel
     let song: Song
-    let onCorrect: () -> Void
+    /// The chord step under the playhead (nil when there is none).
+    let onCorrect: (UUID?) -> Void
 
     var body: some View { ChordKeysContent(song: song, live: model.live, onCorrect: onCorrect) }
 }
@@ -127,7 +128,7 @@ private struct ChordKeysContent: View {
     @EnvironmentObject var model: AppModel
     let song: Song
     @ObservedObject var live: LiveState
-    let onCorrect: () -> Void
+    let onCorrect: (UUID?) -> Void
 
     private static let melodyTeal = Color(hex: 0x6FE0D2)
 
@@ -140,7 +141,7 @@ private struct ChordKeysContent: View {
         let left = (current?.pattern ?? []).map { $0 + transpose }
         let offset = AutoArranger.guideOffset(for: model.activeArrangement)
         let melodyNote = song.melody?.notes.first { $0.end > t }.map { $0.midi + offset + transpose }
-        Button(action: onCorrect) {
+        Button { onCorrect(current?.id) } label: {
             VStack(alignment: .leading, spacing: DS.Space.m) {
                 HStack(alignment: .top) {
                     VStack(alignment: .leading, spacing: DS.Space.xxs) {
