@@ -494,7 +494,7 @@ Stop: no production change, no major training, no release before approval.
   - Settings (§2.14), first run in 2 steps (§2.1), Record (§2.13).
   - Token pass over the legacy screens; contrast fixes.
 - **Each has ids and stress-test steps.** Status, deviations and remaining work: `docs/UX_IMPLEMENTATION_ROADMAP.md`.
-- **Build status:** these are not yet through a full build. The full build for steps 1–4a was running when this was written. Publish only after a green `ios-build.yml`.
+- **Build status:** shipped in v0.3.101 (full build green). The follow-up build carries the test-seed fix and two copy fixes.
 
 ## 7. Open owner decisions
 
@@ -510,4 +510,4 @@ Stop: no production change, no major training, no release before approval.
 
 ## 8. Release history (latest first)
 
-(1 Nov 23:32 IST re-run: launch 4.34 s > 4 s, not published) · (v0.3.72 attempted: Phase 1 iPhone foundation; publish 403) · v0.3.71 (live fill deadlock fix; all gates passed; launch 3.47 s) · v0.3.70 (stuck notes, arpeggio melody bug, ToneMatcher, 20 instruments; launch 3.86 s) · v0.3.67 (publish-anyway; Film Tone Library) · quick-2 · v0.3.61 (Record; owner's preferred older build) · earlier v0.3.x.
+v0.3.101 (6 Nov; UX redesign steps 1–7 + Sound browser; all gates passed; launch median 2.86 s, mean 3.18 s, p90 3.81 s; peak memory 193 MB) · (1 Nov 23:32 IST re-run: launch 4.34 s > 4 s, not published) · (v0.3.72 attempted: Phase 1 iPhone foundation; publish 403) · v0.3.71 (live fill deadlock fix; all gates passed; launch 3.47 s) · v0.3.70 (stuck notes, arpeggio melody bug, ToneMatcher, 20 instruments; launch 3.86 s) · v0.3.67 (publish-anyway; Film Tone Library) · quick-2 · v0.3.61 (Record; owner's preferred older build) · earlier v0.3.x.
