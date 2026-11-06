@@ -296,7 +296,10 @@ public enum AutoArranger {
         let pick = withTone.filter { lead($0.1) == mainLead }.max { weight($0.0) < weight($1.0) }
         guard let (section, source) = pick else { return nil }
         var tone = Arrangement(name: "Main tone", layers: source.layers, masterGain: source.masterGain, master: source.master)
-        tone.rationale = "\(aiMainTonePrefix) from \(section.label): " + (source.rationale ?? "")
+        // Without a reason from the section's tone, end the sentence instead of leaving "from X: ".
+        let why = source.rationale ?? ""
+        tone.rationale = why.trimmingCharacters(in: .whitespaces).isEmpty ? "\(aiMainTonePrefix) from \(section.label)."
+                                                                          : "\(aiMainTonePrefix) from \(section.label): " + why
         return tone
     }
 

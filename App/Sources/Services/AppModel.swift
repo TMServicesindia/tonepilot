@@ -15,7 +15,7 @@ enum EngineKind: String, CaseIterable, Identifiable {
     /// Apple's AVAudioUnitSampler — fallback with fewer controls.
     case appleSampler
     var id: String { rawValue }
-    var displayName: String { self == .tonePilot ? "TonePilot engine (recommended)" : "Apple sampler (legacy)" }
+    var displayName: String { self == .tonePilot ? "TonePilot" : "Apple sampler" }
 }
 
 /// Lets the CoreMIDI thread reach the current output while the main thread may swap engines.
