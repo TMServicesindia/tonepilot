@@ -20,7 +20,9 @@ final class TonePilotUITests: XCTestCase {
     /// Taps and requires the next screen element to appear within `limit` seconds (a freeze fails).
     func tap(_ element: XCUIElement, thenExpect next: XCUIElement? = nil, limit: TimeInterval = 3, _ step: String) {
         XCTAssertTrue(element.waitForExistence(timeout: limit), "Not found in \(limit) s: \(step)")
-        element.tap()
+        // XCUITest can't always "scroll to" an element inside the page's scroll view under the fixed page bar;
+        // when it's on screen but not reported hittable, tap it by position instead.
+        if element.isHittable { element.tap() } else { element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
         if let next { XCTAssertTrue(next.waitForExistence(timeout: limit), "Screen didn't respond in \(limit) s after: \(step)") }
         assertAlive(step)
     }
