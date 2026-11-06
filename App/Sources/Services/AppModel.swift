@@ -1046,7 +1046,6 @@ final class AppModel: ObservableObject {
             do {
                 let current = await MainActor.run { self?.library.song(id: songId) } ?? snapshot
                 let throttle = ProgressThrottle()
-                let hasParts = !stems.isEmpty
                 let progress: (Double) -> Bool = { p in
                     if Task.isCancelled { return false }
                     if throttle.shouldSend(p) { Task { @MainActor in self?.analysisProgress[songId] = p } }
