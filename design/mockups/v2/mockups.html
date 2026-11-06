@@ -1,0 +1,306 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>TonePilot mockups v2</title>
+<style>
+:root{--canvas:#0B0B0D;--surface:#151518;--elevated:#202024;--divider:#242429;--t1:#F5F5F7;--t2:#A3A3AB;--t3:#707078;--accent:#FA9E33;--on:#121212;--am:rgba(250,158,51,.16);--ok:#3DD27A;--warn:#FFD24D;
+--s1:#F0A04B;--s2:#4FC1B4;--s3:#A98BF5;--s4:#F07AA8;--s5:#E8D25B;--s6:#7FD99A}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#18181b;font-family:Inter,system-ui,sans-serif;color:var(--t1);padding:28px;-webkit-font-smoothing:antialiased}
+h1{font:600 22px Inter;color:#FFC98A}.sub{color:#9a9aa2;font-size:14px;margin:4px 0 22px}
+.grid{display:grid;grid-template-columns:repeat(4,390px);gap:28px}
+.cap{font:600 15px Inter;color:#ddd;margin-bottom:6px}.capd{font-size:12.5px;color:#9a9aa2;line-height:1.35;height:36px;margin-bottom:8px}
+.phone{width:390px;height:844px;background:var(--canvas);border-radius:44px;overflow:hidden;position:relative;border:1px solid #2a2a2e;display:flex;flex-direction:column}
+.status{height:47px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 34px;font:600 16px Inter;flex:none}
+.nav{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:600 17px Inter;flex:none}
+.nav .l{color:var(--accent);font-weight:500;display:flex;align-items:center;gap:2px}
+.content{flex:1;overflow:hidden;padding:0 16px}
+.tabbar{height:72px;border-top:1px solid var(--divider);background:rgba(21,21,24,.95);display:flex;justify-content:space-around;padding-top:7px;flex:none}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--t3);width:70px}.tab.on{color:var(--accent)}.tab svg{width:26px;height:24px}
+.large{font:700 34px Inter;letter-spacing:-.4px}
+.surface{background:var(--surface);border-radius:16px;padding:16px}
+.row{display:flex;align-items:center;gap:12px}
+.chip{display:inline-flex;align-items:center;gap:4px;font:600 12px Inter;padding:4px 9px;border-radius:99px;background:var(--elevated);color:var(--t2);white-space:nowrap}
+.chip.acc{background:var(--am);color:var(--accent)}.chip.ok{background:rgba(61,210,122,.15);color:var(--ok)}.chip.warn{background:rgba(255,210,77,.15);color:var(--warn)}
+.btnp{height:50px;border-radius:12px;background:var(--accent);color:var(--on);font:600 17px Inter;display:flex;align-items:center;justify-content:center;gap:8px;flex:1}
+.btns{height:50px;border-radius:12px;background:var(--elevated);color:var(--t1);font:600 16px Inter;display:flex;align-items:center;justify-content:center;gap:8px;flex:1}
+.sec{font:600 17px Inter;margin:20px 0 10px;display:flex;justify-content:space-between;align-items:baseline}.sec a{color:var(--accent);font:500 15px Inter}
+.meta{font-size:12.5px;color:var(--t2)}.k{font-variant-numeric:tabular-nums}
+.list{background:var(--surface);border-radius:16px;overflow:hidden}
+.li{min-height:56px;display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--divider)}.li:last-child{border-bottom:0}.li .t{flex:1;min-width:0}
+.ico{width:22px;height:22px;flex:none}
+/* page segmented with icons */
+.seg{background:var(--elevated);border-radius:14px;padding:3px;display:flex;gap:2px}
+.seg div{flex:1;height:50px;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:600 11.5px Inter;color:var(--t2)}
+.seg div svg{width:20px;height:20px}
+.seg .on{background:var(--accent);color:var(--on)}
+/* instrument tile */
+.tile{border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none;position:relative}
+.tile svg{width:62%;height:62%}
+.f-str{background:linear-gradient(145deg,#5a3418,#2a1a10);color:#FFB866}
+.f-wind{background:linear-gradient(145deg,#174a45,#0f2624);color:#6FE0D2}
+.f-key{background:linear-gradient(145deg,#2c2f63,#171833);color:#A9B2FF}
+.f-pluck{background:linear-gradient(145deg,#5a1f3d,#2b1020);color:#FF9CC8}
+.f-perc{background:linear-gradient(145deg,#5c3a12,#2d1d09);color:#FFD27A}
+.f-voice{background:linear-gradient(145deg,#562147,#2a1023);color:#FF9BD9}
+.f-bass{background:linear-gradient(145deg,#3b2a63,#1d1533);color:#C7B1FF}
+.f-synth{background:linear-gradient(145deg,#1d3d5c,#0f1f2f);color:#7FD0FF}
+.f-brass{background:linear-gradient(145deg,#5a4a12,#2d2509);color:#FFE36E}
+.stack{position:relative;height:var(--h)}
+.stack .tile{position:absolute;box-shadow:0 0 0 3px var(--surface)}
+/* song map */
+.map{display:flex;align-items:flex-end;gap:2px;position:relative}
+.map i{display:block;border-radius:3px 3px 1px 1px}
+.cover{border-radius:12px;background:#121216;display:flex;align-items:flex-end;justify-content:center;padding:6px 5px;flex:none;overflow:hidden;position:relative}
+.star{position:absolute;font-size:12px;color:#fff;text-shadow:0 0 4px rgba(0,0,0,.6)}
+/* keys */
+.keys{display:flex;height:44px;position:relative;border-radius:6px;overflow:hidden;background:#fff}
+.keys .w{flex:1;border-right:1px solid #c9c9cf;background:#f4f4f6}.keys .w.on{background:var(--accent)}.keys .w.nx{background:#bfe9e3}
+.keys .b{position:absolute;top:0;height:26px;background:#1b1b1f;border-radius:0 0 3px 3px}
+.transport{background:rgba(21,21,24,.95);border-top:1px solid var(--divider);padding:6px 20px 4px;flex:none}
+.bar{height:4px;border-radius:2px;background:rgba(255,255,255,.12);position:relative;margin:6px 0}.bar b{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:2px}
+.times{display:flex;justify-content:space-between;font:500 11px Inter;color:var(--t2);font-variant-numeric:tabular-nums}
+.tbtns{display:flex;justify-content:space-between;align-items:center}
+.tb{width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--t1)}
+.pbtn{width:62px;height:62px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.slider{height:4px;border-radius:2px;background:var(--elevated);position:relative;flex:1}.slider b{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--accent)}
+.slider i{position:absolute;top:-10px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.meter{height:6px;border-radius:3px;background:var(--elevated);overflow:hidden;flex:1}.meter b{display:block;height:100%;border-radius:3px}
+.ms{min-width:44px;height:34px;padding:0 10px;border-radius:9px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font:600 13px Inter;color:var(--t2)}.ms.on{background:var(--am);color:var(--accent)}
+.toggle{width:51px;height:31px;border-radius:16px;background:var(--accent);position:relative;flex:none}.toggle:after{content:"";position:absolute;right:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff}
+.sq{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none;color:#fff}.sq svg{width:18px;height:18px}
+.chev{color:var(--t3);font-size:20px}
+.grabber{width:36px;height:5px;border-radius:3px;background:#48484d;margin:8px auto 0}
+.sheet{position:absolute;inset:56px 0 0 0;background:#111114;border-radius:14px 14px 0 0;display:flex;flex-direction:column}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+.step{display:flex;align-items:center;gap:12px;padding:11px 0}
+.stepi{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.stepi svg{width:22px;height:22px}
+.done{background:rgba(61,210,122,.15);color:var(--ok)}.doing{background:var(--am);color:var(--accent)}.todo{background:var(--elevated);color:var(--t3)}
+</style></head><body>
+<h1>TonePilot — proposed screens v2 (for review, not built yet)</h1>
+<div class="sub">Signature elements: Song Map covers &amp; timeline (generated from each song's own analysis), TonePilot's own instrument illustrations, and the Casio keys guide. Inter stands in for SF Pro; line icons stand in for SF Symbols. Content is illustrative.</div>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<!-- UI icons -->
+<symbol id="u-songs" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h11v2H3zm0 4h11v2H3zm0 4h7v2H3zm14-8h4v2h-2v9.5a3 3 0 1 1-2-2.83z"/></symbol>
+<symbol id="u-play" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v13H4zM6 6v9h2.5V6zm4 0v9h2.5V6zm4 0v9h2.5V6zM3 19h18v2H3z"/></symbol>
+<symbol id="u-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.5" fill="currentColor"/></symbol>
+<symbol id="u-set" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm8.4 2.3-1.9-.4-.6-1.5 1.1-1.6-1.9-1.9-1.6 1.1-1.5-.6-.4-1.9h-2.7l-.4 1.9-1.5.6-1.6-1.1-1.9 1.9 1.1 1.6-.6 1.5-1.9.4v2.7l1.9.4.6 1.5-1.1 1.6 1.9 1.9 1.6-1.1 1.5.6.4 1.9h2.7l.4-1.9 1.5-.6 1.6 1.1 1.9-1.9-1.1-1.6.6-1.5 1.9-.4z"/></symbol>
+<symbol id="u-pause" viewBox="0 0 24 24"><path fill="#121212" d="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/></symbol>
+<symbol id="u-tri" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></symbol>
+<symbol id="u-perform" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></symbol>
+<symbol id="u-mix" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 4v16M12 4v16M18 4v16"/><rect x="3.5" y="13" width="5" height="3" rx="1.5" fill="currentColor"/><rect x="9.5" y="7" width="5" height="3" rx="1.5" fill="currentColor"/><rect x="15.5" y="11" width="5" height="3" rx="1.5" fill="currentColor"/></symbol>
+<symbol id="u-tone" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 12h2l2-6 3 12 3-9 2 5 2-2h4"/></symbol>
+<symbol id="u-arp" viewBox="0 0 24 24"><g fill="currentColor"><rect x="3" y="15" width="3.2" height="5" rx="1"/><rect x="8" y="11" width="3.2" height="9" rx="1"/><rect x="13" y="7" width="3.2" height="13" rx="1"/><rect x="18" y="11" width="3.2" height="9" rx="1"/></g></symbol>
+<symbol id="u-sections" viewBox="0 0 24 24"><g fill="currentColor"><rect x="3" y="6" width="5" height="12" rx="1.5"/><rect x="9.5" y="9" width="5" height="9" rx="1.5" opacity=".7"/><rect x="16" y="4" width="5" height="14" rx="1.5"/></g></symbol>
+<symbol id="u-back5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M5 12a7 7 0 1 0 2-5M5 4v4h4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" font-family="Inter" font-weight="700">5</text></symbol>
+<symbol id="u-fwd5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M19 12a7 7 0 1 1-2-5M19 4v4h-4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" font-family="Inter" font-weight="700">5</text></symbol>
+<symbol id="u-loop" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M4 11V9a3 3 0 0 1 3-3h11l-3-3m5 10v2a3 3 0 0 1-3 3H6l3 3"/></symbol>
+<symbol id="u-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2.2" d="M15.5 15.5 21 21"/></symbol>
+<symbol id="u-import" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></symbol>
+<symbol id="u-ear" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M7 9a5 5 0 0 1 10 0c0 3-3 4-3 7a3 3 0 0 1-5.5 1.5M10 9.5a2 2 0 0 1 4 0"/></symbol>
+<symbol id="u-cable" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M9 3v4m6-4v4M7 7h10v4a5 5 0 0 1-10 0zm5 9v5"/></symbol>
+<symbol id="u-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="u-spark" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l2.2 6.3L20 10l-5.8 1.7L12 18l-2.2-6.3L4 10l5.8-1.7zM19 15l1 2.6 2.5 1-2.5 1L19 22l-1-2.4-2.5-1 2.5-1z"/></symbol>
+<symbol id="u-metro" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M9 3h6l4 18H5zM12 15l5-9"/></symbol>
+<symbol id="u-key" viewBox="0 0 24 24"><text x="12" y="17" font-size="15" text-anchor="middle" fill="currentColor" font-family="Inter" font-weight="800">♯</text></symbol>
+<symbol id="u-layers" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M12 3 3 8l9 5 9-5zM3 13l9 5 9-5"/></symbol>
+<symbol id="u-wave" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 12h2m2-5v10m3-13v16m3-11v6m3-9v12m3-7v2"/></symbol>
+<symbol id="u-env" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="M3 19 8 6l3 6h6l4 7"/></symbol>
+<symbol id="u-filter" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 9h9c3 0 4 2 5 4s2 4 4 4"/></symbol>
+<symbol id="u-vib" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 12c2-4 3-4 4.5 0s2.5 4 4.5 0 3-4 4.5 0 2.5 4 4.5 0"/></symbol>
+<symbol id="u-keysr" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M3 5h18v14H3zM8 5v9m4-9v14m4-14v9"/></symbol>
+<symbol id="u-casio" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M2 8h20v9H2z"/><path stroke="currentColor" stroke-width="1.6" d="M5 12v5m3-5v5m3-5v5m3-5v5m3-5v5m3-5v5"/></symbol>
+<symbol id="u-disk" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M4 6h16v12H4zM4 14h16"/></symbol>
+<symbol id="u-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M12 11v6M12 7.5v.5"/></symbol>
+<symbol id="u-split" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 21v-7l-6-6V4m6 10 6-6V4"/></symbol>
+<symbol id="u-ab" viewBox="0 0 24 24"><text x="2" y="17" font-size="11" fill="currentColor" font-family="Inter" font-weight="800">A</text><text x="13" y="17" font-size="11" fill="currentColor" font-family="Inter" font-weight="800">B</text></symbol>
+<!-- Instrument illustrations (TonePilot originals, duotone) -->
+<symbol id="n-violin" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M24 4v14"/><circle cx="24" cy="4.5" r="2.2" fill="currentColor"/><path d="M24 18c-5 0-8 2.5-8 6 0 2 1.5 3 1.5 4S15 30 15 34c0 5 4 9 9 9s9-4 9-9c0-4-2.5-5-2.5-6s1.5-2 1.5-4c0-3.5-3-6-8-6z" fill="currentColor" fill-opacity=".28"/><path d="M20.5 29.5c.5 1 .5 2.5 0 3.5m7-3.5c-.5 1-.5 2.5 0 3.5M24 34v7"/><path d="M8 40 40 16" stroke-width="1.8" opacity=".8"/></g></symbol>
+<symbol id="n-flute" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"><rect x="5" y="20" width="38" height="8" rx="4" transform="rotate(-32 24 24)" fill="currentColor" fill-opacity=".28"/><g fill="currentColor" stroke="none" transform="rotate(-32 24 24)"><circle cx="15" cy="24" r="1.6"/><circle cx="21" cy="24" r="1.6"/><circle cx="26" cy="24" r="1.6"/><circle cx="31" cy="24" r="1.6"/><circle cx="36" cy="24" r="1.6"/><rect x="8" y="22.6" width="3.2" height="2.8" rx="1.4"/></g></g></symbol>
+<symbol id="n-piano" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" fill="none"><rect x="5" y="12" width="38" height="24" rx="4" fill="currentColor" fill-opacity=".28"/><path d="M12.5 24v12M20 24v12M28 24v12M35.5 24v12"/><g fill="currentColor" stroke="none"><rect x="10" y="12" width="5" height="12" rx="1"/><rect x="17.5" y="12" width="5" height="12" rx="1"/><rect x="29" y="12" width="5" height="12" rx="1"/></g></g></symbol>
+<symbol id="n-guitar" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M30 18 41 7"/><path d="m39 5 4 4"/><path d="M27 17c-3-3-8-2-9 2-1 2-3 2-5 3-5 2-6 9-2 13s11 3 13-2c1-2 1-4 3-5 4-1 5-6 2-9z" fill="currentColor" fill-opacity=".28"/><circle cx="21" cy="27" r="3"/><path d="m15 33 3-3"/></g></symbol>
+<symbol id="n-veena" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"><path d="M12 36 38 10"/><circle cx="12" cy="36" r="8" fill="currentColor" fill-opacity=".28"/><circle cx="39" cy="9" r="4" fill="currentColor" fill-opacity=".28"/><path d="M19 25l4 4m0-8 4 4m0-8 4 4"/></g></symbol>
+<symbol id="n-tabla" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" fill="none"><ellipse cx="15" cy="16" rx="8" ry="3" fill="currentColor" fill-opacity=".35"/><path d="M7 16c0 10 2 22 8 22s8-12 8-22" fill="currentColor" fill-opacity=".2"/><ellipse cx="34" cy="22" rx="10" ry="3.5" fill="currentColor" fill-opacity=".35"/><path d="M24 22c0 6 2 16 10 16s10-10 10-16" fill="currentColor" fill-opacity=".2"/><circle cx="15" cy="16" r="1.5" fill="currentColor"/><circle cx="34" cy="22" r="2" fill="currentColor"/></g></symbol>
+<symbol id="n-drums" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><ellipse cx="24" cy="22" rx="14" ry="5" fill="currentColor" fill-opacity=".35"/><path d="M10 22v12c0 3 6 6 14 6s14-3 14-6V22" fill="currentColor" fill-opacity=".2"/><path d="M14 26l6 10m14-10-6 10"/><path d="M14 6l8 13M36 6l-8 13"/></g></symbol>
+<symbol id="n-bass" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M28 20 43 5"/><path d="M25 19c-2-3-7-3-9 0-1 2-2 3-4 3-5 1-6 8-3 12s10 3 12-1c1-2 2-3 4-4 3-2 3-7 0-10z" fill="currentColor" fill-opacity=".28"/><path d="M14 30h6m-5-4h6"/></g></symbol>
+<symbol id="n-voice" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"><rect x="17" y="5" width="14" height="23" rx="7" fill="currentColor" fill-opacity=".28"/><path d="M11 22c0 7 6 12 13 12s13-5 13-12M24 34v8m-7 0h14"/><path d="M17 13h5m-5 5h5" opacity=".7"/></g></symbol>
+<symbol id="n-brass" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M5 24h20l10-9v18l-10-9" fill="currentColor" fill-opacity=".28"/><path d="M12 24v6h10v-6M15 20v-4m4 4v-4"/><path d="M35 15c4 3 6 6 6 9s-2 6-6 9" /></g></symbol>
+<symbol id="n-synth" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"><rect x="5" y="10" width="38" height="28" rx="5" fill="currentColor" fill-opacity=".22"/><path d="M10 26c3-8 5-8 7 0s4 8 7 0 5-8 7 0 4 8 7 0"/><circle cx="12" cy="16" r="1.6" fill="currentColor"/><circle cx="18" cy="16" r="1.6" fill="currentColor"/></g></symbol>
+<symbol id="n-pad" viewBox="0 0 48 48"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"><path d="M14 33h20a8 8 0 0 0 0-16 11 11 0 0 0-21 2 7 7 0 0 0 1 14z" fill="currentColor" fill-opacity=".28"/><path d="M15 39h4m6 0h8" opacity=".7"/></g></symbol>
+</defs></svg>
+
+<div class="grid" id="grid"></div>
+
+<template id="tabbar"><div class="tabbar"><div class="tab" data-t="0"><svg><use href="#u-songs"/></svg>Songs</div><div class="tab" data-t="1"><svg><use href="#u-play"/></svg>Play</div><div class="tab" data-t="2"><svg><use href="#u-rec"/></svg>Record</div><div class="tab" data-t="3"><svg><use href="#u-set"/></svg>Settings</div></div></template>
+
+<script>
+const SONGS={hukum:{secs:[['Intro',.6,.08,2],['Pallavi',.55,.17,1],['BGM',.9,.08,2,true],['Charanam',.7,.18,3],['Pallavi',.6,.14,1],['BGM',.95,.08,2,true],['Pallavi',.8,.15,1],['Outro',.4,.12,4]]},
+ kaava:{secs:[['Intro',.4,.1,4],['Pallavi',.7,.2,1],['Hook',.95,.12,2,true],['Charanam',.6,.2,3],['Hook',1,.14,2,true],['Outro',.5,.12,4]]},
+ naatu:{secs:[['Intro',.5,.08,2],['Verse',.75,.2,1],['Chorus',1,.16,2,true],['Verse',.8,.2,1],['Chorus',1,.2,2,true],['Outro',.6,.1,4]]},
+ kesar:{secs:[['Intro',.3,.12,4],['Verse',.45,.22,1],['Chorus',.7,.18,2,true],['Verse',.5,.22,1],['Chorus',.8,.18,2,true],['Outro',.35,.08,4]]}};
+const COLS=['','#F0A04B','#4FC1B4','#A98BF5','#6E6E78'];
+function map(song,w,h,{star=true,playhead=null,current=-1,gap=2}={}){
+  const s=SONGS[song].secs;let html=`<div class="map" style="width:${w}px;height:${h}px;gap:${gap}px">`;
+  s.forEach(([n,e,len,g,hook],i)=>{html+=`<i style="width:${len*100}%;height:${Math.round(e*100)}%;background:${COLS[g]};opacity:${current<0||i===current?1:.45}"></i>`});
+  if(star){let x=0;s.forEach(([n,e,len,g,hook])=>{if(hook&&star){html+=`<span class="star" style="left:calc(${(x+len/2)*100}% - 6px);bottom:calc(${e*100}% + 1px)">★</span>`}x+=len})}
+  if(playhead!==null)html+=`<span style="position:absolute;left:${playhead*100}%;top:-4px;bottom:-4px;width:2px;background:#fff;border-radius:1px;box-shadow:0 0 0 2px rgba(0,0,0,.4)"></span>`;
+  return html+'</div>'}
+function cover(song,sz){return `<div class="cover" style="width:${sz}px;height:${sz}px">${map(song,sz-10,sz*.62,{star:sz>50,gap:1})}</div>`}
+function tile(inst,fam,sz,extra=''){return `<div class="tile ${fam}" style="width:${sz}px;height:${sz}px;${extra}"><svg><use href="#n-${inst}"/></svg></div>`}
+function keys(on=[],nx=[]){let h='<div class="keys">';for(let i=0;i<21;i++)h+=`<div class="w ${on.includes(i)?'on':''} ${nx.includes(i)?'nx':''}"></div>`;
+ const bl=[0,1,3,4,5,7,8,10,11,12,14,15,17,18,19];bl.forEach(i=>{h+=`<div class="b" style="left:calc(${(i+1)*100/21}% - 5px);width:10px"></div>`});return h+'</div>'}
+const tabbar=t=>document.getElementById('tabbar').innerHTML.replace(`data-t="${t}"`,`data-t="${t}" class="tab on"`).replace('class="tab" data-t="'+t+'" class="tab on"','class="tab on"');
+const status='<div class="status"><span>9:41</span><span style="font-size:13px">●●●● ◔</span></div>';
+const transport=`<div class="transport"><div class="bar"><b style="width:38%"></b></div><div class="times"><span>1:16</span><span>3:21</span></div><div class="tbtns"><div class="tb"><svg class="ico"><use href="#u-loop"/></svg></div><div class="tb"><svg class="ico"><use href="#u-back5"/></svg></div><div class="pbtn"><svg style="width:28px;height:28px"><use href="#u-pause"/></svg></div><div class="tb"><svg class="ico"><use href="#u-fwd5"/></svg></div><div class="tb" style="font:700 15px Inter">1×</div></div></div>`;
+const studioTop=(on)=>`<div class="nav"><span class="l">‹ Songs</span><span style="display:flex;align-items:center;gap:8px">${cover('hukum',26)}Hukum</span><span style="color:var(--accent);font-size:20px">•••</span></div>
+ <div style="padding:0 16px 10px"><div class="seg">${[['perform','Play'],['mix','Mix'],['tone','Tone'],['arp','Arpeggio'],['sections','Sections']].map(([i,t],k)=>`<div class="${k===on?'on':''}"><svg><use href="#u-${i}"/></svg>${t}</div>`).join('')}</div></div>`;
+function phone(cap,desc,body){return `<div><div class="cap">${cap}</div><div class="capd">${desc}</div><div class="phone">${status}${body}</div></div>`}
+const S=[];
+
+// 1 SONGS
+S.push(phone('1 · Songs','“Continue” hero with the song’s own map as cover (★ = hook). Import and Listen as clear icon actions. Rows show map thumbnails + readiness.',`
+<div class="nav"><span class="chip warn"><svg class="ico" style="width:13px;height:13px"><use href="#u-casio"/></svg>Casio not connected</span><span></span></div>
+<div class="content">
+ <div class="large">Songs</div>
+ <div class="surface" style="margin-top:12px;padding:14px;background:linear-gradient(160deg,#1d1d22,#141417)">
+  <div class="meta" style="font-weight:600;letter-spacing:.4px;margin-bottom:10px">CONTINUE</div>
+  <div class="row" style="align-items:stretch">${cover('hukum',96)}
+   <div style="flex:1;display:flex;flex-direction:column;justify-content:space-between">
+    <div><div style="font:700 20px Inter">Hukum</div><div class="meta">Jailer · Tamil · E minor</div></div>
+    <div class="row" style="gap:6px"><div class="row" style="gap:0">${tile('violin','f-str',28,'box-shadow:0 0 0 2px #17171a')}${tile('pad','f-wind',28,'margin-left:-6px;box-shadow:0 0 0 2px #17171a')}</div><span class="meta">Arabic Strings + Slow Strings</span></div>
+   </div>
+   <div class="pbtn" style="align-self:center;width:52px;height:52px"><svg style="width:24px;height:24px"><use href="#u-tri" style="color:#121212"/></svg></div>
+  </div>
+ </div>
+ <div class="row" style="gap:10px;margin-top:12px">
+  <div class="btnp"><svg class="ico"><use href="#u-import"/></svg>Import song</div>
+  <div class="btns" style="flex:.75"><svg class="ico"><use href="#u-ear"/></svg>Listen</div>
+ </div>
+ <div class="row" style="background:var(--elevated);height:38px;border-radius:10px;padding:0 10px;color:var(--t3);gap:8px;margin-top:16px"><svg class="ico" style="width:17px"><use href="#u-search"/></svg>Search songs</div>
+ <div class="sec" style="margin-top:16px">Your songs <a>Sort</a></div>
+ <div class="list">
+  <div class="li">${cover('kaava',48)}<div class="t"><div style="font-weight:600">Kaavaalaa</div><div class="meta">Jailer · Tamil</div></div><span class="chip acc">Separating 42%</span></div>
+  <div class="li">${cover('naatu',48)}<div class="t"><div style="font-weight:600">Naatu Naatu</div><div class="meta">RRR · Telugu</div></div><span class="chip ok"><svg class="ico" style="width:12px;height:12px"><use href="#u-check"/></svg>Ready</span></div>
+  <div class="li">${cover('kesar',48)}<div class="t"><div style="font-weight:600">Kesariya</div><div class="meta">Brahmāstra · Hindi</div></div><span class="chip ok"><svg class="ico" style="width:12px;height:12px"><use href="#u-check"/></svg>Ready</span></div>
+ </div>
+</div>${tabbar(0)}`));
+
+// 2 ANALYSIS
+S.push(phone('2 · Analysing a new song','Instead of a spinner: each step with its icon fills as it finishes, and the result appears right away. Play as soon as the beat is found.',`
+<div class="nav"><span class="l">‹ Songs</span><span>Kaavaalaa</span><span></span></div>
+<div class="content">
+ <div style="text-align:center;margin-top:8px">${cover('kaava',140).replace('class="cover"','class="cover" style="margin:0 auto;width:140px;height:140px;opacity:.95"')}</div>
+ <div style="text-align:center;margin-top:14px"><div style="font:700 22px Inter">Kaavaalaa</div><div class="meta">The song map fills in as TonePilot listens</div></div>
+ <div class="surface" style="margin-top:16px;padding:6px 16px">
+  <div class="step"><div class="stepi done"><svg><use href="#u-metro"/></svg></div><div style="flex:1"><div style="font-weight:600">Beat</div><div class="meta">124 BPM · 4/4</div></div><svg class="ico" style="color:var(--ok)"><use href="#u-check"/></svg></div>
+  <div class="step"><div class="stepi done"><svg><use href="#u-key"/></svg></div><div style="flex:1"><div style="font-weight:600">Key &amp; chords</div><div class="meta">F♯ minor · 38 chords</div></div><svg class="ico" style="color:var(--ok)"><use href="#u-check"/></svg></div>
+  <div class="step"><div class="stepi done"><svg><use href="#u-sections"/></svg></div><div style="flex:1"><div style="font-weight:600">Sections</div><div class="meta">6 sections · hook found ★</div></div><svg class="ico" style="color:var(--ok)"><use href="#u-check"/></svg></div>
+  <div class="step"><div class="stepi doing"><svg><use href="#u-layers"/></svg></div><div style="flex:1"><div style="font-weight:600">Separating parts</div><div class="meta k">42% · about 2 min left</div><div class="slider" style="margin-top:8px;height:5px"><b style="width:42%"></b></div></div></div>
+  <div class="step"><div class="stepi todo"><svg><use href="#u-tone"/></svg></div><div style="flex:1"><div style="font-weight:600;color:var(--t2)">Matching tones</div><div class="meta">Next</div></div></div>
+ </div>
+ <div class="row" style="gap:10px;margin-top:16px"><div class="btnp"><svg class="ico" style="color:#121212"><use href="#u-tri"/></svg>Play now</div></div>
+</div>${tabbar(0)}`));
+
+// 3 PLAY
+S.push(phone('3 · Play — performance view','Level 1: section now (huge) + chord with the Casio keys lit. Level 2: song map timeline and next. Level 3: tone row.',`
+${studioTop(0)}
+<div class="content">
+ <div class="row" style="justify-content:space-between;align-items:flex-end">
+  <div><div class="meta" style="font-weight:600;letter-spacing:.4px">NOW</div><div style="font:800 44px Inter;letter-spacing:-1px;line-height:1.05">BGM <span style="color:var(--accent);font-size:26px;vertical-align:middle">★</span></div></div>
+  <div style="text-align:right"><div class="meta" style="font-weight:600;letter-spacing:.4px">NEXT</div><div style="font:600 18px Inter">Charanam</div><div class="meta k">in 0:12</div></div>
+ </div>
+ <div style="margin-top:12px;position:relative">${map('hukum',358,54,{playhead:.36,current:2})}</div>
+ <div class="row" style="justify-content:space-between;margin-top:6px" ><span class="meta k">1:16</span><span class="meta">Tap the map to jump</span><span class="meta k">3:21</span></div>
+ <div class="surface" style="margin-top:12px;padding:14px">
+  <div class="row" style="justify-content:space-between;align-items:flex-start">
+   <div><div class="meta" style="font-weight:600;letter-spacing:.4px">CHORD</div><div style="font:800 40px Inter;line-height:1.05">Em</div></div>
+   <div class="row" style="gap:16px"><div style="text-align:center"><div class="meta">then</div><div style="font:600 20px Inter">C</div></div><div style="text-align:center;opacity:.6"><div class="meta">&nbsp;</div><div style="font:600 20px Inter">D</div></div><div style="text-align:center;opacity:.4"><div class="meta">&nbsp;</div><div style="font:600 20px Inter">Em</div></div></div>
+  </div>
+  <div style="margin-top:12px">${keys([2,6,9],[13])}</div>
+  <div class="row" style="justify-content:space-between;margin-top:8px"><span class="meta"><span style="color:var(--accent)">■</span> Left hand E · B · E</span><span class="meta"><span style="color:#8fd9cf">■</span> Next melody G</span></div>
+ </div>
+ <div class="surface row" style="margin-top:12px;padding:12px 14px">
+  <div class="row" style="gap:0">${tile('violin','f-str',40,'box-shadow:0 0 0 3px var(--surface)')}${tile('pad','f-wind',40,'margin-left:-10px;box-shadow:0 0 0 3px var(--surface)')}</div>
+  <div style="flex:1;min-width:0"><div class="meta">Tone · from the hook</div><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Arabic Strings + Slow Strings</div></div><span class="chev">›</span>
+ </div>
+</div>${transport}${tabbar(1)}`));
+
+// 4 MIX
+S.push(phone('4 · Mix','Every part is recognisable by its instrument tile, with a live level bar. Mute / Solo labelled. The “closest sound” per part is shown.',`
+${studioTop(1)}
+<div class="content">
+ <div class="sec" style="margin-top:4px">Parts <a>Reset</a></div>
+ <div class="list">
+  ${[['voice','f-voice','Vocals','Muted — you play it',0,'#F07AA8',true],['violin','f-str','Lead instruments','Closest: Arabic Strings',72,'#4FC1B4'],['pad','f-wind','Backing','Pads & chords',55,'#7FD99A'],['drums','f-perc','Drums','',88,'#F0A04B'],['bass','f-bass','Bass','',64,'#A98BF5']].map(([i,f,n,d,lv,c,m])=>`
+  <div class="li">${tile(i,f,44)}<div class="t"><div class="row" style="gap:6px"><span style="font-weight:600">${n}</span></div>${d?`<div class="meta">${d}</div>`:''}<div class="row" style="gap:8px;margin-top:7px"><div class="meter"><b style="width:${lv}%;background:${m?'var(--t3)':c}"></b></div></div></div><div class="ms ${m?'on':''}">${m?'Muted':'Mute'}</div><div class="ms">Solo</div></div>`).join('')}
+ </div>
+ <div class="list" style="margin-top:12px"><div class="li"><div class="sq" style="background:#3a2a12;color:var(--accent)"><svg><use href="#u-split"/></svg></div><div class="t"><div style="font-weight:600">Original plays hard parts</div><div class="meta">In Charanam 2 · Outro</div></div><div class="toggle"></div></div></div>
+ <div class="meta" style="margin:10px 4px 0;display:flex;gap:6px;align-items:center"><svg class="ico" style="width:15px"><use href="#u-info"/></svg>Mute a part to play it yourself.</div>
+</div>${transport}${tabbar(1)}`));
+
+// 5 TONE
+S.push(phone('5 · Tone — suggestion first','Hero: you see the sound (instrument tiles). Why it was chosen as chips. Use / Change / Compare. Layers below with level + audition.',`
+${studioTop(2)}
+<div class="content">
+ <div class="surface" style="padding:16px;border:1px solid rgba(250,158,51,.28);background:linear-gradient(180deg,rgba(250,158,51,.08),rgba(250,158,51,0) 60%),var(--surface)">
+  <div class="row" style="justify-content:space-between"><span class="chip acc"><svg class="ico" style="width:13px;height:13px"><use href="#u-spark"/></svg>Suggested for the hook</span><span class="chip ok"><svg class="ico" style="width:12px;height:12px"><use href="#u-check"/></svg>In use</span></div>
+  <div class="row" style="margin-top:14px;gap:14px">
+   <div style="position:relative;width:96px;height:78px;flex:none">${tile('violin','f-str',66,'position:absolute;left:0;top:0;box-shadow:0 0 0 3px #19171a')}${tile('pad','f-wind',50,'position:absolute;left:46px;top:28px;box-shadow:0 0 0 3px #19171a')}</div>
+   <div><div style="font:700 21px Inter;line-height:1.15">Arabic Strings<br>+ Slow Strings</div><div class="meta" style="margin-top:4px">Warm · expressive · all 61 keys</div></div>
+  </div>
+  <div class="row" style="gap:6px;margin-top:12px;flex-wrap:wrap"><span class="chip">★ BGM heard 3×</span><span class="chip">Both separations agree</span><span class="chip">Attack fitted</span></div>
+  <div class="row" style="gap:8px;margin-top:14px"><div class="btns" style="height:46px"><svg class="ico"><use href="#u-tone"/></svg>Change</div><div class="btns" style="height:46px"><svg class="ico"><use href="#u-ab"/></svg>Compare</div></div>
+ </div>
+ <div class="row" style="margin-top:12px;background:var(--surface);border-radius:12px;padding:3px">
+  <div style="flex:1;height:36px;border-radius:9px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font:600 14px Inter">Whole song</div><div style="flex:1;display:flex;align-items:center;justify-content:center;font:600 14px Inter;color:var(--t2)">Per section</div></div>
+ <div class="sec">Layers <a>Edit</a></div>
+ <div class="list">
+  <div class="li">${tile('violin','f-str',42)}<div class="t"><div style="font-weight:600">Arabic-style Strings</div><div class="row" style="gap:10px;margin-top:9px"><div class="slider"><b style="width:80%"></b><i style="left:calc(80% - 12px)"></i></div><span class="meta k">80%</span></div></div><div class="tb" style="width:38px;height:38px;border-radius:50%;background:var(--am);color:var(--accent)"><svg class="ico" style="width:16px"><use href="#u-tri"/></svg></div></div>
+  <div class="li">${tile('pad','f-wind',42)}<div class="t"><div style="font-weight:600">Slow Strings</div><div class="row" style="gap:10px;margin-top:9px"><div class="slider"><b style="width:55%"></b><i style="left:calc(55% - 12px)"></i></div><span class="meta k">55%</span></div></div><div class="tb" style="width:38px;height:38px;border-radius:50%;background:var(--elevated)"><svg class="ico" style="width:16px"><use href="#u-tri"/></svg></div></div>
+ </div>
+</div>${transport}${tabbar(1)}`));
+
+// 6 SOUND BROWSER
+S.push(phone('6 · Sound browser','Suggested for this section first (with match), then a family grid of illustrated tiles — like a sound library, not a settings list. ▶ to audition on the song’s melody.',`
+<div class="dim"></div><div class="sheet"><div class="grabber"></div>
+<div class="nav"><span class="l">Cancel</span><span>Sounds</span><span style="width:50px"></span></div>
+<div class="content">
+ <div class="row" style="background:var(--elevated);height:38px;border-radius:10px;padding:0 10px;color:var(--t3);gap:8px"><svg class="ico" style="width:17px"><use href="#u-search"/></svg>Search sounds</div>
+ <div class="sec" style="margin-top:14px">For the BGM <span class="meta">closest first</span></div>
+ <div class="row" style="gap:10px;overflow:hidden">
+  ${[['violin','f-str','Arabic Strings','In use',true],['violin','f-str','Expressive Violin','Real'],['flute','f-wind','Bansuri-style','Real']].map(([i,f,n,d,on])=>`<div style="width:108px;flex:none"><div style="position:relative">${tile(i,f,108,on?'box-shadow:0 0 0 2px var(--accent)':'')}<div class="tb" style="position:absolute;right:6px;bottom:6px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff"><svg class="ico" style="width:14px"><use href="#u-tri"/></svg></div></div><div style="font:600 13.5px Inter;margin-top:6px">${n}</div><div class="meta">${d}</div></div>`).join('')}
+ </div>
+ <div class="row" style="gap:8px;margin-top:16px;overflow:hidden">${['All','Strings','Winds','Keys','Indian','Plucked','Synth'].map((c,k)=>`<span class="chip ${k===0?'acc':''}" style="padding:8px 12px;font-size:13px">${c}</span>`).join('')}</div>
+ <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px">
+  ${[['piano','f-key','Steinway Grand','9.2 MB · Get'],['veena','f-pluck','Veena','Built-in'],['tabla','f-perc','Tabla','Built-in'],['flute','f-wind','Real Flute','1.4 MB · Get'],['brass','f-brass','French Horn','1.5 MB · Get'],['synth','f-synth','Film Lead','Built-in']].map(([i,f,n,d])=>`<div>${tile(i,f,108)}<div style="font:600 13px Inter;margin-top:6px">${n}</div><div class="meta" style="${d.includes('Get')?'color:var(--accent)':''}">${d}</div></div>`).join('')}
+ </div>
+</div></div>`));
+
+// 7 TONE EDITOR
+S.push(phone('7 · Tone editor — a layer','The layer as a big tile with its three main controls. Details rows each have an icon and a plain summary. Nothing technical first.',`
+<div class="dim"></div><div class="sheet"><div class="grabber"></div>
+<div class="nav"><span class="l">‹ Main tone</span><span>Layer</span><span style="color:var(--accent);font-weight:600">Done</span></div>
+<div class="content">
+ <div class="row" style="gap:14px">${tile('violin','f-str',84)}<div style="flex:1"><div style="font:700 20px Inter">Arabic-style Strings</div><div class="meta">Real instrument · VSCO</div><div class="row" style="gap:8px;margin-top:10px"><div class="ms" style="color:var(--accent)"><svg class="ico" style="width:14px;margin-right:4px"><use href="#u-tri"/></svg>Audition</div><div class="ms">Swap</div></div></div></div>
+ <div class="surface" style="margin-top:14px">
+  ${[['Level','80%',80],['Brightness','62%',62],['Reverb','30%',30]].map(([n,v,p])=>`<div class="row" style="justify-content:space-between"><span style="font-weight:600">${n}</span><span class="meta k">${v}</span></div><div class="slider" style="margin:14px 0 20px"><b style="width:${p}%"></b><i style="left:calc(${p}% - 12px)"></i></div>`).join('')}
+  <div class="row" style="gap:8px"><div class="ms" style="flex:1">Mute</div><div class="ms" style="flex:1">Solo</div></div>
+ </div>
+ <div class="sec">Details</div>
+ <div class="list">
+  ${[['env','#2d4a7a','Envelope','Slow attack'],['filter','#5a3a7a','Filter & EQ','Fitted to the song'],['vib','#7a4a2a','Vibrato & glide','Arabic style'],['keysr','#2a6a5a','Keys','All 61']].map(([i,c,n,v])=>`<div class="li"><div class="sq" style="background:${c}"><svg><use href="#u-${i}"/></svg></div><div class="t">${n}</div><span class="meta" style="font-size:14px">${v}</span><span class="chev">›</span></div>`).join('')}
+ </div>
+</div></div>`));
+
+// 8 SETTINGS
+S.push(phone('8 · Settings','iOS Settings idiom: coloured icon squares, five short groups, live status on the right. Sound packs live in the Sound browser.',`
+<div class="nav"></div>
+<div class="content">
+ <div class="large" style="margin-top:-8px">Settings</div>
+ <div class="surface row" style="margin-top:12px;padding:12px 14px">${tile('piano','f-key',48)}<div style="flex:1"><div style="font-weight:600">Casio CT-X870IN</div><div class="meta">Not connected · USB + audio cable</div></div><span class="chip acc">Set up</span></div>
+ ${[['KEYBOARD & AUDIO',[['casio','#c27a1a','Keyboard connection','Guide'],['keysr','#3a6ad0','Velocity','Linear'],['info','#5a5a66','Diagnostics','']]],['SOUND',[['layers','#8a4ad0','Sound library','3 packs'],['wave','#d04a7a','Sound engine','TonePilot']]],['SEPARATION',[['split','#2a9a7a','Parts','4 parts'],['ab','#2a7ad0','Check with both models','On']]],['STORAGE & ABOUT',[['disk','#6a6a76','On this iPhone','412 MB'],['info','#6a6a76','Licences & credits','']]]].map(([g,rows])=>`<div class="meta" style="font-weight:600;margin:16px 4px 6px;letter-spacing:.3px">${g}</div><div class="list">${rows.map(([i,c,n,v])=>`<div class="li" style="min-height:48px;padding:8px 14px"><div class="sq" style="background:${c}"><svg><use href="#u-${i}"/></svg></div><div class="t">${n}</div><span class="meta" style="font-size:14px">${v}</span><span class="chev">›</span></div>`).join('')}</div>`).join('')}
+</div>${tabbar(3)}`));
+
+document.getElementById('grid').innerHTML=S.join('');
+</script>
+</body></html>
