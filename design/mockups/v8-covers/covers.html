@@ -1,0 +1,102 @@
+<!doctype html><html><head><meta charset="utf-8"><title>TonePilot song covers — A + B</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#141519;font-family:Inter,system-ui,sans-serif;color:#F5F5F7;padding:30px;-webkit-font-smoothing:antialiased}
+h1{font:700 23px Inter;color:#FFC98A}.sub{color:#9a9aa2;font-size:14px;margin:6px 0 26px;max-width:1500px;line-height:1.4}
+.row{display:flex;gap:26px;align-items:flex-start;margin-bottom:34px}
+.label{width:250px;flex:none}.label b{display:block;font:700 18px Inter;margin-bottom:6px}.label span{font-size:13px;color:#A3A3AB;line-height:1.45}
+.cov{width:200px;flex:none}.cov canvas{width:200px;height:200px;border-radius:18px;display:block;box-shadow:0 14px 30px rgba(0,0,0,.45)}
+.cov .t{font:600 14px Inter;margin-top:10px}.cov .m{font-size:12px;color:#A3A3AB}
+.phone{width:390px;height:844px;border-radius:46px;overflow:hidden;border:1px solid #2c2c31;background:radial-gradient(110% 45% at 100% 0%,rgba(124,92,255,.13),rgba(124,92,255,0) 60%),#101116;flex:none;position:relative}
+.status{height:47px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 34px;font:600 16px Inter}
+.chip{display:inline-flex;align-items:center;gap:5px;font:600 12px Inter;padding:5px 10px;border-radius:99px;background:rgba(255,173,50,.16);color:#FFAD32}
+.ok{background:rgba(61,210,122,.14);color:#3DD27A}
+.btnp{height:50px;border-radius:12px;background:linear-gradient(180deg,#FFBE55,#F59A22);color:#121212;font:600 17px Inter;display:flex;align-items:center;justify-content:center;flex:1;box-shadow:0 6px 18px rgba(255,173,50,.28)}
+.btns{height:50px;border-radius:12px;background:#292C35;font:600 16px Inter;display:flex;align-items:center;justify-content:center;flex:1}
+.li{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid #2A2D36}.li:last-child{border:0}
+.meta{font-size:12.5px;color:#A3A3AB}
+</style></head><body>
+<h1>Song covers — A + B mixed: three options</h1>
+<div class="sub">Order of preference in the app: <b>1) the artwork embedded in your own MP3 / M4A</b> (read on the iPhone, never downloaded) → <b>2) a generated TonePilot cover</b>, made from the song's own analysis — mood sets the colours, sections set the shapes, the title is set in type. Pick a style below; the right column shows it on the Songs screen. Content is illustrative.</div>
+
+<div style="display:flex;gap:40px;align-items:flex-start">
+<div>
+ <div class="row"><div class="label"><b>D1 · Radial Aura</b><span>The waveform wraps around the ring: bars radiate outward from the record, coloured by section; the hook glows amber with ★. Title set large above, language below.</span></div><div id="D1" style="display:flex;gap:18px"></div></div>
+ <div class="row"><div class="label"><b>D2 · Ring over Aura</b><span>The glowing horizontal waveform runs behind a smaller Song Ring (the record). Title top-left. The most layered and musical.</span></div><div id="D2" style="display:flex;gap:18px"></div></div>
+ <div class="row"><div class="label"><b>D3 · Halo</b><span>A soft radial waveform halo with the section ring inside it as a thin record label; title centred under it. The calmest of the three.</span></div><div id="D3" style="display:flex;gap:18px"></div></div>
+</div>
+<div class="phone">
+ <div class="status"><span>9:41</span><span style="font-size:13px">●●●● ◔</span></div>
+ <div style="padding:0 16px">
+  <div style="height:44px;display:flex;align-items:center"><span class="chip">Casio not connected</span></div>
+  <div style="font:700 34px Inter">Songs</div>
+  <div style="margin-top:12px;border-radius:18px;overflow:hidden;position:relative;height:210px" id="hero"></div>
+  <div style="display:flex;gap:10px;margin-top:12px"><div class="btnp">⤓&nbsp; Import song</div><div class="btns" style="flex:.75">Listen</div></div>
+  <div style="font:600 17px Inter;margin:18px 0 10px">Your songs</div>
+  <div style="background:#1C1E25;border-radius:16px" id="rows"></div>
+ </div>
+</div>
+</div>
+
+<script>
+const SONGS=[
+ {t:'Hukum',m:'Jailer · Tamil',lang:'TAMIL',mood:['#3a0d12','#b8321f','#ffb347'],secs:[[.08,.5,2],[.17,.55,1],[.08,.95,2,1],[.18,.7,3],[.14,.6,1],[.08,1,2,1],[.15,.8,1],[.12,.4,4]]},
+ {t:'Kaavaalaa',m:'Jailer · Tamil',lang:'TAMIL',mood:['#2a0b3a','#c2307a','#ff9f5a'],secs:[[.1,.4,4],[.2,.7,1],[.12,.95,2,1],[.2,.6,3],[.14,1,2,1],[.12,.5,4]]},
+ {t:'Naatu Naatu',m:'RRR · Telugu',lang:'TELUGU',mood:['#0b2a2a','#1f9e8a','#ffd34d'],secs:[[.08,.5,2],[.2,.75,1],[.16,1,2,1],[.2,.8,1],[.2,1,2,1],[.1,.6,4]]},
+ {t:'Kesariya',m:'Brahmāstra · Hindi',lang:'HINDI',mood:['#1b1035','#7a4bb8','#ffb38a'],secs:[[.12,.3,4],[.22,.45,1],[.18,.7,2,1],[.22,.5,1],[.18,.8,2,1],[.08,.35,4]]},
+];
+const GC=['','#5FD0C2','#9C8CFF','#FF8DB8','#8A8D99'];
+function bg(x,S,mood){const g=x.createLinearGradient(0,0,S,S);g.addColorStop(0,mood[0]);g.addColorStop(1,'#0c0c12');x.fillStyle=g;x.fillRect(0,0,S,S);
+ const r=x.createRadialGradient(S*.75,S*.2,4,S*.75,S*.2,S*.85);r.addColorStop(0,mood[1]+'cc');r.addColorStop(1,mood[1]+'00');x.fillStyle=r;x.fillRect(0,0,S,S);
+ const r2=x.createRadialGradient(S*.1,S*.95,2,S*.1,S*.95,S*.6);r2.addColorStop(0,mood[2]+'66');r2.addColorStop(1,mood[2]+'00');x.fillStyle=r2;x.fillRect(0,0,S,S)}
+function title(x,S,t,size,y,align='left'){x.fillStyle='#fff';x.font=`800 ${size}px Inter`;x.textAlign=align;x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=8;x.fillText(t,align==='left'?S*.08:S/2,y);x.shadowBlur=0}
+function ring(c,s){const S=c.width,x=c.getContext('2d');bg(x,S,s.mood);const cx=S/2,cy=S*.44,R=S*.3;let a=-Math.PI/2;
+ x.beginPath();x.arc(cx,cy,R+S*.07,0,7);x.fillStyle='rgba(0,0,0,.28)';x.fill();
+ s.secs.forEach(([len,e,g,hook])=>{const a1=a+len*Math.PI*2;x.beginPath();x.arc(cx,cy,R,a+.03,a1-.03);x.lineWidth=S*.03+e*S*.06;x.lineCap='round';x.strokeStyle=hook?'#FFAD32':GC[g];if(hook){x.shadowColor='#FFAD32';x.shadowBlur=S*.08}x.stroke();x.shadowBlur=0;
+  if(hook){const am=(a+a1)/2;x.fillStyle='#fff';x.font=`700 ${S*.07}px Inter`;x.textAlign='center';x.fillText('★',cx+Math.cos(am)*(R+S*.11),cy+Math.sin(am)*(R+S*.11)+S*.025)}a=a1});
+ x.beginPath();x.arc(cx,cy,R*.42,0,7);x.fillStyle='rgba(10,10,14,.85)';x.fill();x.beginPath();x.arc(cx,cy,R*.08,0,7);x.fillStyle='#FFAD32';x.fill();
+ title(x,S,s.t,S*.11,S*.92,'center')}
+function aura(c,s){const S=c.width,x=c.getContext('2d');bg(x,S,s.mood);const mid=S*.6;let pos=0;const tot=s.secs.reduce((a,v)=>a+v[0],0);
+ const N=90;for(let i=0;i<N;i++){const X=S*.06+i*(S*.88/N);let acc=0,sec=s.secs[0];for(const v of s.secs){acc+=v[0]/tot;if(i/N<acc){sec=v;break}}
+  const h=(sec[1]*S*.32)*(.35+.65*Math.abs(Math.sin(i*.33)*Math.cos(i*.08)));const col=sec[3]?'#FFAD32':GC[sec[2]];x.fillStyle=col;x.shadowColor=col;x.shadowBlur=S*.04;x.globalAlpha=.9;
+  x.beginPath();x.roundRect(X,mid-h/2,S*.88/N*.6,h,2);x.fill()}x.globalAlpha=1;x.shadowBlur=0;
+ title(x,S,s.t,S*.12,S*.2);x.fillStyle='rgba(255,255,255,.75)';x.font=`600 ${S*.055}px Inter`;x.textAlign='left';x.fillText(s.lang,S*.08,S*.29)}
+function poster(c,s){const S=c.width,x=c.getContext('2d');bg(x,S,s.mood);
+ x.fillStyle='#fff';x.textAlign='left';const words=s.t.toUpperCase().split(' ');let y=S*.36;const fs=words.length>1?S*.17:S*.2;x.font=`900 ${fs}px Inter`;
+ words.forEach(w=>{let f=fs;x.font=`900 ${f}px Inter`;while(x.measureText(w).width>S*.84&&f>S*.08){f-=2;x.font=`900 ${f}px Inter`}x.fillText(w,S*.08,y);y+=fs*.95});
+ x.fillStyle='rgba(255,255,255,.8)';x.font=`600 ${S*.055}px Inter`;x.fillText(s.lang+'  ·  '+s.m.split(' · ')[0].toUpperCase(),S*.08,S*.82);
+ let X=S*.08;const W=S*.84,tot=s.secs.reduce((a,v)=>a+v[0],0);s.secs.forEach(([len,e,g,hook])=>{const w=len/tot*W;x.fillStyle=hook?'#FFAD32':GC[g];x.beginPath();x.roundRect(X,S*.88,w-3,S*.03,3);x.fill();X+=w})}
+
+function wv(i,sec){return (.35+.65*Math.abs(Math.sin(i*.37)*Math.cos(i*.09)))*sec[1]}
+function secAt(s,f){const tot=s.secs.reduce((a,v)=>a+v[0],0);let acc=0;for(const v of s.secs){acc+=v[0]/tot;if(f<acc)return v}return s.secs[s.secs.length-1]}
+function radial(c,s){const S=c.width,x=c.getContext('2d');bg(x,S,s.mood);const cx=S/2,cy=S*.56,R=S*.2;const N=120;
+ for(let i=0;i<N;i++){const f=i/N,sec=secAt(s,f),a=-Math.PI/2+f*Math.PI*2;const L=S*.04+wv(i,sec)*S*.17;const col=sec[3]?'#FFAD32':GC[sec[2]];
+  x.strokeStyle=col;x.lineWidth=S*.012;x.lineCap='round';x.shadowColor=col;x.shadowBlur=sec[3]?S*.05:S*.02;x.beginPath();x.moveTo(cx+Math.cos(a)*(R+S*.015),cy+Math.sin(a)*(R+S*.015));x.lineTo(cx+Math.cos(a)*(R+L),cy+Math.sin(a)*(R+L));x.stroke()}x.shadowBlur=0;
+ x.beginPath();x.arc(cx,cy,R,0,7);x.fillStyle='rgba(10,10,14,.88)';x.fill();x.beginPath();x.arc(cx,cy,R*.62,0,7);x.strokeStyle='rgba(255,255,255,.08)';x.lineWidth=S*.006;x.stroke();x.beginPath();x.arc(cx,cy,S*.018,0,7);x.fillStyle='#FFAD32';x.fill();
+ let ac=0;const tot=s.secs.reduce((a,v)=>a+v[0],0);s.secs.forEach(v=>{if(v[3]){const am=-Math.PI/2+(ac+v[0]/2)/tot*Math.PI*2;x.fillStyle='#fff';x.font=`700 ${S*.06}px Inter`;x.textAlign='center';x.fillText('★',cx+Math.cos(am)*R*.8,cy+Math.sin(am)*R*.8+S*.02)}ac+=v[0]});
+ if(s.t){title(x,S,s.t,S*.1,S*.15);x.fillStyle='rgba(255,255,255,.7)';x.font=`600 ${S*.045}px Inter`;x.textAlign='left';x.fillText(s.lang,S*.08,S*.22)}}
+function ringAura(c,s){const S=c.width,x=c.getContext('2d');bg(x,S,s.mood);const mid=S*.62;const N=80;
+ for(let i=0;i<N;i++){const X=S*.04+i*(S*.92/N),sec=secAt(s,i/N),h=wv(i,sec)*S*.36,col=sec[3]?'#FFAD32':GC[sec[2]];x.fillStyle=col;x.globalAlpha=.55;x.shadowColor=col;x.shadowBlur=S*.03;x.beginPath();x.roundRect(X,mid-h/2,S*.92/N*.55,h,2);x.fill()}x.globalAlpha=1;x.shadowBlur=0;
+ const cx=S*.72,cy=mid,R=S*.15;x.beginPath();x.arc(cx,cy,R+S*.05,0,7);x.fillStyle='rgba(8,8,12,.75)';x.fill();let a=-Math.PI/2;const tot=s.secs.reduce((q,v)=>q+v[0],0);
+ s.secs.forEach(([len,e,g,hook])=>{const a1=a+len/tot*Math.PI*2;x.beginPath();x.arc(cx,cy,R,a+.04,a1-.04);x.lineWidth=S*.02+e*S*.035;x.lineCap='round';x.strokeStyle=hook?'#FFAD32':GC[g];if(hook){x.shadowColor='#FFAD32';x.shadowBlur=S*.06}x.stroke();x.shadowBlur=0;a=a1});
+ x.beginPath();x.arc(cx,cy,S*.016,0,7);x.fillStyle='#FFAD32';x.fill();
+ if(s.t){title(x,S,s.t,S*.11,S*.18);x.fillStyle='rgba(255,255,255,.7)';x.font=`600 ${S*.05}px Inter`;x.textAlign='left';x.fillText(s.lang,S*.08,S*.26)}}
+function halo(c,s){const S=c.width,x=c.getContext('2d');bg(x,S,s.mood);const cx=S/2,cy=S*.43,R=S*.17;const N=150;
+ for(let i=0;i<N;i++){const f=i/N,sec=secAt(s,f),a=-Math.PI/2+f*Math.PI*2,L=S*.03+wv(i,sec)*S*.13,col=sec[3]?'#FFAD32':GC[sec[2]];x.strokeStyle=col;x.globalAlpha=.75;x.lineWidth=S*.007;x.beginPath();x.moveTo(cx+Math.cos(a)*(R+S*.03),cy+Math.sin(a)*(R+S*.03));x.lineTo(cx+Math.cos(a)*(R+S*.03+L),cy+Math.sin(a)*(R+S*.03+L));x.stroke()}x.globalAlpha=1;
+ let a=-Math.PI/2;const tot=s.secs.reduce((q,v)=>q+v[0],0);x.beginPath();x.arc(cx,cy,R+S*.01,0,7);x.fillStyle='rgba(10,10,14,.9)';x.fill();
+ s.secs.forEach(([len,e,g,hook])=>{const a1=a+len/tot*Math.PI*2;x.beginPath();x.arc(cx,cy,R*.78,a+.05,a1-.05);x.lineWidth=S*.022;x.lineCap='round';x.strokeStyle=hook?'#FFAD32':GC[g];x.stroke();a=a1});
+ x.beginPath();x.arc(cx,cy,S*.016,0,7);x.fillStyle='#FFAD32';x.fill();
+ if(s.t){title(x,S,s.t,S*.1,S*.88,'center')}}
+const styles={D1:radial,D2:ringAura,D3:halo};
+for(const k of ['D1','D2','D3']){const host=document.getElementById(k);SONGS.forEach(s=>{const d=document.createElement('div');d.className='cov';const c=document.createElement('canvas');c.width=400;c.height=400;styles[k](c,s);d.appendChild(c);d.insertAdjacentHTML('beforeend',`<div class="t">${s.t}</div><div class="m">${s.m}</div>`);host.appendChild(d)})}
+// phone: hero uses style A large, rows use A small
+const hero=document.getElementById('hero');const hc=document.createElement('canvas');hc.width=716;hc.height=420;hc.style.cssText='width:358px;height:210px;display:block';
+(function(){const x=hc.getContext('2d'),s=SONGS[0];bg(x,716,s.mood);x.fillStyle='rgba(0,0,0,.25)';x.fillRect(0,0,716,420);
+ const tmp=document.createElement('canvas');tmp.width=400;tmp.height=400;ringAura(tmp,{...s,t:''});x.save();x.beginPath();x.roundRect(28,40,300,300,28);x.clip();x.drawImage(tmp,28,40,300,300);x.restore();
+ x.fillStyle='rgba(255,255,255,.7)';x.font='700 22px Inter';x.fillText('CONTINUE',366,92);x.fillStyle='#fff';x.font='800 54px Inter';x.fillText('Hukum',366,156);x.fillStyle='rgba(255,255,255,.75)';x.font='500 24px Inter';x.fillText('Jailer · Tamil · E minor',366,196);
+ x.fillStyle='#FFAD32';x.beginPath();x.arc(420,290,46,0,7);x.fill();x.fillStyle='#121212';x.beginPath();x.moveTo(408,268);x.lineTo(408,312);x.lineTo(444,290);x.fill();
+ x.fillStyle='rgba(255,255,255,.8)';x.font='500 20px Inter';x.fillText('Arabic Strings + Slow',486,282);x.fillText('Strings',486,308)})();
+hero.appendChild(hc);
+const rows=document.getElementById('rows');[[1,'Separating 42%',''],[2,'✓ Ready','ok'],[3,'✓ Ready','ok']].forEach(([i,st,cl])=>{const s=SONGS[i];const c=document.createElement('canvas');c.width=112;c.height=112;radial(c,{...s,t:''});c.style.cssText='width:56px;height:56px;border-radius:12px;flex:none';
+ const li=document.createElement('div');li.className='li';li.appendChild(c);li.insertAdjacentHTML('beforeend',`<div style="flex:1"><div style="font-weight:600">${s.t}</div><div class="meta">${s.m}</div></div><span class="chip ${cl}">${st}</span>`);rows.appendChild(li)});
+</script></body></html>
