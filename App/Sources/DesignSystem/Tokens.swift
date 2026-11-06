@@ -29,6 +29,14 @@ enum DS {
         /// Section colours (by repetition group): repeats share a colour.
         static let section: [Color] = [0xF0A04B, 0x4FC1B4, 0xA98BF5, 0xF07AA8, 0xE8D25B, 0x7FD99A, 0x7E8CF0, 0x5CC8E8].map { Color(hex: $0) }
 
+        /// Song Map / cover repeat groups (v9): teal, indigo, pink, grey. The current section is `accent`.
+        static let group: [Color] = [0x4FC1B4, 0x8C7CF0, 0xE07AA8, 0x5E5E68].map { Color(hex: $0) }
+        /// Soft amber glow under primary actions (v9).
+        static let accentGlow = Color(hex: 0xFFAD32).opacity(0.30)
+        /// Ambient screen light (v9): faint violet top-right, warm bottom-left.
+        static let ambientViolet = Color(hex: 0x7C5CFF).opacity(0.13)
+        static let ambientWarm = Color(hex: 0xFFAD32).opacity(0.07)
+
         /// Separated parts: a small marker colour each, never a whole tinted card.
         static func part(_ id: String) -> Color {
             switch id {
@@ -52,6 +60,9 @@ enum DS {
             })
         }
     }
+
+    /// Primary-action fill (v9): amber, lighter at the top.
+    static let accentGradient = LinearGradient(colors: [Color(hex: 0xFFBE55), Color(hex: 0xF59A22)], startPoint: .top, endPoint: .bottom)
 
     // MARK: Spacing (4-point grid)
 

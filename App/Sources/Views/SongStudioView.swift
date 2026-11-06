@@ -36,6 +36,15 @@ enum StudioPage: String, CaseIterable, Identifiable {
         case .sections: return "Sections"
         }
     }
+    var symbol: String {
+        switch self {
+        case .play: return "play.fill"
+        case .mix: return "slider.vertical.3"
+        case .keyboard: return "waveform.path"
+        case .arpeggio: return "chart.bar.fill"
+        case .sections: return "rectangle.split.3x1"
+        }
+    }
 }
 
 /// One screen to play a song: timeline, your keyboard, the AI background band, the parts the AI
@@ -61,10 +70,8 @@ struct SongStudioView: View {
         if let song = model.song(songId) {
             VStack(spacing: 0) {
                 // Fixed: which song, and the five pages — never scrolled away, never under the transport.
-                VStack(spacing: DS.Space.s) {
-                    StudioContextBar(song: song)
-                    DSSegmentedControl(items: StudioPage.allCases, selection: $page, title: \.title, identifier: { "page.\($0.rawValue)" })
-                }
+                DSSegmentedControl(items: StudioPage.allCases, selection: $page, title: \.title,
+                                   identifier: { "page.\($0.rawValue)" }, symbol: \.symbol)
                 .padding(.horizontal, DS.Space.screenMargin).padding(.top, DS.Space.xs).padding(.bottom, DS.Space.s)
                 ScrollView {
                     VStack(spacing: DS.Space.m) {
@@ -73,10 +80,9 @@ struct SongStudioView: View {
                             StudioAnalysisStatus(song: song, onListen: { showListen = true })
                             SeparationCard(song: song)
                             PerformanceHeader(song: song)
-                            StudioTimeline(song: song)
-                            if !(song.chordGuide ?? []).isEmpty { LiveGuideHost(song: song, live: model.live) }
-                            DSNavigationRow(symbol: "pianokeys", title: "Tone", value: model.activeArrangement?.name.replacingOccurrences(of: " (My Version)", with: "") ?? "Choose a tone",
-                                            id: "play.tone") { page = .keyboard }
+                            SongMapTimeline(song: song)
+                            if !(song.chordGuide ?? []).isEmpty { ChordKeysCard(song: song) { showMelodyGuide = true } }
+                            ToneRow(song: song) { page = .keyboard }
                         case .mix:
                             SongPartsCard(song: song)
                             AIPartsCard(song: song)
@@ -97,7 +103,7 @@ struct SongStudioView: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0) { TransportBar(song: song, live: model.live) }
             .dsCanvas()
-            .navigationTitle("Song Studio")
+            .navigationTitle(song.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbar(song) }
             .sheet(item: $pickingToneFor) { ref in
@@ -135,7 +141,15 @@ struct SongStudioView: View {
     @ToolbarContentBuilder
     private func toolbar(_ song: Song) -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            Button { model.selectedTab = .library } label: { Label("Library", systemImage: "chevron.left").labelStyle(.titleAndIcon) }
+            Button { model.selectedTab = .library } label: { Label("Songs", systemImage: "chevron.left").labelStyle(.titleAndIcon) }
+        }
+        ToolbarItem(placement: .principal) {
+            HStack(spacing: DS.Space.s) {
+                SongArtwork(title: song.title, size: 26)
+                Text(song.title).font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("studio.context")
         }
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
@@ -168,28 +182,6 @@ struct SongStudioView: View {
 
 // MARK: Header
 
-/// One compact line of musical context, always visible above the pages: which song, its key and tempo.
-/// (The current / next section is on the Play page; the tone is in the Tone row.)
-struct StudioContextBar: View {
-    @EnvironmentObject var model: AppModel
-    let song: Song
-
-    var body: some View {
-        HStack(spacing: DS.Space.m) {
-            SongArtwork(title: song.title, size: DS.Size.artwork)
-            VStack(alignment: .leading, spacing: DS.Space.xxs) {
-                Text(song.title).font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
-                let meta = [song.artist ?? song.film, song.key.map { $0.value.displayName }, song.bpm.map { "\(Int($0.value.rounded())) BPM" }]
-                    .compactMap { $0 }.joined(separator: " · ")
-                if !meta.isEmpty { Text(meta).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1) }
-            }
-            Spacer(minLength: 0)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("studio.context")
-    }
-}
-
 /// The performance view's main readout: the section playing now, large, and the one after it —
 /// legible at arm's length from the keyboard. Redraws with the song position (LiveState) only here.
 struct PerformanceHeader: View {
@@ -210,23 +202,36 @@ private struct PerformanceHeaderContent: View {
         let index = ordered.lastIndex { $0.startTime <= pos + 0.01 }
         let current = index.map { ordered[$0] }
         let next = index.flatMap { $0 + 1 < ordered.count ? ordered[$0 + 1] : nil } ?? (index == nil ? ordered.first : nil)
+        let isHook = current.map { SongMapStyle.hookIds(song).contains($0.id) } ?? false
         let hasAudio = model.audioURL(for: song) != nil
         VStack(alignment: .leading, spacing: DS.Space.xs) {
-            HStack(spacing: DS.Space.s) {
-                RoundedRectangle(cornerRadius: 2).fill(current.map(SectionTimeline.color(for:)) ?? DS.Palette.textTertiary)
-                    .frame(width: 4, height: 28)
-                Text(current?.label ?? (ordered.isEmpty ? "No sections yet" : "Ready"))
-                    .font(DS.Text.display).foregroundStyle(DS.Palette.textPrimary).lineLimit(1).minimumScaleFactor(0.7)
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("NOW").font(DS.Text.metadata.weight(.semibold)).foregroundStyle(DS.Palette.textSecondary)
+                    HStack(alignment: .firstTextBaseline, spacing: DS.Space.s) {
+                        Text(current?.label ?? (ordered.isEmpty ? "No sections yet" : "Ready"))
+                            .font(.system(.largeTitle, design: .default).weight(.heavy)).foregroundStyle(DS.Palette.textPrimary)
+                            .lineLimit(1).minimumScaleFactor(0.6)
+                        Text("★").font(.title2.weight(.bold)).foregroundStyle(DS.Palette.accent).opacity(isHook ? 1 : 0)
+                            .accessibilityHidden(!isHook)
+                    }
+                }
+                Spacer(minLength: DS.Space.s)
+                // Always present (opacity, not `if`), so nothing moves while playing.
+                VStack(alignment: .trailing, spacing: DS.Space.xxs) {
+                    Text("NEXT").font(DS.Text.metadata.weight(.semibold)).foregroundStyle(DS.Palette.textSecondary)
+                    Text(next?.label ?? "—").font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+                    Text(next.map { "in \(max(0, $0.startTime - pos).mmss)" } ?? " ").font(DS.Text.numericSmall).foregroundStyle(DS.Palette.textSecondary)
+                }
+                .opacity(next == nil ? 0.4 : 1)
             }
-            // Fixed line: always present so the layout doesn't move while playing.
-            Text(next.map { "Next: \($0.label) · \(max(0, $0.startTime - pos).mmss)" } ?? " ")
-                .font(DS.Text.bodySecondary.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
             if !hasAudio {
                 Text("No recording on this iPhone — Play starts the song clock.").font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
+        .accessibilityLabel("Now \(current?.label ?? "ready")\(isHook ? ", the hook" : ""). Next \(next?.label ?? "none")")
         .accessibilityIdentifier("play.section")
     }
 }
@@ -353,9 +358,10 @@ struct TransportBar: View {
                 Button { model.studioTogglePlay() } label: {
                     Image(systemName: playing ? "pause.fill" : "play.fill")
                         .font(.system(size: 26, weight: .bold))
-                        .frame(width: 62, height: 62)
-                        .background(Theme.accent, in: Circle())
-                        .foregroundStyle(.black)
+                        .frame(width: DS.Size.transportPlay, height: DS.Size.transportPlay)
+                        .background(DS.accentGradient, in: Circle())
+                        .shadow(color: DS.Palette.accentGlow, radius: 12, y: 5)
+                        .foregroundStyle(DS.Palette.onAccent)
                 }
                 .accessibilityLabel(playing ? "Pause" : (hasAudio ? "Play" : "Start song clock"))
                 .accessibilityIdentifier("transport.play")

@@ -13,8 +13,17 @@ extension View {
             .background(DS.Palette.surface, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
     }
 
-    /// The screen background.
-    func dsCanvas() -> some View { background(DS.Palette.canvas.ignoresSafeArea()) }
+    /// The screen background: Midnight with v9's faint ambient light (violet top-right, warm bottom-left).
+    func dsCanvas() -> some View {
+        background(
+            ZStack {
+                DS.Palette.canvas
+                RadialGradient(colors: [DS.Palette.ambientViolet, .clear], center: .topTrailing, startRadius: 0, endRadius: 420)
+                RadialGradient(colors: [DS.Palette.ambientWarm, .clear], center: .bottomLeading, startRadius: 0, endRadius: 360)
+            }
+            .ignoresSafeArea()
+        )
+    }
 }
 
 /// A section heading with an optional trailing action ("Edit", "See all").
@@ -48,7 +57,9 @@ struct DSPrimaryButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity, minHeight: DS.Size.primaryButton)
             .padding(.horizontal, DS.Space.l)
             .foregroundStyle(enabled ? DS.Palette.onAccent : DS.Palette.textTertiary)
-            .background(enabled ? DS.Palette.accent : DS.Palette.disabled, in: RoundedRectangle(cornerRadius: DS.Radius.m, style: .continuous))
+            .background(enabled ? AnyShapeStyle(DS.accentGradient) : AnyShapeStyle(DS.Palette.disabled),
+                        in: RoundedRectangle(cornerRadius: DS.Radius.m, style: .continuous))
+            .shadow(color: enabled ? DS.Palette.accentGlow : .clear, radius: 9, y: 4)
             .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
@@ -111,6 +122,8 @@ struct DSSegmentedControl<Item: Hashable & Identifiable>: View {
     @Binding var selection: Item
     let title: (Item) -> String
     let identifier: (Item) -> String
+    /// SF Symbol per segment (icon above the label), or nil for text only.
+    var symbol: ((Item) -> String)? = nil
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -121,7 +134,7 @@ struct DSSegmentedControl<Item: Hashable & Identifiable>: View {
             }
         }
         .padding(DS.Space.xxs)
-        .background(DS.Palette.elevated, in: RoundedRectangle(cornerRadius: DS.Radius.m, style: .continuous))
+        .background(DS.Palette.elevated, in: RoundedRectangle(cornerRadius: DS.Radius.m + 2, style: .continuous))
     }
 
     private func segment(_ item: Item, equal: Bool) -> some View {
@@ -129,19 +142,26 @@ struct DSSegmentedControl<Item: Hashable & Identifiable>: View {
         return Button {
             withAnimation(DS.Motion.standard(reduceMotion: reduceMotion)) { selection = item }
         } label: {
-            Text(title(item))
-                .font(DS.Text.label)
-                .lineLimit(1)
-                .fixedSize(horizontal: !equal, vertical: false)
-                .padding(.horizontal, DS.Space.m)
-                .frame(maxWidth: equal ? .infinity : nil, minHeight: DS.Size.segmentedHeight)
-                .foregroundStyle(on ? DS.Palette.onAccent : DS.Palette.textPrimary)
-                .background(on ? DS.Palette.accent : Color.clear, in: RoundedRectangle(cornerRadius: DS.Radius.m - 2, style: .continuous))
-                .contentShape(Rectangle())
+            VStack(spacing: DS.Space.xxs) {
+                if let symbol { Image(systemName: symbol(item)).font(DS.Text.label).imageScale(.medium) }
+                Text(title(item)).font(symbol == nil ? DS.Text.label : DS.Text.metadata.weight(.semibold)).lineLimit(1)
+            }
+            .fixedSize(horizontal: !equal, vertical: false)
+            .padding(.horizontal, DS.Space.s)
+            .frame(maxWidth: equal ? .infinity : nil, minHeight: symbol == nil ? DS.Size.segmentedHeight : 50)
+            .foregroundStyle(on ? DS.Palette.onAccent : DS.Palette.textSecondary)
+            .background {
+                if on {
+                    RoundedRectangle(cornerRadius: DS.Radius.m - 1, style: .continuous).fill(DS.accentGradient)
+                        .shadow(color: DS.Palette.accentGlow, radius: 6, y: 3)
+                }
+            }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .frame(minHeight: DS.Size.touchTarget)
         .accessibilityIdentifier(identifier(item))
+        .accessibilityLabel(title(item))
         .accessibilityAddTraits(on ? [.isSelected, .isButton] : .isButton)
     }
 }

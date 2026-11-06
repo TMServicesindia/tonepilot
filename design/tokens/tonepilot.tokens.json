@@ -105,6 +105,80 @@
     "highContrast": {
       "textSecondary": "#C9C9D0",
       "border": "#4A4A52"
+    },
+    "group": {
+      "values": [
+        "#4FC1B4",
+        "#8C7CF0",
+        "#E07AA8",
+        "#5E5E68"
+      ],
+      "role": "Song Map / cover repeat groups; current section = accent"
+    },
+    "accentGradient": {
+      "top": "#FFBE55",
+      "bottom": "#F59A22",
+      "role": "Primary-action fill"
+    },
+    "accentGlow": {
+      "value": "#FFAD32",
+      "opacity": 0.3,
+      "role": "Soft glow under primary actions"
+    },
+    "ambient": {
+      "violet": "#7C5CFF",
+      "violetOpacity": 0.13,
+      "warm": "#FFAD32",
+      "warmOpacity": 0.07,
+      "role": "Faint screen light: violet top-right, warm bottom-left"
+    },
+    "family": {
+      "strings": [
+        "#6A3C1C",
+        "#241309",
+        "#FFB866"
+      ],
+      "winds": [
+        "#1C5A54",
+        "#0C1F1D",
+        "#6FE0D2"
+      ],
+      "keys": [
+        "#34397A",
+        "#121330",
+        "#A9B2FF"
+      ],
+      "plucked": [
+        "#68244A",
+        "#220B18",
+        "#FF9CC8"
+      ],
+      "percussion": [
+        "#6A4416",
+        "#231606",
+        "#FFD27A"
+      ],
+      "voice": [
+        "#642656",
+        "#210B1C",
+        "#FF9BD9"
+      ],
+      "bass": [
+        "#43317A",
+        "#16102C",
+        "#C7B1FF"
+      ],
+      "synth": [
+        "#1F466A",
+        "#0A1724",
+        "#7FD0FF"
+      ],
+      "brass": [
+        "#62521A",
+        "#221C08",
+        "#FFE36E"
+      ],
+      "role": "Instrument tile radial gradient [light, dark, ink]"
     }
   },
   "space": {

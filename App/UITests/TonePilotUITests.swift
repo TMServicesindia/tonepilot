@@ -55,6 +55,8 @@ final class TonePilotUITests: XCTestCase {
                 // Performance view: current / next section while playing, and the tone row into the Tone page.
                 page("play")
                 XCTAssertTrue(element("play.section").waitForExistence(timeout: 3), "Play page shows the current section")
+                XCTAssertTrue(element("play.map").exists, "Play page shows the song map")
+                XCTAssertTrue(element("play.chord").exists, "Play page shows the chord card with the keys guide")
                 if round == 1 { tap(element("play.tone"), thenExpect: element("tonemode.main"), limit: 3, "tone row opens the Tone page") }
                 page("mix")
                 if round == 1 {
