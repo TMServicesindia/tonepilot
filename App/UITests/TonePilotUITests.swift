@@ -196,6 +196,17 @@ final class TonePilotUITests: XCTestCase {
                     tap(preview, "stop arpeggio preview")
                 }
                 page("sections")
+                if round == 1 {
+                    // Sections (spec §2.12): tap a row to jump; its ⋯ menu opens and closes.
+                    let row = element("sections.row.1")
+                    if row.waitForExistence(timeout: 3) { tap(row, "jump to a section") }
+                    let more = element("sections.more.1")
+                    if more.waitForExistence(timeout: 3) {
+                        tap(more, thenExpect: app.buttons["Loop this section"].firstMatch, "section options")
+                        app.buttons["Loop this section"].firstMatch.tap()
+                        assertAlive("loop a section from its menu")
+                    }
+                }
                 app.swipeUp(); app.swipeDown()
                 assertAlive("scroll Song Studio")
                 tap(element("transport.play"), "pause (round \(round))")

@@ -876,21 +876,29 @@ struct StudioSectionsCard: View {
     let onEditTiming: (SongSection) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label("Sections & tones", systemImage: "list.bullet.rectangle").font(.headline)
+        // Spec §2.12: the Song Map full width, then one row per section (colour = repeat group, ★ hook).
+        let colors = SongMapStyle.groupColors(song)
+        let hooks = SongMapStyle.hookIds(song)
+        VStack(alignment: .leading, spacing: DS.Space.m) {
             if song.sections.isEmpty {
-                Text(song.analysisStatus == .running ? "Sections appear when the analysis finishes." : "No sections yet.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                DSEmptyState(symbol: "rectangle.split.3x1", title: "No sections yet",
+                             message: song.analysisStatus == .running ? "Sections appear when the analysis finishes." : "Analyse the song to find its sections.")
             } else {
-                Text("Each section has its own tone. Tap a section to jump there.").font(.caption).foregroundStyle(.secondary)
-            }
-            ForEach(song.orderedSections) { section in
-                StudioSectionRow(song: song, section: section, onChangeSound: onChangeSound, onEditSound: onEditSound,
-                                 onGuide: onGuide, onEditTiming: onEditTiming)
+                SongMapTimeline(song: song)
+                Text("Tap a section to jump there.").font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
+                VStack(spacing: 0) {
+                    ForEach(Array(song.orderedSections.enumerated()), id: \.element.id) { n, section in
+                        StudioSectionRow(song: song, section: section, index: n,
+                                         color: hooks.contains(section.id) ? DS.Palette.accent : (colors[section.id] ?? DS.Palette.group[0]),
+                                         isHook: hooks.contains(section.id),
+                                         onChangeSound: onChangeSound, onEditSound: onEditSound,
+                                         onGuide: onGuide, onEditTiming: onEditTiming)
+                        if n < song.sections.count - 1 { Divider().overlay(DS.Palette.divider).padding(.leading, DS.Space.l) }
+                    }
+                }
+                .dsSurface(padding: DS.Space.s)
             }
         }
-        .padding(14)
-        .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
     }
 }
 
@@ -898,6 +906,9 @@ struct StudioSectionRow: View {
     @EnvironmentObject var model: AppModel
     let song: Song
     let section: SongSection
+    var index = 0
+    var color: Color = DS.Palette.group[0]
+    var isHook = false
     let onChangeSound: (UUID) -> Void
     let onEditSound: (UUID) -> Void
     let onGuide: (UUID) -> Void
@@ -908,27 +919,47 @@ struct StudioSectionRow: View {
         let isCurrent = model.activeSectionId == section.id
         let acc = song.accompaniment ?? AccompanimentSettings()
         let aiPlays = SongStudio.aiPartsOn(acc) && (acc.guideSections?.contains(section.id) ?? true)
-        HStack(spacing: 10) {
-            RoundedRectangle(cornerRadius: 3).fill(SectionTimeline.color(for: section)).frame(width: 6)
+        let drawing = ToneRow.drawings(tone, library: model.library).first ?? .synth
+        HStack(spacing: DS.Space.m) {
+            RoundedRectangle(cornerRadius: DS.Space.xxs).fill(color).frame(width: DS.Space.xs)
+                .padding(.vertical, DS.Space.xs)
             Button { model.studioJump(to: section.id) } label: {
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 6) {
-                        Text(section.label).font(.subheadline.weight(.semibold))
-                        if section.isClimax == true { Text("CLIMAX").font(.caption2.bold()).foregroundStyle(Theme.accent) }
-                        if aiPlays { Image(systemName: "wand.and.stars").font(.caption2).foregroundStyle(Theme.accent).accessibilityLabel("AI plays the melody here") }
+                HStack(spacing: DS.Space.m) {
+                    VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                        HStack(spacing: DS.Space.xs) {
+                            Text(section.label).font(DS.Text.body.weight(.semibold))
+                                .foregroundStyle(isCurrent ? DS.Palette.accent : DS.Palette.textPrimary).lineLimit(1)
+                            if isHook { Image(systemName: "star.fill").font(DS.Text.metadata).foregroundStyle(DS.Palette.accent).accessibilityLabel("Hook") }
+                            if aiPlays { Image(systemName: "wand.and.stars").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).accessibilityLabel("TonePilot plays the melody here") }
+                        }
+                        Text("\(section.startTime.mmss) – \(section.endTime.mmss)")
+                            .font(DS.Text.metadata.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
                     }
-                    Text("\(section.startTime.mmss) – \(section.endTime.mmss) · \(tone?.name.replacingOccurrences(of: " (My Version)", with: "") ?? "No tone")")
-                        .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    Spacer(minLength: DS.Space.s)
+                    HStack(spacing: DS.Space.s) {
+                        InstrumentTile(drawing: drawing, size: DS.Space.xxl)
+                        Text(tone?.name.replacingOccurrences(of: " (My Version)", with: "") ?? "No tone")
+                            .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary).lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, minHeight: DS.Size.touchTarget, alignment: .leading)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .accessibilityHint("Jumps to this section")
+            .accessibilityIdentifier("sections.row.\(index)")
             Menu {
                 Button { model.studioJump(to: section.id) } label: { Label("Play from here", systemImage: "play") }
-                Button { onChangeSound(section.id) } label: { Label("Change sound…", systemImage: "music.note.list") }
-                Button { onEditSound(section.id) } label: { Label("Edit sound…", systemImage: "slider.horizontal.3") }
+                Button {
+                    model.studioJump(to: section.id)
+                    if model.loopSectionId != nil { model.studioToggleLoop() }   // clear any other loop first
+                    model.studioToggleLoop()
+                } label: {
+                    Label("Loop this section", systemImage: "repeat")
+                }
+                Button { onChangeSound(section.id) } label: { Label("Change tone", systemImage: "music.note.list") }
+                Button { onEditSound(section.id) } label: { Label("Edit tone", systemImage: "slider.horizontal.3") }
                 if song.sections.filter({ $0.arrangementId == tone?.id }).count > 1 {
                     Button {
                         _ = model.detachTone(songId: song.id, sectionId: section.id)
@@ -936,18 +967,21 @@ struct StudioSectionRow: View {
                     } label: { Label("Edit just this section", systemImage: "square.on.square.dashed") }
                 }
                 if song.aiOriginal(for: section) != nil, tone?.origin == .myVersion {
-                    Button { model.restoreAIOriginal(songId: song.id, sectionId: section.id) } label: { Label("Restore AI Original", systemImage: "arrow.uturn.backward") }
+                    Button { model.restoreAIOriginal(songId: song.id, sectionId: section.id) } label: { Label("Back to TonePilot's tone", systemImage: "arrow.uturn.backward") }
                 }
                 Divider()
-                Button { onGuide(section.id) } label: { Label("Section guide & practice", systemImage: "music.note.list") }
-                Button { onEditTiming(section) } label: { Label("Fix timing & name", systemImage: "timeline.selection") }
+                Button { onGuide(section.id) } label: { Label("Section guide and practice", systemImage: "music.note.list") }
+                Button { onEditTiming(section) } label: { Label("Edit timing and name", systemImage: "timeline.selection") }
             } label: {
-                Image(systemName: "ellipsis.circle").font(.title3).frame(width: 44, height: 44).contentShape(Rectangle())
+                Image(systemName: "ellipsis.circle").font(DS.Text.screenTitle.weight(.regular))
+                    .foregroundStyle(DS.Palette.textSecondary)
+                    .frame(width: DS.Size.touchTarget, height: DS.Size.touchTarget).contentShape(Rectangle())
             }
             .accessibilityLabel("\(section.label) options")
+            .accessibilityIdentifier("sections.more.\(index)")
         }
-        .padding(.vertical, 6).padding(.trailing, 2)
-        .background(isCurrent ? Theme.panelRaised : Color.clear, in: RoundedRectangle(cornerRadius: 10))
+        .padding(.vertical, DS.Space.xs).padding(.horizontal, DS.Space.xs)
+        .background(isCurrent ? DS.Palette.accentMuted : Color.clear, in: RoundedRectangle(cornerRadius: DS.Radius.m, style: .continuous))
     }
 }
 
