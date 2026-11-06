@@ -12,8 +12,10 @@ enum UITestSeed {
 
     static func prepareDefaults() {
         guard enabled else { return }
-        UserDefaults.standard.set(true, forKey: "hasCompletedSetup")
-        UserDefaults.standard.set(true, forKey: "studioIntroDismissed")
+        // Screen tour (`-TPFirstRun`): show the first-run screens as a new user sees them.
+        let firstRun = ProcessInfo.processInfo.arguments.contains("-TPFirstRun")
+        UserDefaults.standard.set(!firstRun, forKey: "hasCompletedSetup")
+        UserDefaults.standard.set(!firstRun, forKey: "studioIntroDismissed")
         UserDefaults.standard.set(false, forKey: "autoSeparate")
         // The simulator has no keyboard attached: record immediately.
         UserDefaults.standard.set(false, forKey: "recordWaitForKey")

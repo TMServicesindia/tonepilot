@@ -1,0 +1,57 @@
+name: UI screens (design review)
+# Builds the app for the simulator, runs the screen tour (App/UITests/ScreenTourUITests.swift) and
+# publishes every screenshot to the branch ci/screens-<label> for design reviews (before / after).
+on:
+  workflow_dispatch:
+    inputs:
+      label: { description: "Screenshot set name, e.g. before or after-1", required: true, default: before }
+      runner: { description: "macOS runner", required: false, default: macos-14 }
+permissions:
+  contents: write
+jobs:
+  screens:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+      - name: Project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+      - name: Screen tour
+        run: |
+          DEV=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)['devices']
+          phones = [x for k, v in d.items() if 'iOS' in k for x in v if x['name'].startswith('iPhone')]
+          pick = [x for x in phones if x['name'] in ('iPhone 16', 'iPhone 15')] or phones
+          print(pick[0]['udid'])")
+          xcodebuild test -project TonePilot.xcodeproj -scheme TonePilot -destination "id=$DEV" -derivedDataPath build-sim \
+            -only-testing:TonePilotUITests/ScreenTourUITests -resultBundlePath Screens.xcresult > tour.log 2>&1 || true
+          grep -E "Test Case .*(passed|failed)|error:" tour.log | head -30
+          mkdir -p shots
+          xcrun xcresulttool export attachments --path Screens.xcresult --output-path shots
+          python3 - <<'PY'
+          import json, os, re, shutil
+          m = json.load(open("shots/manifest.json"))
+          os.makedirs("out", exist_ok=True)
+          for test in m:
+              for a in test.get("attachments", []):
+                  name = re.sub(r"[^A-Za-z0-9 ._-]", "", a.get("suggestedHumanReadableName", a["exportedFileName"])).strip()
+                  name = re.sub(r"_\d+_[0-9A-F-]{36}", "", name)
+                  shutil.copy(os.path.join("shots", a["exportedFileName"]), os.path.join("out", name if name.endswith(".png") else name + ".png"))
+          print(len(os.listdir("out")), "screenshots")
+          PY
+      - name: Publish screenshots
+        run: |
+          B="ci/screens-${{ inputs.label }}"
+          cp tour.log out/
+          cd out && git init -q && git checkout -q -b "$B"
+          git config user.name github-actions; git config user.email github-actions@users.noreply.github.com
+          git add . && git commit -qm "Screens ${{ inputs.label }}: run ${GITHUB_RUN_ID} (${GITHUB_SHA::7})"
+          git push -fq "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" "$B"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: screens, path: "out/\nScreens.xcresult\ntour.log", if-no-files-found: ignore }
