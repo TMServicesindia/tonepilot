@@ -85,19 +85,15 @@ private struct MeterBar: View {
 struct ConnectionStatus: View {
     @EnvironmentObject var model: AppModel
     @ObservedObject var midi: MIDIInputManager
-
     var body: some View {
         let casio = midi.sources.first { $0.looksLikeCasio }
         let name = casio?.name ?? midi.sources.first?.name
-        HStack(spacing: 6) {
-            Circle().fill(name == nil ? Theme.bad : Theme.good).frame(width: 8, height: 8)
-            Text(name ?? "No keyboard").font(.caption).lineLimit(1)
-            if let last = midi.lastEventAt, Date().timeIntervalSince(last) < 0.5 {
-                Image(systemName: "waveform").font(.caption2).foregroundStyle(Theme.accent)
-            }
-        }
-        .padding(.horizontal, 10).padding(.vertical, 5)
-        .background(Theme.panelRaised, in: Capsule())
+        let active = midi.lastEventAt.map { Date().timeIntervalSince($0) < 0.5 } ?? false
+        // Not connected is a next step (amber), not an error; connected is quiet and confirmed.
+        DSChip(text: name ?? "Casio not connected",
+               symbol: name == nil ? "pianokeys" : (active ? "waveform" : "checkmark.circle.fill"),
+               tone: name == nil ? .accent : .success)
+            .accessibilityIdentifier("connection.status")
     }
 }
 

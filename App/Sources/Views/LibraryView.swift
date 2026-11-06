@@ -108,11 +108,11 @@ struct LibraryView: View {
             ToolbarItem(placement: .topBarLeading) { ConnectionStatus(midi: model.midi) }
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    Button { showListen = true } label: { Label("Listen to a song (streaming app)", systemImage: "ear") }
-                    Button { pickMP3 = true } label: { Label("Import MP3 / audio file", systemImage: "square.and.arrow.down") }
+                    // Import and Listen are the visible buttons above the list; only the extras live here.
                     Button { showImport = true } label: { Label("Save a YouTube link", systemImage: "link") }
                     Button { showNewPlaylist = true } label: { Label("New playlist", systemImage: "text.badge.plus") }
-                } label: { Image(systemName: "plus.circle.fill").font(.title3).accessibilityLabel("Add") }
+                } label: { Image(systemName: "ellipsis.circle").accessibilityLabel("More") }
+                .accessibilityIdentifier("songs.more")
             }
         }
         .sheet(isPresented: $showImport) { ImportSongView().environmentObject(model) }
