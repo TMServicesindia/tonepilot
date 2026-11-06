@@ -804,17 +804,28 @@ struct AIPartsCard: View {
         let sources = tracks.filter { [SongStudio.stem(.lead), SongStudio.stem(.other), SongStudio.stem(.vocals)].contains($0.id) }
         let current = acc.aiPartTrack.flatMap { id in sources.first { $0.id == id } } ?? sources.first
         let on = acc.aiPartTrack != nil && acc.aiPartsEnabled == true && current != nil
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Original plays the difficult parts", systemImage: "wand.and.stars").font(.headline)
+        VStack(alignment: .leading, spacing: DS.Space.m) {
             if sources.isEmpty {
-                Text("Available after the song is separated into parts.").font(.footnote).foregroundStyle(.secondary)
+                Label("Original plays hard parts", systemImage: "wand.and.stars").font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary)
+                Text("Available after the song is split into parts.").font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
             } else {
-                Text("Can't play a passage yet? The recording's own part plays in the sections you pick. Everywhere else, it's you.")
-                    .font(.caption).foregroundStyle(.secondary)
-                Toggle("Fill in difficult parts", isOn: Binding(get: { on }, set: { v in
+                // Spec: one toggle row, short copy; the details only when it's on.
+                Toggle(isOn: Binding(get: { on }, set: { v in
                     if v, acc.aiPartTrack == nil, let first = current { model.setAIPartSource(first.id, songId: song.id) }
                     model.setAIParts(v, songId: song.id)
-                }))
+                })) {
+                    HStack(spacing: DS.Space.m) {
+                        Image(systemName: "wand.and.stars").foregroundStyle(on ? DS.Palette.accent : DS.Palette.textSecondary)
+                            .frame(width: DS.Size.touchTarget - DS.Space.s, height: DS.Size.touchTarget - DS.Space.s)
+                            .background(on ? DS.Palette.accentMuted : DS.Palette.elevated, in: RoundedRectangle(cornerRadius: DS.Radius.s, style: .continuous))
+                        VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                            Text("Original plays hard parts").font(DS.Text.body.weight(.semibold)).foregroundStyle(DS.Palette.textPrimary)
+                            Text("In the sections you pick. Everywhere else, it's you.").font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
+                        }
+                    }
+                }
+                .tint(DS.Palette.accent)
+                .accessibilityIdentifier("aiparts.toggle")
                 if on, let current {
                     Picker("Played by", selection: Binding(get: { current.id }, set: { model.setAIPartSource($0, songId: song.id) })) {
                         ForEach(sources) { t in
@@ -822,20 +833,19 @@ struct AIPartsCard: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    Text("Plays in").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                    Text("Plays in").font(DS.Text.caption.weight(.semibold)).foregroundStyle(DS.Palette.textSecondary)
                     FlowSections(song: song, selected: acc.guideSections) { model.toggleAIPart($0, songId: song.id) }
                     HStack {
                         Button("Suggested") { model.setAIPartSections(SongStudio.suggestedAIParts(song, source: acc.aiPartTrack), songId: song.id) }
                         Button("Whole song") { model.setAIPartSections(nil, songId: song.id) }
                         Spacer()
                     }
-                    .font(.footnote).buttonStyle(.bordered)
+                    .font(DS.Text.caption).buttonStyle(.bordered).tint(DS.Palette.accent)
                     TrackRow(track: { var t = current; t.enabled = true; return t }(), songId: song.id, showHeader: false)
                 }
             }
         }
-        .padding(14)
-        .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
+        .dsSurface()
     }
 }
 
