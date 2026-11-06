@@ -25,7 +25,7 @@ permissions:
 jobs:
   build:
     runs-on: ${{ inputs.runner || 'macos-15' }}
-    timeout-minutes: 45
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
 
@@ -195,8 +195,9 @@ jobs:
           print(pick[0]['udid'])")
           echo "Simulator: $DEV"
           code=0
+          # The screen tour (design screenshots) runs in ui-screens.yml, not in the gate.
           xcodebuild test -project TonePilot.xcodeproj -scheme TonePilot -destination "id=$DEV" -derivedDataPath build-sim \
-            -resultBundlePath UITests.xcresult > uitest.log 2>&1 || code=$?
+            -skip-testing:TonePilotUITests/ScreenTourUITests -resultBundlePath UITests.xcresult > uitest.log 2>&1 || code=$?
           grep -E "Test Case .*(passed|failed)|error:|crashed|measured \[" uitest.log | sed -E 's/^.*Test Case .-\[TonePilotUITests\.//' | head -60
           grep -E "measured \[" uitest.log | sed -E "s/.*measured \[([^]]+)\] average: ([0-9.]+).*/\1: \2/" | sort -u | while IFS= read -r l; do echo "::notice title=App speed::$l"; done
           grep -E "error:|crashed" uitest.log | sort -u | head -15 | while IFS= read -r l; do echo "::error title=Speed & crash tests::$l"; done
