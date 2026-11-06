@@ -76,10 +76,11 @@ struct GeneratedCover: View {
             let f = Double(i) / Double(n)
             let sec = m.section(at: f)
             let ang = -Double.pi / 2 + f * 2 * .pi
+            let ca = CGFloat(Foundation.cos(ang)), sa = CGFloat(Foundation.sin(ang))
             let L = S * 0.04 + CGFloat(m.wave(i, sec.energy)) * S * 0.16
             var p = Path()
-            p.move(to: CGPoint(x: c.x + cos(ang) * (R + S * 0.04), y: c.y + sin(ang) * (R + S * 0.04)))
-            p.addLine(to: CGPoint(x: c.x + cos(ang) * (R + S * 0.04 + L), y: c.y + sin(ang) * (R + S * 0.04 + L)))
+            p.move(to: CGPoint(x: c.x + ca * (R + S * 0.04), y: c.y + sa * (R + S * 0.04)))
+            p.addLine(to: CGPoint(x: c.x + ca * (R + S * 0.04 + L), y: c.y + sa * (R + S * 0.04 + L)))
             ctx.stroke(p, with: .color(sec.color.opacity(0.8)), lineWidth: max(1, S * 0.012))
         }
         ctx.fill(Path(ellipseIn: CGRect(x: c.x - R - S * 0.01, y: c.y - R - S * 0.01, width: 2 * (R + S * 0.01), height: 2 * (R + S * 0.01))), with: .color(Color(hex: 0x0A0A0E).opacity(0.9)))
@@ -145,6 +146,6 @@ private struct CoverModel {
     /// A stable, waveform-like height per bar (0...1), scaled by the section's energy.
     func wave(_ i: Int, _ energy: Double) -> Double {
         let x = Double(i + seed % 17)
-        return (0.35 + 0.65 * abs(sin(x * 0.37) * cos(x * 0.09))) * max(0.25, energy)
+        return (0.35 + 0.65 * abs(Foundation.sin(x * 0.37) * Foundation.cos(x * 0.09))) * max(0.25, energy)
     }
 }
