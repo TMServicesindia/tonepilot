@@ -53,24 +53,14 @@ struct LibraryView: View {
             }
 
             if query.isEmpty, filterPlaylist == nil {
-                Section { addSongCard }
-                    .listRowInsets(EdgeInsets()).listRowBackground(Color.clear)
                 if let id = model.activeSongId, let song = model.song(id) {
-                    Section("Continue") {
-                        Button { model.openStudio(id) } label: {
-                            HStack(spacing: 12) {
-                                SongArtwork(title: song.title, size: 52)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(song.title).font(.headline).lineLimit(1)
-                                    Text("Back to Song Studio").font(.caption).foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                Image(systemName: "play.circle.fill").font(.title).foregroundStyle(Theme.accent)
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .foregroundStyle(.primary)
-                    }
+                    Section { ContinueCard(song: song) }
+                        .listRowInsets(EdgeInsets()).listRowBackground(Color.clear)
+                }
+                Section { addSongActions }
+                    .listRowInsets(EdgeInsets(top: DS.Space.xs, leading: 0, bottom: DS.Space.xs, trailing: 0)).listRowBackground(Color.clear)
+                if model.library.songs.isEmpty {
+                    Section { emptyLibrary }.listRowBackground(Color.clear)
                 }
             }
             Section(songs.isEmpty ? "" : "Your songs") {
@@ -81,7 +71,9 @@ struct LibraryView: View {
                     Button { model.openStudio(song.id) } label: {
                         SongRow(song: song, status: status(song)).contentShape(Rectangle())
                     }
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(DS.Palette.textPrimary)
+                    .listRowBackground(DS.Palette.surface)
+                    .accessibilityIdentifier("songs.row.\(song.title)")
                     .accessibilityHint("Opens the song in Song Studio")
                         .swipeActions {
                             Button(role: .destructive) { model.deleteSong(song.id) } label: { Label("Delete", systemImage: "trash") }
@@ -105,11 +97,13 @@ struct LibraryView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .dsCanvas()
         .navigationTitle("Songs")
         .fileImporter(isPresented: $pickMP3, allowedContentTypes: [.mp3, .mpeg4Audio, .wav, .aiff, .audio]) { result in
             if case .success(let url) = result, let id = model.importAndAnalyze(from: url) { model.openStudio(id) }
         }
-        .searchable(text: $query, prompt: "Title, film, composer, language, tag")
+        .searchable(text: $query, prompt: "Search songs")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) { ConnectionStatus(midi: model.midi) }
             ToolbarItem(placement: .topBarTrailing) {
@@ -134,49 +128,50 @@ struct LibraryView: View {
         }
     }
 
-    /// The big "add a song" entry point (the main thing to do in an empty library).
-    private var addSongCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if model.library.songs.isEmpty {
-                Text("Play along with any song").font(.title2.weight(.bold))
-                Text("Add a song you own. TonePilot finds the tempo, key, chords and sections, separates the vocals, drums, bass and music, and sets up a tone for every section.")
-                    .font(.subheadline).foregroundStyle(.secondary)
-            }
-            HStack(spacing: 10) {
-                Button { pickMP3 = true } label: {
-                    Label("Import song", systemImage: "square.and.arrow.down")
-                        .labelStyle(.titleAndIcon)
-                        .font(.headline).frame(maxWidth: .infinity, minHeight: 50)
-                }
-                .buttonStyle(.borderedProminent)
+    /// Import (primary) and Listen: the two ways to add a song.
+    private var addSongActions: some View {
+        HStack(spacing: DS.Space.s) {
+            Button { pickMP3 = true } label: { Label("Import song", systemImage: "square.and.arrow.down") }
+                .buttonStyle(.dsPrimary)
                 .accessibilityIdentifier("songs.import")
-                Button { showListen = true } label: {
-                    Label("Listen", systemImage: "ear")
-                        .labelStyle(.titleAndIcon)
-                        .font(.headline).frame(maxWidth: .infinity, minHeight: 50)
-                }
-                .buttonStyle(.bordered)
-            }
+            Button { showListen = true } label: { Label("Listen", systemImage: "ear") }
+                .buttonStyle(.dsSecondary)
+                .frame(maxWidth: 150)
+                .accessibilityIdentifier("songs.listen")
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(LinearGradient(colors: [Theme.accent.opacity(0.22), Theme.panel], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    in: RoundedRectangle(cornerRadius: 18))
     }
 
-    /// What the song is ready for, in one pill.
+    /// Empty library: one picture, one sentence, one action (the Import button above).
+    private var emptyLibrary: some View {
+        VStack(spacing: DS.Space.s) {
+            HStack(alignment: .bottom, spacing: 4) {
+                ForEach(Array([0.4, 0.6, 0.9, 0.55, 0.75, 0.35].enumerated()), id: \.offset) { i, h in
+                    RoundedRectangle(cornerRadius: 3).fill(i == 2 ? DS.Palette.accent : DS.Palette.group[i % 4].opacity(0.8))
+                        .frame(width: 14, height: 70 * h)
+                }
+            }
+            .frame(height: 80)
+            Text("Import a song you own").font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary)
+            Text("MP3, M4A or WAV. TonePilot analyses it on this iPhone.")
+                .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary).multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, DS.Space.xl)
+        .accessibilityElement(children: .combine)
+    }
+
+    /// What the song is ready for, in one chip.
     private func status(_ song: Song) -> SongRow.Status {
         if song.analysisStatus == .running {
-            return .init(text: "Analysing \(Int(((model.analysisProgress[song.id] ?? 0) * 100).rounded()))%", color: Theme.warn, symbol: "waveform")
+            return .init(text: "Analysing \(Int(((model.analysisProgress[song.id] ?? 0) * 100).rounded()))%", tone: .accent, symbol: nil)
         }
         if let p = model.separationProgress[song.id] {
-            return .init(text: "Separating \(Int((p * 100).rounded()))%", color: Theme.warn, symbol: "scissors")
+            return .init(text: "Separating \(Int((p * 100).rounded()))%", tone: .accent, symbol: nil)
         }
-        if song.analysisStatus == .failed { return .init(text: "Needs attention", color: Theme.bad, symbol: "exclamationmark.triangle") }
-        if song.sourceType == .youtubeLink { return .init(text: "Link only", color: .secondary, symbol: "link") }
-        if !model.stemKinds(for: song).isEmpty { return .init(text: "Parts ready", color: Theme.good, symbol: "checkmark") }
-        if song.analysisStatus == .completed { return .init(text: "Ready", color: Theme.good, symbol: "checkmark") }
-        return .init(text: "Not analysed", color: .secondary, symbol: nil)
+        if song.analysisStatus == .failed { return .init(text: "Needs attention", tone: .error, symbol: "exclamationmark.triangle") }
+        if song.sourceType == .youtubeLink { return .init(text: "Link only", tone: .neutral, symbol: "link") }
+        if song.analysisStatus == .completed || !model.stemKinds(for: song).isEmpty { return .init(text: "Ready", tone: .success, symbol: "checkmark") }
+        return .init(text: "Not analysed", tone: .neutral, symbol: nil)
     }
 
     private func chip(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {
@@ -191,30 +186,72 @@ struct LibraryView: View {
 }
 
 struct SongRow: View {
-    struct Status { let text: String; let color: Color; let symbol: String? }
+    struct Status { let text: String; let tone: DSChip.Tone; let symbol: String? }
     let song: Song
     var status: Status?
 
     var body: some View {
-        HStack(spacing: 12) {
-            SongArtwork(title: song.title, size: 48)
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 4) {
-                    Text(song.title).font(.headline).lineLimit(1)
-                    if song.isFavorite { Image(systemName: "star.fill").font(.caption2).foregroundStyle(.yellow) }
+        HStack(spacing: DS.Space.m) {
+            SongCover(song: song, size: 52)
+            VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                HStack(spacing: DS.Space.xs) {
+                    Text(song.title).font(DS.Text.body.weight(.semibold)).lineLimit(1)
+                    if song.isFavorite { Image(systemName: "star.fill").font(DS.Text.metadata).foregroundStyle(DS.Palette.accent) }
                 }
-                Text([song.artist, song.film, song.composer].compactMap { $0 }.joined(separator: " · ").ifEmpty(details))
-                    .font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                if let status { StatusPill(text: status.text, color: status.color, symbol: status.symbol) }
+                Text([song.film ?? song.artist, song.language].compactMap { $0 }.joined(separator: " · ").ifEmpty(details))
+                    .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
             }
-            Spacer(minLength: 4)
-            Image(systemName: "chevron.right").font(.caption).foregroundStyle(.tertiary)
+            Spacer(minLength: DS.Space.xs)
+            if let status { DSChip(text: status.text, symbol: status.symbol, tone: status.tone).fixedSize() }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, DS.Space.xxs)
     }
 
     private var details: String {
         [song.bpm.map { "\(Int($0.value.rounded())) BPM" }, song.key?.value.displayName].compactMap { $0 }.joined(separator: " · ").ifEmpty("No details")
+    }
+}
+
+/// The song you were playing: large cover, its tone, and one Play button.
+struct ContinueCard: View {
+    @EnvironmentObject var model: AppModel
+    let song: Song
+
+    var body: some View {
+        let tone = model.mainTone(of: song) ?? model.activeArrangement
+        let drawings = ToneRow.drawings(tone, library: model.library)
+        Button { model.openStudio(song.id) } label: {
+            HStack(alignment: .center, spacing: DS.Space.m) {
+                SongCover(song: song, size: 96)
+                VStack(alignment: .leading, spacing: DS.Space.xs) {
+                    Text("CONTINUE").font(DS.Text.metadata.weight(.semibold)).foregroundStyle(DS.Palette.textSecondary)
+                    Text(song.title).font(DS.Text.screenTitle).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+                    Text([song.film ?? song.artist, song.key?.value.displayName].compactMap { $0 }.joined(separator: " · "))
+                        .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
+                    if let tone {
+                        HStack(spacing: DS.Space.xs) {
+                            HStack(spacing: -8) { ForEach(drawings, id: \.self) { InstrumentTile(drawing: $0, size: 24) } }
+                            Text(tone.name.replacingOccurrences(of: " (My Version)", with: "")).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
+                        }
+                    }
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "play.fill").font(.title3.weight(.bold)).foregroundStyle(DS.Palette.onAccent)
+                    .frame(width: 52, height: 52)
+                    .background(DS.accentGradient, in: Circle())
+                    .shadow(color: DS.Palette.accentGlow, radius: 10, y: 4)
+                    .accessibilityHidden(true)
+            }
+            .padding(DS.Space.m)
+            .background(
+                LinearGradient(colors: [DS.Palette.ambientViolet.opacity(1.2), DS.Palette.accent.opacity(0.08)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .background(DS.Palette.surface),
+                in: RoundedRectangle(cornerRadius: DS.Radius.l, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Continue \(song.title)")
+        .accessibilityIdentifier("songs.continue")
     }
 }
 

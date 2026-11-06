@@ -46,6 +46,9 @@ final class AppModel: ObservableObject {
     @Published var studioRate: Float = 1
     /// Waveform peaks per song (computed once per session).
     @Published var waveforms: [UUID: [Float]] = [:]
+    /// Cover art embedded in each song's own file (AppModel+Artwork); missing = no artwork / not loaded yet.
+    @Published var artworks: [UUID: UIImage] = [:]
+    var artworkRequested: Set<UUID> = []
     /// A tone being auditioned from the tone picker (not yet assigned to a section).
     @Published var previewingToneId: UUID?
     /// Song Arpeggio preview running on the engine's own pattern clock (independent of the song).
@@ -677,6 +680,8 @@ final class AppModel: ObservableObject {
             try? store.deleteAudio(named: file)
         }
         try? store.deleteStems(for: id)
+        for ext in ["jpg", "none"] { try? FileManager.default.removeItem(at: artworkDirectory.appendingPathComponent("\(id.uuidString).\(ext)")) }
+        artworks[id] = nil; artworkRequested.remove(id)
         analysisTasks[id]?.cancel()
         library.deleteSong(id: id)
         if activeSongId == id { activeSongId = nil; activate(nil) }

@@ -157,7 +157,7 @@ struct SongStudioView: View {
         }
         ToolbarItem(placement: .principal) {
             HStack(spacing: DS.Space.s) {
-                SongArtwork(title: song.title, size: 26)
+                SongCover(song: song, size: 26)
                 Text(song.title).font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
             }
             .accessibilityElement(children: .combine)
