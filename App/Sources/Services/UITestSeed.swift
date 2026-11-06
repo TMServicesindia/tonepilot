@@ -23,6 +23,11 @@ enum UITestSeed {
 
     @MainActor static func seed(_ model: AppModel) {
         if enabled, ProcessInfo.processInfo.arguments.contains("-TPAnalysing") { seedAnalysing(model) }
+        else if enabled, model.library.songs.contains(where: { $0.title == analysingTitle }) {
+            // Only the -TPAnalysing launches show it; other tours start without it.
+            model.library.songs.removeAll { $0.title == analysingTitle }
+            model.save()
+        }
         guard enabled, !model.library.songs.contains(where: { $0.title == title }) else { return }
         let sr = 44_100.0, seconds = 40.0, bpm = 100.0
         let beat = 60 / bpm, bar = beat * 4
