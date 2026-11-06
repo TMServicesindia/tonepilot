@@ -65,6 +65,16 @@ final class ScreenTourUITests: XCTestCase {
         tour(prefix: "B")
     }
 
+    func testAnalysing() {
+        launch(["-TPAnalysing"])
+        XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15))
+        _ = tapIfThere(app.tabBars.buttons["Songs"]); shot("D00 Songs with an analysing song")
+        if tapIfThere(app.staticTexts["Analysing Demo"].firstMatch, 8) {
+            _ = el("analysis.step.melody").waitForExistence(timeout: 8)
+            shot("D01 Analysing")
+        }
+    }
+
     func testFirstRun() {
         launch(["-TPFirstRun"])
         shot("C00 First run")

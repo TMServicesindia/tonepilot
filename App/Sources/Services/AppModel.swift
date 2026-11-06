@@ -129,6 +129,10 @@ final class AppModel: ObservableObject {
     @Published var patchLoadErrors: [String] = []
     @Published var analysisProgress: [UUID: Double] = [:]
     @Published var analysisStage: [UUID: String] = [:]
+    /// The analysis step running now (index into `AnalysisStep.allCases`), for the Analysing step list.
+    @Published var analysisStep: [UUID: Int] = [:]
+    /// The step a failed analysis stopped at (this launch only), so the step list can mark it.
+    @Published var analysisFailedStep: [UUID: Int] = [:]
     @Published var analysisNotice: [UUID: String] = [:]
     @Published var isSectionPlaying = false
     /// Song position from the active timing reference (backing track or timer), for the UI.
@@ -893,6 +897,8 @@ final class AppModel: ObservableObject {
         song.analysisError = nil
         update(song)
         analysisProgress[songId] = 0
+        analysisStep[songId] = 0
+        analysisFailedStep[songId] = nil
         analysisNotice[songId] = nil
         let patches = library.patches
         let client = useServer ? AnalysisServerClient(settings: serverSettings, token: serverToken) : nil
@@ -960,10 +966,15 @@ final class AppModel: ObservableObject {
                 }
                 let toneLoader = PartMatcher.loader(bank: bank)
                 if !stems.isEmpty { await stage("Analysing, then matching each part's instrument…", base) }
+                let hasParts = !stems.isEmpty
                 let progress: (Double) -> Bool = { p in
                     if Task.isCancelled { return false }
                     let value = base + (0.95 - base) * p
-                    if throttle.shouldSend(value) { Task { @MainActor in self?.analysisProgress[songId] = value } }
+                    let step = AnalysisStep.current(pipeline: p, hasParts: hasParts).rawValue
+                    if throttle.shouldSend(value) { Task { @MainActor in
+                        self?.analysisProgress[songId] = value
+                        if self?.analysisStep[songId] != step { self?.analysisStep[songId] = step }
+                    } }
                     return true
                 }
                 let instruments: ([SongSection]) -> [UUID: [String: Double]] = { sections in
@@ -991,7 +1002,7 @@ final class AppModel: ObservableObject {
                     var s = output.song
                     if !stemInfos.isEmpty { s.stems = stemInfos }
                     self.analysisProgress[songId] = nil
-                    self.analysisStage[songId] = nil
+                    self.analysisStage[songId] = nil; self.analysisStep[songId] = nil
                     self.update(s)
                     if self.activeSongId == songId { self.startPerformance(songId: songId) }
                     // Analysed from parts separated here: check them with the other model too (P3.3).
@@ -1007,8 +1018,9 @@ final class AppModel: ObservableObject {
                     guard let self, var s = self.library.song(id: songId) else { return }
                     s.analysisStatus = error is CancellationError || (error as? SongAnalysisError) == .cancelled ? .notStarted : .failed
                     s.analysisError = Self.describe(error)
+                    self.analysisFailedStep[songId] = s.analysisStatus == .failed ? self.analysisStep[songId] : nil
                     self.analysisProgress[songId] = nil
-                    self.analysisStage[songId] = nil
+                    self.analysisStage[songId] = nil; self.analysisStep[songId] = nil
                     self.update(s)
                 }
             }
@@ -1034,6 +1046,7 @@ final class AppModel: ObservableObject {
             do {
                 let current = await MainActor.run { self?.library.song(id: songId) } ?? snapshot
                 let throttle = ProgressThrottle()
+                let hasParts = !stems.isEmpty
                 let progress: (Double) -> Bool = { p in
                     if Task.isCancelled { return false }
                     if throttle.shouldSend(p) { Task { @MainActor in self?.analysisProgress[songId] = p } }
@@ -1050,7 +1063,7 @@ final class AppModel: ObservableObject {
                 await MainActor.run {
                     guard let self else { return }
                     self.analysisProgress[songId] = nil
-                    self.analysisStage[songId] = nil
+                    self.analysisStage[songId] = nil; self.analysisStep[songId] = nil
                     self.analysisNotice[songId] = "Analysed from the microphone — accuracy depends on volume and room noise. Listen again to re-analyse."
                     self.update(output.song)
                 }
@@ -1060,7 +1073,7 @@ final class AppModel: ObservableObject {
                     s.analysisStatus = .failed
                     s.analysisError = Self.describe(error)
                     self.analysisProgress[songId] = nil
-                    self.analysisStage[songId] = nil
+                    self.analysisStage[songId] = nil; self.analysisStep[songId] = nil
                     self.update(s)
                 }
             }

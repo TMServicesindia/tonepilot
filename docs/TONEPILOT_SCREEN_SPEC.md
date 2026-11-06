@@ -101,6 +101,7 @@ Sheets: Tone editor · Sound browser · Compare · Correct chord · Edit section
 | Primary | **Play now** (enabled once the beat is found) |
 | Errors | The failed step shows "Couldn't separate the parts" + **Try again**; the other results stay |
 | ids | `analysis.step.<name>`, `analysis.playNow`, `analysis.retry`, `analysis.cancel` |
+| Built (6 Nov) | Steps: Beat and tempo → Key and chords → Melody → Sections and hook → Matching tones (only with separated parts) → Your arrangement. The analyser returns every result together at the end, so a step shows ✓ **Done** when it has run, and the results ("124 BPM", "F♯ minor"…) appear on the Play page when the song is ready. Separating parts keeps its own card (it runs after the first analysis). **Play now** is secondary because the transport play is the screen's primary. ids: `analysis.step.beat/chords/melody/sections/tones/arrangement` |
 
 ### 2.4 Play › Play (performance view, default)
 

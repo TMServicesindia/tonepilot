@@ -22,6 +22,7 @@ enum UITestSeed {
     }
 
     @MainActor static func seed(_ model: AppModel) {
+        if enabled, ProcessInfo.processInfo.arguments.contains("-TPAnalysing") { seedAnalysing(model) }
         guard enabled, !model.library.songs.contains(where: { $0.title == title }) else { return }
         let sr = 44_100.0, seconds = 40.0, bpm = 100.0
         let beat = 60 / bpm, bar = beat * 4
@@ -96,6 +97,20 @@ enum UITestSeed {
             PartFusion.apply(.fused, to: &song)
         }
         model.update(song)
+    }
+
+    static let analysingTitle = "Analysing Demo"
+
+    /// `-TPAnalysing`: a song shown mid-analysis (melody step) for the Analysing step list. Display
+    /// only: no analysis task runs, so the state stays put for the screen tour and the stress test.
+    @MainActor private static func seedAnalysing(_ model: AppModel) {
+        var song = model.library.songs.first { $0.title == analysingTitle }
+            ?? Song(title: analysingTitle, artist: "TonePilot tests", sourceType: .importedFile, sourceReference: "uitest-analysing.wav",
+                    userConfirmedRights: true, duration: 40, analysisStatus: .running)
+        song.analysisStatus = .running
+        if model.library.song(id: song.id) == nil { model.library.songs.append(song); model.save() } else { model.update(song) }
+        model.analysisStep[song.id] = AnalysisStep.melody.rawValue
+        model.analysisProgress[song.id] = 0.45
     }
 
     private static func write(_ samples: [Float], sr: Double, to url: URL) throws {

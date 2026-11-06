@@ -256,27 +256,30 @@ struct StudioAnalysisStatus: View {
 
     var body: some View {
         switch song.analysisStatus {
+        case .running where song.sourceType != .listened, .failed where song.sourceType != .listened:
+            // Imported songs: the step list (spec §2.3).
+            AnalysisStepList(song: song, hasParts: !model.stemKinds(for: song).isEmpty)
         case .running:
-            Card(title: "Building your arrangement") {
-                ProgressView(value: model.analysisProgress[song.id] ?? 0) {
-                    Text(model.analysisStage[song.id] ?? "Analysing on this iPhone…").font(.subheadline)
-                }
-                Text("Tempo, key and chords → melody → sections → a tone for every section. You can already play the recording.")
-                    .font(.caption).foregroundStyle(.secondary)
-                Button("Cancel analysis") { model.cancelAnalysis(songId: song.id) }.font(.caption)
+            // Listen Mode runs as one step (no recording to play), so a single progress line.
+            VStack(alignment: .leading, spacing: DS.Space.s) {
+                Text("Analysing what TonePilot heard").font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary)
+                ProgressView(value: model.analysisProgress[song.id] ?? 0).tint(DS.Palette.accent)
+                Button("Cancel") { model.cancelAnalysis(songId: song.id) }
+                    .buttonStyle(.dsSecondary).accessibilityIdentifier("analysis.cancel")
             }
+            .dsSurface()
         case .failed, .notStarted:
-            Card(title: "Analysis") {
-                if let e = song.analysisError { Text(e).font(.footnote).foregroundStyle(Theme.bad) }
+            VStack(alignment: .leading, spacing: DS.Space.s) {
+                if let e = song.analysisError { Text(e).font(DS.Text.caption).foregroundStyle(DS.Palette.error) }
                 if song.sourceType == .listened {
-                    Button("Listen again to analyse", action: onListen).buttonStyle(.borderedProminent)
+                    Button("Listen again to analyse", action: onListen).buttonStyle(.dsPrimary)
                 } else if model.audioURL(for: song) != nil {
-                    Button(song.analysisStatus == .failed ? "Try again" : "Analyse & arrange") {
-                        model.analyze(songId: song.id, useServer: model.serverSettings.enabled)
-                    }
-                    .buttonStyle(.borderedProminent)
+                    Button("Analyse this song") { model.analyze(songId: song.id, useServer: model.serverSettings.enabled) }
+                        .buttonStyle(.dsPrimary)
+                        .accessibilityIdentifier("analysis.start")
                 }
             }
+            .dsSurface()
         default:
             if let notice = model.analysisNotice[song.id] {
                 Label(notice, systemImage: "info.circle").font(.caption).foregroundStyle(Theme.warn)

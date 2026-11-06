@@ -247,6 +247,22 @@ final class TonePilotUITests: XCTestCase {
     }
 
     /// Scrolling Song Studio while the song plays must stay smooth (hitch ratio reported).
+    /// The Analysing step list (spec §2.3): a song held mid-analysis by `-TPAnalysing`.
+    func testAnalysingStepList() {
+        app.launchArguments += ["-TPAnalysing"]
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15))
+        tap(app.tabBars.buttons["Songs"], "Songs tab")
+        tap(app.staticTexts["Analysing Demo"].firstMatch, thenExpect: element("analysis.step.melody"), limit: 8, "open the analysing song")
+        for step in ["beat", "chords", "melody", "sections", "arrangement"] {
+            XCTAssertTrue(element("analysis.step.\(step)").exists, "step \(step) is listed")
+        }
+        XCTAssertTrue(element("analysis.playNow").exists, "Play now is shown")
+        XCTAssertTrue(element("analysis.cancel").exists, "Cancel is shown")
+        page("mix"); page("play")
+        assertAlive("analysing step list")
+    }
+
     func testScrollingIsSmoothWhilePlaying() {
         app.launch()
         XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15))
