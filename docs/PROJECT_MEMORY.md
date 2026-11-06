@@ -484,6 +484,18 @@ Stop: no production change, no major training, no release before approval.
 - iOS stays fully native. Tokens are platform-neutral for a future Android theme; no Android build (earlier decision stands).
 - Deliverables: the 8 UX docs named in the owner's prompt, before/after simulator screenshots (`ui-screens.yml` → `ci/screens-<label>`), design system in SwiftUI. All build gates stay mandatory.
 
+## 6z+. UX build, steps 4–7 (owner, 6 Nov: "Go ahead and start building")
+
+- **Coded:**
+  - Songs leftovers: amber "Casio not connected" chip; ⋯ menu without the duplicate Import / Listen.
+  - Analysing step list (§2.3, `-TPAnalysing` seed).
+  - Tone editor (§2.7), Arpeggio (§2.11), Sections (§2.12), AI parts row.
+  - Sound browser (§2.8).
+  - Settings (§2.14), first run in 2 steps (§2.1), Record (§2.13).
+  - Token pass over the legacy screens; contrast fixes.
+- **Each has ids and stress-test steps.** Status, deviations and remaining work: `docs/UX_IMPLEMENTATION_ROADMAP.md`.
+- **Build status:** these are not yet through a full build. The full build for steps 1–4a was running when this was written. Publish only after a green `ios-build.yml`.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
