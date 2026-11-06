@@ -79,6 +79,11 @@ final class TonePilotUITests: XCTestCase {
                 page("keyboard")
                 tap(element("tonemode.sections"), "tone per section")
                 tap(element("tonemode.main"), "main tone")
+                // Tone page: the layer level slider saves the main tone (round 1 only: it marks the tone as yours).
+                if round == 1 {
+                    let level = element("tone.layer.level.0")
+                    if level.waitForExistence(timeout: 3) { level.adjust(toNormalizedSliderPosition: 0.7); assertAlive("layer level") }
+                }
                 if round == 2 {
                     // Blind comparison sheet: opens and closes (no downloads needed).
                     let hookMenu = element("tone.hookSource")

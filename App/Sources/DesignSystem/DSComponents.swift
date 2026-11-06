@@ -144,10 +144,11 @@ struct DSSegmentedControl<Item: Hashable & Identifiable>: View {
         } label: {
             VStack(spacing: DS.Space.xxs) {
                 if let symbol { Image(systemName: symbol(item)).font(DS.Text.label).imageScale(.medium) }
-                Text(title(item)).font(symbol == nil ? DS.Text.label : DS.Text.metadata.weight(.semibold)).lineLimit(1)
+                Text(title(item)).font(symbol == nil ? DS.Text.label : DS.Text.metadata.weight(.semibold))
+                    .lineLimit(1).minimumScaleFactor(0.85)
             }
             .fixedSize(horizontal: !equal, vertical: false)
-            .padding(.horizontal, DS.Space.s)
+            .padding(.horizontal, equal ? DS.Space.xxs : DS.Space.s)
             .frame(maxWidth: equal ? .infinity : nil, minHeight: symbol == nil ? DS.Size.segmentedHeight : 50)
             .foregroundStyle(on ? DS.Palette.onAccent : DS.Palette.textSecondary)
             .background {

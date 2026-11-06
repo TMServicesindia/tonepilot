@@ -87,7 +87,6 @@ struct SongStudioView: View {
                             SongPartsCard(song: song)
                             AIPartsCard(song: song)
                         case .keyboard:
-                            if !song.sections.isEmpty { ToneModeSwitch(song: song) }
                             MyKeyboardCard(song: song, onChangeSound: changeSound, onEditSound: editSound, onEditTone: { editingTone = ToneEditTarget(id: $0) },
                                            onCompare: { comparing = true })
                         case .arpeggio:
@@ -141,7 +140,13 @@ struct SongStudioView: View {
     @ToolbarContentBuilder
     private func toolbar(_ song: Song) -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            Button { model.selectedTab = .library } label: { Label("Songs", systemImage: "chevron.left").labelStyle(.titleAndIcon) }
+            Button { model.selectedTab = .library } label: {
+                HStack(spacing: DS.Space.xxs) {
+                    Image(systemName: "chevron.left").font(DS.Text.body.weight(.semibold))
+                    Text("Songs").font(DS.Text.body)
+                }
+            }
+            .accessibilityLabel("Songs")
         }
         ToolbarItem(placement: .principal) {
             HStack(spacing: DS.Space.s) {
@@ -632,110 +637,6 @@ struct FusionLine: View {
             .buttonStyle(.borderless)
             .accessibilityIdentifier("fusion.start")
         }
-    }
-}
-
-struct MyKeyboardCard: View {
-    @EnvironmentObject var model: AppModel
-    let song: Song
-    let onChangeSound: (UUID) -> Void
-    let onEditSound: (UUID) -> Void
-    let onEditTone: (UUID) -> Void
-    var onCompare: () -> Void = {}
-
-    var body: some View {
-        let switching = song.switching ?? SwitchingSettings()
-        let sectionId = model.activeSectionId ?? song.orderedSections.first?.id
-        let usingMain = model.isUsingMainTone(song)
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label("My keyboard", systemImage: "pianokeys").font(.headline)
-                Spacer()
-                ConnectionStatus(midi: model.midi)
-            }
-            if model.midi.sources.isEmpty {
-                Text("Connect the Casio's USB TO HOST port to the iPhone. Settings › Connect your Casio shows how.")
-                    .font(.caption).foregroundStyle(.secondary)
-            }
-            if AudioSessionSetup.isBuiltInSpeaker {
-                Label("Sound is coming from the iPhone speaker. Connect the audio cable to the Casio's AUDIO IN to hear it there.", systemImage: "speaker.wave.2")
-                    .font(.caption).foregroundStyle(Theme.warn)
-            }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(model.activeArrangement?.name.replacingOccurrences(of: " (My Version)", with: "") ?? "No tone selected")
-                    .font(.title3.weight(.bold)).lineLimit(2)
-                if let a = model.activeArrangement {
-                    Text(a.layers.filter { !$0.muted }.compactMap { model.library.patch(id: $0.patchId)?.name }.joined(separator: " + "))
-                        .font(.caption).foregroundStyle(.secondary).lineLimit(2)
-                }
-                Text(usingMain ? "One tone for the whole song." : "The tone changes with each section.")
-                    .font(.caption2).foregroundStyle(.secondary)
-                // Phase 3: where the main tone comes from (the song's hook) and how the song feels — suggestions.
-                if usingMain, let u = song.understanding, let hook = u.hook,
-                   let hs = song.sections.first(where: { $0.id == hook.sectionId }) {
-                    Menu {
-                        ForEach(song.orderedSections.filter { s in !song.orderedSections.contains { $0.id != s.id && $0.repetitionGroup != nil && $0.repetitionGroup == s.repetitionGroup && $0.type == s.type && $0.startTime < s.startTime } }) { s in
-                            Button(s.label) { model.setHook(s.id, songId: song.id) }
-                        }
-                    } label: {
-                        Label("From \(hs.label) — \(hook.chosenByUser ? "your choice" : (hook.kind == .bgm ? "the song's BGM hook" : "the song's hook"))",
-                              systemImage: "music.note")
-                            .font(.caption).lineLimit(1)
-                    }
-                    .accessibilityIdentifier("tone.hookSource")
-                    if let feel = u.moods[hs.id.uuidString]?.label ?? u.overall {
-                        Text("Feel: \(feel) (suggestion)").font(.caption2).foregroundStyle(.secondary)
-                    }
-                }
-                FusionLine(song: song)
-            }
-            HStack {
-                if usingMain, let main = model.mainTone(of: song) {
-                    Button { onEditTone(main.id) } label: { Label("Edit main tone", systemImage: "slider.horizontal.3") }
-                        .buttonStyle(.borderedProminent)
-                        .accessibilityIdentifier("tone.editMain")
-                    Button { onCompare() } label: { Label("Compare blind", systemImage: "ear") }
-                        .buttonStyle(.bordered)
-                        .accessibilityIdentifier("tone.compare")
-                } else if let sectionId {
-                    Button { onChangeSound(sectionId) } label: { Label("Change sound", systemImage: "music.note.list") }
-                        .buttonStyle(.borderedProminent)
-                    Button { onEditSound(sectionId) } label: { Label("Edit sound", systemImage: "slider.horizontal.3") }
-                        .buttonStyle(.bordered)
-                }
-            }
-            if let track = model.studioTracks(for: song).first(where: { $0.id == SongStudio.keyboard }) {
-                TrackRow(track: track, songId: song.id, showHeader: false)
-            }
-            if !usingMain, !song.sections.isEmpty {
-                Toggle(isOn: Binding(get: { switching.mode == .automatic },
-                                     set: { auto in
-                                         var s = switching
-                                         s.mode = auto ? .automatic : .assisted
-                                         if model.audioURL(for: song) == nil, s.reference == .backingTrack { s.reference = .timer }
-                                         model.updateSwitching(s)
-                                     })) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Switch automatically")
-                        Text(switching.mode == .automatic ? "Follows the song position." : "TonePilot shows the next section's tone; tap it to switch.")
-                            .font(.caption2).foregroundStyle(.secondary)
-                    }
-                }
-                if let id = model.pendingSuggestion, let next = song.sections.first(where: { $0.id == id }) {
-                    Button { model.confirmSuggestion() } label: {
-                        HStack {
-                            Image(systemName: "arrow.right.circle.fill")
-                            Text("Switch to \(next.label)").lineLimit(1)
-                            Spacer()
-                        }
-                        .padding(12).frame(maxWidth: .infinity, minHeight: 44)
-                        .background(Theme.accent, in: RoundedRectangle(cornerRadius: 10)).foregroundStyle(.black)
-                    }
-                }
-            }
-        }
-        .padding(14)
-        .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
     }
 }
 
