@@ -213,6 +213,12 @@ final class TonePilotUITests: XCTestCase {
                 tap(app.tabBars.buttons["Record"], thenExpect: element("record.button"), "Record tab")
                 tap(app.tabBars.buttons["Settings"], "Settings tab")
                 if round == 1 {
+                    // The Casio card (spec §2.14) opens the connection guide.
+                    let casio = element("settings.casio")
+                    if casio.waitForExistence(timeout: 3) {
+                        tap(casio, "open the Casio set-up")
+                        app.navigationBars.buttons.firstMatch.tap(); assertAlive("back from the Casio set-up")
+                    }
                     // Real instrument sounds (sound packs): the section shows without downloading anything.
                     let packs = element("settings.soundpacks")
                     var scrolls = 0
@@ -220,13 +226,15 @@ final class TonePilotUITests: XCTestCase {
                     XCTAssertTrue(packs.waitForExistence(timeout: 5), "Settings shows the Real instrument sounds section")
                     assertAlive("sound packs section")
                     let fusionSetting = element("settings.fusion")
+                    var down = 0
+                    while !fusionSetting.exists && down < 4 { app.swipeUp(); down += 1 }
                     if fusionSetting.waitForExistence(timeout: 2) {
                         let sw = fusionSetting.switches.firstMatch.exists ? fusionSetting.switches.firstMatch : fusionSetting
                         tap(sw, "both-models setting off"); tap(sw, "both-models setting on")
                     }
                     app.swipeDown(); app.swipeDown(); app.swipeDown()
                     // Licences: every bundled full licence text opens.
-                    let licenses = app.buttons["Licenses & credits"].firstMatch
+                    let licenses = element("settings.licences")
                     var tries = 0
                     while !(licenses.exists && licenses.isHittable) && tries < 6 { app.swipeUp(); tries += 1 }
                     if licenses.exists {

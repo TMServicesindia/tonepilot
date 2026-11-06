@@ -7,52 +7,99 @@ struct SettingsView: View {
     @State private var backupURL: URL?
 
     var body: some View {
+        // Spec §2.14: Casio card · Keyboard & audio · Sound · Separation · Storage & about.
         List {
+            Section { CasioCard(midi: model.midi) }
             Section("Keyboard & audio") {
-                NavigationLink { MIDIDiagnosticsView(midi: model.midi) } label: { Label("MIDI & audio diagnostics", systemImage: "cable.connector") }
-                NavigationLink { ConnectionGuideView() } label: { Label("Connect your Casio CT-X870IN", systemImage: "pianokeys") }
-                NavigationLink { TroubleshootingView() } label: { Label("Troubleshooting", systemImage: "wrench.and.screwdriver") }
-                Picker("Velocity curve", selection: $model.velocityCurve) {
+                NavigationLink { MIDIDiagnosticsView(midi: model.midi) } label: { SettingsLabel("MIDI and audio check", "cable.connector", DS.Palette.info) }
+                NavigationLink { TroubleshootingView() } label: { SettingsLabel("Troubleshooting", "wrench.and.screwdriver", DS.Palette.section[6]) }
+                Picker(selection: $model.velocityCurve) {
                     ForEach(VelocityCurve.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
-                }
+                } label: { SettingsLabel("Touch response", "hand.tap", DS.Palette.section[3]) }
             }
             Section {
-                Picker("Sound engine", selection: Binding(get: { model.engineKind }, set: { model.setEngine($0) })) {
+                Picker(selection: Binding(get: { model.engineKind }, set: { model.setEngine($0) })) {
                     ForEach(EngineKind.allCases) { Text($0.displayName).tag($0) }
-                }
+                } label: { SettingsLabel("Sound engine", "waveform", DS.Palette.accent) }
                 NavigationLink { SoundFontSettingsView() } label: {
-                    Label("SoundFonts", systemImage: "music.quarternote.3")
+                    SettingsLabel("SoundFonts", "music.quarternote.3", DS.Palette.section[1])
                     Spacer()
-                    if !model.defaultSoundFontInstalled { Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Theme.warn) }
+                    if !model.defaultSoundFontInstalled {
+                        Label("Needed", systemImage: "exclamationmark.triangle.fill").font(DS.Text.metadata).foregroundStyle(DS.Palette.warning)
+                    }
                 }
-                NavigationLink { SamplePatchCreatorView() } label: { Label("Create a sample instrument", systemImage: "waveform.badge.plus") }
-            } header: { Text("Sounds") } footer: {
-                Text("The TonePilot engine supports per-layer envelope, filter, EQ, chorus, glide/vibrato, and the generated accompaniment. The Apple sampler is a simpler fallback.")
+                NavigationLink { SamplePatchCreatorView() } label: { SettingsLabel("Create a sample instrument", "waveform.badge.plus", DS.Palette.section[2]) }
+            } header: { Text("Sound") } footer: {
+                Text("The TonePilot engine has every tone control. The Apple sampler is a simpler fallback.")
             }
-            SeparationModelsSection()
             SoundPacksSection()
-            Section("AI analysis") {
-                NavigationLink { AnalysisServerSettingsView() } label: {
-                    Label("Analysis server (vocal separation)", systemImage: "server.rack")
-                    Spacer()
-                    Text(model.serverSettings.enabled ? "On" : "Off").foregroundStyle(.secondary)
-                }
-            }
+            SeparationModelsSection()
             Section {
-                LabeledContent("Songs", value: "\(model.library.songs.count)")
-                if let backupURL {
-                    ShareLink(item: backupURL) { Label("Share backup folder", systemImage: "square.and.arrow.up") }
-                } else {
-                    Button { backupURL = try? model.exportBackup() } label: { Label("Back up library & samples…", systemImage: "externaldrive") }
+                NavigationLink { AnalysisServerSettingsView() } label: {
+                    SettingsLabel("Your analysis server", "server.rack", DS.Palette.section[7])
+                    Spacer()
+                    Text(model.serverSettings.enabled ? "On" : "Off").foregroundStyle(DS.Palette.textSecondary)
                 }
-            } header: { Text("Your data") } footer: {
-                Text("Everything is stored on this iPhone (Files › On My iPhone › TonePilot). Songs are analysed on-device; audio is only sent to an analysis server you set up and switch on. Deleting a song also deletes its audio and stems. Backups include your library, sample files and stems, not the songs themselves.")
-            }
-            Section("About") {
-                NavigationLink("Licenses & credits") { LicensesView() }
+                LabeledContent { Text("\(model.library.songs.count)") } label: { SettingsLabel("Songs on this iPhone", "music.note.list", DS.Palette.section[5]) }
+                if let backupURL {
+                    ShareLink(item: backupURL) { SettingsLabel("Share the backup", "square.and.arrow.up", DS.Palette.success) }
+                } else {
+                    Button { backupURL = try? model.exportBackup() } label: { SettingsLabel("Back up library and samples", "externaldrive", DS.Palette.success) }
+                }
+                NavigationLink { LicensesView() } label: { SettingsLabel("Licences and credits", "doc.text", DS.Palette.textTertiary) }
+                    .accessibilityIdentifier("settings.licences")
+            } header: { Text("Storage & about") } footer: {
+                Text("Everything stays on this iPhone (Files › On My iPhone › TonePilot). Audio goes only to an analysis server you set up and switch on.")
             }
         }
+        .scrollContentBackground(.hidden)
+        .dsCanvas()
         .navigationTitle("Settings")
+    }
+}
+
+/// A settings row label with a coloured icon square (iOS Settings style).
+struct SettingsLabel: View {
+    let title: String
+    let symbol: String
+    let color: Color
+    init(_ title: String, _ symbol: String, _ color: Color) { self.title = title; self.symbol = symbol; self.color = color }
+
+    var body: some View {
+        Label {
+            Text(title).foregroundStyle(DS.Palette.textPrimary)
+        } icon: {
+            Image(systemName: symbol).font(DS.Text.metadata.weight(.semibold))
+                .foregroundStyle(DS.Palette.onAccent)
+                .frame(width: DS.Space.xl + DS.Space.xs, height: DS.Space.xl + DS.Space.xs)
+                .background(color, in: RoundedRectangle(cornerRadius: DS.Radius.s - DS.Space.xxs, style: .continuous))
+        }
+    }
+}
+
+/// The Casio at the top of Settings: is it connected, and the way to set it up.
+struct CasioCard: View {
+    @ObservedObject var midi: MIDIInputManager
+
+    var body: some View {
+        let casio = midi.sources.first { $0.looksLikeCasio }
+        let name = casio?.name ?? midi.sources.first?.name
+        VStack(alignment: .leading, spacing: DS.Space.m) {
+            HStack(spacing: DS.Space.m) {
+                InstrumentTile(drawing: .piano, size: 56)
+                VStack(alignment: .leading, spacing: DS.Space.xs) {
+                    Text("Casio CT-X870IN").font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary)
+                    DSChip(text: name.map { "Connected · \($0)" } ?? "Not connected",
+                           symbol: name == nil ? "pianokeys" : "checkmark.circle.fill",
+                           tone: name == nil ? .accent : .success)
+                }
+            }
+            NavigationLink { ConnectionGuideView() } label: {
+                Text(name == nil ? "Set up the Casio" : "Connection guide").font(DS.Text.body.weight(.semibold)).foregroundStyle(DS.Palette.accent)
+            }
+            .accessibilityIdentifier("settings.casio")
+        }
+        .padding(.vertical, DS.Space.xs)
     }
 }
 
