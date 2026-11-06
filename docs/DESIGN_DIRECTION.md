@@ -168,3 +168,12 @@ Each screen has exactly three levels.
   - **Keys guide:** left hand amber, next melody note teal.
 - **Light:** primary buttons, the play button and the selected page carry a soft amber glow; a faint violet / warm ambient light sits behind each screen; the Tone suggestion card has a warm tint.
 - **Still not allowed:** glowing cards everywhere, colour as the only signal, decoration in bars and navigation.
+
+
+## v9 — song covers (owner, 6 Nov)
+
+The file's own artwork first. Otherwise a generated cover:
+- **D2 "Ring over Aura"** for large covers;
+- **D3 "Halo"** for small ones.
+
+Explorations: `design/mockups/v7-covers`, `v8-covers`. The full set with covers: `design/mockups/v9`.

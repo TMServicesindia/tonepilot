@@ -43,6 +43,16 @@ Shipped as vector assets, one tone, so they tint per state.
 
 Each library family maps to one drawing (`InstrumentFamily → drawing`).
 
+### Song covers (owner, 6 Nov: D2 + D3)
+
+1. **The song file's own embedded artwork** (ID3 APIC / MP4 `covr`), read on the iPhone, never downloaded.
+2. Otherwise, **a generated cover** from the song's analysis:
+   - **Mood sets the colours:** energy + major / minor → a three-colour gradient. For example, intense = deep red / amber, celebratory = teal / yellow, romantic = violet / peach.
+   - **Sections set the shapes:** colour = repetition group; the hook is amber.
+   - **Large covers (≥ 90 pt; Continue card, Analysing): style D2 "Ring over Aura".** The glowing waveform across the cover, with the Song Ring (sections as arcs, hook arc amber) as a record on top.
+   - **Small covers (rows, the Play header): style D3 "Halo".** A soft radial waveform halo around a thin section ring.
+   - **Drawing:** in a `Canvas`, cached as an image per song (re-drawn only when the analysis changes).
+
 ### Song Map
 
 - **Data:** sections (width = length, height = energy) from the analysis.
