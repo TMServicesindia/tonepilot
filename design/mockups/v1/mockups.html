@@ -1,0 +1,338 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>TonePilot mockups v1</title>
+<style>
+:root{
+  --canvas:#0B0B0D;--surface:#151518;--elevated:#202024;--border:#2C2C32;--divider:#242429;
+  --t1:#F5F5F7;--t2:#A3A3AB;--t3:#707078;--accent:#FA9E33;--on:#121212;--accentMuted:rgba(250,158,51,.16);
+  --ok:#3DD27A;--warn:#FFD24D;--err:#FF5A4F;
+  --s1:#F0A04B;--s2:#4FC1B4;--s3:#A98BF5;--s4:#F07AA8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a1d;font-family:Inter,system-ui,sans-serif;color:var(--t1);padding:28px;-webkit-font-smoothing:antialiased}
+h1{font:600 22px Inter;color:#FFC98A;margin:0 0 4px}
+.sub{color:#9a9aa2;font-size:14px;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(4,390px);gap:28px}
+.cap{font:600 15px Inter;color:#ddd;margin:0 0 8px}
+.capd{font-size:12.5px;color:#9a9aa2;margin:-4px 0 10px;line-height:1.35;height:34px}
+.phone{width:390px;height:844px;background:var(--canvas);border-radius:44px;overflow:hidden;position:relative;border:1px solid #2a2a2e;display:flex;flex-direction:column}
+.status{height:47px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 30px 6px 34px;font:600 16px Inter}
+.nav{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:600 17px Inter}
+.nav .l,.nav .r{color:var(--accent);font-weight:500;min-width:60px}
+.nav .r{text-align:right}
+.content{flex:1;overflow:hidden;padding:0 16px}
+.tabbar{height:83px;border-top:1px solid var(--divider);background:rgba(21,21,24,.94);display:flex;justify-content:space-around;padding-top:8px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--t3);width:70px}
+.tab.on{color:var(--accent)}
+.tab svg{width:26px;height:24px}
+.large{font:700 34px Inter;letter-spacing:-.4px;margin:4px 0 12px}
+.surface{background:var(--surface);border-radius:16px;padding:16px}
+.row{display:flex;align-items:center;gap:12px}
+.chip{display:inline-flex;align-items:center;gap:4px;font:600 12px Inter;padding:4px 8px;border-radius:99px;background:var(--elevated);color:var(--t2)}
+.chip.acc{background:var(--accentMuted);color:var(--accent)}
+.chip.ok{background:rgba(61,210,122,.16);color:var(--ok)}
+.chip.warn{background:rgba(255,210,77,.16);color:var(--warn)}
+.btnp{height:50px;border-radius:12px;background:var(--accent);color:var(--on);font:600 17px Inter;display:flex;align-items:center;justify-content:center;gap:8px;flex:1}
+.btns{height:50px;border-radius:12px;background:var(--elevated);color:var(--t1);font:600 17px Inter;display:flex;align-items:center;justify-content:center;gap:8px;flex:1}
+.sec{font:600 17px Inter;margin:22px 0 10px;display:flex;justify-content:space-between;align-items:baseline}
+.sec a{color:var(--accent);font:500 15px Inter}
+.meta{font-size:12px;color:var(--t2)}
+.art{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font:700 15px Inter;color:#fff;flex:none}
+.seg{background:var(--elevated);border-radius:12px;padding:2px;display:flex;gap:2px}
+.seg div{flex:1;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font:600 14.5px Inter}
+.seg .on{background:var(--accent);color:var(--on)}
+.wave{height:64px;border-radius:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:1.4px;padding:0 2px}
+.wave i{display:block;width:2px;background:rgba(255,255,255,.55);border-radius:1px}
+.band{position:absolute;top:0;bottom:0;border-radius:3px}
+.play{position:absolute;top:0;bottom:0;width:2px;background:var(--accent)}
+.schip{height:44px;border-radius:10px;background:var(--elevated);padding:0 12px;display:flex;align-items:center;font:600 14.5px Inter;position:relative;white-space:nowrap}
+.schip:before{content:"";position:absolute;top:0;left:8px;right:8px;height:3px;border-radius:2px;background:var(--c)}
+.schip.on{background:var(--accent);color:var(--on)}
+.transport{background:rgba(21,21,24,.94);border-top:1px solid var(--divider);padding:8px 20px 6px}
+.bar{height:4px;border-radius:2px;background:rgba(255,255,255,.12);position:relative;margin:6px 0 6px}
+.bar b{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:2px}
+.times{display:flex;justify-content:space-between;font:500 11px Inter;color:var(--t2);font-variant-numeric:tabular-nums}
+.tbtns{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.tb{width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--t1)}
+.pbtn{width:64px;height:64px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.slider{height:4px;border-radius:2px;background:var(--elevated);position:relative;flex:1}
+.slider b{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--accent)}
+.slider i{position:absolute;top:-10px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.ms{width:44px;height:36px;border-radius:9px;background:var(--elevated);display:flex;align-items:center;justify-content:center;font:600 13px Inter;color:var(--t2)}
+.ms.on{background:var(--accentMuted);color:var(--accent)}
+.toggle{width:51px;height:31px;border-radius:16px;background:var(--accent);position:relative;flex:none}
+.toggle:after{content:"";position:absolute;right:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff}
+.toggle.off{background:#39393d}.toggle.off:after{right:auto;left:2px}
+.list{background:var(--surface);border-radius:16px;overflow:hidden}
+.li{min-height:52px;display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--divider)}
+.li:last-child{border-bottom:0}
+.li .t{flex:1}
+.chev{color:var(--t3);font-size:18px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.grabber{width:36px;height:5px;border-radius:3px;background:#48484d;margin:8px auto 0}
+.sheet{position:absolute;inset:60px 0 0 0;background:#111114;border-radius:14px 14px 0 0;display:flex;flex-direction:column}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.k{font-variant-numeric:tabular-nums}
+.big{font:700 40px Inter;letter-spacing:-.5px}
+.ico{width:22px;height:22px;flex:none}
+.note{font-size:12px;color:var(--t2);line-height:1.4}
+</style></head><body>
+<h1>TonePilot — proposed screens v1 (for review, not built yet)</h1>
+<div class="sub">Built from the design tokens (design/tokens/tonepilot.tokens.json). Fonts: Inter here, SF Pro in the app; icons are stand-ins for SF Symbols. Content is illustrative: song names, tones and match values are examples.</div>
+
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <symbol id="i-songs" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h11v2H3zm0 4h11v2H3zm0 4h7v2H3zm14-8h4v2h-2v9.5a3 3 0 1 1-2-2.83z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M4 4h16v13H4zM6 6v9h2.5V6zm4 0v9h2.5V6zm4 0v9h2.5V6zM3 19h18v2H3z"/></symbol>
+  <symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.5" fill="currentColor"/></symbol>
+  <symbol id="i-set" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zm8.4 2.3-1.9-.4-.6-1.5 1.1-1.6-1.9-1.9-1.6 1.1-1.5-.6-.4-1.9h-2.7l-.4 1.9-1.5.6-1.6-1.1-1.9 1.9 1.1 1.6-.6 1.5-1.9.4v2.7l1.9.4.6 1.5-1.1 1.6 1.9 1.9 1.6-1.1 1.5.6.4 1.9h2.7l.4-1.9 1.5-.6 1.6 1.1 1.9-1.9-1.1-1.6.6-1.5 1.9-.4z"/></symbol>
+  <symbol id="i-pp" viewBox="0 0 24 24"><path fill="#121212" d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path fill="#121212" d="M7 5h3.5v14H7zm6.5 0H17v14h-3.5z"/></symbol>
+  <symbol id="i-aud" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-back5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M5 12a7 7 0 1 0 2-5M5 4v4h4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" font-family="Inter" font-weight="700">5</text></symbol>
+  <symbol id="i-fwd5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M19 12a7 7 0 1 1-2-5M19 4v4h-4"/><text x="12" y="15.5" font-size="7" text-anchor="middle" fill="currentColor" font-family="Inter" font-weight="700">5</text></symbol>
+  <symbol id="i-loop" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M4 11V9a3 3 0 0 1 3-3h11l-3-3m5 10v2a3 3 0 0 1-3 3H6l3 3"/></symbol>
+  <symbol id="i-keys" viewBox="0 0 24 24"><path fill="currentColor" d="M3 4h18v16H3zm2 2v12h2.5v-5H9V6zm6 0v7h1.5v5h2v-5H16V6zm7 0v7h1.5v5H19V6z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l2.2 6.3L20 10l-5.8 1.7L12 18l-2.2-6.3L4 10l5.8-1.7zM19 15l1 2.6 2.5 1-2.5 1L19 22l-1-2.4-2.5-1 2.5-1z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path stroke="currentColor" stroke-width="2.2" d="M15.5 15.5 21 21"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" d="M12 3v12m-5-5 5 5 5-5M4 17v3h16v-3"/></symbol>
+  <symbol id="i-ear" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M7 9a5 5 0 0 1 10 0c0 3-3 4-3 7a3 3 0 0 1-5.5 1.5M10 9.5a2 2 0 0 1 4 0"/></symbol>
+  <symbol id="i-cable" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M9 3v4m6-4v4M7 7h10v4a5 5 0 0 1-10 0zm5 9v5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.6" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-split" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" d="M12 21v-7l-6-6V4m6 10 6-6V4M4 6l2-2 2 2m8 0 2-2 2 2"/></symbol>
+  <symbol id="i-ab" viewBox="0 0 24 24"><text x="3" y="17" font-size="11" fill="currentColor" font-family="Inter" font-weight="700">A</text><text x="13" y="17" font-size="11" fill="currentColor" font-family="Inter" font-weight="700">B</text></symbol>
+ </defs>
+</svg>
+
+<div class="grid">
+
+<!-- 1 SONGS -->
+<div>
+<div class="cap">1 · Songs</div><div class="capd">One import action (no duplicate “+”). Song rows show readiness at a glance. Keyboard status is a quiet chip.</div>
+<div class="phone">
+ <div class="status"><span>9:41</span><span>▂▄▆ ◔</span></div>
+ <div class="nav"><span class="chip warn"><svg class="ico" style="width:14px;height:14px"><use href="#i-cable"/></svg>No keyboard</span><span></span></div>
+ <div class="content">
+  <div class="large">Songs</div>
+  <div class="row" style="background:var(--elevated);height:36px;border-radius:10px;padding:0 10px;color:var(--t3);gap:8px"><svg class="ico" style="width:17px"><use href="#i-search"/></svg>Search songs</div>
+  <div class="row" style="margin-top:16px;gap:12px">
+   <div class="btnp"><svg class="ico"><use href="#i-import"/></svg>Import song</div>
+   <div class="btns" style="flex:.7"><svg class="ico"><use href="#i-ear"/></svg>Listen</div>
+  </div>
+  <div class="sec">Recent</div>
+  <div class="list">
+   <div class="li"><div class="art" style="background:linear-gradient(135deg,#c2662d,#8a3b8f)">HU</div><div class="t"><div style="font-weight:600">Hukum</div><div class="meta">Jailer · Tamil · 3:21</div></div><span class="chip ok"><svg class="ico" style="width:12px;height:12px"><use href="#i-check"/></svg>Ready</span></div>
+   <div class="li"><div class="art" style="background:linear-gradient(135deg,#2d8ec2,#3b4f8f)">KA</div><div class="t"><div style="font-weight:600">Kaavaalaa</div><div class="meta">Jailer · Tamil · 3:10</div></div><span class="chip acc">Separating 42%</span></div>
+   <div class="li"><div class="art" style="background:linear-gradient(135deg,#3da36b,#2b6a7a)">NA</div><div class="t"><div style="font-weight:600">Naatu Naatu</div><div class="meta">RRR · Telugu · 3:36</div></div><span class="chip">Analysed</span></div>
+   <div class="li"><div class="art" style="background:linear-gradient(135deg,#b8436a,#6d3fa0)">KE</div><div class="t"><div style="font-weight:600">Kesariya</div><div class="meta">Brahmāstra · Hindi · 4:28</div></div><span class="chip">Analysed</span></div>
+  </div>
+ </div>
+ <div class="tabbar"><div class="tab on"><svg><use href="#i-songs"/></svg>Songs</div><div class="tab"><svg><use href="#i-play"/></svg>Play</div><div class="tab"><svg><use href="#i-rec"/></svg>Record</div><div class="tab"><svg><use href="#i-set"/></svg>Settings</div></div>
+</div></div>
+
+<!-- 2 PLAY -->
+<div>
+<div class="cap">2 · Play (performance view, default)</div><div class="capd">Pages fixed at the top. Big “now / next” readable from the keyboard. Chords now and next. Tone one tap away.</div>
+<div class="phone">
+ <div class="status"><span>9:41</span><span>▂▄▆ ◔</span></div>
+ <div class="nav"><span class="l">‹ Songs</span><span>Hukum</span><span class="r">•••</span></div>
+ <div class="content">
+  <div class="row" style="margin-bottom:10px"><div class="art" style="background:linear-gradient(135deg,#c2662d,#8a3b8f)">HU</div><div><div style="font:600 17px Inter">Hukum</div><div class="meta">Jailer · E minor · 128 BPM</div></div></div>
+  <div class="seg"><div class="on">Play</div><div>Mix</div><div>Tone</div><div>Arpeggio</div><div>Sections</div></div>
+  <div style="margin-top:18px" class="row"><div style="width:4px;height:34px;border-radius:2px;background:var(--s2)"></div><div class="big">BGM</div><span class="chip acc" style="margin-left:auto">Hook</span></div>
+  <div style="color:var(--t2);font-size:15px;margin:4px 0 14px" class="k">Next: Charanam · 0:12</div>
+  <div class="wave" id="w1"></div>
+  <div class="row" style="gap:8px;margin-top:10px;overflow:hidden">
+   <div class="schip" style="--c:var(--s2)">Intro</div><div class="schip" style="--c:var(--s1)">Pallavi</div><div class="schip on" style="--c:var(--s2)">BGM</div><div class="schip" style="--c:var(--s3)">Charanam</div><div class="schip" style="--c:var(--s1)">Pallavi</div>
+  </div>
+  <div class="surface" style="margin-top:12px;padding:14px 16px">
+   <div class="row" style="justify-content:space-between"><div><div class="meta" style="font-weight:600;letter-spacing:.3px">CHORD</div><div style="font:700 34px Inter" class="k">Em</div><div class="meta">Left hand: E · B · E</div></div>
+   <div style="text-align:right"><div class="meta" style="font-weight:600">NEXT</div><div style="font:600 22px Inter">C</div><div class="meta k">in 2.4 s</div></div></div>
+  </div>
+  <div class="surface row" style="margin-top:12px;padding:12px 16px"><svg class="ico" style="color:var(--accent)"><use href="#i-keys"/></svg><div style="flex:1"><div class="meta">Tone</div><div style="font-weight:600">Arabic-style Strings + Slow Strings</div></div><svg class="ico" style="color:var(--t3);width:16px"><use href="#i-chev"/></svg></div>
+ </div>
+ <div class="transport"><div class="bar"><b style="width:38%"></b></div><div class="times"><span>1:16</span><span>3:21</span></div>
+  <div class="tbtns"><div class="tb"><svg class="ico"><use href="#i-loop"/></svg></div><div class="tb"><svg class="ico"><use href="#i-back5"/></svg></div><div class="pbtn"><svg style="width:28px;height:28px"><use href="#i-pause"/></svg></div><div class="tb"><svg class="ico"><use href="#i-fwd5"/></svg></div><div class="tb" style="font:700 15px Inter">1×</div></div></div>
+ <div class="tabbar" style="height:70px"><div class="tab"><svg><use href="#i-songs"/></svg>Songs</div><div class="tab on"><svg><use href="#i-play"/></svg>Play</div><div class="tab"><svg><use href="#i-rec"/></svg>Record</div><div class="tab"><svg><use href="#i-set"/></svg>Settings</div></div>
+</div></div>
+
+<!-- 3 MIX -->
+<div>
+<div class="cap">3 · Mix</div><div class="capd">Parts as calm rows with a colour marker (no tinted cards). Mute / Solo are labelled buttons. One toggle for hard parts.</div>
+<div class="phone">
+ <div class="status"><span>9:41</span><span>▂▄▆ ◔</span></div>
+ <div class="nav"><span class="l">‹ Songs</span><span>Hukum</span><span class="r">•••</span></div>
+ <div class="content">
+  <div class="row" style="margin-bottom:10px"><div class="art" style="background:linear-gradient(135deg,#c2662d,#8a3b8f)">HU</div><div><div style="font:600 17px Inter">Hukum</div><div class="meta">Jailer · E minor · 128 BPM</div></div></div>
+  <div class="seg"><div>Play</div><div class="on">Mix</div><div>Tone</div><div>Arpeggio</div><div>Sections</div></div>
+  <div class="sec">Parts <a>Reset</a></div>
+  <div class="list">
+   <div class="li" style="flex-wrap:wrap"><div class="dot" style="background:var(--s4)"></div><div class="t" style="font-weight:600">Vocals</div><div class="ms on">Mute</div><div class="ms">Solo</div><div style="flex-basis:100%;display:flex;align-items:center;gap:12px;padding:6px 0 4px 22px"><div class="slider"><b style="width:0%;background:var(--t3)"></b><i style="left:-4px"></i></div><span class="meta k" style="width:34px;text-align:right">Off</span></div></div>
+   <div class="li" style="flex-wrap:wrap"><div class="dot" style="background:var(--s2)"></div><div class="t"><div style="font-weight:600">Lead instruments</div><div class="meta">Closest: Arabic-style Strings</div></div><div class="ms">Mute</div><div class="ms">Solo</div><div style="flex-basis:100%;display:flex;align-items:center;gap:12px;padding:6px 0 4px 22px"><div class="slider"><b style="width:90%"></b><i style="left:calc(90% - 12px)"></i></div><span class="meta k" style="width:34px;text-align:right">90%</span></div></div>
+   <div class="li" style="flex-wrap:wrap"><div class="dot" style="background:#7FD99A"></div><div class="t" style="font-weight:600">Backing</div><div class="ms">Mute</div><div class="ms">Solo</div><div style="flex-basis:100%;display:flex;align-items:center;gap:12px;padding:6px 0 4px 22px"><div class="slider"><b style="width:75%"></b><i style="left:calc(75% - 12px)"></i></div><span class="meta k" style="width:34px;text-align:right">75%</span></div></div>
+   <div class="li" style="flex-wrap:wrap"><div class="dot" style="background:var(--s1)"></div><div class="t" style="font-weight:600">Drums</div><div class="ms">Mute</div><div class="ms">Solo</div><div style="flex-basis:100%;display:flex;align-items:center;gap:12px;padding:6px 0 4px 22px"><div class="slider"><b style="width:85%"></b><i style="left:calc(85% - 12px)"></i></div><span class="meta k" style="width:34px;text-align:right">85%</span></div></div>
+   <div class="li" style="flex-wrap:wrap"><div class="dot" style="background:var(--s3)"></div><div class="t" style="font-weight:600">Bass</div><div class="ms">Mute</div><div class="ms">Solo</div><div style="flex-basis:100%;display:flex;align-items:center;gap:12px;padding:6px 0 4px 22px"><div class="slider"><b style="width:80%"></b><i style="left:calc(80% - 12px)"></i></div><span class="meta k" style="width:34px;text-align:right">80%</span></div></div>
+  </div>
+  <div class="list" style="margin-top:12px"><div class="li"><div class="t"><div style="font-weight:600">Original plays hard parts</div><div class="meta">In the sections you pick</div></div><div class="toggle off"></div></div></div>
+  <div class="note" style="margin:10px 4px 0">Mute a part to play it yourself.</div>
+ </div>
+ <div class="transport"><div class="bar"><b style="width:38%"></b></div><div class="times"><span>1:16</span><span>3:21</span></div>
+  <div class="tbtns"><div class="tb"><svg class="ico"><use href="#i-loop"/></svg></div><div class="tb"><svg class="ico"><use href="#i-back5"/></svg></div><div class="pbtn"><svg style="width:28px;height:28px"><use href="#i-pause"/></svg></div><div class="tb"><svg class="ico"><use href="#i-fwd5"/></svg></div><div class="tb" style="font:700 15px Inter">1×</div></div></div>
+ <div class="tabbar" style="height:70px"><div class="tab"><svg><use href="#i-songs"/></svg>Songs</div><div class="tab on"><svg><use href="#i-play"/></svg>Play</div><div class="tab"><svg><use href="#i-rec"/></svg>Record</div><div class="tab"><svg><use href="#i-set"/></svg>Settings</div></div>
+</div></div>
+
+<!-- 4 TONE -->
+<div>
+<div class="cap">4 · Tone (suggestion first)</div><div class="capd">The AI's choice as a suggestion with Use / Change / Compare and why. Layers as tiles with level; Edit for details.</div>
+<div class="phone">
+ <div class="status"><span>9:41</span><span>▂▄▆ ◔</span></div>
+ <div class="nav"><span class="l">‹ Songs</span><span>Hukum</span><span class="r">•••</span></div>
+ <div class="content">
+  <div class="row" style="margin-bottom:10px"><div class="art" style="background:linear-gradient(135deg,#c2662d,#8a3b8f)">HU</div><div><div style="font:600 17px Inter">Hukum</div><div class="meta">Jailer · E minor · 128 BPM</div></div></div>
+  <div class="seg"><div>Play</div><div>Mix</div><div class="on">Tone</div><div>Arpeggio</div><div>Sections</div></div>
+  <div class="seg" style="margin-top:14px;background:var(--surface)"><div style="height:34px;background:var(--elevated)">Whole song</div><div style="height:34px;color:var(--t2)">Per section</div></div>
+  <div class="surface" style="margin-top:12px;background:linear-gradient(180deg,rgba(250,158,51,.10),rgba(250,158,51,.03)),var(--surface);border:1px solid rgba(250,158,51,.25)">
+   <div class="row" style="gap:8px;color:var(--accent);font:600 13px Inter"><svg class="ico" style="width:16px"><use href="#i-spark"/></svg>SUGGESTED FOR THE HOOK</div>
+   <div style="font:700 21px Inter;margin:8px 0 4px">Arabic-style Strings + Slow Strings</div>
+   <div class="meta" style="font-size:13px">From the BGM — an instrumental line heard 3×, no singing over it.</div>
+   <div class="row" style="gap:6px;margin-top:10px"><span class="chip ok"><svg class="ico" style="width:12px;height:12px"><use href="#i-check"/></svg>Both separations agree</span><span class="chip">Feel: intense</span></div>
+   <div class="row" style="gap:10px;margin-top:14px"><div class="btnp" style="height:44px"><svg class="ico" style="width:18px"><use href="#i-check"/></svg>In use</div><div class="btns" style="height:44px">Change</div><div class="btns" style="height:44px;flex:.55"><svg class="ico"><use href="#i-ab"/></svg></div></div>
+  </div>
+  <div class="sec">Layers <a>Edit</a></div>
+  <div class="list">
+   <div class="li"><div class="dot" style="background:var(--s2)"></div><div class="t"><div style="font-weight:600">Arabic-style Strings</div><div style="display:flex;align-items:center;gap:10px;margin-top:8px"><div class="slider"><b style="width:80%"></b><i style="left:calc(80% - 12px)"></i></div><span class="meta k">80%</span></div></div><div class="tb" style="width:36px;color:var(--accent)"><svg class="ico"><use href="#i-aud"/></svg></div></div>
+   <div class="li"><div class="dot" style="background:var(--s3)"></div><div class="t"><div style="font-weight:600">Slow Strings</div><div style="display:flex;align-items:center;gap:10px;margin-top:8px"><div class="slider"><b style="width:55%"></b><i style="left:calc(55% - 12px)"></i></div><span class="meta k">55%</span></div></div><div class="tb" style="width:36px;color:var(--accent)"><svg class="ico"><use href="#i-aud"/></svg></div></div>
+  </div>
+  <div class="note" style="margin:10px 4px 0">All 61 keys · Brighter attack fitted to the song</div>
+ </div>
+ <div class="transport"><div class="bar"><b style="width:38%"></b></div><div class="times"><span>1:16</span><span>3:21</span></div>
+  <div class="tbtns"><div class="tb"><svg class="ico"><use href="#i-loop"/></svg></div><div class="tb"><svg class="ico"><use href="#i-back5"/></svg></div><div class="pbtn"><svg style="width:28px;height:28px"><use href="#i-pause"/></svg></div><div class="tb"><svg class="ico"><use href="#i-fwd5"/></svg></div><div class="tb" style="font:700 15px Inter">1×</div></div></div>
+ <div class="tabbar" style="height:70px"><div class="tab"><svg><use href="#i-songs"/></svg>Songs</div><div class="tab on"><svg><use href="#i-play"/></svg>Play</div><div class="tab"><svg><use href="#i-rec"/></svg>Record</div><div class="tab"><svg><use href="#i-set"/></svg>Settings</div></div>
+</div></div>
+
+<!-- 5 TONE EDITOR -->
+<div>
+<div class="cap">5 · Tone editor (sheet)</div><div class="capd">Layer tiles first: sound, level, brightness. Envelope, filter, vibrato, key range under Details — nothing technical up front.</div>
+<div class="phone">
+ <div class="status"><span>9:41</span><span>▂▄▆ ◔</span></div>
+ <div class="dim"></div>
+ <div class="sheet">
+  <div class="grabber"></div>
+  <div class="nav"><span class="l">Cancel</span><span>Main tone</span><span class="r" style="font-weight:600">Done</span></div>
+  <div class="content">
+   <div class="surface">
+    <div class="row"><div class="dot" style="background:var(--s2)"></div><div style="flex:1"><div style="font:600 17px Inter">Arabic-style Strings</div><div class="meta">Real instrument · VSCO</div></div><div class="ms" style="width:auto;padding:0 12px;color:var(--accent)">Change</div></div>
+    <div style="margin-top:16px" class="meta">Level</div><div class="row" style="margin-top:10px"><div class="slider"><b style="width:80%"></b><i style="left:calc(80% - 12px)"></i></div><span class="meta k" style="width:36px;text-align:right">80%</span></div>
+    <div style="margin-top:16px" class="meta">Brightness</div><div class="row" style="margin-top:10px"><div class="slider"><b style="width:62%"></b><i style="left:calc(62% - 12px)"></i></div><span class="meta k" style="width:36px;text-align:right">62%</span></div>
+    <div class="row" style="margin-top:16px;gap:8px"><div class="ms" style="flex:1">Mute</div><div class="ms" style="flex:1">Solo</div><div class="ms" style="flex:1;color:var(--accent)">▶ Audition</div></div>
+   </div>
+   <div class="list" style="margin-top:12px">
+    <div class="li"><div class="t">Envelope</div><span class="meta">Slow attack</span><svg class="ico" style="width:14px;color:var(--t3)"><use href="#i-chev"/></svg></div>
+    <div class="li"><div class="t">Filter &amp; EQ</div><span class="meta">Fitted</span><svg class="ico" style="width:14px;color:var(--t3)"><use href="#i-chev"/></svg></div>
+    <div class="li"><div class="t">Vibrato &amp; glide</div><span class="meta">Arabic style</span><svg class="ico" style="width:14px;color:var(--t3)"><use href="#i-chev"/></svg></div>
+    <div class="li"><div class="t">Keys</div><span class="meta">All 61</span><svg class="ico" style="width:14px;color:var(--t3)"><use href="#i-chev"/></svg></div>
+   </div>
+   <div class="surface row" style="margin-top:12px;padding:12px 16px"><div class="dot" style="background:var(--s3)"></div><div style="flex:1"><div style="font-weight:600">Slow Strings</div><div class="meta">Level 55%</div></div><svg class="ico" style="width:14px;color:var(--t3)"><use href="#i-chev"/></svg></div>
+   <div class="row" style="margin-top:12px;gap:10px"><div class="btns" style="height:44px">+ Add layer</div><div class="btns" style="height:44px">Effects</div></div>
+   <div class="note" style="margin:12px 4px 0">Why: the BGM's lead line sounds closest to these strings (both separations agree).</div>
+  </div>
+ </div>
+</div></div>
+
+<!-- 6 SOUND BROWSER -->
+<div>
+<div class="cap">6 · Sound browser (one place)</div><div class="capd">Suggested for this song first, then everything. Tap ▶ to audition on the song's melody. Packs show size + Get.</div>
+<div class="phone">
+ <div class="status"><span>9:41</span><span>▂▄▆ ◔</span></div>
+ <div class="dim"></div>
+ <div class="sheet">
+  <div class="grabber"></div>
+  <div class="nav"><span class="l">Cancel</span><span>Choose a sound</span><span class="r"></span></div>
+  <div class="content">
+   <div class="row" style="background:var(--elevated);height:36px;border-radius:10px;padding:0 10px;color:var(--t3);gap:8px"><svg class="ico" style="width:17px"><use href="#i-search"/></svg>Search sounds</div>
+   <div class="row" style="gap:8px;margin-top:12px;overflow:hidden"><span class="chip acc" style="padding:8px 12px;font-size:13px">Suggested</span><span class="chip" style="padding:8px 12px;font-size:13px">All</span><span class="chip" style="padding:8px 12px;font-size:13px">Strings</span><span class="chip" style="padding:8px 12px;font-size:13px">Flute</span><span class="chip" style="padding:8px 12px;font-size:13px">Indian</span><span class="chip" style="padding:8px 12px;font-size:13px">Piano</span></div>
+   <div class="sec" style="margin-top:16px">For the BGM</div>
+   <div class="list">
+    <div class="li"><div class="tb" style="width:36px;height:36px;border-radius:50%;background:var(--accentMuted);color:var(--accent)"><svg class="ico" style="width:16px"><use href="#i-aud"/></svg></div><div class="t"><div style="font-weight:600">Arabic-style Strings</div><div class="meta">Real instrument · closest</div></div><svg class="ico" style="color:var(--accent)"><use href="#i-check"/></svg></div>
+    <div class="li"><div class="tb" style="width:36px;height:36px;border-radius:50%;background:var(--elevated)"><svg class="ico" style="width:16px"><use href="#i-aud"/></svg></div><div class="t"><div style="font-weight:600">Expressive Violin</div><div class="meta">Real instrument</div></div></div>
+    <div class="li"><div class="tb" style="width:36px;height:36px;border-radius:50%;background:var(--elevated)"><svg class="ico" style="width:16px"><use href="#i-aud"/></svg></div><div class="t"><div style="font-weight:600">Film Strings</div><div class="meta">Built-in</div></div></div>
+   </div>
+   <div class="sec">Real instruments</div>
+   <div class="list">
+    <div class="li"><div class="tb" style="width:36px;height:36px;border-radius:50%;background:var(--elevated)"><svg class="ico" style="width:16px"><use href="#i-aud"/></svg></div><div class="t"><div style="font-weight:600">Bansuri-style Flute</div><div class="meta">Real Flute pack · 1.4 MB</div></div><span class="chip acc" style="padding:7px 14px;font-size:14px">Get</span></div>
+    <div class="li"><div class="tb" style="width:36px;height:36px;border-radius:50%;background:var(--elevated)"><svg class="ico" style="width:16px"><use href="#i-aud"/></svg></div><div class="t"><div style="font-weight:600">Steinway Grand</div><div class="meta">9.2 MB</div></div><span class="chip acc" style="padding:7px 14px;font-size:14px">Get</span></div>
+    <div class="li"><div class="tb" style="width:36px;height:36px;border-radius:50%;background:var(--elevated)"><svg class="ico" style="width:16px"><use href="#i-aud"/></svg></div><div class="t"><div style="font-weight:600">Solo Violin</div><div class="meta">Installed</div></div><span class="chip ok">✓</span></div>
+   </div>
+   <div class="note" style="margin:10px 4px 0">▶ previews download-free. Free, public-domain recordings (VSCO, VCSL).</div>
+  </div>
+ </div>
+</div></div>
+
+<!-- 7 CHORD CORRECTION -->
+<div>
+<div class="cap">7 · Correct a chord (tap the chord)</div><div class="capd">From the Play page's chord card: the two likeliest chords first, then root and type. Two taps.</div>
+<div class="phone">
+ <div class="status"><span>9:41</span><span>▂▄▆ ◔</span></div>
+ <div class="dim"></div>
+ <div class="sheet" style="inset:330px 0 0 0">
+  <div class="grabber"></div>
+  <div class="nav"><span class="l">Cancel</span><span>Chord at 1:16</span><span class="r" style="font-weight:600">Done</span></div>
+  <div class="content">
+   <div class="meta" style="margin:4px 0 10px">Heard as Em. Is it right?</div>
+   <div class="row" style="gap:10px">
+    <div class="surface" style="flex:1;text-align:center;border:2px solid var(--accent);padding:14px"><div style="font:700 30px Inter">Em</div><div class="meta">Likely · 72%</div></div>
+    <div class="surface" style="flex:1;text-align:center;padding:14px"><div style="font:700 30px Inter">G</div><div class="meta">Possible · 21%</div></div>
+   </div>
+   <div class="sec" style="margin-top:18px">Something else</div>
+   <div class="row" style="gap:6px;flex-wrap:wrap">
+    <span class="chip" style="padding:9px 13px;font-size:14px">C</span><span class="chip" style="padding:9px 13px;font-size:14px">D</span><span class="chip acc" style="padding:9px 13px;font-size:14px">E</span><span class="chip" style="padding:9px 13px;font-size:14px">F</span><span class="chip" style="padding:9px 13px;font-size:14px">G</span><span class="chip" style="padding:9px 13px;font-size:14px">A</span><span class="chip" style="padding:9px 13px;font-size:14px">B</span>
+   </div>
+   <div class="seg" style="margin-top:12px"><div>Major</div><div class="on">Minor</div><div>7</div><div>m7</div><div>sus</div></div>
+   <div class="row" style="gap:10px;margin-top:16px"><div class="btns" style="height:44px">▶ Hear it</div><div class="btns" style="height:44px">Apply to repeats</div></div>
+  </div>
+ </div>
+</div></div>
+
+<!-- 8 SETTINGS -->
+<div>
+<div class="cap">8 · Settings (regrouped)</div><div class="capd">Five groups instead of five screens of scrolling. Sound packs live in the Sound browser; storage shows space used.</div>
+<div class="phone">
+ <div class="status"><span>9:41</span><span>▂▄▆ ◔</span></div>
+ <div class="nav"></div>
+ <div class="content">
+  <div class="large" style="margin-top:-6px">Settings</div>
+  <div class="meta" style="font-weight:600;margin:6px 4px 6px">KEYBOARD &amp; AUDIO</div>
+  <div class="list">
+   <div class="li"><svg class="ico" style="color:var(--accent)"><use href="#i-cable"/></svg><div class="t">Connect your Casio</div><span class="chip warn">Not connected</span><span class="chev">›</span></div>
+   <div class="li"><svg class="ico" style="color:var(--accent)"><use href="#i-keys"/></svg><div class="t">Velocity</div><span class="meta" style="font-size:15px">Linear</span><span class="chev">›</span></div>
+   <div class="li"><svg class="ico" style="color:var(--accent)"><use href="#i-set"/></svg><div class="t">Diagnostics</div><span class="chev">›</span></div>
+  </div>
+  <div class="meta" style="font-weight:600;margin:18px 4px 6px">SOUND</div>
+  <div class="list">
+   <div class="li"><div class="t">Sound library</div><span class="meta" style="font-size:15px">3 packs</span><span class="chev">›</span></div>
+   <div class="li"><div class="t">Sound engine</div><span class="meta" style="font-size:15px">TonePilot</span><span class="chev">›</span></div>
+  </div>
+  <div class="meta" style="font-weight:600;margin:18px 4px 6px">SEPARATION</div>
+  <div class="list">
+   <div class="li"><div class="t">Parts</div><span class="meta" style="font-size:15px">4 parts</span><span class="chev">›</span></div>
+   <div class="li"><div class="t"><div>Check with both models</div><div class="meta">Takes about twice as long</div></div><div class="toggle"></div></div>
+  </div>
+  <div class="meta" style="font-weight:600;margin:18px 4px 6px">STORAGE &amp; DATA</div>
+  <div class="list"><div class="li"><div class="t">On this iPhone</div><span class="meta" style="font-size:15px">412 MB</span><span class="chev">›</span></div><div class="li"><div class="t">Back up library</div><span class="chev">›</span></div></div>
+  <div class="meta" style="font-weight:600;margin:18px 4px 6px">ABOUT</div>
+  <div class="list"><div class="li"><div class="t">Licences &amp; credits</div><span class="chev">›</span></div></div>
+ </div>
+ <div class="tabbar"><div class="tab"><svg><use href="#i-songs"/></svg>Songs</div><div class="tab"><svg><use href="#i-play"/></svg>Play</div><div class="tab"><svg><use href="#i-rec"/></svg>Record</div><div class="tab on"><svg><use href="#i-set"/></svg>Settings</div></div>
+</div></div>
+
+</div>
+<script>
+// Waveform bars + section bands for the Play mockup.
+const w=document.getElementById('w1');
+const bands=[[0,.08,'#4FC1B4'],[.08,.32,'#F0A04B'],[.32,.42,'#4FC1B4'],[.42,.66,'#A98BF5'],[.66,.9,'#F0A04B'],[.9,1,'#4FC1B4']];
+for(const [a,b,c] of bands){const d=document.createElement('div');d.className='band';d.style.left=(a*100)+'%';d.style.width=((b-a)*100-.6)+'%';d.style.background=c;d.style.opacity=.22;w.appendChild(d)}
+for(let i=0;i<120;i++){const e=document.createElement('i');const h=10+Math.abs(Math.sin(i*.37)*30+Math.sin(i*1.7)*14);e.style.height=Math.min(58,h)+'px';e.style.position='relative';w.appendChild(e)}
+const p=document.createElement('div');p.className='play';p.style.left='38%';w.appendChild(p);
+</script>
+</body></html>
