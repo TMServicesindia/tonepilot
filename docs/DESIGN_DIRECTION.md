@@ -152,3 +152,19 @@ Each screen has exactly three levels.
 4. **Plain words**, no theory or engine jargon on main screens.
 5. **Always know where you are:** song name, page and section always visible in Play.
 6. **Native iOS patterns:** navigation bar, sheets, lists, segmented control and tab bar.
+
+
+---
+
+# v6 — v5 layout and usability + colour from v2 / v3 (owner, 6 Nov: "colours went too dull; combine v2 and v3")
+
+- **Layout, controls and usability rules:** unchanged from v5 / the screen spec.
+- **Colour returns where it identifies something:**
+  - **Instrument tiles:** family-tinted (strings warm brown, winds teal, keys indigo, plucked rose, percussion bronze, voice plum, bass violet, synth blue, brass gold), with v3's shaded instrument art.
+  - **Song Map:** repeats in teal / indigo / pink / grey; the current section amber with a soft glow.
+  - **Parts:** coloured dots and coloured level bars.
+  - **Settings and Details rows:** coloured icon squares by group (iOS Settings idiom).
+  - **Status:** success in green (✓ Ready, finished analysis steps).
+  - **Keys guide:** left hand amber, next melody note teal.
+- **Light:** primary buttons, the play button and the selected page carry a soft amber glow; a faint violet / warm ambient light sits behind each screen; the Tone suggestion card has a warm tint.
+- **Still not allowed:** glowing cards everywhere, colour as the only signal, decoration in bars and navigation.
