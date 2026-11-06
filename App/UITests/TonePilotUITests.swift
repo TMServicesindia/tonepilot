@@ -175,6 +175,7 @@ final class TonePilotUITests: XCTestCase {
                     let add = element("arpeggio.addFill")
                     if add.waitForExistence(timeout: 3) { tap(add, "add a fill to a block-chord section") }
                 }
+                XCTAssertTrue(element("arpeggio.state").waitForExistence(timeout: 3), "arpeggio shows its state line")
                 let live = element("arpeggio.live")
                 if live.waitForExistence(timeout: 3) {
                     tap(live, "live fill-in on")

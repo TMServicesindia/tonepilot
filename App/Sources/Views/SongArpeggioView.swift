@@ -8,14 +8,8 @@ struct SongArpeggioCard: View {
     let song: Song
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Label("Song Arpeggio", systemImage: "pianokeys.inverse").font(.headline)
-                Spacer()
-                Text("Live").font(.caption2.weight(.semibold))
-                    .padding(.horizontal, 7).padding(.vertical, 3)
-                    .background(Theme.accent.opacity(0.18), in: Capsule()).foregroundStyle(Theme.accent)
-            }
+        VStack(alignment: .leading, spacing: DS.Space.l) {
+            stateLine
             if let arp = song.arpeggio, !model.arpeggioSections(song).isEmpty {
                 learned(arp)
             } else {
@@ -23,9 +17,36 @@ struct SongArpeggioCard: View {
             }
             if let arp = song.arpeggio { skippedSections(arp) }
         }
-        .padding(14)
-        .background(Theme.panel, in: RoundedRectangle(cornerRadius: 16))
+        .dsSurface()
         .onDisappear { if model.arpeggioPreview?.songId == song.id { model.stopArpeggioPreview() } }
+    }
+
+    // MARK: State (spec §2.11: one clear line)
+
+    /// "Waiting for your chord" / "Playing the fill" / "Live fill-in is off". Fixed height, so nothing moves.
+    private var stateLine: some View {
+        let live = song.arpeggio?.liveFill == true && !model.arpeggioSections(song).isEmpty
+        let chord = model.arpeggioLiveChord
+        let previewing = model.arpeggioPreview?.songId == song.id
+        let (title, detail, symbol, on): (String, String, String, Bool) = {
+            if previewing { return ("Playing the preview", "On the song's own chords", "play.circle.fill", true) }
+            if live, let chord { return ("Playing the fill", "Following \(chord)", "waveform", true) }
+            if live { return ("Waiting for your chord", "Play the root with your left hand", "hand.raised", false) }
+            return ("Live fill-in is off", "Preview it, or turn it on below", "pause.circle", false)
+        }()
+        return HStack(spacing: DS.Space.m) {
+            Image(systemName: symbol).font(DS.Text.screenTitle)
+                .foregroundStyle(on ? DS.Palette.accent : DS.Palette.textSecondary)
+                .frame(width: DS.Size.touchTarget, height: DS.Size.touchTarget)
+                .background(on ? DS.Palette.accentMuted : DS.Palette.elevated, in: RoundedRectangle(cornerRadius: DS.Radius.m, style: .continuous))
+            VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                Text(title).font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+                Text(detail).font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
+            }
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("arpeggio.state")
     }
 
     // MARK: No fill unless sure
@@ -37,33 +58,34 @@ struct SongArpeggioCard: View {
         let rows = skipped.filter { s in !skipped.contains { $0.id != s.id && $0.repetitionGroup != nil && $0.repetitionGroup == s.repetitionGroup && $0.type == s.type && $0.startTime < s.startTime } }
         if !rows.isEmpty {
             VStack(alignment: .leading, spacing: 6) {
-                Text("No fill (the song doesn't play broken chords here)").font(.subheadline.weight(.semibold))
+                Text("No fill in these sections").font(DS.Text.label).foregroundStyle(DS.Palette.textPrimary)
                 ForEach(rows) { s in
                     HStack {
                         VStack(alignment: .leading, spacing: 1) {
-                            Text(s.label).font(.subheadline).lineLimit(1)
-                            Text(Self.heard(arp.skipped?[s.id.uuidString])).font(.caption2).foregroundStyle(.secondary)
+                            Text(s.label).font(DS.Text.bodySecondary).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+                            Text(Self.heard(arp.skipped?[s.id.uuidString])).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                         }
                         Spacer()
                         Button("Add a fill anyway") {
                             model.setArpeggioStyle(ArpeggioStyles.all.first?.id, songId: song.id, sectionId: s.id)
                             model.selectArpeggioSection(s.id, songId: song.id)
                         }
-                        .font(.caption.weight(.semibold)).buttonStyle(.bordered)
+                        .font(DS.Text.caption.weight(.semibold)).buttonStyle(.bordered).tint(DS.Palette.accent)
+                        .frame(minHeight: DS.Size.touchTarget)
                         .accessibilityIdentifier("arpeggio.addFill")
                     }
                 }
             }
-            .padding(12)
-            .background(Theme.panelRaised, in: RoundedRectangle(cornerRadius: 12))
+            .padding(DS.Space.m)
+            .background(DS.Palette.elevated, in: RoundedRectangle(cornerRadius: DS.Radius.m, style: .continuous))
             .accessibilityIdentifier("arpeggio.skipped")
         }
     }
 
     static func heard(_ kind: String?) -> String {
         switch AccompanimentClassifier.Kind(rawValue: kind ?? "") {
-        case .blockChords: return "Heard block chords / strums"
-        case .melodic: return "Heard a melody line, not chords"
+        case .blockChords: return "The song plays block chords here"
+        case .melodic: return "The song plays a melody here, not chords"
         case .some(.none): return "Too quiet or too short to tell"
         default: return "Not sure enough to fill"
         }
@@ -73,21 +95,22 @@ struct SongArpeggioCard: View {
 
     @ViewBuilder private var notLearned: some View {
         let separated = !model.stemKinds(for: song).isEmpty
-        Text("TonePilot learns each section's broken-chord pattern — its rhythm, accents and chord positions — from the song's separated **Music** part. Then you can preview it on the song's own chords.")
-            .font(.footnote).foregroundStyle(.secondary)
+        Text("TonePilot learns each section's broken-chord pattern from the song's Music part.")
+            .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
         if model.separationProgress[song.id] != nil || song.analysisStatus == .running {
-            Label("Learning starts when the separation and analysis finish.", systemImage: "hourglass").font(.caption)
+            Label("Learning starts when the analysis finishes.", systemImage: "hourglass")
+                .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
         } else if !separated {
             Button { model.separateStems(song.id) } label: { Label("Separate the parts first", systemImage: "scissors") }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.dsPrimary)
                 .disabled(!model.canSeparate || model.audioURL(for: song) == nil)
         } else {
             Button { model.analyze(songId: song.id, useServer: model.serverSettings.enabled) } label: {
                 Label("Learn the patterns", systemImage: "sparkles")
             }
-            .buttonStyle(.borderedProminent)
-            Text("Re-analyses the song from its separated parts (your tones and corrections are kept).")
-                .font(.caption2).foregroundStyle(.secondary)
+            .buttonStyle(.dsPrimary)
+            Text("Your tones and corrections are kept.")
+                .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
         }
     }
 
@@ -105,61 +128,62 @@ struct SongArpeggioCard: View {
         // 1. Live fill-in
         VStack(alignment: .leading, spacing: 8) {
             Toggle(isOn: Binding(get: { live }, set: { model.setArpeggioLive($0, songId: song.id) })) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Live fill-in").font(.headline)
-                    Text("Start each bar with your broken chord — TonePilot plays the rest, in your tone.")
-                        .font(.caption).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                    Text("Live fill-in").font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary)
+                    Text("Start each bar with your chord. TonePilot plays the rest.")
+                        .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
                 }
             }
-            .tint(Theme.accent)
+            .tint(DS.Palette.accent)
             .accessibilityIdentifier("arpeggio.live")
             if live, UITestSeed.enabled {
                 // Speed & crash tests only: key presses through the real MIDI path.
                 Button("Test: play R · 5 · 8") { model.uiTestPlayChordHand() }
-                    .font(.caption).accessibilityIdentifier("arpeggio.testKeys")
+                    .font(DS.Text.caption).accessibilityIdentifier("arpeggio.testKeys")
             }
             if live {
                 HStack(spacing: 8) {
                     yourPart(pattern)
                     Spacer(minLength: 0)
                     Text(model.arpeggioLiveChord.map { "Heard: \($0)" } ?? "Play your root…")
-                        .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.accent).lineLimit(1)
+                        .font(DS.Text.label).foregroundStyle(DS.Palette.accent).lineLimit(1)
                 }
                 Stepper(value: Binding(get: { arp.effectiveSplit }, set: { model.setArpeggioSplit($0, songId: song.id) }), in: 40...84) {
-                    Text("Chord hand: below \(NoteName.name(for: arp.effectiveSplit))").font(.subheadline)
+                    Text("Chord hand: below \(NoteName.name(for: arp.effectiveSplit))").font(DS.Text.bodySecondary)
                 }
-                Text("Start with R · 5 — TonePilot continues the song's pattern, softer and above your hand, in the song's rhythm (locked to its beat while it plays). It never plays the notes you play, follows your chord changes at once, and stays silent when you play a full chord.")
-                    .font(.caption2).foregroundStyle(.secondary)
+                Text("Play R · 5 and TonePilot continues above your hand. A full chord stops the fill.")
+                    .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 chordMemory(arp)
             }
         }
-        .padding(12)
-        .background(Theme.panelRaised, in: RoundedRectangle(cornerRadius: 12))
+        .padding(DS.Space.m)
+        .background(DS.Palette.elevated, in: RoundedRectangle(cornerRadius: DS.Radius.m, style: .continuous))
 
         // 2. Section
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: DS.Space.s) {
                 ForEach(sections) { s in
                     let on = s.id == current.id
                     Button { model.selectArpeggioSection(s.id, songId: song.id) } label: {
-                        Text(s.label).font(.subheadline.weight(.semibold)).lineLimit(1)
-                            .padding(.horizontal, 12).frame(minHeight: 40)
-                            .background(on ? Theme.accent : Theme.panelRaised, in: RoundedRectangle(cornerRadius: 10))
-                            .foregroundStyle(on ? .black : .primary)
+                        Text(s.label).font(DS.Text.label).lineLimit(1)
+                            .padding(.horizontal, DS.Space.m).frame(minHeight: DS.Size.touchTarget)
+                            .background(on ? DS.Palette.accent : DS.Palette.elevated, in: Capsule())
+                            .foregroundStyle(on ? DS.Palette.onAccent : DS.Palette.textPrimary)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityAddTraits(on ? .isSelected : [])
                 }
             }
         }
 
         // 3. Pattern (a basic style, adjusted to the song)
         HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(style.name).font(.title3.weight(.bold))
-                Text(style.shape).font(.subheadline.monospaced()).foregroundStyle(Theme.accent)
-                Text(style.id == suggested?.id ? "Suggested from the song · \(style.meterName) · \(Int(arp.effectiveBPM.rounded())) BPM"
+            VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                Text(style.name).font(DS.Text.screenTitle).foregroundStyle(DS.Palette.textPrimary)
+                Text(style.shape).font(DS.Text.bodySecondary.monospaced()).foregroundStyle(DS.Palette.accent)
+                Text(style.id == suggested?.id ? "Learned from \(current.label) · \(style.meterName) · \(Int(arp.effectiveBPM.rounded())) BPM"
                                                : "Your choice · \(style.meterName) · \(Int(arp.effectiveBPM.rounded())) BPM")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
             }
             Spacer()
             Menu {
@@ -177,25 +201,25 @@ struct SongArpeggioCard: View {
                     Button { model.setArpeggioStyle(nil, songId: song.id, sectionId: current.id) } label: { Label("Back to the suggestion", systemImage: "arrow.uturn.backward") }
                 }
             } label: {
-                Label("Change", systemImage: "slider.horizontal.3").font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 12).frame(minHeight: 40)
-                    .background(Theme.panelRaised, in: RoundedRectangle(cornerRadius: 10))
+                Label("Change", systemImage: "slider.horizontal.3").font(DS.Text.label)
+                    .padding(.horizontal, DS.Space.m).frame(minHeight: DS.Size.touchTarget)
+                    .background(DS.Palette.elevated, in: RoundedRectangle(cornerRadius: DS.Radius.s, style: .continuous))
             }
             .accessibilityIdentifier("arpeggio.style")
         }
         PatternGrid(pattern: pattern, yours: live ? 2 : 0)
 
         // 4. Preview and sound
-        HStack(spacing: 12) {
-            Button {
+        HStack(spacing: DS.Space.m) {
+            let preview = Button {
                 if previewing { model.stopArpeggioPreview() } else { model.startArpeggioPreview(songId: song.id, sectionId: current.id) }
             } label: {
                 Label(previewing ? "Stop preview" : "Preview", systemImage: previewing ? "stop.fill" : "play.fill")
                     .labelStyle(.titleAndIcon)
-                    .font(.headline).frame(maxWidth: .infinity, minHeight: 48)
             }
-            .buttonStyle(.borderedProminent)
             .accessibilityIdentifier("arpeggio.preview")
+            // Preview is the one primary while live fill-in is off (spec §2.11).
+            if live { preview.buttonStyle(.dsSecondary) } else { preview.buttonStyle(.dsPrimary) }
             Menu {
                 Button { model.setArpeggioSound(nil, songId: song.id) } label: {
                     if arp.soundId == nil { Label("Same as my keys", systemImage: "checkmark") } else { Text("Same as my keys") }
@@ -211,12 +235,13 @@ struct SongArpeggioCard: View {
             } label: {
                 Label(arp.soundId.flatMap { model.library.patch(id: $0)?.name } ?? "My keys' tone", systemImage: "music.note")
                     .labelStyle(.titleAndIcon)
-                    .font(.subheadline).lineLimit(1).frame(minHeight: 48).padding(.horizontal, 10)
-                    .background(Theme.panelRaised, in: RoundedRectangle(cornerRadius: 10))
+                    .font(DS.Text.bodySecondary).lineLimit(1).frame(minHeight: DS.Size.primaryButton).padding(.horizontal, DS.Space.m)
+                    .background(DS.Palette.elevated, in: RoundedRectangle(cornerRadius: DS.Radius.m, style: .continuous))
             }
+            .accessibilityIdentifier("arpeggio.sound")
         }
-        Text("Preview plays this pattern on the song's own chords, on its own clock — the song can stay paused.")
-            .font(.caption2).foregroundStyle(.secondary)
+        Text("Preview plays on the song's own chords. The song can stay paused.")
+            .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
         LabeledSlider(title: "Fill volume", value: arp.effectiveVolume, range: 0...1, format: { "\(Int(($0 * 100).rounded()))" }) {
             model.setArpeggioVolume($0, songId: song.id)
         }
@@ -229,13 +254,13 @@ struct SongArpeggioCard: View {
     @ViewBuilder private func chordMemory(_ arp: SongArpeggio) -> some View {
         let learned = arp.memory.sorted { $0.key < $1.key }
         HStack(spacing: 6) {
-            Text("Your chords:").font(.caption.weight(.semibold))
+            Text("Your chords:").font(DS.Text.caption.weight(.semibold))
             if learned.isEmpty {
-                Text("play a 3rd or a full chord once and TonePilot remembers it").font(.caption2).foregroundStyle(.secondary)
+                Text("Play a chord once and TonePilot remembers it").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
             } else {
-                ForEach(learned, id: \.key) { pc, q in StatusPill(text: NoteName.sharpNames[pc] + (q == .minor ? "m" : ""), color: Theme.accent) }
-                Spacer(minLength: 4)
-                Button("Reset") { model.resetChordMemory(songId: song.id) }.font(.caption.weight(.semibold))
+                ForEach(learned, id: \.key) { pc, q in DSChip(text: NoteName.sharpNames[pc] + (q == .minor ? "m" : ""), tone: .accent) }
+                Spacer(minLength: DS.Space.xs)
+                Button("Reset") { model.resetChordMemory(songId: song.id) }.font(DS.Text.caption.weight(.semibold))
                     .accessibilityIdentifier("arpeggio.resetChords")
             }
         }
@@ -253,7 +278,7 @@ struct SongArpeggioCard: View {
         let k = min(hits.count, 2)
         let you = hits.prefix(k).map { ArpeggioStyle.number($0.degree) }.joined(separator: "·")
         let ai = hits.dropFirst(k).map { ArpeggioStyle.number($0.degree) }.joined(separator: "·")
-        return Text("You **\(you)** → TonePilot **\(ai.isEmpty ? "—" : ai)**").font(.caption.monospaced())
+        return Text("You **\(you)** → TonePilot **\(ai.isEmpty ? "—" : ai)**").font(DS.Text.caption.monospaced())
     }
 }
 
@@ -267,19 +292,21 @@ struct PatternGrid: View {
         let sorted = pattern.hits.sorted { $0.step < $1.step }
         let yourSteps = Set(sorted.prefix(yours).map(\.step))
         let hits = Dictionary(sorted.map { ($0.step, $0) }, uniquingKeysWith: { a, _ in a })
-        HStack(spacing: 6) {
+        HStack(spacing: DS.Space.s) {
             ForEach(0..<pattern.beatsPerBar, id: \.self) { beat in
-                HStack(spacing: 2) {
+                HStack(spacing: DS.Space.xxs) {
                     ForEach(0..<pattern.stepsPerBeat, id: \.self) { sub in
                         let step = beat * pattern.stepsPerBeat + sub
                         let hit = hits[step]
                         Text(hit.map { ArpeggioStyle.number($0.degree) } ?? "·")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
-                            .frame(maxWidth: .infinity, minHeight: 44)
-                            .background(hit == nil ? Theme.panelRaised : Theme.accent.opacity(0.35 + 0.6 * (hit?.velocity ?? 0)),
-                                        in: RoundedRectangle(cornerRadius: 6))
-                            .overlay(RoundedRectangle(cornerRadius: 6).stroke(yourSteps.contains(step) ? Color.white : .clear, lineWidth: 2))
-                            .foregroundStyle(hit == nil ? Color.secondary : .black)
+                            .font(DS.Text.label.monospacedDigit())
+                            .minimumScaleFactor(0.6)
+                            .frame(maxWidth: .infinity, minHeight: DS.Size.primaryButton)
+                            .background(hit == nil ? DS.Palette.elevated : DS.Palette.accent.opacity(0.35 + 0.6 * (hit?.velocity ?? 0)),
+                                        in: RoundedRectangle(cornerRadius: DS.Radius.s, style: .continuous))
+                            .overlay(RoundedRectangle(cornerRadius: DS.Radius.s, style: .continuous)
+                                .stroke(yourSteps.contains(step) ? DS.Palette.textPrimary : .clear, lineWidth: 2))
+                            .foregroundStyle(hit == nil ? DS.Palette.textTertiary : DS.Palette.onAccent)
                             .accessibilityLabel("Step \(step + 1): \(hit?.degree.label ?? "rest")\(yourSteps.contains(step) ? ", you play" : "")")
                     }
                 }
@@ -299,14 +326,15 @@ struct LabeledSlider: View {
     @State private var editing = false
 
     var body: some View {
-        HStack(spacing: 10) {
-            Text(title).font(.subheadline).frame(width: 92, alignment: .leading)
+        HStack(spacing: DS.Space.m) {
+            Text(title).font(DS.Text.bodySecondary).foregroundStyle(DS.Palette.textSecondary).frame(minWidth: 84, alignment: .leading)
             Slider(value: $current, in: range) { e in
                 editing = e
                 if !e { onCommit(current) }
             }
-            .tint(Theme.accent)
-            Text(format(current)).font(.caption.monospacedDigit()).foregroundStyle(.secondary).frame(width: 64, alignment: .trailing)
+            .tint(DS.Palette.accent)
+            .accessibilityLabel(title)
+            Text(format(current)).font(DS.Text.metadata.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary).frame(minWidth: 64, alignment: .trailing)
         }
         .onAppear { current = value }
         .onChange(of: value) { _, v in if !editing { current = v } }
