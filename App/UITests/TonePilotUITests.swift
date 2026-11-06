@@ -205,6 +205,15 @@ final class TonePilotUITests: XCTestCase {
                         tap(more, thenExpect: app.buttons["Loop this section"].firstMatch, "section options")
                         app.buttons["Loop this section"].firstMatch.tap()
                         assertAlive("loop a section from its menu")
+                        // Sound browser (spec §2.8): open from Change tone, hear a tile, filter, cancel.
+                        tap(more, thenExpect: app.buttons["Change tone"].firstMatch, "section options again")
+                        tap(app.buttons["Change tone"].firstMatch, thenExpect: element("sounds.cancel"), limit: 5, "open the sound browser")
+                        let tile = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'sounds.tile.'")).firstMatch
+                        if tile.waitForExistence(timeout: 3) { tap(tile, "hear a sound") }
+                        XCTAssertTrue(element("sounds.use").exists, "the browser has Use this")
+                        let chip = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'sounds.family.' AND identifier != 'sounds.family.all'")).firstMatch
+                        if chip.waitForExistence(timeout: 2) { tap(chip, "filter by family"); tap(element("sounds.family.all"), "all families") }
+                        tap(element("sounds.cancel"), "close the sound browser")
                     }
                 }
                 app.swipeUp(); app.swipeDown()

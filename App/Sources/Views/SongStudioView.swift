@@ -997,75 +997,139 @@ struct StudioSectionRow: View {
 
 // MARK: Tone picker (preview, then apply)
 
+/// Sound browser (spec §2.8, GarageBand): search, this song's tones, family chips and a grid of tiles.
+/// Tap a tile to hear it on your keyboard; nothing changes until **Use this**.
 struct TonePickerSheet: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
     let songId: UUID
     let sectionId: UUID
     @State private var search = ""
+    @State private var family: InstrumentFamily?
+
+    private let columns = [GridItem(.adaptive(minimum: 96), spacing: DS.Space.m)]
 
     var body: some View {
         let list = model.library.toneList(search: search)
         let sectionLabel = model.song(songId)?.sections.first { $0.id == sectionId }?.label ?? "this section"
         let previewing = model.previewingToneId.flatMap { model.tone(id: $0) }
+        let fromSong = list.songTones.filter { $0.songId == songId }
+        let families = list.instruments.map(\.family)
+        let groups = list.instruments.filter { family == nil || $0.family == family }
         NavigationStack {
-            List {
-                Section {
-                    Text("Tap a tone to hear it on your keyboard. Nothing changes until you choose **Use for \(sectionLabel)**.")
-                        .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
-                    if let previewing {
-                        Button {
-                            model.assignTone(previewing, songId: songId, sectionId: sectionId)
-                            dismiss()
-                        } label: {
-                            Label("Use “\(previewing.name)” for \(sectionLabel)", systemImage: "checkmark.circle.fill").font(DS.Text.section)
+            ScrollView {
+                VStack(alignment: .leading, spacing: DS.Space.xl) {
+                    if !fromSong.isEmpty, family == nil {
+                        VStack(alignment: .leading, spacing: DS.Space.s) {
+                            Text("From this song").font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary)
+                            grid(fromSong, large: true)
                         }
                     }
+                    if family == nil, !list.myTones.isEmpty {
+                        VStack(alignment: .leading, spacing: DS.Space.s) {
+                            Text("My tones").font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary)
+                            grid(list.myTones, large: false)
+                        }
+                    }
+                    ForEach(groups) { g in
+                        VStack(alignment: .leading, spacing: DS.Space.s) {
+                            Text(g.family.displayName).font(DS.Text.section).foregroundStyle(DS.Palette.textPrimary)
+                            grid(g.entries, large: false)
+                        }
+                    }
+                    if groups.isEmpty && fromSong.isEmpty && list.myTones.isEmpty {
+                        DSEmptyState(symbol: "magnifyingglass", title: "No sounds match", message: "Try another name.")
+                    }
                 }
-                if !list.songTones.isEmpty {
-                    Section("Song tones") { ForEach(list.songTones) { row($0) } }
-                }
-                if !list.myTones.isEmpty {
-                    Section("My tones") { ForEach(list.myTones) { row($0) } }
-                }
-                ForEach(list.instruments) { group in
-                    Section(group.family.displayName) { ForEach(group.entries) { row($0) } }
-                }
+                .padding(.horizontal, DS.Space.screenMargin).padding(.vertical, DS.Space.m)
             }
+            .safeAreaInset(edge: .top, spacing: 0) { chips(families) }
+            .safeAreaInset(edge: .bottom, spacing: 0) { useBar(previewing, sectionLabel: sectionLabel) }
+            .dsCanvas()
             .searchable(text: $search, prompt: "Search sounds")
             .navigationTitle("Sound for \(sectionLabel)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { model.endTonePreview(); dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Use") {
-                        if let previewing { model.assignTone(previewing, songId: songId, sectionId: sectionId) }
-                        dismiss()
-                    }
-                    .disabled(previewing == nil)
+                    Button("Cancel") { model.endTonePreview(); dismiss() }.accessibilityIdentifier("sounds.cancel")
                 }
             }
         }
         .onDisappear { if model.previewingToneId != nil { model.endTonePreview() } }
     }
 
-    private func row(_ entry: Library.ToneList.Entry) -> some View {
-        Button { model.previewTone(entry.tone) } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(entry.tone.name)
-                    Text(entry.subtitle).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
-                }
-                Spacer()
-                if model.previewingToneId == entry.tone.id {
-                    Image(systemName: "speaker.wave.2.fill").foregroundStyle(DS.Palette.accent).accessibilityLabel("Previewing")
+    private func chips(_ families: [InstrumentFamily]) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: DS.Space.s) {
+                chip("All", selected: family == nil, id: "sounds.family.all") { family = nil }
+                ForEach(families, id: \.self) { f in
+                    chip(f.displayName, selected: family == f, id: "sounds.family.\(f.rawValue)") { family = f }
                 }
             }
+            .padding(.horizontal, DS.Space.screenMargin).padding(.vertical, DS.Space.s)
+        }
+        .background(DS.Palette.canvas)
+    }
+
+    private func chip(_ title: String, selected: Bool, id: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title).font(DS.Text.label)
+                .padding(.horizontal, DS.Space.m).frame(minHeight: DS.Size.touchTarget - DS.Space.xs)
+                .foregroundStyle(selected ? DS.Palette.onAccent : DS.Palette.textPrimary)
+                .background(selected ? DS.Palette.accent : DS.Palette.elevated, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(id)
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
+    private func grid(_ entries: [Library.ToneList.Entry], large: Bool) -> some View {
+        LazyVGrid(columns: columns, alignment: .leading, spacing: DS.Space.l) {
+            ForEach(entries) { tile($0, large: large) }
+        }
+    }
+
+    private func tile(_ entry: Library.ToneList.Entry, large: Bool) -> some View {
+        let selected = model.previewingToneId == entry.tone.id
+        let drawing = ToneRow.drawings(entry.tone, library: model.library).first ?? .synth
+        return Button { model.previewTone(entry.tone) } label: {
+            VStack(alignment: .leading, spacing: DS.Space.xs) {
+                InstrumentTile(drawing: drawing, size: large ? 96 : 80, selected: selected)
+                Text(entry.tone.name).font(DS.Text.caption.weight(.semibold))
+                    .foregroundStyle(selected ? DS.Palette.accent : DS.Palette.textPrimary)
+                    .lineLimit(2).multilineTextAlignment(.leading)
+                Text(entry.subtitle).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
         }
-        .foregroundStyle(.primary)
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(entry.tone.name)\(selected ? ", playing on your keys" : "")")
+        .accessibilityAddTraits(selected ? .isSelected : [])
+        .accessibilityIdentifier("sounds.tile.\(entry.tone.name)")
+    }
+
+    private func useBar(_ previewing: Arrangement?, sectionLabel: String) -> some View {
+        HStack(spacing: DS.Space.m) {
+            VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                Text(previewing == nil ? "Tap a sound to hear it" : "On your keys now")
+                    .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
+                Text(previewing?.name ?? "Nothing changes until you choose").font(DS.Text.label)
+                    .foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+            }
+            Spacer(minLength: DS.Space.s)
+            Button("Use this") {
+                if let previewing { model.assignTone(previewing, songId: songId, sectionId: sectionId) }
+                dismiss()
+            }
+            .buttonStyle(.dsPrimary)
+            .frame(maxWidth: 150)
+            .disabled(previewing == nil)
+            .accessibilityHint("Uses it for \(sectionLabel)")
+            .accessibilityIdentifier("sounds.use")
+        }
+        .padding(.horizontal, DS.Space.screenMargin).padding(.vertical, DS.Space.m)
+        .background(.bar)
     }
 }
 
