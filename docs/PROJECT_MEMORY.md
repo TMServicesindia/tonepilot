@@ -494,7 +494,7 @@ Stop: no production change, no major training, no release before approval.
   - Settings (§2.14), first run in 2 steps (§2.1), Record (§2.13).
   - Token pass over the legacy screens; contrast fixes.
 - **Each has ids and stress-test steps.** Status, deviations and remaining work: `docs/UX_IMPLEMENTATION_ROADMAP.md`.
-- **Build status:** shipped in v0.3.101 (full build green). The follow-up build carries the test-seed fix and two copy fixes.
+- **Build status:** shipped in v0.3.101 (full build green). Not yet built: the test-seed fix and two copy fixes (main-tone reason, shorter engine names). Eight full-build runs on 6 Nov were cancelled before starting because GitHub had no macOS arm64 runner. They ship with the next real change's full build.
 
 ## 7. Open owner decisions
 
