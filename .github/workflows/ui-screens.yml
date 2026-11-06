@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       label: { description: "Screenshot set name, e.g. before or after-1", required: true, default: before }
-      runner: { description: "macOS runner", required: false, default: macos-14 }
+      runner: { description: "macOS runner", required: false, default: macos-15 }
 permissions:
   contents: write
 jobs:
