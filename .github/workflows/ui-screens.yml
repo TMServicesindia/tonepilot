@@ -38,6 +38,7 @@ jobs:
           xcodebuild test -project TonePilot.xcodeproj -scheme TonePilot -destination "id=$DEV" -derivedDataPath build-sim \
             -only-testing:TonePilotUITests/ScreenTourUITests -resultBundlePath Screens.xcresult > tour.log 2>&1 || true
           grep -E "Test Case .*(passed|failed)|error:" tour.log | head -30
+          grep -E "error:" tour.log | sort -u | head -10 | while IFS= read -r l; do echo "::error title=Screen tour::$l"; done
           mkdir -p shots
           xcrun xcresulttool export attachments --path Screens.xcresult --output-path shots
           python3 - <<'PY'
@@ -50,6 +51,8 @@ jobs:
                   name = re.sub(r"_\d+_[0-9A-F-]{36}", "", name)
                   shutil.copy(os.path.join("shots", a["exportedFileName"]), os.path.join("out", name if name.endswith(".png") else name + ".png"))
           print(len(os.listdir("out")), "screenshots")
+          if not os.listdir("out"):
+              raise SystemExit("no screenshots: the app didn't build or the tour didn't run (see the errors above)")
           PY
       - name: Publish screenshots
         run: |

@@ -3,7 +3,7 @@
 *v1 · 6 Nov 2026*
 
 - **Source of truth:** `design/tokens/tonepilot.tokens.json`. It's platform-neutral, so a Compose theme can be generated from it.
-- **SwiftUI implementation:** `App/Sources/DesignSystem/` (`Tokens.swift` and `Components.swift`).
+- **SwiftUI implementation:** `App/Sources/DesignSystem/` (`Tokens.swift` and `DSComponents.swift`).
 - **CI check:** `.github/scripts/check_tokens.py` fails the build if the Swift tokens drift from the JSON.
 
 ## Principles
