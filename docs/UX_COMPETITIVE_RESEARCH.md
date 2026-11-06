@@ -70,3 +70,51 @@
 - [Roland Zenbeats — App Store](https://apps.apple.com/us/app/1473380367) · [MusicRadar](https://www.musicradar.com/news/rolands-new-zenbeats-app-features-tr-drum-sounds-and-makes-music-creation-easy) · [Synthtopia 3.0](https://www.synthtopia.com/content/2022/05/18/roland-zenbeats-3-0/)
 - [MainStage User Guide](https://support.apple.com/en-au/guide/mainstage/mstgff038c57/mac)
 - [Casio Music Space (Casio AU)](https://casioau.com/pages/casio-music-music-space) · [Yamaha Chord Tracker](https://uk.yamaha.com/en/musical-instruments/keyboards/products/apps/chord-tracker/)
+
+---
+
+## Locked design brief (owner, 6 Nov 2026)
+
+The owner accepted this research as the design brief for the UX track. It is not to be redone. Competitor patterns above are documented; everything below is TonePilot's own direction.
+
+**Direction:** *a calm instrument companion, not a miniature DAW.* Legible, calm and quick to operate while playing a physical keyboard.
+
+| Area | Decision |
+|---|---|
+| Navigation | Three primary places: Songs, Play, Settings |
+| Play | **Not just a tab**: the central song workspace *and* performance environment. Song selection, analysis, tone creation and playback connect naturally into it |
+| Song Studio | One coherent workspace, not disconnected feature screens |
+| Tone Maker | Start from the intelligent recommendation, then refine; never a blank configuration |
+| Sound selection | One unified browser with filters and instant audition; sound packs show preview and size before download |
+| Tone editing | Layer tiles with 2–3 primary controls; Details on demand |
+| Playback | A dedicated, uncluttered performance view: current section, next section, tone, essential transport |
+| Analysis | Every result is a suggestion with a clear accept or change action |
+| Content | Short labels, minimal explanation, no redundant text |
+| Visual identity | Restrained dark palette, the existing amber accent, native SwiftUI, SF Symbols, Dynamic Type, monospaced digits for time and values, meaningful section colours |
+| Design system | Shared semantic tokens and reusable components |
+| Platform | iOS stays genuinely native. Tokens are platform-neutral for a future Android theme, but SwiftUI interaction patterns are never compromised for portability |
+
+### Five principles
+
+1. **One obvious next action** on every important screen.
+2. **Never make users configure what AI can configure:** a usable starting tone is always there.
+3. **Progressive disclosure:** essentials first; advanced controls when asked.
+4. **Performance separate from configuration:** editing a tone and playing a song feel like two modes.
+5. **Preserve musical context:** the user always knows which song, section, tone or part they're on.
+
+### Validation tasks (counted for steps, clarity, discoverability, errors, time)
+
+1. Import a song.
+2. Analyse it.
+3. Find its main hook.
+4. Review the tone recommendation.
+5. Preview an alternative sound.
+6. Edit a layer.
+7. Return to playback.
+8. Move between sections.
+9. Correct a chord suggestion.
+10. Play the song without unnecessary screens.
+
+### Final test for every screen
+
+> Can a keyboard player understand what this screen does, identify the next action and complete it quickly without reading a long explanation? If not, simplify it.

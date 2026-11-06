@@ -476,6 +476,14 @@ Stop: no production change, no major training, no release before approval.
 - Core suite: 274 tests, 0 failures. **Published v0.3.93** (launch median 2.03 s, peak 147 MB).
 - Accompaniment check published in **v0.3.92**; full licence texts in the app (Settings › Licenses › Full licence texts) in **v0.3.94** (launch median 2.47 s, peak 152 MB, all gates passed).
 
+## 6z. UX transformation track (owner, 6 Nov)
+
+- Claude also acts as lead product designer / UX researcher / iOS design-systems architect.
+- Design skills installed project-level (`.claude/skills/`, 12, MIT, markdown only). Apple HIG is the authority.
+- **Locked brief:** `docs/UX_COMPETITIVE_RESEARCH.md` ("A calm instrument companion, not a miniature DAW"; Play = central workspace + performance; 5 principles; 10 validation tasks).
+- iOS stays fully native. Tokens are platform-neutral for a future Android theme; no Android build (earlier decision stands).
+- Deliverables: the 8 UX docs named in the owner's prompt, before/after simulator screenshots (`ui-screens.yml` → `ci/screens-<label>`), design system in SwiftUI. All build gates stay mandatory.
+
 ## 7. Open owner decisions
 
 - Draft permission emails to the Demucs author/Meta (commercial weights) and the GeneralUser GS author (training use) — offered, awaiting yes.
