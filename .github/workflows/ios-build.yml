@@ -146,6 +146,9 @@ jobs:
             echo "::warning title=Models::models-v1/manifest.json isn't published yet — separation will fail to download until coreml-convert.yml publishes it"
           fi
 
+      - name: Design tokens in sync (JSON ↔ SwiftUI)
+        run: python3 .github/scripts/check_tokens.py
+
       - name: Generate Xcode project
         run: |
           brew install xcodegen

@@ -48,6 +48,8 @@ struct LiveGuideStrip: View {
             Text("No clear chord here — play the Sa–Pa drone or follow the melody.").font(.caption2).foregroundStyle(Theme.warn)
                 .lineLimit(1).minimumScaleFactor(0.7)
                 .opacity(current?.isDrone == true ? 1 : 0)
+            // Only when the song has a melody estimate (fixed per song, so nothing moves while playing).
+            if song.melody != nil {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text("RIGHT HAND").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
@@ -72,9 +74,10 @@ struct LiveGuideStrip: View {
                     }
                 }
             }
+            }
         }
-        .padding(12)
-        .background(Theme.panel, in: RoundedRectangle(cornerRadius: 14))
+        .padding(DS.Space.m)
+        .background(DS.Palette.surface, in: RoundedRectangle(cornerRadius: DS.Radius.l, style: .continuous))
     }
 
     private func transposed(_ step: ChordGuideStep) -> ChordGuideStep {

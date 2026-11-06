@@ -23,7 +23,7 @@ struct SectionTimeline: View {
     /// Current song position (backing track or timer), drawn as a line.
     var playhead: Double? = nil
 
-    static let palette: [Color] = [.orange, .teal, .purple, .pink, .yellow, .mint, .indigo, .cyan]
+    static let palette: [Color] = DS.Palette.section
 
     static func color(for section: SongSection) -> Color {
         guard let g = section.repetitionGroup?.unicodeScalars.first?.value else { return .gray }

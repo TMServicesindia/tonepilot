@@ -1,13 +1,15 @@
 import SwiftUI
 import TonePilotCore
 
+/// Legacy names, now mapped onto the design-system tokens (`DS.Palette`). New code uses `DS` directly;
+/// screens move off `Theme` as they are redesigned.
 enum Theme {
-    static let accent = Color(red: 0.98, green: 0.62, blue: 0.20)
-    static let panel = Color(white: 0.11)
-    static let panelRaised = Color(white: 0.16)
-    static let good = Color.green
-    static let warn = Color.orange
-    static let bad = Color.red
+    static let accent = DS.Palette.accent
+    static let panel = DS.Palette.surface
+    static let panelRaised = DS.Palette.elevated
+    static let good = DS.Palette.success
+    static let warn = DS.Palette.warning
+    static let bad = DS.Palette.error
 }
 
 /// Shows how sure the analyser is, and whether a value came from the user, an algorithm or a model.

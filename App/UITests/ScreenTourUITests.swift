@@ -33,7 +33,7 @@ final class ScreenTourUITests: XCTestCase {
         _ = tapIfThere(app.tabBars.buttons["Songs"]); shot("\(prefix)10 Songs")
         guard tapIfThere(app.staticTexts["Demo Song"].firstMatch, 8) else { return }
         _ = el("transport.play").waitForExistence(timeout: 8)
-        for (n, page) in [("21", "mix"), ("22", "keyboard"), ("23", "arpeggio"), ("24", "sections")] {
+        for (n, page) in [("20", "play"), ("21", "mix"), ("22", "keyboard"), ("23", "arpeggio"), ("24", "sections")] {
             if tapIfThere(el("page.\(page)")) {
                 shot("\(prefix)\(n) Studio \(page)")
                 app.swipeUp(); shot("\(prefix)\(n)b Studio \(page) scrolled"); app.swipeDown(); app.swipeDown()
