@@ -81,3 +81,37 @@ Each screen has exactly three levels.
 - **No glow waves or decorative gradients in chrome.** Subtle family tints appear only on instrument tiles.
 - **No icon-only controls** except the universally understood transport.
 - **No layout motion during playback** (CLAUDE.md smoothness rules).
+
+---
+
+# v3 — "crazy" round: best-in-class per feature, then go further
+
+*Owner, 6 Nov: "more crazy — think who is best in each feature, how they designed the screen, and ideate." Each idea starts from a documented best-in-class pattern (public sources, not hands-on) and adds what only TonePilot can do: it knows every song's sections, chords, parts and tones. All of it is drawable in SwiftUI (`Canvas`, `TimelineView`, observing `LiveState` in small views) at 60 fps; feasibility notes are below.*
+
+| Feature | Best in class (why it works) | TonePilot's crazy version |
+|---|---|---|
+| **Home** | Spotify / Apple Music: one giant hero, then horizontal shelves; artwork carries the emotion | **Song Aura hero:** the last song's real waveform drawn as a glowing aura in its section colours, then shelves ("Ready to play", "Needs a tone", "Tamil"), each card with its Song Map cover |
+| **Analysis** | Shazam: the pulsing button turns waiting into anticipation. Moises: a simple progress state | **Discovery scan:** a light beam sweeps the waveform, sections light up behind it, and every instrument it finds pops in as a tile ("Found: strings · flute · tabla"), so waiting becomes a reveal |
+| **Play / perform** | Synthesia / Simply Piano: falling notes onto a keyboard, readable without music reading. MainStage: calm full-screen perform mode | **Note highway onto your Casio:** left-hand chord blocks (amber) and melody notes (teal) fall onto a keyboard strip matching the CT-X870IN's keys, with the section lane on top and the hook ★ glowing as it approaches. Section name huge, transport minimal |
+| **Mix** | Koala / Ableton Note: big touch pads you hit without looking. djay: glowing level rings | **Stage pads:** each part is a large pad with its instrument art and a live level ring. Tap = mute ("You play this"), swipe up / down = volume, long-press = solo |
+| **Tone** | Native Instruments / Spitfire LABS: every instrument has hero artwork and a few big macro knobs. Logic: plug-in tiles | **Tone card with a match radar:** hero instrument art, and a radar (bright, warm, attack, sustain, vibrato, width) that overlays *the song's part* (outline) on *your tone* (filled), so you can see why it matches and what's off. Layers stack like Wallet cards |
+| **Sound browser** | Splice: waveform previews, tags, instant audition. Spitfire LABS: beautiful cards | **Audition deck:** the closest sound as a big card with a match bar, playing the song's own melody. Swipe left = next closest, swipe right = use, ▶ = replay. Grid view for browsing by family |
+| **Arpeggio** | Patterning / Koala: radial step sequencers that look like instruments | **Pattern ring:** a 16-step circle; lit steps show the chord position (R · 5 · 8 · 3); a sweeping arm follows the beat; the centre shows the style and BPM |
+| **Chord correction** | Chordify / Yamaha Chord Tracker: chord diagrams, pick from suggestions | **Chord wheel:** the circle of fifths with the heard chord lit and the two likeliest alternatives glowing; tap a segment to hear it on the song, then confirm |
+
+## Imagery
+
+- **Instrument artwork** in a richer, gradient-shaded TonePilot style:
+  - original vector art, licence-free and Android-ready;
+  - used big on Tone, the Audition deck and stage pads;
+  - small elsewhere.
+- **Glow is data:** auras, highways and rings come from the song's own audio and analysis, never decorative wallpaper. That keeps "crazy" meaningful.
+
+## Guard rails (unchanged from the locked brief)
+
+- **Perform stays calm in layout:** visuals move, but nothing reflows while playing.
+- **Every bold control has a plain fallback:**
+  - pads also have Mute / Solo in VoiceOver actions;
+  - the deck has a list view;
+  - the wheel has a chord picker.
+- **Reduce Motion:** the highway becomes a static now / next view; the scan becomes a progress list.
