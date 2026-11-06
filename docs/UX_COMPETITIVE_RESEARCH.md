@@ -118,3 +118,31 @@ The owner accepted this research as the design brief for the UX track. It is not
 ### Final test for every screen
 
 > Can a keyboard player understand what this screen does, identify the next action and complete it quickly without reading a long explanation? If not, simplify it.
+
+---
+
+## Benchmark per feature (owner's strategy, 6 Nov — adopted)
+
+No single competitor is best. TonePilot combines the best experience per task around one job: **take a song, understand its musical identity, build a suitable sound, and let the musician play along.** These are design benchmarks from public documentation, not hands-on rankings.
+
+| Feature | Benchmark | What makes it easy | TonePilot response |
+|---|---|---|---|
+| Import, analysis, separation | Moises | Guided flow: upload → separate → mute / solo, synced chords | The analysis is a guided step list with results; the Mix page has mute / solo / volume |
+| Sound discovery | GarageBand | Instrument-first tiles, preview, then download | The Sound browser: instrument drawings, ▶ preview, size + Get |
+| Tone editing | Logic Pro for iPad | Tiles with a few controls; Details for the rest | Layer card: Level, Brightness, Reverb; Details: envelope, filter, vibrato, keys |
+| Playback and practice | iReal Pro | Follow-along chords, jump, loop a section, tempo | Play page: chord now / next, tap a section to jump, loop, speed |
+| Performance | MainStage | A dedicated, focused perform view | The Play page is calm: big section and chord, fixed transport |
+| Chord correction | Yamaha Chord Tracker | Alternatives first, then root / type, audition | Two likely chords as big buttons → root / type → Hear it |
+| Capture | Ableton Note | Recording as a musical action | Record: one big button, recordings as a list |
+| Separate workspaces | Koala Sampler | Sample / Sequence / Perform each have one purpose | Play / Mix / Tone / Arpeggio / Sections each have one job |
+
+**Avoid list (locked):**
+- glows behind every card;
+- big images that push controls down;
+- competing colours;
+- icon-only navigation;
+- long paragraphs;
+- features hidden in ⋯ menus;
+- every setting visible to beginners;
+- AI confidence shown as proven accuracy;
+- one long scroll mixing performance and editing.

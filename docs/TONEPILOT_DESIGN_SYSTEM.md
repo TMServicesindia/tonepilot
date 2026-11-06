@@ -29,18 +29,18 @@
 
 | Token | Dark | Light | Use |
 |---|---|---|---|
-| `canvas` | #0B0B0D | #F4F4F6 | Screen background |
-| `surface` | #151518 | #FFFFFF | Grouped content |
-| `elevated` | #202024 | #ECECF0 | Chips, segmented track, inputs |
-| `border` / `divider` | #2C2C32 / #242429 | #D9D9DF / #E3E3E8 | Hairlines (high contrast: #4A4A52) |
+| `canvas` (Midnight) | #101116 | #F4F4F6 | Screen background |
+| `surface` | #1C1E25 | #FFFFFF | Grouped content |
+| `elevated` | #292C35 | #ECECF0 | Chips, segmented track, inputs |
+| `border` / `divider` | #353843 / #2A2D36 | #D9D9DF / #E3E3E8 | Hairlines (high contrast: #4A4A52) |
 | `textPrimary` | #F5F5F7 | #111114 | Titles, body |
 | `textSecondary` | #A3A3AB | #5C5C66 | Metadata (high contrast: #C9C9D0) |
 | `textTertiary` | #707078 | #8C8C96 | Placeholders, disabled |
-| `accent` / `onAccent` | #FA9E33 / #121212 | #D9770A / #FFFFFF | Primary action, selection, playhead |
+| `accent` / `onAccent` | #FFAD32 / #121212 | #D9770A / #FFFFFF | Primary action, selection, playhead |
 | `accentMuted` | accent 16% | | Selected and suggestion backgrounds |
 | `success` / `warning` / `error` / `info` | #3DD27A / #FFD24D / #FF5A4F / #6CC8FF | | Status (always with text) |
 | `section[8]` | amber, teal, violet, pink, yellow, green, indigo, cyan | | Section by repetition group |
-| `part.*` | vocals pink, drums amber, bass violet, music teal… | | Marker per separated part |
+| `part.*` | vocals pink, music teal, drums amber, bass violet… | | **Small marker only** (dot / thin bar), never a background or glow |
 
 The app currently runs dark only. Light values are defined and ready, and switching is a later product decision.
 

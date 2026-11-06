@@ -115,3 +115,40 @@ Each screen has exactly three levels.
   - the deck has a list view;
   - the wheel has a chord picker.
 - **Reduce Motion:** the highway becomes a static now / next view; the scan becomes a progress list.
+
+---
+
+# v4 — usability first, calm colour (owner, 6 Nov: "too colourful; I don't feel the usability — don't compromise on usability")
+
+## Usability check of the v3 ideas
+
+| v3 idea | Usability problem | v4 decision |
+|---|---|---|
+| Song Aura home | Decorative; tells you nothing you can act on | **Drop.** Continue card with Play (v2) |
+| Discovery scan | Pretty but hard to read progress | **Keep the idea as a clear step list** (icons + results) plus "Play now" |
+| Note highway | Needs fast reading while playing; busy; a new skill to learn | **Drop for now.** Static "chord now → next" plus the keys guide (readable at a glance) |
+| Stage pads | Volume by swipe is a hidden gesture; pads hide levels | **Drop.** Rows with visible sliders and labelled Mute / Solo |
+| Match radar | Most players can't read a radar chart | **Replace** with a plain sentence: "Why this tone", plus one match % |
+| Audition deck | Swipe-only choices are hidden and easy to trigger by mistake | **Drop.** List with ▶ and a clear "Use" button |
+| Pattern ring | Hard to edit precisely on a circle | **Drop.** Linear step grid (current app), larger |
+| Chord wheel | The circle of fifths intimidates non-theory users | **Drop.** Two big likely chords, then root + type |
+
+## Calm colour rules (v4)
+
+- **Base:** neutral near-black and greys. No violet glows, no gradients on content.
+- **Amber is the only colour of action:** primary button, the current selection, the playhead and the current section.
+- **Instrument art:** single-tone line drawings on neutral tiles. Recognisable by shape, not colour.
+- **Song Map:** grey blocks; the current section is amber and the hook is marked ★. Repeats share a grey shade.
+- **Status colours:**
+  - red only for errors;
+  - amber for attention;
+  - success is a ✓ icon in neutral text, not green fills.
+
+## Usability rules applied to every v4 screen
+
+1. **One primary action per screen**, visually obvious, and reachable with the thumb.
+2. **Visible controls:** no hidden gestures; every action has a labelled button.
+3. **Touch targets ≥ 44 pt;** body text ≥ 15 pt; the Play page readable from the keyboard (section 40 pt+, chord 40 pt+).
+4. **Plain words**, no theory or engine jargon on main screens.
+5. **Always know where you are:** song name, page and section always visible in Play.
+6. **Native iOS patterns:** navigation bar, sheets, lists, segmented control and tab bar.
