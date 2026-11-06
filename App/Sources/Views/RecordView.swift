@@ -14,44 +14,50 @@ struct RecordView: View {
             Section {
                 RecordPanel(live: model.live)
                 Toggle(isOn: $model.recordIncludeSong) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Include the song parts that are playing")
-                        Text(model.recordIncludeSong ? "Your playing and the music, in sync." : "Only what you play on your keyboard.")
-                            .font(.caption).foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                        Text("Include the song parts")
+                        Text(model.recordIncludeSong ? "Your playing and the music, in sync." : "Only what you play.")
+                            .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
                     }
                 }
-                .tint(Theme.accent)
+                .tint(DS.Palette.accent)
                 .disabled(model.recordState != .idle)
                 .accessibilityIdentifier("record.includeSong")
                 Toggle(isOn: $model.recordWaitForKey) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Start when I press the first key")
-                        Text("No silence at the start — the moment just before your first note is kept.")
-                            .font(.caption).foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: DS.Space.xxs) {
+                        Text("Start on the first key")
+                        Text("No silence at the start.")
+                            .font(DS.Text.caption).foregroundStyle(DS.Palette.textSecondary)
                     }
                 }
-                .tint(Theme.accent)
+                .tint(DS.Palette.accent)
                 .disabled(model.recordState != .idle)
                 .accessibilityIdentifier("record.waitForKey")
-                if let e = model.recordError { Text(e).font(.caption).foregroundStyle(Theme.bad) }
+                if let e = model.recordError {
+                    Label(e, systemImage: "exclamationmark.triangle.fill").font(DS.Text.caption).foregroundStyle(DS.Palette.error)
+                }
             } footer: {
-                Text("Records TonePilot's own sound straight from the app (your tones, the arpeggio fill, and the song parts if included) — nothing from the room.")
+                Text("Records TonePilot's own sound, not the room.")
             }
 
             Section("Recordings") {
                 if model.recordings.isEmpty {
-                    Text("Your recordings appear here as MP3 files. They're also in the Files app › On My iPhone › TonePilot › Recordings.")
-                        .font(.footnote).foregroundStyle(.secondary)
+                    DSEmptyState(symbol: "waveform", title: "No recordings yet", message: "Saved as MP3 in Files › TonePilot › Recordings.")
+                        .accessibilityIdentifier("record.empty")
                 }
                 ForEach(model.recordings) { r in
-                    RecordingRow(recording: r, player: player)
+                    RecordingRow(recording: r, player: player,
+                                 onRename: { newName = r.name; renaming = r },
+                                 onDelete: { player.stop(); model.deleteRecording(r) })
                         .swipeActions {
                             Button(role: .destructive) { player.stop(); model.deleteRecording(r) } label: { Label("Delete", systemImage: "trash") }
-                            Button { newName = r.name; renaming = r } label: { Label("Rename", systemImage: "pencil") }.tint(.blue)
+                            Button { newName = r.name; renaming = r } label: { Label("Rename", systemImage: "pencil") }.tint(DS.Palette.info)
                         }
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .dsCanvas()
         .navigationTitle("Record")
         .onAppear { model.refreshRecordings() }
         .onDisappear { player.stop() }
@@ -70,7 +76,7 @@ private struct RecordPanel: View {
 
     var body: some View {
         let state = model.recordState
-        VStack(spacing: 14) {
+        VStack(spacing: DS.Space.l) {
             Button {
                 switch state {
                 case .idle: model.startRecording()
@@ -79,13 +85,14 @@ private struct RecordPanel: View {
                 }
             } label: {
                 ZStack {
-                    Circle().stroke(Color.white.opacity(0.25), lineWidth: 4).frame(width: 96, height: 96)
+                    // Red is the universal record mark (the one non-error use of the error colour).
+                    Circle().stroke(DS.Palette.border, lineWidth: 4).frame(width: 96, height: 96)
                     if case .idle = state {
-                        Circle().fill(Color.red).frame(width: 76, height: 76)
+                        Circle().fill(DS.Palette.error).frame(width: 76, height: 76)
                     } else if case .saving = state {
                         ProgressView().controlSize(.large)
                     } else {
-                        RoundedRectangle(cornerRadius: 8).fill(Color.red).frame(width: 40, height: 40)
+                        RoundedRectangle(cornerRadius: DS.Radius.s).fill(DS.Palette.error).frame(width: 40, height: 40)
                     }
                 }
                 .frame(width: 104, height: 104)
@@ -93,30 +100,31 @@ private struct RecordPanel: View {
             .buttonStyle(.plain)
             .accessibilityIdentifier("record.button")
             .accessibilityLabel(state == .idle ? "Record" : "Stop")
-            Text(Self.clock(live.recordSeconds)).font(.system(size: 34, weight: .semibold, design: .rounded).monospacedDigit())
+            Text(Self.clock(live.recordSeconds)).font(DS.Text.display.monospacedDigit())
+                .foregroundStyle(DS.Palette.textPrimary)
                 .opacity(state == .idle ? 0.4 : 1)
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    Capsule().fill(Color.white.opacity(0.1))
-                    Capsule().fill(LinearGradient(colors: [.green, .yellow, .red], startPoint: .leading, endPoint: .trailing))
+                    Capsule().fill(DS.Palette.elevated)
+                    Capsule().fill(LinearGradient(colors: [DS.Palette.success, DS.Palette.warning, DS.Palette.error], startPoint: .leading, endPoint: .trailing))
                         .frame(width: geo.size.width * CGFloat(live.recordLevel))
                 }
             }
             .frame(height: 6)
-            Text(statusText(state)).font(.subheadline.weight(.semibold))
-                .foregroundStyle(state == .idle ? Color.secondary : Theme.accent)
+            Text(statusText(state)).font(DS.Text.label)
+                .foregroundStyle(state == .idle ? DS.Palette.textSecondary : DS.Palette.accent)
                 .frame(maxWidth: .infinity)
                 .accessibilityIdentifier("record.status")
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
+        .padding(.vertical, DS.Space.s)
     }
 
     private func statusText(_ s: Recorder.State) -> String {
         switch s {
         case .idle: return "Tap to record"
-        case .waitingForKey: return "Ready — recording starts with your first key"
-        case .recording: return "Recording… tap to stop"
+        case .waitingForKey: return "Ready. Recording starts with your first key"
+        case .recording: return "Recording. Tap to stop"
         case .saving(let p): return "Saving MP3… \(Int(p * 100))%"
         }
     }
@@ -130,26 +138,37 @@ private struct RecordPanel: View {
 private struct RecordingRow: View {
     let recording: Recording
     @ObservedObject var player: RecordingPlayer
+    var onRename: () -> Void = {}
+    var onDelete: () -> Void = {}
 
     var body: some View {
         let playing = player.current == recording.url
-        HStack(spacing: 12) {
+        HStack(spacing: DS.Space.m) {
             Button { playing ? player.stop() : player.play(recording.url) } label: {
-                Image(systemName: playing ? "stop.circle.fill" : "play.circle.fill").font(.system(size: 34))
-                    .foregroundStyle(Theme.accent)
+                Image(systemName: playing ? "stop.circle.fill" : "play.circle.fill").font(DS.Text.largeTitle.weight(.regular))
+                    .foregroundStyle(DS.Palette.accent)
+                    .frame(width: DS.Size.touchTarget, height: DS.Size.touchTarget)
             }
             .buttonStyle(.plain)
             .accessibilityLabel(playing ? "Stop \(recording.name)" : "Play \(recording.name)")
             VStack(alignment: .leading, spacing: 2) {
-                Text(recording.name).font(.subheadline.weight(.semibold)).lineLimit(1)
+                Text(recording.name).font(DS.Text.body.weight(.semibold)).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
                 Text("\(recording.duration.mmss) · \(ByteCountFormatter.string(fromByteCount: recording.bytes, countStyle: .file)) · MP3")
-                    .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    .font(DS.Text.metadata.monospacedDigit()).foregroundStyle(DS.Palette.textSecondary)
             }
-            Spacer(minLength: 4)
+            Spacer(minLength: DS.Space.xs)
             ShareLink(item: recording.url) {
-                Image(systemName: "square.and.arrow.up").font(.title3).frame(width: 44, height: 44)
+                Image(systemName: "square.and.arrow.up").frame(width: DS.Size.touchTarget, height: DS.Size.touchTarget)
             }
             .accessibilityLabel("Share or save \(recording.name)")
+            // Visible ⋯ for what the swipe also offers (no hidden-only actions).
+            Menu {
+                Button(action: onRename) { Label("Rename", systemImage: "pencil") }
+                Button(role: .destructive, action: onDelete) { Label("Delete", systemImage: "trash") }
+            } label: {
+                Image(systemName: "ellipsis.circle").frame(width: DS.Size.touchTarget, height: DS.Size.touchTarget)
+            }
+            .accessibilityLabel("\(recording.name) options")
         }
     }
 }
