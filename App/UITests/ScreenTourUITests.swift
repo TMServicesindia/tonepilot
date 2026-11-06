@@ -77,11 +77,10 @@ final class ScreenTourUITests: XCTestCase {
 
     func testFirstRun() {
         launch(["-TPFirstRun"])
-        shot("C00 First run")
-        for k in 1...4 {
-            let next = app.buttons.matching(NSPredicate(format: "label IN {'Next', 'Continue', 'Get started', 'Done', 'Start'}")).firstMatch
-            guard next.waitForExistence(timeout: 3) else { break }
-            next.tap(); shot("C0\(k) First run step \(k)")
-        }
+        shot("C00 First run · welcome")
+        // Simulator: no Casio, so step 1 offers Connect / Later.
+        if tapIfThere(el("setup.later")) || tapIfThere(el("setup.continue"), 1) { shot("C01 First run · add a song") }
+        _ = tapIfThere(el("setup.explore"))
+        shot("C02 After first run")
     }
 }

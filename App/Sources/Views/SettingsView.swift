@@ -281,45 +281,63 @@ struct LicensesView: View {
     }
 }
 
+/// First run (spec §2.1): two steps to the first song. 1 · Welcome + connect the Casio. 2 · Import a song.
 struct SetupWizardView: View {
     @EnvironmentObject var model: AppModel
     let onDone: () -> Void
     @State private var step = 0
+    @State private var guide = false
+    @State private var pickSong = false
 
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 20) {
-                switch step {
-                case 0:
-                    Text("Welcome to TonePilot").font(.largeTitle.bold())
-                    Text("Play film-song tones — layered piano, strings, bells, pads — from your Casio's keys, with the sound coming from this iPhone through the Casio's speakers.")
-                    Text("Import songs you own as MP3s and TonePilot analyses them on-device to help you build a tone for each intro, interlude and chorus.")
-                        .foregroundStyle(.secondary)
-                case 1:
-                    Text("Install sounds").font(.title.bold())
-                    if model.defaultSoundFontInstalled {
-                        Label("Default SoundFont installed", systemImage: "checkmark.circle.fill").foregroundStyle(Theme.good)
-                    } else {
-                        Text("TonePilot needs a General MIDI SoundFont for its built-in sounds. Get GeneralUser GS (free) and import it.")
-                        NavigationLink("Open SoundFonts") { SoundFontSettingsView() }
-                    }
-                default:
-                    Text("Connect your keyboard").font(.title.bold())
-                    ConnectionStatus(midi: model.midi)
-                    Text("1. Casio USB TO HOST → iPhone (USB camera adapter) for MIDI.\n2. iPhone audio output → Casio AUDIO IN (3.5 mm cable) for sound.")
-                    NavigationLink("Full connection guide") { ConnectionGuideView() }
-                    AuditionStrip()
-                }
+            VStack(alignment: .leading, spacing: DS.Space.l) {
+                Spacer(minLength: DS.Space.l)
+                if step == 0 { welcome } else { ready }
                 Spacer()
-                HStack {
-                    if step > 0 { Button("Back") { step -= 1 } }
-                    Spacer()
-                    Button(step == 2 ? "Start" : "Next") { if step == 2 { onDone() } else { step += 1 } }
-                        .buttonStyle(.borderedProminent)
+                Text("Step \(step + 1) of 2").font(DS.Text.metadata).foregroundStyle(DS.Palette.textTertiary)
+                    .frame(maxWidth: .infinity)
+            }
+            .padding(DS.Space.xl)
+            .dsCanvas()
+            .navigationDestination(isPresented: $guide) { ConnectionGuideView() }
+            .fileImporter(isPresented: $pickSong, allowedContentTypes: [.mp3, .mpeg4Audio, .wav, .aiff, .audio]) { result in
+                if case .success(let url) = result, let id = model.importAndAnalyze(from: url) {
+                    onDone()
+                    model.openStudio(id)
                 }
             }
-            .padding(24)
         }
+    }
+
+    @ViewBuilder private var welcome: some View {
+        let connected = !model.midi.sources.isEmpty
+        InstrumentTile(drawing: .piano, size: 96)
+        Text("Welcome to TonePilot").font(DS.Text.largeTitle).foregroundStyle(DS.Palette.textPrimary)
+        Text("Play film-song tones on your Casio.").font(DS.Text.body).foregroundStyle(DS.Palette.textSecondary)
+        if connected {
+            DSChip(text: "Casio connected", symbol: "checkmark.circle.fill", tone: .success)
+            Button("Continue") { step = 1 }.buttonStyle(.dsPrimary).accessibilityIdentifier("setup.continue")
+        } else {
+            Button("Connect your Casio") { guide = true }.buttonStyle(.dsPrimary).accessibilityIdentifier("setup.connect")
+            Button("Later") { step = 1 }.buttonStyle(.dsSecondary).accessibilityIdentifier("setup.later")
+        }
+    }
+
+    @ViewBuilder private var ready: some View {
+        InstrumentTile(drawing: .voice, size: 96)
+        Text("Add your first song").font(DS.Text.largeTitle).foregroundStyle(DS.Palette.textPrimary)
+        Text("Import a song you own. TonePilot finds its sections, chords and tones on this iPhone.")
+            .font(DS.Text.body).foregroundStyle(DS.Palette.textSecondary)
+        if !model.defaultSoundFontInstalled {
+            NavigationLink { SoundFontSettingsView() } label: {
+                Label("Add the free SoundFont for the built-in sounds", systemImage: "exclamationmark.triangle.fill")
+                    .font(DS.Text.caption).foregroundStyle(DS.Palette.warning)
+            }
+            .accessibilityIdentifier("setup.soundfont")
+        }
+        Button("Import a song") { pickSong = true }.buttonStyle(.dsPrimary).accessibilityIdentifier("setup.import")
+        Button("Explore first") { onDone() }.buttonStyle(.dsSecondary).accessibilityIdentifier("setup.explore")
     }
 }
 

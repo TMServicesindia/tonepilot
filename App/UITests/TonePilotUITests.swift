@@ -275,6 +275,21 @@ final class TonePilotUITests: XCTestCase {
     }
 
     /// Scrolling Song Studio while the song plays must stay smooth (hitch ratio reported).
+    /// First run (spec §2.1): Connect opens the guide; Later → step 2; Explore first closes it.
+    func testFirstRunSteps() {
+        app.launchArguments += ["-TPFirstRun"]
+        app.launch()
+        let connect = element("setup.connect")
+        if connect.waitForExistence(timeout: 15) {
+            tap(connect, "open the connection guide")
+            app.navigationBars.buttons.firstMatch.tap(); assertAlive("back from the guide")
+            tap(element("setup.later"), thenExpect: element("setup.import"), "first run step 2")
+        } else {
+            tap(element("setup.continue"), thenExpect: element("setup.import"), "first run step 2")
+        }
+        tap(element("setup.explore"), thenExpect: app.tabBars.buttons["Songs"], limit: 5, "close the first run")
+    }
+
     /// The Analysing step list (spec §2.3): a song held mid-analysis by `-TPAnalysing`.
     func testAnalysingStepList() {
         app.launchArguments += ["-TPAnalysing"]
