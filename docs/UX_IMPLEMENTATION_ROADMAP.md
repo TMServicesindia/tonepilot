@@ -15,9 +15,9 @@ the full build (`ios-build.yml`: speed & crash gate, budgets, core tests) and a 
 | 4 | Songs: Continue card, D2/D3 covers (embedded artwork first), status chips, empty state, amber "Casio not connected" chip, ⋯ menu · **Analysing** step list | Built | ids `songs.*`, `analysis.*`, `connection.status`; `-TPAnalysing` seed |
 | 5 | Tone editor (header + Level / Brightness / Reverb + Details rows) · Arpeggio (state line, larger grid) · Sections (Song Map + rows) · AI parts row · **Sound browser** | Built | ids `layer.*`, `arpeggio.state`, `sections.row/more.<n>`, `sounds.*` |
 | 6 | Settings (Casio card + four groups, coloured icon squares) · First run (2 steps) · Record | Built | ids `settings.casio`, `settings.licences`, `setup.*`, `record.empty` |
-| 7 | Copy pass · accessibility pass · after screenshots · journeys re-measured | In progress | Token pass, contrast fixes, after-5 / after-6 screenshots done |
+| 7 | Copy pass · accessibility pass · after screenshots · journeys re-measured | Built | Automated audit 240 → 224 issues; journeys in `USER_JOURNEYS.md` |
 
-Steps 1–6 shipped in **v0.3.101** (6 Nov, full build green).
+Steps 1–6 shipped in **v0.3.101** (6 Nov); step 7 in **v0.3.111** (10 Nov). Both full builds green.
 
 ## Deviations from the spec (and why)
 

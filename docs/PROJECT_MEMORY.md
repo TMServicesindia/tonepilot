@@ -494,7 +494,7 @@ Stop: no production change, no major training, no release before approval.
   - Settings (§2.14), first run in 2 steps (§2.1), Record (§2.13).
   - Token pass over the legacy screens; contrast fixes.
 - **Each has ids and stress-test steps.** Status, deviations and remaining work: `docs/UX_IMPLEMENTATION_ROADMAP.md`.
-- **Build status:** shipped in v0.3.101 (full build green). Not yet built: the test-seed fix and two copy fixes (main-tone reason, shorter engine names). Eight full-build runs on 6 Nov were cancelled before starting because GitHub had no macOS arm64 runner. They ship with the next real change's full build.
+- **Build status:** steps 1–6 shipped in v0.3.101; step 7 and the follow-up fixes shipped in v0.3.111 (10 Nov, full build green).
 
 ## 7. Open owner decisions
 
@@ -510,4 +510,4 @@ Stop: no production change, no major training, no release before approval.
 
 ## 8. Release history (latest first)
 
-v0.3.101 (6 Nov; UX redesign steps 1–7 + Sound browser; all gates passed; launch median 2.86 s, mean 3.18 s, p90 3.81 s; peak memory 193 MB) · (1 Nov 23:32 IST re-run: launch 4.34 s > 4 s, not published) · (v0.3.72 attempted: Phase 1 iPhone foundation; publish 403) · v0.3.71 (live fill deadlock fix; all gates passed; launch 3.47 s) · v0.3.70 (stuck notes, arpeggio melody bug, ToneMatcher, 20 instruments; launch 3.86 s) · v0.3.67 (publish-anyway; Film Tone Library) · quick-2 · v0.3.61 (Record; owner's preferred older build) · earlier v0.3.x.
+v0.3.111 (10 Nov; UX step 7: copy pass, Sound browser for the whole song, accessibility audit fixes, journey re-measure; all gates passed; launch median 2.81 s, p90 2.93 s; peak memory 195 MB) · v0.3.101 (6 Nov; UX redesign steps 1–7 + Sound browser; all gates passed; launch median 2.86 s, mean 3.18 s, p90 3.81 s; peak memory 193 MB) · (1 Nov 23:32 IST re-run: launch 4.34 s > 4 s, not published) · (v0.3.72 attempted: Phase 1 iPhone foundation; publish 403) · v0.3.71 (live fill deadlock fix; all gates passed; launch 3.47 s) · v0.3.70 (stuck notes, arpeggio melody bug, ToneMatcher, 20 instruments; launch 3.86 s) · v0.3.67 (publish-anyway; Film Tone Library) · quick-2 · v0.3.61 (Record; owner's preferred older build) · earlier v0.3.x.
