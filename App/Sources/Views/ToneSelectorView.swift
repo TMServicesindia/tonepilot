@@ -50,7 +50,7 @@ struct ToneSelectorView: View {
                 }
             }
             Section { AuditionStrip() } footer: {
-                Text("Press keys on your Casio (or here) to hear the selected tone. Tones play through the app into the keyboard's AUDIO IN.")
+                Text("Play your Casio, or the keys here, to hear the tone.")
             }
         }
         .searchable(text: $search, prompt: "Search tones")
@@ -74,7 +74,7 @@ struct ToneSelectorView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(entry.tone.name).font(.body.weight(isActive(entry.tone) ? .bold : .regular))
-                        Text(entry.subtitle).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
+                        Text(PatchSourceType.friendlySubtitle(entry.subtitle)).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
                     }
                     Spacer()
                     if isActive(entry.tone) { Image(systemName: "pianokeys.inverse").foregroundStyle(DS.Palette.accent) }

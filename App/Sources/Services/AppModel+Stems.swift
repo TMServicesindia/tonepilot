@@ -194,7 +194,7 @@ extension AppModel {
             Task { @MainActor in
                 guard let self else { return }
                 self.musicSplitProgress[songId] = nil
-                if let failure = failureText { self.separationError[songId] = "Lead/backing split: \(failure)"; return }
+                if let failure = failureText { self.separationError[songId] = "Couldn't split the music (\(failure)). Try again."; return }
                 guard let made = madeStems, var song = self.song(songId) else { return }
                 song.stems = (song.stems ?? []).filter { $0.kind != .lead && $0.kind != .backing } + made
                 var acc = song.accompaniment ?? AccompanimentSettings()

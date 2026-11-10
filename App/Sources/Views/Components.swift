@@ -40,7 +40,7 @@ struct ConfidenceBadge: View {
 struct SourceTypeBadge: View {
     let type: PatchSourceType
     var body: some View {
-        Text(type.displayName)
+        Text(type.friendlyName)
             .font(.caption2.weight(.medium))
             .padding(.horizontal, 6).padding(.vertical, 2)
             .background((type == .experimentalExtraction ? Theme.warn : Color.blue).opacity(0.2), in: Capsule())
@@ -208,5 +208,23 @@ extension Double {
         guard isFinite else { return "--:--" }
         let s = Int(self.rounded(.down))
         return String(format: "%d:%02d", s / 60, s % 60)
+    }
+}
+
+extension PatchSourceType {
+    /// Plain names for the interface (copy audit: no "SoundFont" or "sample zone" on screen).
+    var friendlyName: String {
+        switch self {
+        case .soundFont: return "Built-in"
+        case .synthesized: return "Built-in synth"
+        case .licensedSample: return "Real instrument"
+        case .userSample: return "My sample"
+        case .experimentalExtraction: return "From a song part (experimental)"
+        }
+    }
+
+    /// The tone list's subtitles carry the core's names; show the plain one instead.
+    static func friendlySubtitle(_ text: String) -> String {
+        allCases.first { $0.displayName == text }?.friendlyName ?? text
     }
 }

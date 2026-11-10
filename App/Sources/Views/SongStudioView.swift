@@ -559,7 +559,7 @@ struct SeparationCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 10) {
                     ProgressView().controlSize(.small)
-                    Text("Downloading the separation model (one time)…").font(DS.Text.label)
+                    Text("Downloading the parts model (one time)…").font(DS.Text.label)
                     Spacer()
                     Text("\(Int(d * 100))%").font(.caption.monospacedDigit())
                 }
@@ -595,7 +595,7 @@ struct SeparationCard: View {
                 }
                 .pickerStyle(.segmented)
                 if !model.models.isInstalled(model.separationPack) {
-                    Text("The first time, the separation model is downloaded (Wi-Fi recommended).").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
+                    Text("The first time, the parts model downloads (Wi-Fi recommended).").font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 }
             }
             .padding(14)
@@ -1098,7 +1098,7 @@ struct TonePickerSheet: View {
                 Text(entry.tone.name).font(DS.Text.caption.weight(.semibold))
                     .foregroundStyle(selected ? DS.Palette.accent : DS.Palette.textPrimary)
                     .lineLimit(2).multilineTextAlignment(.leading)
-                Text(entry.subtitle).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
+                Text(PatchSourceType.friendlySubtitle(entry.subtitle)).font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary).lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())

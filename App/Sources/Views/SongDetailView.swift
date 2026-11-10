@@ -74,7 +74,7 @@ struct SongDetailView: View {
                     ProgressView(value: model.analysisProgress[songId] ?? 0) {
                         Text(model.analysisStage[songId] ?? "Analysing on this iPhone…").font(DS.Text.bodySecondary)
                     }
-                    Text("Tempo, key and chords → melody → sections and what plays in each → tones, layers and effects for every section.")
+                    Text("Tempo, key and chords, then the melody, the sections and a tone for each.")
                         .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                     Button("Cancel") { model.cancelAnalysis(songId: songId) }.font(DS.Text.metadata)
                 }
@@ -114,7 +114,7 @@ struct SongDetailView: View {
                         if let m = song.melody {
                             chip(m.source == .vocalStem ? "Melody from vocals" : "Melody from mix", m.source == .vocalStem ? 0.8 : 0.5, .algorithm)
                         }
-                        if !(song.stems ?? []).isEmpty { chip("Stems: \((song.stems ?? []).map(\.kind.rawValue).joined(separator: ", "))", 0.8, .model) }
+                        if !(song.stems ?? []).isEmpty { chip("Parts: \((song.stems ?? []).map { $0.kind.rawValue.capitalized }.joined(separator: ", "))", 0.8, .model) }
                     }
                 }
                 if let notice = model.analysisNotice[songId] { Text(notice).font(DS.Text.metadata).foregroundStyle(DS.Palette.warning) }
@@ -174,7 +174,7 @@ struct SongDetailView: View {
 
     private func limitations(_ song: Song) -> [String] {
         SongAnalyzer.baseLimitations + ((song.stems ?? []).isEmpty ? [SongAnalyzer.noStemsLimitation] : [
-            "Separated stems contain artifacts and bleed; instrument roles are estimates."])
+            "Separated parts can carry traces of other instruments; instrument roles are estimates."])
     }
 
     private func chip(_ text: String, _ confidence: Double, _ provenance: ValueProvenance) -> some View {
@@ -250,7 +250,7 @@ struct SongDetailView: View {
                     }
                     .pickerStyle(.segmented)
                 }
-                Text("Chords and melody notes are corrected in the Melody & chord guide; section timing via each section's ⋯ menu.")
+                Text("Fix chords and notes in the chord guide. Fix section timing from each section's ⋯ menu.")
                     .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
             }
         }
@@ -303,7 +303,7 @@ struct SectionToneRow: View {
                     }
                     Button { model.regenerateSection(songId: song.id, sectionId: section.id) } label: { Label("Regenerate this section", systemImage: "wand.and.stars") }
                     if song.aiOriginal(for: section) != nil {
-                        Button { model.restoreAIOriginal(songId: song.id, sectionId: section.id) } label: { Label("Restore AI Original", systemImage: "arrow.uturn.backward") }
+                        Button { model.restoreAIOriginal(songId: song.id, sectionId: section.id) } label: { Label("Back to TonePilot's tone", systemImage: "arrow.uturn.backward") }
                     }
                     if model.audioURL(for: song) != nil {
                         Button {

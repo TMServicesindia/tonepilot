@@ -920,11 +920,11 @@ final class AppModel: ObservableObject {
                     do {
                         await stage("Uploading to your analysis server…", 0.02)
                         let job = try await client.submit(audioFile: url, consent: true, model: settings.model, transcribeVocals: settings.transcribeVocals)
-                        await stage("Separating vocals and instruments (Demucs)…", 0.05)
+                        await stage("Splitting into parts on your server…", 0.05)
                         let result = try await client.waitForResult(job: job) { p in
                             Task { @MainActor in self?.analysisProgress[songId] = 0.05 + 0.35 * p }
                         }
-                        await stage("Downloading stems…", 0.4)
+                        await stage("Downloading the parts…", 0.4)
                         for stem in result.stems {
                             guard let kind = StemInfo.Kind(rawValue: stem.kind) else { continue }
                             let file = try await client.downloadStem(stem, to: stemDir)

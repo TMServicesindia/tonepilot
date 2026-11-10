@@ -112,7 +112,7 @@ extension AppModel {
                 if bgTask != .invalid { UIApplication.shared.endBackgroundTask(bgTask) }
                 let wasRunning = self.fusionProgress[songId] != nil
                 self.fusionProgress[songId] = nil
-                if let failureText { self.fusionError[songId] = "Second separation: \(failureText)" }
+                if let failureText { self.fusionError[songId] = "Couldn't check with the second model (\(failureText)). Try again later." }
                 if wasRunning, let result, let current = self.song(songId) {
                     // The song was re-analysed meanwhile: these matches belong to other sections.
                     if current.partMatches == snapshot.partMatches, current.sectionLeadMatches == snapshot.sectionLeadMatches {

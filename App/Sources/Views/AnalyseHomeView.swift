@@ -15,7 +15,7 @@ struct AnalyseHomeView: View {
                 Button { showListen = true } label: { Label("Listen to a song from your streaming app", systemImage: "ear") }
                 Button { pickMP3 = true } label: { Label("Import MP3 / audio file", systemImage: "square.and.arrow.down") }
             } footer: {
-                Text("Analysis runs on this iPhone: tempo & beats, key, chords, section boundaries and repeated parts, plus tone suggestions.")
+                Text("Analysed on this iPhone: tempo, key, chords, sections and tones.")
             }
             Section("Songs") {
                 ForEach(model.library.songs.filter { [.importedFile, .listened].contains($0.sourceType) }) { song in

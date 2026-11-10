@@ -192,7 +192,7 @@ struct MelodyChordGuideView: View {
                 }
             }
         } header: { Text("Left hand · Root → Fifth → Root") } footer: {
-            Text("Tap a chord to correct it. Where no clear chord was found, the guide suggests a tonic drone (Sa–Pa) instead of forcing one.")
+            Text("Tap a chord to correct it. Where no chord is clear, play the Sa–Pa drone.")
         }
     }
 

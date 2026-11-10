@@ -40,7 +40,7 @@ struct SamplePatchCreatorView: View {
                 Picker("Family", selection: $family) {
                     ForEach(InstrumentFamily.allCases, id: \.self) { Text($0.displayName).tag($0) }
                 }
-                Toggle("Built from an AI-separated stem (experimental)", isOn: $experimentalStem)
+                Toggle("Built from a separated part (experimental)", isOn: $experimentalStem)
             }
             Section {
                 ForEach($rows) { $row in
@@ -115,7 +115,7 @@ struct SamplePatchCreatorView: View {
                                                                 license: LicenseInfo(name: licenseName.isEmpty ? "User supplied" : licenseName, redistributable: false))
             if experimentalStem {
                 patch.sourceType = .experimentalExtraction
-                patch.notes = "Built from an AI-separated stem: expect artifacts and bleed."
+                patch.notes = "Built from a separated part: expect traces of other instruments."
                 model.library.upsert(patch)
                 model.save()
             }

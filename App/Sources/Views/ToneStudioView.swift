@@ -223,7 +223,7 @@ struct ArrangementEditorView: View {
             HStack { Text("EQ mid").frame(width: 80, alignment: .leading); Slider(value: m.eq.midDB, in: -12...12, step: 0.5) }
             HStack { Text("EQ high").frame(width: 80, alignment: .leading); Slider(value: m.eq.highDB, in: -12...12, step: 0.5) }
         } header: { Text("Master effects") } footer: {
-            Text("Layers send to these shared effects by their own reverb/chorus/delay amounts. A limiter keeps the output from clipping into the Casio's AUDIO IN.")
+            Text("Shared by all layers. A limiter stops the sound clipping into the Casio.")
         }
     }
 
@@ -302,7 +302,7 @@ struct LayerEditor: View {
     }
 
     private var source: String {
-        let kind = patch.map { $0.sourceType.displayName } ?? "Sound"
+        let kind = patch.map { $0.sourceType.friendlyName } ?? "Sound"
         return summary.isEmpty ? kind : "\(kind) · \(summary)"
     }
 
@@ -506,7 +506,7 @@ struct PatchPicker: View {
                         .padding(.vertical, 2)
                     }
                 } footer: {
-                    Text("Film Tone Library: sounds for Indian film music from the 90s keyboard era to today's mass and EDM songs. Every sound can be edited.")
+                    Text("Film Tone Library: Indian film sounds from the 90s to today. Every sound can be edited.")
                 }
                 ForEach(InstrumentFamily.allCases, id: \.self) { family in
                     let patches = model.library.patches.filter { $0.family == family && matches($0) }

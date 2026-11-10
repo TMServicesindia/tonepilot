@@ -412,15 +412,15 @@ struct SeparationModelsSection: View {
             Toggle(isOn: $model.fusionEnabled) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Check tones with both models")
-                    Text("After a song is separated, it is separated again with the other model in the background (about twice the time; downloads that model once). Where both hear the same instrument the tone is surer; where they differ you can choose.")
+                    Text("Surer tones. Takes about twice as long.")
                         .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
                 }
             }
             .accessibilityIdentifier("settings.fusion")
         } header: {
-            Text("Separation models")
+            Text("Parts (4 or 6)")
         } footer: {
-            Text("Downloaded the first time you separate a song (Wi-Fi recommended) and kept on this iPhone. Deleting one frees space; it downloads again when needed.")
+            Text("Downloads when first needed (Wi-Fi recommended). Delete one to free space.")
         }
     }
 }
@@ -468,7 +468,7 @@ struct SoundPacksSection: View {
         } header: {
             Text("Real instrument sounds").accessibilityIdentifier("settings.soundpacks")
         } footer: {
-            Text("Recorded instruments from free, public-domain (CC0) libraries: VSCO 2 Community Edition and the Versilian Community Sample Library. Each pack's sounds play on all keys and join the nearest-sound search. Wi-Fi recommended.")
+            Text("Free, public-domain recordings (VSCO, VCSL). They join the closest-sound search. Wi-Fi recommended.")
         }
         .onAppear { if model.soundPackList.isEmpty { model.loadSoundPackList() } }
     }

@@ -294,7 +294,7 @@ struct ImportSongView: View {
                     Section {
                         Button { pickFile = true } label: { Label("Choose MP3 / audio file…", systemImage: "folder") }
                     } footer: {
-                        Text("MP3, M4A, WAV and AIFF. Analysis starts as soon as the file is added; title and artist come from the file's tags or its name.")
+                        Text("MP3, M4A, WAV or AIFF. Analysis starts as soon as it's added.")
                     }
                 } else {
                     Section {

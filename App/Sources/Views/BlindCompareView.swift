@@ -49,7 +49,7 @@ struct BlindCompareView: View {
                     .disabled(first == nil || second == nil || first == second)
                     .accessibilityIdentifier("compare.start")
                 } footer: {
-                    Text("Pick today's tone and a real-instrument tone (download them in Settings › Real instrument sounds). The test hides which is which.")
+                    Text("Choose two sounds. TonePilot hides which is which.")
                 }
             } else {
                 Section {
