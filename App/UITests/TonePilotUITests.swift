@@ -22,6 +22,9 @@ final class TonePilotUITests: XCTestCase {
         XCTAssertTrue(element.waitForExistence(timeout: limit), "Not found in \(limit) s: \(step)")
         // XCUITest can't always "scroll to" an element inside the page's scroll view under the fixed page bar;
         // when it's on screen but not reported hittable, tap it by position instead.
+        // Under the fixed transport (bottom quarter of the screen): scroll it clear first.
+        var scrolls = 0
+        while !element.isHittable && scrolls < 2 && element.frame.midY > app.frame.height * 0.75 { app.swipeUp(); scrolls += 1 }
         if element.isHittable { element.tap() } else { element.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap() }
         if let next { XCTAssertTrue(next.waitForExistence(timeout: limit), "Screen didn't respond in \(limit) s after: \(step)") }
         assertAlive(step)
@@ -72,6 +75,10 @@ final class TonePilotUITests: XCTestCase {
                 if round == 1 {
                     let split = element("parts.split")
                     if split.waitForExistence(timeout: 2) {
+                        // It sits at the bottom of the Mix page: scroll it clear of the transport before tapping
+                        // (a position tap under the transport would land on the transport instead).
+                        var scrolls = 0
+                        while !split.isHittable && scrolls < 4 { app.swipeUp(); scrolls += 1 }
                         tap(split, "split Music into Lead & Backing")
                         XCTAssertTrue(element("stem.header.audio.stem.lead").waitForExistence(timeout: 60), "Lead instruments part appears")
                         assertAlive("lead/backing split")
