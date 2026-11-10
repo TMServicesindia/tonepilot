@@ -361,6 +361,7 @@ struct TransportBar: View {
             .frame(height: DS.Size.touchTarget)   // a 4 pt bar with a full-size touch area
             .accessibilityElement()
             .accessibilityLabel("Position")
+            .accessibilityIdentifier("transport.position")
             .accessibilityValue("\(pos.mmss) of \(duration.mmss)")
             .accessibilityAdjustableAction { model.studioSeek(to: $0 == .increment ? pos + 10 : max(0, pos - 10)) }
             HStack {

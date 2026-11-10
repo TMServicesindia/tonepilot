@@ -39,7 +39,6 @@ jobs:
             -only-testing:TonePilotUITests/ScreenTourUITests -resultBundlePath Screens.xcresult > tour.log 2>&1 || true
           grep -E "Test Case .*(passed|failed)|error:" tour.log | head -30
           # Accessibility audit summary (ScreenTourUITests.audit): one notice per issue type and screen.
-          grep -E "SPLITDIAG:" tour.log | head -20 | while IFS= read -r l; do echo "::notice title=Split diagnostic::$l"; done
           grep -E "^A11Y:" tour.log | sort -u > a11y.txt || true
           echo "::notice title=Accessibility audit::$(wc -l < a11y.txt) issues (see a11y.txt)"
           awk -F' · ' '{print $1" · "$2}' a11y.txt | sort | uniq -c | sort -rn | head -25 | while IFS= read -r l; do echo "::notice title=A11Y::$l"; done

@@ -85,35 +85,6 @@ final class ScreenTourUITests: XCTestCase {
         tour(prefix: "B")
     }
 
-    /// Diagnostic for the stress test's split step: split Music into Lead & Backing on the demo song,
-    /// screenshot while waiting, and print what the Mix page shows ("SPLITDIAG:" lines in tour.log).
-    func testSplitDiagnostics() {
-        launch()
-        XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15))
-        _ = tapIfThere(app.tabBars.buttons["Songs"])
-        guard tapIfThere(app.staticTexts["Demo Song"].firstMatch, 8) else { print("SPLITDIAG: no demo song"); return }
-        _ = el("transport.play").waitForExistence(timeout: 8)
-        _ = tapIfThere(el("page.mix"))
-        let split = el("parts.split")
-        print("SPLITDIAG: split exists=\(split.waitForExistence(timeout: 3)) hittable=\(split.exists && split.isHittable) frame=\(split.exists ? split.frame : .zero) screen=\(app.frame)")
-        var scrolls = 0
-        while split.exists && !split.isHittable && scrolls < 4 { app.swipeUp(); scrolls += 1 }
-        print("SPLITDIAG: after \(scrolls) scrolls hittable=\(split.exists && split.isHittable) frame=\(split.exists ? split.frame : .zero)")
-        shot("S00 Mix before split")
-        if split.exists { split.tap() }
-        for k in 1...6 {
-            Thread.sleep(forTimeInterval: 10)
-            let lead = el("stem.header.audio.stem.lead").exists
-            print("SPLITDIAG: t=\(k * 10)s lead=\(lead) split=\(el("parts.split").exists)")
-            shot("S0\(k) Mix after \(k * 10)s")
-            if lead { break }
-        }
-        let headers = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'stem.'")).allElementsBoundByIndex.map(\.identifier)
-        print("SPLITDIAG: stem ids \(headers)")
-        let texts = app.staticTexts.allElementsBoundByIndex.map(\.label).filter { $0.localizedCaseInsensitiveContains("split") || $0.localizedCaseInsensitiveContains("couldn") || $0.localizedCaseInsensitiveContains("lead") }
-        print("SPLITDIAG: texts \(texts)")
-    }
-
     func testAnalysing() {
         launch(["-TPAnalysing"])
         XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15))
