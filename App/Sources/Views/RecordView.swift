@@ -103,6 +103,8 @@ private struct RecordPanel: View {
             Text(Self.clock(live.recordSeconds)).font(DS.Text.display.monospacedDigit())
                 .foregroundStyle(DS.Palette.textPrimary)
                 .opacity(state == .idle ? 0.4 : 1)
+                .accessibilityLabel("Recording time")
+                .accessibilityValue("\(Int(live.recordSeconds) / 60) minutes \(Int(live.recordSeconds) % 60) seconds")
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     Capsule().fill(DS.Palette.elevated)

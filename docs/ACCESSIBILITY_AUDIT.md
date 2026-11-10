@@ -57,4 +57,8 @@ accessibility-large text (B). Run `after-7`: **240 issues**.
 | Hit area too small | 13 | Transport position bar (16 pt); tone mode options (36 pt); the **Edit** header action | All raised to 44 pt |
 | Label not human-readable | 2 | — | Review in the next run |
 
-The next tour (`after-7b`) re-runs the audit after these fixes.
+**After the fixes (`after-7b`): 224 issues.**
+- Hit area: 13 → 1 (one system element in the tone editor sheet).
+- Text clipped: 68 → 56. The ones left at default size are not visibly truncated in the screenshots; they are one-line labels inside combined elements.
+- Label not human-readable: the Record clock ("0:00.0") now has the spoken label "Recording time" and a value in minutes and seconds.
+- Contrast and Dynamic Type: unchanged, for the system and translucent-bar reasons above.
