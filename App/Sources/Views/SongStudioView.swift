@@ -53,6 +53,8 @@ struct SongStudioView: View {
     @EnvironmentObject var model: AppModel
     let songId: UUID
     @State private var pickingToneFor: SectionRef?
+    /// Sound browser for the whole song's main tone.
+    @State private var pickingMainTone = false
     @State private var editingTone: ToneEditTarget?
     /// The tone editor opens full height (its layers are its main content); it can be pulled down to half.
     @State private var toneDetent: PresentationDetent = .large
@@ -94,7 +96,7 @@ struct SongStudioView: View {
                             AIPartsCard(song: song)
                         case .keyboard:
                             MyKeyboardCard(song: song, onChangeSound: changeSound, onEditSound: editSound, onEditTone: { editingTone = ToneEditTarget(id: $0) },
-                                           onCompare: { comparing = true })
+                                           onCompare: { comparing = true }, onChangeMainTone: { pickingMainTone = true })
                         case .arpeggio:
                             SongArpeggioCard(song: song)
                         case .sections:
@@ -113,6 +115,9 @@ struct SongStudioView: View {
             .toolbar { toolbar(song) }
             .sheet(item: $pickingToneFor) { ref in
                 TonePickerSheet(songId: songId, sectionId: ref.id).environmentObject(model)
+            }
+            .sheet(isPresented: $pickingMainTone) {
+                TonePickerSheet(songId: songId, sectionId: nil).environmentObject(model)
             }
             .sheet(item: $editingTone) { target in
                 NavigationStack { ArrangementEditorView(songId: songId, arrangementId: target.id, onDone: { editingTone = nil }) }
@@ -1003,7 +1008,8 @@ struct TonePickerSheet: View {
     @EnvironmentObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
     let songId: UUID
-    let sectionId: UUID
+    /// nil: the whole song's main tone.
+    let sectionId: UUID?
     @State private var search = ""
     @State private var family: InstrumentFamily?
 
@@ -1011,7 +1017,7 @@ struct TonePickerSheet: View {
 
     var body: some View {
         let list = model.library.toneList(search: search)
-        let sectionLabel = model.song(songId)?.sections.first { $0.id == sectionId }?.label ?? "this section"
+        let sectionLabel = sectionId.flatMap { id in model.song(songId)?.sections.first { $0.id == id }?.label } ?? "the whole song"
         let previewing = model.previewingToneId.flatMap { model.tone(id: $0) }
         let fromSong = list.songTones.filter { $0.songId == songId }
         let families = list.instruments.map(\.family)
@@ -1119,7 +1125,10 @@ struct TonePickerSheet: View {
             }
             Spacer(minLength: DS.Space.s)
             Button("Use this") {
-                if let previewing { model.assignTone(previewing, songId: songId, sectionId: sectionId) }
+                if let previewing {
+                    if let sectionId { model.assignTone(previewing, songId: songId, sectionId: sectionId) }
+                    else { model.assignMainTone(previewing, songId: songId) }
+                }
                 dismiss()
             }
             .buttonStyle(.dsPrimary)

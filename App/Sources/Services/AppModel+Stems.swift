@@ -273,6 +273,25 @@ extension AppModel {
         if activeSongId == songId { activate(tone, songId: songId, sectionId: activeSectionId) }
     }
 
+    /// Uses `tone` as the song's main tone (Sound browser in whole-song mode). The main tone keeps its
+    /// id and name; its reason says it was your choice, so the AI refresh leaves it alone.
+    func assignMainTone(_ tone: Arrangement, songId: UUID) {
+        guard var song = song(songId) else { return }
+        let current = mainTone(of: song)
+        var t = tone
+        t.id = current?.id ?? UUID()
+        t.name = "Main tone"
+        t.origin = current?.origin ?? .myVersion
+        t.derivedFrom = nil
+        t.rationale = "Your choice: \(tone.name.replacingOccurrences(of: " (My Version)", with: ""))."
+        t.createdAt = current?.createdAt ?? Date()
+        t.updatedAt = Date().addingTimeInterval(2)   // newer than created: counts as yours, not the AI's
+        if let i = song.arrangements.firstIndex(where: { $0.id == t.id }) { song.arrangements[i] = t } else { song.arrangements.append(t) }
+        update(song)
+        previewingToneId = nil
+        if activeSongId == songId, isUsingMainTone(song) { activate(t, songId: songId, sectionId: activeSectionId) }
+    }
+
     /// Makes `sectionId` the song's hook (your choice wins over the analysis) and rebuilds the AI main
     /// tone from it. A main tone you edited yourself is kept.
     func setHook(_ sectionId: UUID, songId: UUID) {

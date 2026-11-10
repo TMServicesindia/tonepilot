@@ -13,6 +13,8 @@ struct MyKeyboardCard: View {
     let onEditSound: (UUID) -> Void
     let onEditTone: (UUID) -> Void
     var onCompare: () -> Void = {}
+    /// Whole-song mode: Change opens the Sound browser for the main tone.
+    var onChangeMainTone: () -> Void = {}
 
     var body: some View {
         let usingMain = model.isUsingMainTone(song)
@@ -25,7 +27,7 @@ struct MyKeyboardCard: View {
             ConnectionChips()
             ToneSuggestionCard(song: song, tone: tone, usingMain: usingMain, sectionId: sectionId,
                                onChange: {
-                                   if usingMain, let t = tone { onEditTone(t.id) } else if let s = sectionId { onChangeSound(s) }
+                                   if usingMain { onChangeMainTone() } else if let s = sectionId { onChangeSound(s) }
                                },
                                onCompare: onCompare)
             if !song.sections.isEmpty { ToneModeSwitch(song: song) }

@@ -100,6 +100,12 @@ final class TonePilotUITests: XCTestCase {
                 if round == 1 {
                     let level = element("tone.layer.level.0")
                     if level.waitForExistence(timeout: 3) { level.adjust(toNormalizedSliderPosition: 0.7); assertAlive("layer level") }
+                    // Whole-song mode: Change opens the Sound browser for the main tone; cancel leaves it unchanged.
+                    let change = element("tone.change")
+                    if change.waitForExistence(timeout: 3) {
+                        tap(change, thenExpect: element("sounds.cancel"), limit: 5, "Sound browser for the whole song")
+                        tap(element("sounds.cancel"), "close the Sound browser")
+                    }
                 }
                 if round == 2 {
                     // Blind comparison sheet: opens and closes (no downloads needed).
