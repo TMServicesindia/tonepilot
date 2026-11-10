@@ -38,6 +38,10 @@ jobs:
           xcodebuild test -project TonePilot.xcodeproj -scheme TonePilot -destination "id=$DEV" -derivedDataPath build-sim \
             -only-testing:TonePilotUITests/ScreenTourUITests -resultBundlePath Screens.xcresult > tour.log 2>&1 || true
           grep -E "Test Case .*(passed|failed)|error:" tour.log | head -30
+          # Accessibility audit summary (ScreenTourUITests.audit): one notice per issue type and screen.
+          grep -E "^A11Y:" tour.log | sort -u > a11y.txt || true
+          echo "::notice title=Accessibility audit::$(wc -l < a11y.txt) issues (see a11y.txt)"
+          awk -F' · ' '{print $1" · "$2}' a11y.txt | sort | uniq -c | sort -rn | head -25 | while IFS= read -r l; do echo "::notice title=A11Y::$l"; done
           grep -E "error:" tour.log | sort -u | head -10 | while IFS= read -r l; do echo "::error title=Screen tour::$l"; done
           mkdir -p shots
           xcrun xcresulttool export attachments --path Screens.xcresult --output-path shots
@@ -58,6 +62,7 @@ jobs:
         run: |
           B="ci/screens-${{ inputs.label }}"
           cp tour.log out/
+          cp a11y.txt out/ 2>/dev/null || true
           cd out && git init -q && git checkout -q -b "$B"
           git config user.name github-actions; git config user.email github-actions@users.noreply.github.com
           git add . && git commit -qm "Screens ${{ inputs.label }}: run ${GITHUB_RUN_ID} (${GITHUB_SHA::7})"

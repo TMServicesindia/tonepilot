@@ -21,6 +21,19 @@ final class ScreenTourUITests: XCTestCase {
         add(a)
     }
 
+    /// Xcode's automated accessibility audit (contrast, text clipping, element description, hit size,
+    /// Dynamic Type). Issues are printed as "A11Y:" lines in tour.log for review; they don't fail the tour.
+    func audit(_ screen: String) {
+        guard #available(iOS 17.0, *) else { return }
+        do {
+            try app.performAccessibilityAudit { issue in
+                let who = issue.element.map { "\($0.elementType.rawValue) id='\($0.identifier)' label='\($0.label)'" } ?? "-"
+                print("A11Y: [\(screen)] \(issue.auditType.rawValue) · \(issue.compactDescription) · \(who)")
+                return true
+            }
+        } catch { print("A11Y: [\(screen)] audit error \(error)") }
+    }
+
     func el(_ id: String) -> XCUIElement { app.descendants(matching: .any).matching(identifier: id).firstMatch }
 
     func tapIfThere(_ e: XCUIElement, _ timeout: TimeInterval = 4) -> Bool {
@@ -30,17 +43,17 @@ final class ScreenTourUITests: XCTestCase {
 
     func tour(prefix: String) {
         XCTAssertTrue(app.tabBars.buttons["Songs"].waitForExistence(timeout: 15))
-        _ = tapIfThere(app.tabBars.buttons["Songs"]); shot("\(prefix)10 Songs")
+        _ = tapIfThere(app.tabBars.buttons["Songs"]); shot("\(prefix)10 Songs"); audit("\(prefix) Songs")
         guard tapIfThere(app.staticTexts["Demo Song"].firstMatch, 8) else { return }
         _ = el("transport.play").waitForExistence(timeout: 8)
         for (n, page) in [("20", "play"), ("21", "mix"), ("22", "keyboard"), ("23", "arpeggio"), ("24", "sections")] {
             if tapIfThere(el("page.\(page)")) {
-                shot("\(prefix)\(n) Studio \(page)")
+                shot("\(prefix)\(n) Studio \(page)"); audit("\(prefix) \(page)")
                 app.swipeUp(); shot("\(prefix)\(n)b Studio \(page) scrolled"); app.swipeDown(); app.swipeDown()
             }
         }
         if tapIfThere(el("page.keyboard")), tapIfThere(el("tone.editMain")) {
-            _ = el("tone.done").waitForExistence(timeout: 5); shot("\(prefix)30 Tone editor")
+            _ = el("tone.done").waitForExistence(timeout: 5); shot("\(prefix)30 Tone editor"); audit("\(prefix) Tone editor")
             app.swipeUp(); shot("\(prefix)30b Tone editor scrolled")
             let done = el("tone.done"); if done.exists { done.tap() }
         }
@@ -48,9 +61,16 @@ final class ScreenTourUITests: XCTestCase {
             shot("\(prefix)31 Blind compare")
             _ = tapIfThere(el("compare.done"))
         }
-        if tapIfThere(app.tabBars.buttons["Record"]) { shot("\(prefix)40 Record") }
+        // Sound browser (spec §2.8): Sections › first section ⋯ › Change tone.
+        if tapIfThere(el("page.sections")), tapIfThere(el("sections.more.0")), tapIfThere(app.buttons["Change tone"].firstMatch) {
+            _ = el("sounds.cancel").waitForExistence(timeout: 5)
+            shot("\(prefix)32 Sound browser"); audit("\(prefix) Sound browser")
+            app.swipeUp(); shot("\(prefix)32b Sound browser scrolled")
+            _ = tapIfThere(el("sounds.cancel"))
+        }
+        if tapIfThere(app.tabBars.buttons["Record"]) { shot("\(prefix)40 Record"); audit("\(prefix) Record") }
         if tapIfThere(app.tabBars.buttons["Settings"]) {
-            shot("\(prefix)50 Settings")
+            shot("\(prefix)50 Settings"); audit("\(prefix) Settings")
             for k in 1...4 { app.swipeUp(); shot("\(prefix)5\(k) Settings scrolled \(k)") }
         }
     }
