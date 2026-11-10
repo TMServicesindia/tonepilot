@@ -28,9 +28,9 @@ struct PartRow: View {
                 VStack(alignment: .leading, spacing: DS.Space.xxs) {
                     HStack(spacing: DS.Space.s) {
                         Circle().fill(color).frame(width: 8, height: 8)
-                        Text(track.name).font(DS.Text.body.weight(.semibold)).foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+                        Text(track.name).font(DS.Text.body.weight(.semibold)).foregroundStyle(DS.Palette.textPrimary).lineLimit(2)
                     }
-                    Text(note).font(DS.Text.caption).foregroundStyle(on ? DS.Palette.textSecondary : DS.Palette.accent).lineLimit(1)
+                    Text(note).font(DS.Text.caption).foregroundStyle(on ? DS.Palette.textSecondary : DS.Palette.accent).lineLimit(2)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())

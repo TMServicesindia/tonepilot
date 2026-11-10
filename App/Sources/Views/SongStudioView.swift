@@ -320,9 +320,10 @@ struct ToneModeSwitch: View {
     private func option(_ title: String, selected: Bool, id: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title).font(DS.Text.label)
-                .padding(.horizontal, 12).frame(minHeight: 36)
+                .padding(.horizontal, DS.Space.m).frame(minHeight: DS.Size.touchTarget)
                 .background(selected ? DS.Palette.accent : Color.clear, in: Capsule())
-                .foregroundStyle(selected ? .black : .primary)
+                .foregroundStyle(selected ? DS.Palette.onAccent : DS.Palette.textPrimary)
+                .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier(id)
@@ -344,10 +345,10 @@ struct TransportBar: View {
         let pos = live.position ?? model.cursor
         let duration = max(song.duration ?? song.sections.map(\.endTime).max() ?? 1, 1)
         let hasAudio = model.audioURL(for: song) != nil
-        VStack(spacing: 8) {
+        VStack(spacing: 0) {
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
-                    Capsule().fill(Color.white.opacity(0.12))
+                    Capsule().fill(DS.Palette.elevated)
                     Capsule().fill(DS.Palette.accent).frame(width: geo.size.width * min(1, max(0, pos / duration)))
                 }
                 .frame(height: 4)
@@ -357,7 +358,7 @@ struct TransportBar: View {
                     model.studioSeek(to: Double(max(0, min(1, v.location.x / max(1, geo.size.width)))) * duration)
                 })
             }
-            .frame(height: 16)
+            .frame(height: DS.Size.touchTarget)   // a 4 pt bar with a full-size touch area
             .accessibilityElement()
             .accessibilityLabel("Position")
             .accessibilityValue("\(pos.mmss) of \(duration.mmss)")
@@ -1012,8 +1013,10 @@ struct TonePickerSheet: View {
     let sectionId: UUID?
     @State private var search = ""
     @State private var family: InstrumentFamily?
+    @Environment(\.dynamicTypeSize) private var typeSize
 
-    private let columns = [GridItem(.adaptive(minimum: 96), spacing: DS.Space.m)]
+    /// Three tiles a row normally; two at accessibility text sizes so names aren't squeezed.
+    private var columns: [GridItem] { [GridItem(.adaptive(minimum: typeSize.isAccessibilitySize ? 150 : 96), spacing: DS.Space.m)] }
 
     var body: some View {
         let list = model.library.toneList(search: search)
@@ -1116,14 +1119,35 @@ struct TonePickerSheet: View {
     }
 
     private func useBar(_ previewing: Arrangement?, sectionLabel: String) -> some View {
-        HStack(spacing: DS.Space.m) {
-            VStack(alignment: .leading, spacing: DS.Space.xxs) {
-                Text(previewing == nil ? "Tap a sound to hear it" : "On your keys now")
-                    .font(DS.Text.metadata).foregroundStyle(DS.Palette.textSecondary)
-                Text(previewing?.name ?? "Nothing changes until you choose").font(DS.Text.label)
-                    .foregroundStyle(DS.Palette.textPrimary).lineLimit(1)
+        // Side by side when it fits; stacked at large text sizes (nothing truncated).
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: DS.Space.m) {
+                useStatus(previewing)
+                Spacer(minLength: DS.Space.s)
+                useButton(previewing, sectionLabel: sectionLabel).frame(maxWidth: 150)
             }
-            Spacer(minLength: DS.Space.s)
+            VStack(alignment: .leading, spacing: DS.Space.s) {
+                useStatus(previewing)
+                useButton(previewing, sectionLabel: sectionLabel)
+            }
+        }
+        .padding(.horizontal, DS.Space.screenMargin).padding(.vertical, DS.Space.m)
+        .background(.bar)
+    }
+
+    private func useStatus(_ previewing: Arrangement?) -> some View {
+        VStack(alignment: .leading, spacing: DS.Space.xxs) {
+            Text(previewing == nil ? "Tap a sound to hear it" : "On your keys now")
+                .font(previewing == nil ? DS.Text.label : DS.Text.metadata)
+                .foregroundStyle(previewing == nil ? DS.Palette.textPrimary : DS.Palette.textSecondary)
+            if let previewing {
+                Text(previewing.name).font(DS.Text.label).foregroundStyle(DS.Palette.textPrimary).lineLimit(2)
+            }
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func useButton(_ previewing: Arrangement?, sectionLabel: String) -> some View {
             Button("Use this") {
                 if let previewing {
                     if let sectionId { model.assignTone(previewing, songId: songId, sectionId: sectionId) }
@@ -1132,13 +1156,9 @@ struct TonePickerSheet: View {
                 dismiss()
             }
             .buttonStyle(.dsPrimary)
-            .frame(maxWidth: 150)
             .disabled(previewing == nil)
             .accessibilityHint("Uses it for \(sectionLabel)")
             .accessibilityIdentifier("sounds.use")
-        }
-        .padding(.horizontal, DS.Space.screenMargin).padding(.vertical, DS.Space.m)
-        .background(.bar)
     }
 }
 

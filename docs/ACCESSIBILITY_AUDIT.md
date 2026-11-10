@@ -43,3 +43,18 @@
 onAccent on accent: 10.1. `textTertiary` is below 4.5 : 1 for text and below 3 : 1 on `elevated`,
 so it is kept for placeholders and decorative icons only. Fixed: the Analysing "Waiting" step, the
 Arpeggio grid's rest dots and the first-run step counter now use `textSecondary`.
+
+## Automated audit on the built screens (10 Nov, Xcode `performAccessibilityAudit`)
+
+The screen tour (`ScreenTourUITests.audit`) now audits every main screen at default text (A) and at
+accessibility-large text (B). Run `after-7`: **240 issues**.
+
+| Issue type | Count | Main causes | Action |
+|---|---|---|---|
+| Dynamic Type partially unsupported | 82 | Navigation-bar titles and toolbar items (iOS caps their size by design); transport times; segmented labels shrunk by `minimumScaleFactor` | Segmented labels no longer shrink (the control scrolls instead). Navigation bars: system behaviour, accepted |
+| Contrast failed | 74 | Text sampled under the translucent transport, tab bar and Sound browser bar; disabled **Use this** (exempt); system list headers | Transport track uses `elevated`. Content under bars: accepted (it scrolls clear). The token table above passes |
+| Text clipped | 68 | Sound browser bar ("Nothing changes until…"); part names at large text ("Music & in…"); one-line labels in combined elements | Use bar stacks at large text and shows no truncated sentence; part names wrap to 2 lines; Sound browser uses 2 columns at accessibility sizes |
+| Hit area too small | 13 | Transport position bar (16 pt); tone mode options (36 pt); the **Edit** header action | All raised to 44 pt |
+| Label not human-readable | 2 | — | Review in the next run |
+
+The next tour (`after-7b`) re-runs the audit after these fixes.

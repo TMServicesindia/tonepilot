@@ -39,7 +39,8 @@ struct DSSectionHeader: View {
             if let action {
                 Button(action.title, action: action.run)
                     .font(DS.Text.label).foregroundStyle(DS.Palette.accent)
-                    .frame(minHeight: DS.Size.touchTarget)
+                    .frame(minWidth: DS.Size.touchTarget, minHeight: DS.Size.touchTarget)
+                    .contentShape(Rectangle())
                     .accessibilityIdentifier(action.id)
             }
         }
@@ -145,7 +146,7 @@ struct DSSegmentedControl<Item: Hashable & Identifiable>: View {
             VStack(spacing: DS.Space.xxs) {
                 if let symbol { Image(systemName: symbol(item)).font(DS.Text.label).imageScale(.medium) }
                 Text(title(item)).font(symbol == nil ? DS.Text.label : DS.Text.metadata.weight(.semibold))
-                    .lineLimit(1).minimumScaleFactor(0.85)
+                    .lineLimit(1)
             }
             .fixedSize(horizontal: !equal, vertical: false)
             .padding(.horizontal, equal ? DS.Space.xxs : DS.Space.s)
