@@ -62,3 +62,26 @@ The suggestion card comes first: hook → tone → why. Then:
 
 - Large transport.
 - Connection status is a quiet chip, amber when the keyboard is missing (not red); tapping it opens the guide.
+
+## Re-measured after the build (10 Nov 2026)
+
+Counted on the built screens: from the code paths, and through the stress test and screen tour,
+which drive each path on the simulator. Taps start from the screen named in "From"; "Files" is the
+system file picker.
+
+| # | Task | From | Path as built | Before | Now | Target |
+|---|---|---|---|---|---|---|
+| 1 | Import a song | Songs | **Import song** › Files › pick | 3 + Files | **1 + Files** | 2 + Files |
+| 2 | Analyse it | — | Automatic; the Analysing step list shows each step | 0 | **0** | 0 |
+| 3 | Find the main hook | Play | ★ on the Song Map (0), or **Tone** › "Suggested for the hook" (1) | 2 + 2 scrolls | **0–1** | 1 |
+| 4 | Review the tone | Play | **Tone**: card shows the tone, the hook and a one-line reason | 3 + 2 scrolls | **1** | 1 |
+| 5 | Preview an alternative | Play | **Tone** › **Change** › tap a tile (hear it on your keys) | 5 + 2 scrolls | **3** (2 on the Tone page) | 2 on the Tone page |
+| 6 | Edit a layer | Play | **Tone** › **Edit** › Level / Brightness / Reverb on the layer; Details for the rest | 5 + 3 scrolls | **2** (3 with Details) | 2–3 |
+| 7 | Return to playback | Tone editor | **Done** (transport always visible) | 1 | **1** | 1 |
+| 8 | Move between sections | Play | Tap the Song Map | 1 | **1** | 1 |
+| 9 | Correct a chord | Play | Tap the chord card › pick one of the two options › **Save** | 4–5 | **3** | 2 |
+| 10 | Play the song | Songs | Tap the song › play (lands on the Play page) | 2 | **2** | 2 |
+
+**Missed targets:**
+- **Journey 9** takes 3 taps against a target of 2. Save is kept as a confirmation step because the sheet also offers **Hear it** and **Also fix the repeats** before the change is committed.
+- **Journey 5**, until 10 Nov, opened the tone editor in whole-song mode. **Change** now opens the Sound browser in both modes.
