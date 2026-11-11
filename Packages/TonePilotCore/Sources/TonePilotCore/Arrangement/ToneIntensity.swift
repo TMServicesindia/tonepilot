@@ -29,11 +29,13 @@ public enum InstrumentEvidence {
                                   "piano", "organ", "plucked", "bells", "choir", "voice"]
 
     /// How much a label says about the family: broad labels the classifier gives to many sounds
-    /// ("keyboard (musical)" for synths and organs, "plucked string instrument" and plain "guitar"
-    /// for every guitar) count half, so the specific labels decide.
+    /// count half, so the specific labels decide. Plain "guitar" and the playing-technique labels
+    /// ("guitar_tapping", "guitar_strum") say a guitar plays, not which kind, so they count half too.
+    /// "bowed_string_instrument" names exactly the strings family, so it counts in full.
+    /// (Checked on the instrument check's pre-registered held-out set, 11 Nov.)
     public static func weight(forLabel label: String) -> Double {
         let l = label.lowercased()
-        let broad = ["keyboard", "plucked_string", "bowed_string", "musical_instrument", "wind_instrument"]
+        let broad = ["plucked_string", "musical_instrument", "wind_instrument", "guitar_tapping", "guitar_strum"]
         return l == "guitar" || broad.contains(where: { l.contains($0) }) ? 0.5 : 1
     }
 
@@ -42,6 +44,10 @@ public enum InstrumentEvidence {
         let l = label.lowercased()
         func has(_ words: String...) -> Bool { words.contains { l.contains($0) } }
         if has("bass_guitar", "bass_drum") { return nil }   // the bass part, not a lead instrument
+        // "keyboard (musical)" is given to organs, synths, brass, strings and guitars alike: no family.
+        if l == "keyboard_musical" || l == "keyboard" { return nil }
+        // Organs before synths: "electronic_organ" is an organ, not electronic music.
+        if has("organ", "harmonium") { return "organ" }
         if has("trumpet", "trombone", "french_horn", "tuba", "brass", "bugle", "cornet") { return "brass" }
         if has("violin", "fiddle", "cello", "viola", "double_bass", "bowed", "orchestra", "string_section") { return "strings" }
         if has("flute", "piccolo", "recorder", "pan_pipe", "panpipe") { return "flute" }
@@ -49,8 +55,7 @@ public enum InstrumentEvidence {
         if has("synthesizer", "theremin", "electronic_music", "techno", "electronic") { return "synth" }
         if has("electric_guitar", "distortion", "power_chord", "rock_music") { return "electricGuitar" }
         if has("acoustic_guitar", "guitar", "ukulele", "banjo") { return "acousticGuitar" }
-        if has("piano", "keyboard", "harpsichord") { return "piano" }
-        if has("organ", "harmonium") { return "organ" }
+        if has("piano", "harpsichord") { return "piano" }
         if has("sitar", "veena", "mandolin", "harp", "zither", "koto", "dulcimer", "santoor", "sarod", "plucked") { return "plucked" }
         if has("bell", "chime", "glockenspiel", "celesta", "marimba", "xylophone", "vibraphone", "music_box") { return "bells" }
         if has("choir", "chant", "a_capella") { return "choir" }
