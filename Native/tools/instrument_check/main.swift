@@ -4,6 +4,7 @@
 // Usage: instrument_check <GeneralUser-GS.sf2>
 import AVFoundation
 import Foundation
+import SoundAnalysis
 
 struct Case { let program: UInt8; let name: String; let expected: Set<String>; let low: Int }
 let cases: [Case] = [
@@ -26,6 +27,26 @@ let cases: [Case] = [
     .init(program: 46, name: "Harp", expected: ["plucked"], low: 60),
     .init(program: 14, name: "Tubular bells", expected: ["bells"], low: 67),
     .init(program: 52, name: "Choir", expected: ["choir", "voice"], low: 60),
+]
+
+/// HELD-OUT set (pre-registered 11 Nov, before any mapping change): other GM programs of the same
+/// families, never used to choose a fix. A change is kept only if it doesn't lower this score.
+let heldOut: [Case] = [
+    .init(program: 60, name: "French horn", expected: ["brass"], low: 50),
+    .init(program: 58, name: "Tuba", expected: ["brass"], low: 36),
+    .init(program: 42, name: "Cello", expected: ["strings"], low: 48),
+    .init(program: 49, name: "Slow strings", expected: ["strings"], low: 55),
+    .init(program: 68, name: "Oboe", expected: ["reed"], low: 64),
+    .init(program: 79, name: "Ocarina", expected: ["flute"], low: 67),
+    .init(program: 18, name: "Rock organ", expected: ["organ"], low: 55),
+    .init(program: 16, name: "Drawbar organ", expected: ["organ"], low: 55),
+    .init(program: 29, name: "Overdriven guitar", expected: ["electricGuitar"], low: 52),
+    .init(program: 26, name: "Jazz guitar", expected: ["electricGuitar", "acousticGuitar"], low: 52),
+    .init(program: 25, name: "Steel guitar", expected: ["acousticGuitar"], low: 55),
+    .init(program: 1, name: "Bright piano", expected: ["piano"], low: 60),
+    .init(program: 80, name: "Square lead", expected: ["synth"], low: 60),
+    .init(program: 105, name: "Banjo", expected: ["acousticGuitar", "plucked"], low: 60),
+    .init(program: 11, name: "Vibraphone", expected: ["bells"], low: 60),
 ]
 
 guard CommandLine.arguments.count > 1 else { print("usage: instrument_check <sf2>"); exit(2) }
@@ -68,26 +89,52 @@ func render(_ c: Case) throws -> URL {
     return url
 }
 
-var hits = 0
-var classifySeconds = 0.0
-for c in cases {
-    do {
-        let url = try render(c)
-        let section = SongSection(type: .verse, startTime: 0, endTime: 8)
-        let started = Date()
-        let heard = InstrumentRecognizer.recognize(files: [url], sections: [section])[section.id] ?? [:]
-        classifySeconds += Date().timeIntervalSince(started)
-        let ranked = heard.filter { $0.key != "voice" || c.expected.contains("voice") }.sorted { $0.value > $1.value }
-        let top = ranked.first
-        let ok = top.map { c.expected.contains($0.key) } ?? false
-        if ok { hits += 1 }
-        let list = ranked.prefix(3).map { "\($0.key) \(Int($0.value * 100))%" }.joined(separator: ", ")
-        print("\(ok ? "OK  " : "MISS") \(c.name): \(list.isEmpty ? "nothing recognised" : list)")
-    } catch {
-        print("ERROR \(c.name): \(error)")
+/// Apple's raw labels for one clip (top 6 by mean confidence), to see what the mapping receives.
+func rawLabels(_ url: URL) -> String {
+    final class Collect: NSObject, SNResultsObserving {
+        var sums: [String: Double] = [:]; var n = 0
+        func request(_ request: SNRequest, didProduce result: SNResult) {
+            guard let r = result as? SNClassificationResult else { return }
+            n += 1
+            for c in r.classifications where c.confidence > 0.02 { sums[c.identifier, default: 0] += c.confidence }
+        }
     }
+    guard let analyzer = try? SNAudioFileAnalyzer(url: url), let request = try? SNClassifySoundRequest(classifierIdentifier: .version1) else { return "-" }
+    request.overlapFactor = 0.25
+    let c = Collect()
+    guard (try? analyzer.add(request, withObserver: c)) != nil else { return "-" }
+    analyzer.analyze()
+    let n = Double(max(1, c.n))
+    return c.sums.sorted { $0.value > $1.value }.prefix(6).map { "\($0.key) \(Int(($0.value / n) * 100))%" }.joined(separator: ", ")
 }
+
+var classifySeconds = 0.0
+func run(_ set: [Case], tag: String) -> Int {
+    var hits = 0
+    for c in set {
+        do {
+            let url = try render(c)
+            let section = SongSection(type: .verse, startTime: 0, endTime: 8)
+            let started = Date()
+            let heard = InstrumentRecognizer.recognize(files: [url], sections: [section])[section.id] ?? [:]
+            classifySeconds += Date().timeIntervalSince(started)
+            let ranked = heard.filter { $0.key != "voice" || c.expected.contains("voice") }.sorted { $0.value > $1.value }
+            let ok = ranked.first.map { c.expected.contains($0.key) } ?? false
+            if ok { hits += 1 }
+            let list = ranked.prefix(3).map { "\($0.key) \(Int($0.value * 100))%" }.joined(separator: ", ")
+            print("\(ok ? "OK  " : "MISS") \(tag)\(c.name): \(list.isEmpty ? "nothing recognised" : list)")
+            print("LABELS \(tag)\(c.name): \(rawLabels(url))")
+        } catch {
+            print("ERROR \(c.name): \(error)")
+        }
+    }
+    return hits
+}
+
+let hits = run(cases, tag: "")
+let heldHits = run(heldOut, tag: "[held-out] ")
 let accuracy = Double(hits) / Double(cases.count)
 print("RESULT Instrument recognition: \(hits)/\(cases.count) instruments right (\(Int((accuracy * 100).rounded()))%)")
+print("RESULT Held-out instruments: \(heldHits)/\(heldOut.count) right (\(Int((Double(heldHits) / Double(heldOut.count) * 100).rounded()))%)")
 print(String(format: "RESULT Recognition speed: %.1f%% of real time (%.2f s for %.0f s of audio)",
-             100 * classifySeconds / (8 * Double(cases.count)), classifySeconds, 8 * Double(cases.count)))
+             100 * classifySeconds / (8 * Double(cases.count + heldOut.count)), classifySeconds, 8 * Double(cases.count + heldOut.count)))

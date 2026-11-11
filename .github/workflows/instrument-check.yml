@@ -1,0 +1,34 @@
+# Quick instrument-recognition check (the same tool as the full build's step), on its own so mapping
+# changes can be measured in minutes. Prints the 19-instrument DEV score, the pre-registered held-out
+# score and Apple's raw labels per clip. A measurement only; it publishes nothing.
+name: Instrument recognition check
+on:
+  workflow_dispatch:
+    inputs:
+      runner: { description: "macOS runner", required: false, default: macos-15 }
+permissions: { contents: read }
+jobs:
+  check:
+    runs-on: ${{ inputs.runner }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | tail -1)"
+      - name: SoundFont
+        run: |
+          mkdir -p App/Resources/SoundFonts
+          curl -fsSL -o App/Resources/SoundFonts/GeneralUser-GS.sf2 https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/main/GeneralUser-GS.sf2
+      - name: Check
+        run: |
+          set -uo pipefail
+          mkdir -p build-instruments && cd build-instruments
+          sed '/^import TonePilotCore$/d' ../App/Sources/Audio/InstrumentRecognizer.swift > InstrumentRecognizer.swift
+          swiftc -O -target "$(uname -m)-apple-macos14" $(find ../Packages/TonePilotCore/Sources/TonePilotCore -name '*.swift') \
+            InstrumentRecognizer.swift ../Native/tools/instrument_check/main.swift -o instrument_check > compile.log 2>&1 \
+            || { grep -E "error:" compile.log | sort -u | head -10; exit 1; }
+          ./instrument_check ../App/Resources/SoundFonts/GeneralUser-GS.sf2 | tee instruments.log
+          grep -E "^RESULT" instruments.log | while IFS= read -r l; do echo "::notice title=Instrument recognition::$l"; done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: instruments, path: build-instruments/instruments.log, if-no-files-found: ignore }
