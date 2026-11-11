@@ -44,7 +44,21 @@ This answers "which of *our* tones sounds closest", **not** "which instrument is
 | Number | What it measures | Method | Caveat |
 |---|---|---|---|
 | Lead 4/12 exact, 7/12 family; backing 2/12, 5/12 | **Tone matching** (1b), not recognition | `ToneMatchingBenchmarks`: 12 songs rendered from GeneralUser GS (General MIDI sounds); is the matched tone the rendering instrument? | Synthetic, Western GM sounds, 12 cases. **Not real film music** |
-| 14/19 (73.7%) | **Recognition** (1a), family level | `Native/tools/instrument_check`: one clean phrase per GeneralUser GS instrument through Apple's classifier, in the iPhone build | Single clean instruments, no mix, no reverb, no Indian instruments. **Not real film music** |
+| 16/19 (84%), was 14/19 | **Recognition** (1a), family level | `Native/tools/instrument_check`: one clean phrase per GeneralUser GS instrument through Apple's classifier, in the iPhone build | Single clean instruments, no mix, no reverb, no Indian instruments. **Not real film music** |
+| 8/15 (53%) held-out, was 6/15 | Same, on 15 other GM instruments | Pre-registered 11 Nov before any change; never used to choose a fix | Same caveats; shows the 19-instrument score overstates general accuracy |
+
+**Label-mapping fixes (11 Nov), chosen from Apple's raw labels, kept because neither set lost a case:**
+- organ labels before synth ("electronic_organ" was counted as synth);
+- no family for the generic "keyboard (musical)" label (given to organs, synths, brass, strings and guitars);
+- guitar technique labels ("guitar_tapping", "guitar_strum") at half weight, like plain "guitar";
+- "bowed_string_instrument" at full weight (it names the strings family).
+
+**Left (classifier errors, not mapping):**
+- trombone heard as bassoon (91%);
+- steel, jazz and clean electric guitars heard as keyboard, harpsichord or piano;
+- French horn, tuba and GM strings get a strong "synthesizer" label, probably because GM SoundFont playback sounds synthetic to the classifier.
+
+These need real recordings (owner action 0.3/0.4) or the EfficientAT head (stage 1, option C) as a second opinion. Run-to-run noise is a few points per clip; the distortion guitar margin is narrow (43% vs 41%).
 
 **There is no measurement of either system on real Tamil, Telugu or Hindi film music.**
 
