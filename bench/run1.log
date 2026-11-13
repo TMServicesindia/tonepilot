@@ -1,0 +1,248 @@
+warning: 'tonepilotcore': found 22 file(s) which are unhandled; explicitly declare them as resources or exclude from the target
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/inference/basic_pitch/note.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/instruments/efficientat/mel_harmonic_mask.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/rhythm/beat_this/beat.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/inference/basic_pitch/contour.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/instruments/efficientat/mel_harmonic_mask.json
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/inference/basic_pitch/audio.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/pipeline/stems-ios.json
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/rhythm/beat_this/report.json
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/instruments/efficientat/mel.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/instruments/efficientat/ref_embedding.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/pipeline/mix-only.json
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/instruments/efficientat/audio.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/rhythm/beat_this/reference.json
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/instruments/efficientat/meta.json
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/instruments/efficientat/ref_probs.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/pipeline/listened.json
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/inference/basic_pitch/onset.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/rhythm/beat_this/audio.s16
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/inference/basic_pitch/descriptor.json
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/rhythm/beat_this/mel.f32
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/inference/basic_pitch/report.json
+    /__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Fixtures/rhythm/beat_this/downbeat.f32
+Building for production...
+[0/12] Write sources
+[3/12] Write swift-version-24593BA9C3E375BF.txt
+[5/13] Compiling TonePilotCore AccompanimentClassifier.swift
+[6/14] Compiling TonePilotBridge AppCore.swift
+[6/14] Write Objects.LinkFileList
+[7/15] Linking libTonePilotBridge.so
+[9/15] Compiling TonePilotCoreTests AccompanimentClassifierTests.swift
+/__w/tonepilot/tonepilot/Packages/TonePilotCore/Tests/TonePilotCoreTests/Benchmarks/AccompanimentBenchmarks.swift:116:46: warning: left side of nil coalescing operator '??' has non-optional type 'String', so the right side is never used
+114 |             let v = AccompanimentClassifier.classify(ctx, beats: beats, chords: chords, section: s)
+115 |             let ev = v.evidence.sorted { $0.key < $1.key }.map { String(format: "%@ %.2f", $0.key, $0.value) }.joined(separator: ", ")
+116 |             print("ACCOMP-EVIDENCE \(s.label ?? "?"): \(v.kind.rawValue) conf \(String(format: "%.2f", v.confidence)) · \(ev)")
+    |                                              `- warning: left side of nil coalescing operator '??' has non-optional type 'String', so the right side is never used
+117 |         }
+118 |         return ArpeggioLearner.learnGated(.init(music: music, beats: beats, beatsPerBar: 4, chords: chords, sections: sections))?.patterns ?? [:]
+[9/15] /__w/tonepilot/tonepilot/Packages/TonePilotCore/.build/x86_64-unknown-linux-gnu/release/TonePilotCorePackageDiscoveredTests.derived/all-discovered-tests.swift
+[10/15] Write sources
+[12/16] Compiling TonePilotCorePackageDiscoveredTests TonePilotCoreTests.swift
+[12/16] /__w/tonepilot/tonepilot/Packages/TonePilotCore/.build/x86_64-unknown-linux-gnu/release/TonePilotCorePackageTests.derived/runner.swift
+[13/16] Write sources
+[15/17] Compiling TonePilotCorePackageTests runner.swift
+[15/17] Write Objects.LinkFileList
+[16/17] Linking TonePilotCorePackageTests.xctest
+Build complete! (140.49s)
+Test Suite 'Selected tests' started at 2026-11-13 21:57:34.790
+Test Suite 'AnalysisBaselineBenchmarks' started at 2026-11-13 21:57:34.792
+Test Case 'AnalysisBaselineBenchmarks.testArpeggioLearning' started at 2026-11-13 21:57:34.792
+AUDIT ARP 16ths R5 8 3: steps F 1.00, degrees 8/8 right, grid 4/beat (truth 4), learned Root · 5th · Octave · 3rd · Root · 5th · Octave · High 3rd
+AUDIT ARP 8ths guitar: steps F 1.00, degrees 8/8 right, grid 4/beat (truth 2), learned Root · 5th · Octave · 5th · 3rd · 5th · Octave · 5th
+AUDIT ARP tisra 6/8: steps F 1.00, degrees 6/6 right, grid 3/beat (truth 3), learned Root · 5th · Octave · High 3rd · Octave · 5th
+AUDIT ARP 3/4 waltz: steps F 1.00, degrees 4/4 right, grid 4/beat (truth 2), learned Root · 5th · Octave · 3rd
+AUDIT ARP syncopated 3-3-2: steps F 1.00, degrees 3/3 right, grid 4/beat (truth 2), learned Root · 5th · Octave
+AUDIT RESULT arpeggio: step F 1.00, chord-degree accuracy 100%, grid right 2/5
+Test Case 'AnalysisBaselineBenchmarks.testArpeggioLearning' passed (3.966 seconds)
+Test Case 'AnalysisBaselineBenchmarks.testChordRecognition' started at 2026-11-13 21:57:38.758
+AUDIT CHORDS triads piano: 16/16 bars exact, 16/16 right root; key MusicalKey(tonic: 0, mode: TonePilotCore.MusicalKey.Mode.major)
+AUDIT CHORDS triads strings+drums: 16/16 bars exact, 16/16 right root; key MusicalKey(tonic: 0, mode: TonePilotCore.MusicalKey.Mode.major)
+AUDIT CHORDS minor key guitar: 4/16 bars exact, 4/16 right root; key MusicalKey(tonic: 0, mode: TonePilotCore.MusicalKey.Mode.major)
+AUDIT CHORDS sevenths EP: 12/16 bars exact, 12/16 right root; key MusicalKey(tonic: 5, mode: TonePilotCore.MusicalKey.Mode.major)
+AUDIT CHORDS inversions piano: 12/16 bars exact, 12/16 right root; key MusicalKey(tonic: 0, mode: TonePilotCore.MusicalKey.Mode.major)
+AUDIT CHORDS minor key organ+drums: 7/16 bars exact, 15/16 right root; key MusicalKey(tonic: 7, mode: TonePilotCore.MusicalKey.Mode.major)
+AUDIT RESULT chords: 70% exact (root+major/minor), 78% right root
+Test Case 'AnalysisBaselineBenchmarks.testChordRecognition' passed (4.238 seconds)
+Test Case 'AnalysisBaselineBenchmarks.testSectionBoundaries' started at 2026-11-13 21:57:42.996
+AUDIT SECTIONS truth: ["19.7", "38.9", "58.1", "77.3"] found: ["19.7", "38.9", "58.1", "77.3"] labels: ["Instrumental intro", "Interlude 1", "Interlude 2", "Interlude 3", "Outro"]
+AUDIT RESULT sections: boundary F (±2 beats) 1.00; repeats grouped A/B/A/B/C → ABABA
+Test Case 'AnalysisBaselineBenchmarks.testSectionBoundaries' passed (3.771 seconds)
+Test Case 'AnalysisBaselineBenchmarks.testTempoBeatsMeter' started at 2026-11-13 21:57:46.767
+AUDIT TEMPO  72 bpm 4/4 no drums: est 143.7 octave beatF 0.65 meter 4 (truth 4)
+AUDIT TEMPO  72 bpm 4/4 drums: est 71.9 ✓ beatF 0.97 meter 4 (truth 4)
+AUDIT TEMPO  72 bpm 3/4 no drums: est 143.7 octave beatF 0.65 meter 4 (truth 3)
+AUDIT TEMPO  72 bpm 3/4 drums: est 72.0 ✓ beatF 0.97 meter 4 (truth 3)
+AUDIT TEMPO  72 bpm 6/8 no drums: est 107.9 octave beatF 0.40 meter 4 (truth 2)
+AUDIT TEMPO  72 bpm 6/8 drums: est 72.0 ✓ beatF 0.97 meter 4 (truth 2)
+AUDIT TEMPO  96 bpm 4/4 no drums: est 95.9 ✓ beatF 0.98 meter 4 (truth 4)
+AUDIT TEMPO  96 bpm 4/4 drums: est 95.9 ✓ beatF 0.98 meter 4 (truth 4)
+AUDIT TEMPO  96 bpm 3/4 no drums: est 95.9 ✓ beatF 0.06 meter 4 (truth 3)
+AUDIT TEMPO  96 bpm 3/4 drums: est 96.1 ✓ beatF 0.98 meter 4 (truth 3)
+AUDIT TEMPO  96 bpm 6/8 no drums: est 143.7 octave beatF 0.39 meter 4 (truth 2)
+AUDIT TEMPO  96 bpm 6/8 drums: est 96.0 ✓ beatF 0.98 meter 4 (truth 2)
+AUDIT TEMPO 128 bpm 4/4 no drums: est 128.8 ✓ beatF 0.98 meter 4 (truth 4)
+AUDIT TEMPO 128 bpm 4/4 drums: est 128.6 ✓ beatF 0.98 meter 4 (truth 4)
+AUDIT TEMPO 128 bpm 3/4 no drums: est 128.8 ✓ beatF 0.98 meter 4 (truth 3)
+AUDIT TEMPO 128 bpm 3/4 drums: est 128.8 ✓ beatF 0.98 meter 3 (truth 3)
+AUDIT TEMPO 128 bpm 6/8 no drums: est 128.8 ✓ beatF 0.08 meter 4 (truth 2)
+AUDIT TEMPO 128 bpm 6/8 drums: est 64.2 octave beatF 0.65 meter 4 (truth 2)
+AUDIT TEMPO 150 bpm 4/4 no drums: est 151.1 ✓ beatF 0.98 meter 4 (truth 4)
+AUDIT TEMPO 150 bpm 4/4 drums: est 150.9 ✓ beatF 0.98 meter 4 (truth 4)
+AUDIT TEMPO 150 bpm 3/4 no drums: est 151.1 ✓ beatF 0.04 meter 4 (truth 3)
+AUDIT TEMPO 150 bpm 3/4 drums: est 151.2 ✓ beatF 0.98 meter 3 (truth 3)
+AUDIT TEMPO 150 bpm 6/8 no drums: est 151.2 ✓ beatF 0.03 meter 4 (truth 2)
+AUDIT TEMPO 150 bpm 6/8 drums: est 75.2 octave beatF 0.65 meter 4 (truth 2)
+AUDIT RESULT tempo: 18/24 exact, 6 octave/metrical errors; beat F 0.72 (no drums 0.52, drums 0.92); meter 10/24
+Test Case 'AnalysisBaselineBenchmarks.testTempoBeatsMeter' passed (22.232 seconds)
+Test Suite 'AnalysisBaselineBenchmarks' passed at 2026-11-13 21:58:08.999
+	 Executed 4 tests, with 0 failures (0 unexpected) in 34.208 (34.208) seconds
+Test Suite 'HarmonyBenchmarks' started at 2026-11-13 21:58:08.999
+Test Case 'HarmonyBenchmarks.testCurrentAnalyzer' started at 2026-11-13 21:58:08.999
+HARMONY in-sample current triads piano: 47/47 beats
+HARMONY in-sample current triads strings+drums: 47/47 beats
+HARMONY in-sample current minor A guitar: 35/47 beats
+HARMONY in-sample current minor C strings+drums: 12/47 beats
+HARMONY in-sample current sevenths EP+drums: 29/47 beats
+HARMONY in-sample current inversions piano: 47/47 beats
+HARMONY in-sample current pedal bass strings: 47/47 beats
+HARMONY in-sample current half-bar changes piano+drums: 11/47 beats
+HARMONY in-sample current drone + flute melody: 0/59 beats
+HARMONY RESULT in-sample · current analyzer: beat accuracy 73% (target ≥ 85%); minor keys 50% (≥ 75%); half-bar 23%; drone labelled drone 0% (≥ 90%); truth in alternatives 82% (≥ 95%)
+HARMONY in-sample hypotheses triads piano: 44/47 beats
+HARMONY in-sample hypotheses triads strings+drums: 47/47 beats
+HARMONY in-sample hypotheses minor A guitar: 47/47 beats
+HARMONY in-sample hypotheses minor C strings+drums: 36/47 beats
+HARMONY in-sample hypotheses sevenths EP+drums: 30/47 beats
+HARMONY in-sample hypotheses inversions piano: 42/47 beats
+HARMONY in-sample hypotheses pedal bass strings: 47/47 beats
+HARMONY in-sample hypotheses half-bar changes piano+drums: 47/47 beats
+HARMONY in-sample hypotheses drone + flute melody: 59/59 beats
+HARMONY RESULT in-sample · hypotheses on mix: beat accuracy 90% (target ≥ 85%); minor keys 88% (≥ 75%); half-bar 100%; drone labelled drone 100% (≥ 90%); truth in alternatives 97% (≥ 95%)
+HARMONY in-sample stem triads piano: 44/47 beats
+HARMONY in-sample stem triads strings+drums: 47/47 beats
+HARMONY in-sample stem minor A guitar: 47/47 beats
+HARMONY in-sample stem minor C strings+drums: 47/47 beats
+HARMONY in-sample stem sevenths EP+drums: 29/47 beats
+HARMONY in-sample stem inversions piano: 42/47 beats
+HARMONY in-sample stem pedal bass strings: 47/47 beats
+HARMONY in-sample stem half-bar changes piano+drums: 47/47 beats
+HARMONY in-sample stem drone + flute melody: 59/59 beats
+HARMONY RESULT in-sample · hypotheses on accompaniment stem: beat accuracy 93% (target ≥ 85%); minor keys 100% (≥ 75%); half-bar 100%; drone labelled drone 100% (≥ 90%); truth in alternatives 98% (≥ 95%)
+HARMONY held-out 1 (128 BPM, other instruments) current triads piano: 47/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) current triads strings+drums: 21/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) current minor A guitar: 41/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) current minor C strings+drums: 11/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) current sevenths EP+drums: 12/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) current inversions piano: 32/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) current pedal bass strings: 44/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) current half-bar changes piano+drums: 14/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) current drone + flute melody: 0/59 beats
+HARMONY RESULT held-out 1 (128 BPM, other instruments) · current analyzer: beat accuracy 59% (target ≥ 85%); minor keys 55% (≥ 75%); half-bar 30%; drone labelled drone 0% (≥ 90%); truth in alternatives 76% (≥ 95%)
+HARMONY held-out 1 (128 BPM, other instruments) hypotheses triads piano: 47/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) hypotheses triads strings+drums: 42/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) hypotheses minor A guitar: 47/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) hypotheses minor C strings+drums: 33/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) hypotheses sevenths EP+drums: 32/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) hypotheses inversions piano: 39/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) hypotheses pedal bass strings: 42/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) hypotheses half-bar changes piano+drums: 47/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) hypotheses drone + flute melody: 59/59 beats
+HARMONY RESULT held-out 1 (128 BPM, other instruments) · hypotheses on mix: beat accuracy 88% (target ≥ 85%); minor keys 85% (≥ 75%); half-bar 100%; drone labelled drone 100% (≥ 90%); truth in alternatives 98% (≥ 95%)
+HARMONY held-out 1 (128 BPM, other instruments) stem triads piano: 47/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) stem triads strings+drums: 42/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) stem minor A guitar: 47/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) stem minor C strings+drums: 39/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) stem sevenths EP+drums: 29/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) stem inversions piano: 39/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) stem pedal bass strings: 42/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) stem half-bar changes piano+drums: 47/47 beats
+HARMONY held-out 1 (128 BPM, other instruments) stem drone + flute melody: 59/59 beats
+HARMONY RESULT held-out 1 (128 BPM, other instruments) · hypotheses on accompaniment stem: beat accuracy 88% (target ≥ 85%); minor keys 91% (≥ 75%); half-bar 100%; drone labelled drone 100% (≥ 90%); truth in alternatives 100% (≥ 95%)
+HARMONY held-out 2 (84 BPM, other instruments) current triads piano: 47/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) current triads strings+drums: 30/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) current minor A guitar: 35/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) current minor C strings+drums: 12/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) current sevenths EP+drums: 23/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) current inversions piano: 43/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) current pedal bass strings: 47/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) current half-bar changes piano+drums: 11/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) current drone + flute melody: 0/59 beats
+HARMONY RESULT held-out 2 (84 BPM, other instruments) · current analyzer: beat accuracy 66% (target ≥ 85%); minor keys 50% (≥ 75%); half-bar 23%; drone labelled drone 0% (≥ 90%); truth in alternatives 77% (≥ 95%)
+HARMONY held-out 2 (84 BPM, other instruments) hypotheses triads piano: 46/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) hypotheses triads strings+drums: 41/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) hypotheses minor A guitar: 47/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) hypotheses minor C strings+drums: 25/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) hypotheses sevenths EP+drums: 29/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) hypotheses inversions piano: 39/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) hypotheses pedal bass strings: 27/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) hypotheses half-bar changes piano+drums: 47/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) hypotheses drone + flute melody: 27/59 beats
+HARMONY RESULT held-out 2 (84 BPM, other instruments) · hypotheses on mix: beat accuracy 80% (target ≥ 85%); minor keys 77% (≥ 75%); half-bar 100%; drone labelled drone 46% (≥ 90%); truth in alternatives 91% (≥ 95%)
+HARMONY held-out 2 (84 BPM, other instruments) stem triads piano: 46/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) stem triads strings+drums: 45/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) stem minor A guitar: 47/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) stem minor C strings+drums: 47/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) stem sevenths EP+drums: 26/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) stem inversions piano: 39/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) stem pedal bass strings: 27/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) stem half-bar changes piano+drums: 47/47 beats
+HARMONY held-out 2 (84 BPM, other instruments) stem drone + flute melody: 58/59 beats
+HARMONY RESULT held-out 2 (84 BPM, other instruments) · hypotheses on accompaniment stem: beat accuracy 86% (target ≥ 85%); minor keys 100% (≥ 75%); half-bar 100%; drone labelled drone 98% (≥ 90%); truth in alternatives 96% (≥ 95%)
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) current triads piano: 32/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) current triads strings+drums: 35/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) current minor A guitar: 15/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) current minor C strings+drums: 9/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) current sevenths EP+drums: 2/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) current inversions piano: 12/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) current pedal bass strings: 38/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) current half-bar changes piano+drums: 29/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) current drone + flute melody: 0/59 beats
+HARMONY RESULT held-out 3 (110 BPM, +3 semitones, other instruments; untouched) · current analyzer: beat accuracy 46% (target ≥ 85%); minor keys 26% (≥ 75%); half-bar 62%; drone labelled drone 0% (≥ 90%); truth in alternatives 50% (≥ 95%)
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) hypotheses triads piano: 47/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) hypotheses triads strings+drums: 47/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) hypotheses minor A guitar: 47/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) hypotheses minor C strings+drums: 39/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) hypotheses sevenths EP+drums: 38/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) hypotheses inversions piano: 15/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) hypotheses pedal bass strings: 23/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) hypotheses half-bar changes piano+drums: 47/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) hypotheses drone + flute melody: 0/59 beats
+HARMONY RESULT held-out 3 (110 BPM, +3 semitones, other instruments; untouched) · hypotheses on mix: beat accuracy 81% (target ≥ 85%); minor keys 91% (≥ 75%); half-bar 100%; drone labelled drone 0% (≥ 90%); truth in alternatives 91% (≥ 95%)
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) stem triads piano: 47/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) stem triads strings+drums: 47/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) stem minor A guitar: 47/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) stem minor C strings+drums: 47/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) stem sevenths EP+drums: 38/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) stem inversions piano: 15/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) stem pedal bass strings: 23/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) stem half-bar changes piano+drums: 47/47 beats
+HARMONY held-out 3 (110 BPM, +3 semitones, other instruments; untouched) stem drone + flute melody: 59/59 beats
+HARMONY RESULT held-out 3 (110 BPM, +3 semitones, other instruments; untouched) · hypotheses on accompaniment stem: beat accuracy 83% (target ≥ 85%); minor keys 100% (≥ 75%); half-bar 100%; drone labelled drone 100% (≥ 90%); truth in alternatives 94% (≥ 95%)
+HARMONY time for all runs: 106.9 s
+Test Case 'HarmonyBenchmarks.testCurrentAnalyzer' passed (106.87 seconds)
+Test Suite 'HarmonyBenchmarks' passed at 2026-11-13 21:59:55.869
+	 Executed 1 test, with 0 failures (0 unexpected) in 106.87 (106.87) seconds
+Test Suite 'ToneMatchingBenchmarks' started at 2026-11-13 21:59:55.869
+Test Case 'ToneMatchingBenchmarks.testToneMatchingOnRenderedSongs' started at 2026-11-13 21:59:55.869
+BENCH Flute [Flute]: lead → Melodic Accordion 71% ✗ | backing [Orchestral Strings] → Cinematic Low Strings 82% ✓
+BENCH Violin [Violin]: lead → Sarangi-like Folk Fiddle 65% ~ | backing [Warm Pad] → 90s Film Strings 72% ✗
+BENCH Shehnai [Shehnai]: lead → Nadaswaram-like Lead 93% ✓ | backing [Orchestral Strings] → Classic Synth Brass 80% ✗
+BENCH Trumpet [Trumpet]: lead → Nadaswaram-like Lead 72% ✗ | backing [Slow Strings] → Cinematic Low Strings 84% ~
+BENCH Alto sax [Alto Sax]: lead → Melody Sax 97% ✓ | backing [Electric Piano] → Melody Sax 66% ✗
+BENCH Sitar [Sitar]: lead → Nadaswaram-like Lead 69% ~ | backing [Warm Pad] → Mass Brass Hits 60% ✗
+BENCH Saw lead [Saw Lead]: lead → Supersaw Lead 90% ~ | backing [Synth Strings] → EDM Supersaw Chords 63% ~
+BENCH Nylon guitar [Nylon Guitar]: lead → Breathy Shakuhachi Lead 68% ✗ | backing [Orchestral Strings] → Wide Synth Pad 84% ✗
+BENCH Piano [Grand Piano]: lead → Retro 80s Lead 65% ✗ | backing [Slow Strings] → Cinematic Low Strings 82% ~
+BENCH Accordion [Accordion]: lead → Melodic Accordion 87% ✓ | backing [Orchestral Strings] → Cinematic Low Strings 83% ✓
+BENCH Clarinet [Clarinet]: lead → 90s Pan Flute Lead 80% ✗ | backing [Warm Pad] → 90s Film Strings 75% ✗
+BENCH Pan flute [Pan Flute]: lead → 90s Pan Flute Lead 76% ✓ | backing [Orchestral Strings] → Classic Synth Brass 79% ✗
+BENCH RESULT [same bank] lead: 4/12 exact sound, 7/12 right family; backing: 2/12 exact, 5/12 family · 123 s
+Test Case 'ToneMatchingBenchmarks.testToneMatchingOnRenderedSongs' passed (123.147 seconds)
+Test Suite 'ToneMatchingBenchmarks' passed at 2026-11-13 22:01:59.017
+	 Executed 1 test, with 0 failures (0 unexpected) in 123.147 (123.147) seconds
+Test Suite 'Selected tests' passed at 2026-11-13 22:01:59.017
+	 Executed 6 tests, with 0 failures (0 unexpected) in 264.225 (264.225) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.0.3 (18c42c19cac3faf)
+✔ Test run with 0 tests passed after 0.001 seconds.
